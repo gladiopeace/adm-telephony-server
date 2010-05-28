@@ -10,7 +10,7 @@ public class AdmThreadExecutor {
 	ThreadPoolExecutor executor;
 
 	private AdmThreadExecutor() {
-		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);//TODO read form config file
+		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(AdmTelephonyServer.getInstance().getDefinition().getMaxThreads());
 	}
 
 	public static AdmThreadExecutor getInstance() {

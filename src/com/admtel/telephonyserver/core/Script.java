@@ -1,6 +1,7 @@
 package com.admtel.telephonyserver.core;
 
 import java.util.ArrayList;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +14,10 @@ import com.admtel.telephonyserver.events.InboundAlertingEvent;
 import com.admtel.telephonyserver.events.OutboundAlertingEvent;
 import com.admtel.telephonyserver.interfaces.EventListener;
 
-public abstract class Script implements EventListener {
+import com.admtel.telephonyserver.interfaces.Authorizer;
+import com.admtel.telephonyserver.radius.AuthorizeResult;
+
+public abstract class Script implements EventListener, Authorizer {
 
 	static Logger log = Logger.getLogger(Script.class);
 
@@ -99,6 +103,12 @@ public abstract class Script implements EventListener {
 		return true;
 	}
 
+	@Override
+	public AuthorizeResult authorize(String username,
+			String password, String address, String callingStationId,
+			String calledStationId, boolean routing, boolean number) {
+		return RadiusServers.getInstance().authorize(username, password, address, callingStationId, calledStationId, routing, number);
+	}
 	public abstract String getDisplayStr();
 
 	protected abstract void processEvent(Event event);

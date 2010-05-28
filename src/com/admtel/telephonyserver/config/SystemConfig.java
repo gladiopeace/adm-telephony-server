@@ -51,6 +51,7 @@ public class SystemConfig {
 	public void loadServerDefinition() {
 		ServerDefinition serverDefinition = new ServerDefinition();
 		serverDefinition.setMaxThreads(config.getInt("server.maxthreads"));
+		serverDefinition.setAddress(config.getString("server.address"));
 		futureDefinitions.put(serverDefinition.getId(), serverDefinition);
 	}
 
@@ -110,6 +111,31 @@ public class SystemConfig {
 		}
 	}
 
+	public void loadRadiusDefinition(){
+		int counter=0;
+		SubnodeConfiguration subnode;
+		while (true){
+			try{
+				subnode = config.configurationAt(String.format("radius.server(%d)", counter));
+				if (subnode != null){
+					RadiusDefinition definition = new RadiusDefinition();
+					definition.setId(subnode.getString("id"));
+					definition.setAddress(subnode.getString("address"));
+					definition.setAuthPort(subnode.getInt("auth-port", 1812));
+					definition.setAcctPort(subnode.getInt("acct-port", 1813));
+					definition.setSecret(subnode.getString("secret"));
+					definition.setRetryCount(subnode.getInt("retry-count",5));
+					definition.setSocketTimeout(subnode.getInt("socket-timeout", 5000));
+					futureDefinitions.put(definition.getId(), definition);
+				}
+			}
+			catch (Exception e){
+				log.warn(e.getMessage());
+				return;
+			}
+			counter++;
+		}
+	}
 	public void loadCLI_ListenersDefinition() {
 		int counter = 0;
 		SubnodeConfiguration subnode;
@@ -168,6 +194,7 @@ public class SystemConfig {
 		loadScriptFactoriesDefinition();
 		loadSwitchesDefinition();
 		loadScriptFactoriesDefinition();
+		loadRadiusDefinition();
 		// Dump the loaded configurations
 
 		for (DefinitionInterface definition : futureDefinitions.values()) {

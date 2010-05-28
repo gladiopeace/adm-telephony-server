@@ -87,7 +87,7 @@ public class Switches implements DefinitionChangeListener {
 	@Override
 	public void definitionRemoved(DefinitionInterface definition) {
 		if (definition instanceof SwitchDefinition) {
-
+			//TODO
 		}
 	}
 
@@ -95,7 +95,7 @@ public class Switches implements DefinitionChangeListener {
 	public void defnitionChanged(DefinitionInterface oldDefinition,
 			DefinitionInterface newDefinition) {
 		if (newDefinition instanceof SwitchDefinition) {
-
+			//TODO
 		}
 
 	}

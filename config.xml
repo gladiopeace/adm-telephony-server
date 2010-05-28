@@ -1,8 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 <server>
-<maxthreads>10</maxthreads>
+	<maxthreads>10</maxthreads>
+	<address>172.16.140.1</address>
 </server>
+
+<radius>
+	<server>
+		<id>first radius server</id>
+		<address>172.16.140.129</address>
+		<auth-port>1812</auth-port>
+		<acct-port>1813</acct-port>
+		<secret>mysecret</secret>
+		<retry-count>5</retry-count>
+		<socket-timeout>5000</socket-timeout>
+	</server>
+	<server>
+	  	<id>Second radius server</id>
+	  	<address>172.16.140.130</address>
+		<auth-port>1812</auth-port>
+		<acct-port>1813</acct-port>
+	  	<secret>mysercret</secret>
+	  	<retry-count>5</retry-count>
+	  	<socket-timeout>5000</socket-timeout>	  
+	</server>
+</radius>
+
+
 <switch-listeners>
  <switch-listener>
  	<address>
@@ -66,5 +90,7 @@
   <class>com.admtel.telephonyserver.scriptfactories.XMLScriptFactory</class>
  </scriptfactory>
 </scriptfactories>
+
+
 
 </config>
