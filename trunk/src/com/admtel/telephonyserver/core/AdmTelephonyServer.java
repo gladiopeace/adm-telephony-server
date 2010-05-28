@@ -5,19 +5,28 @@ import org.apache.log4j.Logger;
 import com.admtel.telephonyserver.cli.CLI_Connections;
 import com.admtel.telephonyserver.config.DefinitionChangeListener;
 import com.admtel.telephonyserver.config.DefinitionInterface;
+import com.admtel.telephonyserver.config.ServerDefinition;
 import com.admtel.telephonyserver.config.SystemConfig;
 
 public class AdmTelephonyServer implements DefinitionChangeListener {
 
 	static Logger log = Logger.getLogger(AdmTelephonyServer.class);
 
+	private ServerDefinition definition;
+	
+	private static class SingletonHolder {
+		private static AdmTelephonyServer instance = new AdmTelephonyServer();
+	}
+	
+	public static AdmTelephonyServer getInstance(){
+		return SingletonHolder.instance;
+	}
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		log.debug("Adm Telephony Server started ...");
-		AdmTelephonyServer server = new AdmTelephonyServer();
-		server.start();
+		getInstance().start();
 		while (true) {
 			try {
 				Thread.sleep(10000);
@@ -41,6 +50,7 @@ public class AdmTelephonyServer implements DefinitionChangeListener {
 		sysConfig.addDefinitionChangeListener(ScriptManager.getInstance());
 		
 		sysConfig.addDefinitionChangeListener(CLI_Connections.getInstance());
+		sysConfig.addDefinitionChangeListener(RadiusServers.getInstance());
 		
 		SystemConfig.getInstance().load();
 	}
@@ -48,11 +58,15 @@ public class AdmTelephonyServer implements DefinitionChangeListener {
 	@Override
 	public void definitionAdded(DefinitionInterface definition) {
 		log.debug("Definition : " + definition + ", added");
+		if (definition instanceof ServerDefinition){
+			this.definition = (ServerDefinition)definition;
+		}
 	}
 
 	@Override
 	public void definitionRemoved(DefinitionInterface definition) {
 		log.debug("Definition : " + definition + ", removed");
+		//TODO update server definition
 	}
 
 	@Override
@@ -60,6 +74,13 @@ public class AdmTelephonyServer implements DefinitionChangeListener {
 			DefinitionInterface newDefinition) {
 		log.debug("Definition : " + oldDefinition + " changed to "
 				+ newDefinition);
+		//TODO, update server definition
+	}
+	public ServerDefinition getDefinition() {
+		return definition;
+	}
+	public void setDefinition(ServerDefinition definition) {
+		this.definition = definition;
 	}
 
 }

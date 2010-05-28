@@ -3,6 +3,13 @@ package com.admtel.telephonyserver.config;
 public class ServerDefinition implements DefinitionInterface {
 
 	int maxThreads = 10;
+	String address = "127.0.0.1";
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
 	@Override
 	public String getId() {
 		return "Server";
@@ -17,6 +24,7 @@ public class ServerDefinition implements DefinitionInterface {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((address == null) ? 0 : address.hashCode());
 		result = prime * result + maxThreads;
 		return result;
 	}
@@ -29,12 +37,19 @@ public class ServerDefinition implements DefinitionInterface {
 		if (getClass() != obj.getClass())
 			return false;
 		ServerDefinition other = (ServerDefinition) obj;
+		if (address == null) {
+			if (other.address != null)
+				return false;
+		} else if (!address.equals(other.address))
+			return false;
 		if (maxThreads != other.maxThreads)
 			return false;
 		return true;
 	}
 	
-	public String toString(){
-		return super.toString()+":"+this.maxThreads;
+	@Override
+	public String toString() {
+		return "ServerDefinition [address=" + address + ", maxThreads="
+				+ maxThreads + "]";
 	}
 }
