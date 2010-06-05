@@ -29,7 +29,7 @@ public class AdmTelephonyServer implements DefinitionChangeListener {
 		getInstance().start();
 		while (true) {
 			try {
-				Thread.sleep(10000);
+				Thread.sleep(30000);
 				//SystemConfig.getInstance().load();
 			} catch (Exception e) {
 
