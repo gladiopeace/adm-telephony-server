@@ -11,20 +11,20 @@
 		<address>172.16.140.129</address>
 		<auth-port>1812</auth-port>
 		<acct-port>1813</acct-port>
-		<secret>mysecret</secret>
+		<secret>meravoip</secret>
 		<retry-count>5</retry-count>
 		<socket-timeout>5000</socket-timeout>
 	</server>
-	<server>
+	<!--<server>
 	  	<id>Second radius server</id>
 	  	<address>172.16.140.130</address>
 		<auth-port>1812</auth-port>
 		<acct-port>1813</acct-port>
-	  	<secret>mysercret</secret>
+	  	<secret>meravoip</secret>
 	  	<retry-count>5</retry-count>
 	  	<socket-timeout>5000</socket-timeout>	  
 	</server>
-</radius>
+--></radius>
 
 
 <switch-listeners>
@@ -71,7 +71,7 @@
   	<type>freeswitch</type>  
   	<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultFSAddressTranslator</addresstranslator> 	
  </switch>
- <switch>
+ <!--<switch>
   <id>MyAsterisk</id>
   <address>172.16.34.134</address>
   <port>5038</port>
@@ -80,7 +80,7 @@
   <type>asterisk</type>
   <addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator</addresstranslator>
  </switch>
-</switches>
+--></switches>
 
 <scriptfactories>
  <scriptfactory>

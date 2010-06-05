@@ -59,10 +59,22 @@ public class RadiusServer implements Authorizer{
 			String password, String address, String callingStationId,
 			String calledStationId, boolean routing, boolean number) {
 		log.trace(String.format("authorize :%s:%s:%s:%s:%s:%s", username, address, callingStationId, calledStationId, routing, number));
+		if (username == null || username.isEmpty()){
+			username="0000";
+		}
+		if(password==null || password.isEmpty()){
+			password="0000";
+		}
+		if (callingStationId == null || callingStationId.isEmpty()){
+			callingStationId="0000";
+		}
+		if(calledStationId == null || calledStationId.isEmpty()){
+			calledStationId="0000";
+		}
 		
 		AccessRequest ar = new AccessRequest(username, password);
 		AuthorizeResult result = new AuthorizeResult();
-		ar.setAuthProtocol(AccessRequest.AUTH_PAP); // or AUTH_CHAP
+		//ar.setAuthProtocol(AccessRequest.AUTH_PAP); // or AUTH_CHAP
 		ar.setDictionary(dictionary);
 		ar.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
 		ar.addAttribute("Service-Type", "Login-User");
