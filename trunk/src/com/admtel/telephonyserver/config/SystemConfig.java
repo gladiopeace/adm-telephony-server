@@ -54,7 +54,12 @@ public class SystemConfig {
 		serverDefinition.setAddress(config.getString("server.address"));
 		futureDefinitions.put(serverDefinition.getId(), serverDefinition);
 	}
-
+	public void loadRegistrarDefinition(){
+		RegistrarDefinition registrarDefinition = new RegistrarDefinition();
+		registrarDefinition.setClassName(config.getString("registrar.class", "com.admtel.telephonyserver.registrar.SimpleRegistrar"));
+		registrarDefinition.setEnabled(config.getBoolean("registrar.enabled", true));
+		futureDefinitions.put(registrarDefinition.getId(), registrarDefinition);
+	}
 	public void loadSwitchListenersDefinition() {
 		int counter = 0;
 		SubnodeConfiguration subnode;
@@ -195,6 +200,7 @@ public class SystemConfig {
 		loadSwitchesDefinition();
 		loadScriptFactoriesDefinition();
 		loadRadiusDefinition();
+		loadRegistrarDefinition();
 		// Dump the loaded configurations
 
 		for (DefinitionInterface definition : futureDefinitions.values()) {

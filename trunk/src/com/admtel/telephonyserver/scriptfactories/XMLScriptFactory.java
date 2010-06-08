@@ -66,6 +66,7 @@ public class XMLScriptFactory implements ScriptFactory, Loadable {
 		Iterator<ScriptData> it = scripts.iterator();
 		while (it.hasNext()) {
 			ScriptData scriptData = it.next();
+			log.debug("CreateScript, checking scriptData {" + scriptData+"}" );
 			if (scriptData.matches(channelData.getCalledNumber())) {
 				if (scriptData.className != null) {
 					Class c = SmartClassLoader.getClass(scriptData.className);
@@ -117,7 +118,7 @@ public class XMLScriptFactory implements ScriptFactory, Loadable {
 
 	@Override
 	public void load() {
-		// TODO, relad logic
+		// TODO, reload logic
 
 		int counter = 0;
 		try {

@@ -23,10 +23,12 @@ import com.admtel.telephonyserver.events.freeswitch.FSChannelEvent;
 import com.admtel.telephonyserver.events.freeswitch.FSChannelOriginateEvent;
 import com.admtel.telephonyserver.events.freeswitch.FSCommandReplyEvent;
 import com.admtel.telephonyserver.events.freeswitch.FSEvent;
+import com.admtel.telephonyserver.events.freeswitch.FSRegisterEvent;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
+import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.utils.AdmUtils;
 
-public class FSSwitch extends Switch implements IoHandler, TimerNotifiable{
+public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	static Logger log = Logger.getLogger(ASTSwitch.class);
 
@@ -54,15 +56,16 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable{
 		@Override
 		public void onMessage(Object message) {
 			BasicIoMessage basicMessage = (BasicIoMessage) message;
-			if (basicMessage != null){
-				FSEvent event = FSEvent.buildEvent(FSSwitch.this
-						.getSwitchId(), basicMessage.getMessage());
+			if (basicMessage != null) {
+				FSEvent event = FSEvent.buildEvent(FSSwitch.this.getSwitchId(),
+						basicMessage.getMessage());
 				switch (event.getEventType()) {
 				case CommandReply: {
 					FSCommandReplyEvent cre = (FSCommandReplyEvent) event;
 					if (cre.isSuccess()) {
 						FSSwitch.this.status = SwitchStatus.Ready;
-						session.write("event plain all"); // TODO, create new state to
+						session.write("event plain all"); // TODO, create new
+															// state to
 						// check for return of event
 						// filter
 						messageHandler = new LoggedInState();
@@ -74,45 +77,61 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable{
 					break;
 				}
 			}
-			
+
 		}
 	}
+
 	private class LoggedInState extends QueuedMessageHandler {
 
 		@Override
 		public void onMessage(Object message) {
 			BasicIoMessage basicIoMessage = (BasicIoMessage) message;
 			if (basicIoMessage != null) {
-				FSEvent event = FSEvent.buildEvent(FSSwitch.this
-						.getSwitchId(), basicIoMessage.getMessage());
-				/*log.debug(String.format("Switch (%s) : \n%s", FSSwitch.this
-						.getSwitchId(), basicIoMessage.getMessage()));*/
+				FSEvent event = FSEvent.buildEvent(FSSwitch.this.getSwitchId(),
+						basicIoMessage.getMessage());
+				log.debug(String.format("Switch (%s) : \n%s", FSSwitch.this
+						.getSwitchId(), basicIoMessage.getMessage()));
 				if (event == null) {
-					/*log.debug("Didn't create Event for message ...");*/
+					/* log.debug("Didn't create Event for message ..."); */
 					return;
 				}
 				switch (event.getEventType()) {
 				case ChannelCreate: {
 					FSChannelCreateEvent cce = (FSChannelCreateEvent) event;
-					FSChannel channel = new FSChannel(FSSwitch.this, cce.getChannelId(), basicIoMessage.session);
+					FSChannel channel = new FSChannel(FSSwitch.this, cce
+							.getChannelId(), basicIoMessage.session);
 					FSSwitch.this.addChannel(channel);
 				}
-				break;
+					break;
+				case FsRegister: {
+					FSRegisterEvent registerEvent = (FSRegisterEvent) event;
+					if (registerEvent.getRegistered()) {
+						Registrar.getInstance().register(
+								new UserLocation(registerEvent.getSwitchId(),
+										"UU", registerEvent.getUser()));
+					} else {
+						Registrar.getInstance().unregister(
+								registerEvent.getUser());
+					}
 				}
-				if (event instanceof FSChannelEvent){
+					break;
+				}
+				if (event instanceof FSChannelEvent) {
 					FSChannelEvent channelEvent = (FSChannelEvent) event;
-					FSChannel channel = (FSChannel) FSSwitch.this.getChannel(channelEvent.getChannelId());
-					if (channel != null){
-						switch (event.getEventType()){
+					FSChannel channel = (FSChannel) FSSwitch.this
+							.getChannel(channelEvent.getChannelId());
+					if (channel != null) {
+						switch (event.getEventType()) {
 						case ChannelData:
-							//Replace the iosession, with the session from the incoming connection
-							 channel.setIoSession(basicIoMessage.getSession());
+							// Replace the iosession, with the session from the
+							// incoming connection
+							channel.setIoSession(basicIoMessage.getSession());
 							break;
-						case ChannelOriginate:
-						{
+						case ChannelOriginate: {
 							FSChannelOriginateEvent coe = (FSChannelOriginateEvent) event;
-							FSChannel otherChannel = (FSChannel) FSSwitch.this.getChannel(coe.getDestinationChannel());
-							if (otherChannel != null){
+							FSChannel otherChannel = (FSChannel) FSSwitch.this
+									.getChannel(coe.getDestinationChannel());
+							if (otherChannel != null) {
 								otherChannel.processNativeEvent(channelEvent);
 							}
 						}
@@ -122,9 +141,10 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable{
 					}
 				}
 			}
-			
+
 		}
 	}
+
 	public FSSwitch(SwitchDefinition definition) {
 		super(definition);
 		this.encodingDelimiter = "\n\n";
@@ -134,7 +154,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable{
 	@Override
 	public void start() {
 		reconnectTimer = Timers.getInstance().startTimer(this, RECONNECT_AFTER,
-				false, null);		
+				false, null);
 	}
 
 	@Override
@@ -148,44 +168,46 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable{
 	public void exceptionCaught(IoSession session, Throwable exception)
 			throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void messageReceived(IoSession session, Object message) throws Exception {
+	public void messageReceived(IoSession session, Object message)
+			throws Exception {
 		messageHandler
-		.putMessage(new BasicIoMessage(session, (String) message));
-		
+				.putMessage(new BasicIoMessage(session, (String) message));
+
 	}
 
 	@Override
 	public void messageSent(IoSession session, Object message) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void sessionClosed(IoSession session) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void sessionCreated(IoSession session) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
+	public void sessionIdle(IoSession session, IdleStatus status)
+			throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void sessionOpened(IoSession session) throws Exception {
 		this.session = session;
-		messageHandler = new LoggingInState();		
+		messageHandler = new LoggingInState();
 	}
 
 	@Override
@@ -194,9 +216,11 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable{
 			return true;// stop the timer
 		return connect();
 	}
+
 	private boolean isConnected() {
 		return (session != null && session.isConnected());
 	}
+
 	private boolean connect() {
 		log.debug(String.format("Trying to connect to %s:%d", definition
 				.getAddress(), definition.getPort()));

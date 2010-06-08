@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scripts>
+
+ <script name="SoftSwitch">
+  <called>1[0-9]{3}</called>
+  <class>scripts/SoftSwitch.groovy</class>
+    <parameters>
+   <parameter key="language" value="arabic"/>
+  </parameters>
+ </script>
+ 
  <script name="voicemail">
   <called>1234</called>
   <class>com.admtel.telephony.scripts.SimpleTestScript</class>

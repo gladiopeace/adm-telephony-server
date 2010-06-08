@@ -16,6 +16,7 @@ import com.admtel.telephonyserver.interfaces.EventListener;
 
 import com.admtel.telephonyserver.interfaces.Authorizer;
 import com.admtel.telephonyserver.radius.AuthorizeResult;
+import com.admtel.telephonyserver.registrar.UserLocation;
 
 public abstract class Script implements EventListener, Authorizer {
 
@@ -109,6 +110,12 @@ public abstract class Script implements EventListener, Authorizer {
 			String calledStationId, boolean routing, boolean number) {
 		return RadiusServers.getInstance().authorize(username, password, address, callingStationId, calledStationId, routing, number);
 	}
+	
+	//Registrar functions
+	public UserLocation find(String user){
+		return Registrar.getInstance().find(user);
+	}
+	
 	public abstract String getDisplayStr();
 
 	protected abstract void processEvent(Event event);

@@ -20,9 +20,11 @@ import com.admtel.telephonyserver.core.Timers.Timer;
 import com.admtel.telephonyserver.events.asterisk.ASTChannelEvent;
 import com.admtel.telephonyserver.events.asterisk.ASTEvent;
 import com.admtel.telephonyserver.events.asterisk.ASTNewChannelEvent;
+import com.admtel.telephonyserver.events.asterisk.ASTPeerStatusEvent;
 import com.admtel.telephonyserver.events.asterisk.ASTResponseEvent;
 import com.admtel.telephonyserver.events.asterisk.ASTEvent.EventType;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
+import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.utils.AdmUtils;
 
 public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
@@ -100,6 +102,16 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 					ASTChannel channel = new ASTChannel(ASTSwitch.this, nce
 							.getChannelId(), basicIoMessage.getSession());
 					ASTSwitch.this.addChannel(channel);
+				}
+					break;
+				case PeerStatus:{
+					ASTPeerStatusEvent pse = (ASTPeerStatusEvent) event;
+					if (pse.getRegistered()){
+						Registrar.getInstance().register(new UserLocation(event.getSwitchId(),"XXX", pse.getUser()));
+					}
+					else{
+						Registrar.getInstance().unregister(pse.getUser());
+					}									
 				}
 					break;
 				}

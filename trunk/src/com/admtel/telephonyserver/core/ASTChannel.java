@@ -323,6 +323,7 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 						Script script = ScriptManager.getInstance()
 								.createScript(channelData);
 						if (script != null) {
+							log.debug("Created script " + script);
 							listeners.add(script);
 						}
 						// Send inbound alerting event

@@ -4,6 +4,13 @@ import com.admtel.telephonyserver.core.Channel;
 
 public class InboundAlertingEvent extends ChannelEvent {
 
+	@Override
+	public String toString() {
+		return "InboundAlertingEvent [calledIdNumber=" + calledIdNumber
+				+ ", callerIdName=" + callerIdName + ", callerIdNumber="
+				+ callerIdNumber + "]";
+	}
+
 	String callerIdNumber;
 	String callerIdName;
 	String calledIdNumber;
