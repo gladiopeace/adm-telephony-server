@@ -22,12 +22,14 @@ import com.admtel.telephonyserver.core.AdmThreadExecutor;
 import com.admtel.telephonyserver.core.Channel;
 import com.admtel.telephonyserver.core.Conference;
 import com.admtel.telephonyserver.core.Conferences;
+import com.admtel.telephonyserver.core.Registrar;
 import com.admtel.telephonyserver.core.Script;
 import com.admtel.telephonyserver.core.Scripts;
 import com.admtel.telephonyserver.core.Switch;
 import com.admtel.telephonyserver.core.SwitchListener;
 import com.admtel.telephonyserver.core.SwitchListeners;
 import com.admtel.telephonyserver.core.Switches;
+import com.admtel.telephonyserver.registrar.UserLocation;
 
 public class CLI_Connection extends IoHandlerAdapter {
 	static Logger log = Logger.getLogger(CLI_Connection.class);
@@ -117,11 +119,22 @@ public class CLI_Connection extends IoHandlerAdapter {
 				showConferences(session);
 			} else if (((String)message).startsWith("originate")){
 				originateCall(session, (String)message);
-			}else {
+			}else if (((String)message).equals("show users")){
+				showUsers(session);
+			}else{			
 				session.write("Invalid command\n");
 			}
 			session.write("> ");
 			break;
+		}
+	}
+
+	private void showUsers(IoSession session) {
+		// TODO Auto-generated method stub
+		session.write("Users\n");
+		Collection<UserLocation> users = Registrar.getInstance().get(0, -1);
+		for (UserLocation userLocation:users){
+			session.write(String.format("\t%s\n", userLocation));
 		}
 	}
 

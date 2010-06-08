@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.admtel.telephonyserver.utils.CodecsUtils;
+
 public class FSEvent {
 
 	static Logger log = Logger.getLogger(FSEvent.class);
@@ -57,16 +59,29 @@ public class FSEvent {
 		// log.debug("Got packet {"+ eventStr+"}");
 		String eventName = map.get("Event-Name");
 		if (eventName != null) {
-			Constructor ctor = EVENTS_MAP.get(eventName);
-			if (ctor == null) {
-				return null;
-			}
+			if (eventName.equals("CUSTOM")) {
+				String eventSubclass = CodecsUtils.urlDecode(map.get("Event-Subclass"));
+				if (eventSubclass != null){
+					if (eventSubclass.equals("sofia::register")){
+						return new FSRegisterEvent (switchId, map, true);
+					}
+					else if (eventSubclass.equals("sofia::unregister")){
+						return new FSRegisterEvent(switchId, map, false);
+					}
+				}
 
-			if (ctor != null) {
-				try {
-					return (FSEvent) ctor.newInstance(switchId, map);
-				} catch (Exception ex) {
-					log.fatal(ex.toString());
+			} else {
+				Constructor ctor = EVENTS_MAP.get(eventName);
+				if (ctor == null) {
+					return null;
+				}
+
+				if (ctor != null) {
+					try {
+						return (FSEvent) ctor.newInstance(switchId, map);
+					} catch (Exception ex) {
+						log.fatal(ex.toString());
+					}
 				}
 			}
 		} else {
@@ -89,6 +104,7 @@ public class FSEvent {
 
 	public enum EventType {
 		AuthRequest, CommandReply, HeartBeat, ChannelExecute, ChannelExecuteComplete, ChannelData, SessionDisconnect, ChannelDestroy, DTMF, ChannelHangup, ChannelAnswered, ChannelCreate, ChannelOutgoing, ChannelState, ChannelOriginate,
+		FsRegister
 	}
 
 	EventType eventType;

@@ -11,6 +11,7 @@ import com.admtel.telephonyserver.events.DtmfEvent;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.InboundAlertingEvent;
 import com.admtel.telephonyserver.interfaces.EventListener;
+import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.utils.AdmUtils;
 
 public abstract class Channel {
@@ -194,6 +195,20 @@ public abstract class Channel {
 
 	}
 
+	final public Result dial(UserLocation userLocation, long timeout){
+		Result result = Result.Ok;
+		if (userLocation.getSwitchId().equals(this.getSwitch().getDefinition().getId())){
+			
+			//TODO have more dynamic protocols to dial out
+			
+			result = internalDial("sip:"+userLocation.getUser(), timeout);
+		}
+		else{
+			result = internalDial(String.format("sip:%s@%s", userLocation.getUser(), getSwitch().getDefinition().getAddress()), timeout);
+		}
+		
+		return result;
+	}
 	final public Result dial(String address, long timeout) {
 		/*
 		 * if (state != State.Idle){
@@ -224,6 +239,8 @@ public abstract class Channel {
 			break;
 		case InboundAlerting: {
 			InboundAlertingEvent ie = (InboundAlertingEvent) e;
+			ie.setCalledIdNumber(channelData.getCalledNumber());
+			ie.setCallerIdNumber(channelData.getCallerIdNumber());
 			state = State.InboundAlerting;
 
 		}
