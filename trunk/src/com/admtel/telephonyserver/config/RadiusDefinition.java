@@ -8,6 +8,25 @@ public class RadiusDefinition implements DefinitionInterface {
 	int retryCount;
 	int socketTimeout;
 	
+	Boolean startAccounting;
+	Boolean stopAccounting;
+	
+
+	public Boolean getStartAccounting() {
+		return startAccounting;
+	}
+
+	public void setStartAccounting(Boolean startAccounting) {
+		this.startAccounting = startAccounting;
+	}
+
+	public Boolean getStopAccounting() {
+		return stopAccounting;
+	}
+
+	public void setStopAccounting(Boolean stopAccounting) {
+		this.stopAccounting = stopAccounting;
+	}
 
 	public int getRetryCount() {
 		return retryCount;
@@ -30,7 +49,8 @@ public class RadiusDefinition implements DefinitionInterface {
 		return "RadiusDefinition [acctPort=" + acctPort + ", address="
 				+ address + ", authPort=" + authPort + ", id=" + id
 				+ ", retryCount=" + retryCount + ", secret=" + secret
-				+ ", socketTimeout=" + socketTimeout + "]";
+				+ ", socketTimeout=" + socketTimeout + ", startAccounting="
+				+ startAccounting + ", stopAccounting=" + stopAccounting + "]";
 	}
 
 	@Override
@@ -44,6 +64,10 @@ public class RadiusDefinition implements DefinitionInterface {
 		result = prime * result + retryCount;
 		result = prime * result + ((secret == null) ? 0 : secret.hashCode());
 		result = prime * result + socketTimeout;
+		result = prime * result
+				+ ((startAccounting == null) ? 0 : startAccounting.hashCode());
+		result = prime * result
+				+ ((stopAccounting == null) ? 0 : stopAccounting.hashCode());
 		return result;
 	}
 
@@ -78,6 +102,16 @@ public class RadiusDefinition implements DefinitionInterface {
 		} else if (!secret.equals(other.secret))
 			return false;
 		if (socketTimeout != other.socketTimeout)
+			return false;
+		if (startAccounting == null) {
+			if (other.startAccounting != null)
+				return false;
+		} else if (!startAccounting.equals(other.startAccounting))
+			return false;
+		if (stopAccounting == null) {
+			if (other.stopAccounting != null)
+				return false;
+		} else if (!stopAccounting.equals(other.stopAccounting))
 			return false;
 		return true;
 	}

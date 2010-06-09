@@ -6,6 +6,9 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import org.joda.time.Period;
 
 import com.admtel.telephonyserver.events.DtmfEvent;
 import com.admtel.telephonyserver.events.Event;
@@ -33,7 +36,11 @@ public abstract class Channel {
 
 	protected ChannelData channelData = new ChannelData();
 	protected Participant conferenceParticipant; //information about the channel when joined in a conference bridge
-
+	
+	protected DateTime createdTime = new DateTime();
+	protected DateTime connectedTime = null;
+	
+	
 	public void addEventListener(EventListener listener) {
 		listeners.add(listener);
 	}
@@ -76,6 +83,12 @@ public abstract class Channel {
 		return dtmfBuffer;
 	}
 
+	public long getSessionTime(){
+		if (connectedTime == null){
+			return 0;
+		}
+		return new Duration(connectedTime, new DateTime()).getMillis();
+	}
 	public abstract Result internalPlayAndGetDigits(int max, String prompt,
 			long timeout, String terminators, boolean interruptPlay);
 
