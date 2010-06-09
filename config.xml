@@ -17,6 +17,8 @@
 		<secret>meravoip</secret>
 		<retry-count>5</retry-count>
 		<socket-timeout>5000</socket-timeout>
+		<start-accounting>true</start-accounting>
+		<stop-accounting>true</stop-accounting>
 	</server>
 	<!--<server>
 	  	<id>Second radius server</id>

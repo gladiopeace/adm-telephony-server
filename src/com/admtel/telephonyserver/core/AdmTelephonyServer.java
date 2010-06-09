@@ -7,6 +7,7 @@ import com.admtel.telephonyserver.config.DefinitionChangeListener;
 import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.ServerDefinition;
 import com.admtel.telephonyserver.config.SystemConfig;
+import com.admtel.telephonyserver.radius.RadiusServers;
 
 public class AdmTelephonyServer implements DefinitionChangeListener {
 

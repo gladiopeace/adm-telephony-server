@@ -6,6 +6,7 @@ import java.io.SequenceInputStream;
 import java.net.SocketException;
 
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import org.tinyradius.attribute.RadiusAttribute;
 import org.tinyradius.dictionary.Dictionary;
 import org.tinyradius.dictionary.DictionaryParser;
@@ -20,6 +21,10 @@ import com.admtel.telephonyserver.core.AdmTelephonyServer;
 import com.admtel.telephonyserver.interfaces.Authorizer;
 
 public class RadiusServer implements Authorizer{
+	
+	public enum AccountingType {Start, Stop, InterimUpdate};
+	public enum CallOrigin {Answer, Originate};
+	
 	static Logger log = Logger.getLogger(RadiusServer.class);
 
 	private static final String DICTIONARY_RESOURCE = "org/tinyradius/dictionary/default_dictionary";
@@ -120,5 +125,10 @@ public class RadiusServer implements Authorizer{
 		}
 		return result;
 	}
+	
+	/*public void accounting (AccountingType type, String userName, String serviceType, String acctUniqueSessionId, String acctSessionId, 
+			int accountDelayTime, String calledStationId, String callingStationId, CallOrigin callOrigin, DateTime setupTime, String gwId, String remoteAddress, ){
+		
+	}*/
 
 }

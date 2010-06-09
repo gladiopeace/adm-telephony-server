@@ -1,4 +1,4 @@
-package com.admtel.telephonyserver.core;
+package com.admtel.telephonyserver.radius;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,8 +9,6 @@ import com.admtel.telephonyserver.config.DefinitionChangeListener;
 import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.RadiusDefinition;
 import com.admtel.telephonyserver.interfaces.Authorizer;
-import com.admtel.telephonyserver.radius.AuthorizeResult;
-import com.admtel.telephonyserver.radius.RadiusServer;
 
 public class RadiusServers implements DefinitionChangeListener, Authorizer {
 
