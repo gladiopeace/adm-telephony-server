@@ -193,6 +193,28 @@ public class SystemConfig {
 		}
 	}
 
+	public void loadEventListenersDefinition(){
+		int counter = 0;
+		SubnodeConfiguration subnode;
+		while (true) {
+			try {
+				subnode = config.configurationAt(String.format(
+						"event-listeners.event-listener(%d)", counter));
+				if (subnode != null) {
+					EventListenerDefinition definition = new EventListenerDefinition();
+					definition.setClassName(subnode.getString("class"));
+					futureDefinitions.put(definition.getId(), definition);
+				} else {
+					return;
+				}
+			} catch (Exception e) {
+				log.warn(e.getMessage());
+				return;
+			}
+			counter++;
+
+		}		
+	}
 	public void load() {
 		log.debug("Loading System configuration ...");
 		futureDefinitions.clear();
@@ -204,6 +226,7 @@ public class SystemConfig {
 		loadScriptFactoriesDefinition();
 		loadRadiusDefinition();
 		loadRegistrarDefinition();
+		loadEventListenersDefinition();
 		// Dump the loaded configurations
 
 		for (DefinitionInterface definition : futureDefinitions.values()) {

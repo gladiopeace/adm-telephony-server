@@ -53,6 +53,7 @@ public class AdmTelephonyServer implements DefinitionChangeListener {
 		sysConfig.addDefinitionChangeListener(CLI_Connections.getInstance());
 		sysConfig.addDefinitionChangeListener(RadiusServers.getInstance());
 		sysConfig.addDefinitionChangeListener(Registrar.getInstance());
+		sysConfig.addDefinitionChangeListener(EventsManager.getInstance());
 		
 		SystemConfig.getInstance().load();
 	}

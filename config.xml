@@ -98,4 +98,12 @@
  </scriptfactory>
 </scriptfactories>
 
+<event-listeners>
+	<event-listener>
+	 <class>com.admtel.telephonyserver.eventlisteners.SimpleEventListener</class>
+	</event-listener>
+	<event-listener>
+	 <class>scripts/MyEventListener.groovy</class>
+	</event-listener>
+</event-listeners>
 </config>
