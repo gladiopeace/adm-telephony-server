@@ -19,6 +19,7 @@
 		<socket-timeout>5000</socket-timeout>
 		<start-accounting>true</start-accounting>
 		<stop-accounting>true</stop-accounting>
+		<interim-update>10</interim-update>
 	</server>
 	<!--<server>
 	  	<id>Second radius server</id>

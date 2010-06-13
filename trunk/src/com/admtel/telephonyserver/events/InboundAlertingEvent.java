@@ -14,6 +14,7 @@ public class InboundAlertingEvent extends ChannelEvent {
 	String callerIdNumber;
 	String callerIdName;
 	String calledIdNumber;
+	String serviceNumber;
 	
 	public InboundAlertingEvent(Channel channel) {
 		super(channel);
@@ -50,6 +51,11 @@ public class InboundAlertingEvent extends ChannelEvent {
 		this.callerIdNumber = callerIdNumber;
 		this.callerIdName = callerIdName;
 		this.calledIdNumber = calledIdNumber;
+	}
+
+	public void setServiceNumber(String serviceNumber) {
+		this.serviceNumber = serviceNumber;
+		
 	}
 	
 }

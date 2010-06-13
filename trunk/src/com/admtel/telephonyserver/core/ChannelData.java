@@ -7,6 +7,8 @@ public class ChannelData extends VariableMap {
 	public final static String CALLER_ID_NAME = "CallerIdName";
 	public final static String CALLER_ID_NUMBER="CallerIdNumber";
 	public final static String CALLED_NUMBER="CalledNumber";
+	public final static String USERNAME="UserName";
+	public final static String SERVICE_NUMBER="ServiceNumber";
 	
 	public void setCallerIdName(String callerIdName){
 		addVariable(CALLER_ID_NAME, callerIdName);
@@ -33,5 +35,18 @@ public class ChannelData extends VariableMap {
 			result +=","+entry.getKey()+":"+entry.getValue();
 		}
 		return result;
+	}
+	public void setUserName(String userName) {
+		addVariable(USERNAME, userName);
+		
+	}
+	public String getUserName(){
+		return getVariable(USERNAME);
+	}
+	public void setServiceNumber(String serviceNumber){
+		addVariable(SERVICE_NUMBER, serviceNumber);
+	}
+	public String getServiceNumber(){
+		return getVariable(SERVICE_NUMBER);
 	}
 }

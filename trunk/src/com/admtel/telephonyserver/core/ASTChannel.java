@@ -249,6 +249,8 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 				ASTNewChannelEvent nce = (ASTNewChannelEvent) astEvent;
 				channelData.setCalledNumber(nce.getCalledNum());
 				channelData.setCallerIdNumber(nce.getCallerIdNum());
+				channelData.setUserName(nce.getUserName());
+				channelData.setServiceNumber(nce.getCalledNum());
 				switch (nce.getChannelState()) {
 				case Ring:
 					currentState = new InboundAlertingState();
@@ -692,6 +694,12 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 				ASTHangupEvent asthe = (ASTHangupEvent) astEvent;
 				HangupEvent he = new HangupEvent(ASTChannel.this);
 				he.setHangupCauseStr(asthe.getCauseTxt());
+				try{
+					he.setHangCause(Integer.parseInt(asthe.getCause()));
+				}
+				catch (Exception e){
+					he.setHangCause(16);
+				}
 				ASTChannel.this.onEvent(he);
 			}
 				break;
