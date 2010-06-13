@@ -29,7 +29,7 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 	Random rnd = new Random(System.currentTimeMillis());
 
 	private RadiusServers() {
-		EventsManager.getInstance().addEventListener(this);
+		EventsManager.getInstance().addEventListener(this.getClass().toString(), this);
 	}
 
 	private boolean isEnabled(){
