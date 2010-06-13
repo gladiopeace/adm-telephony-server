@@ -4,6 +4,11 @@ import java.util.Map;
 
 public class ASTHangupEvent extends ASTChannelEvent {
 
+	@Override
+	public String toString() {
+		return "ASTHangupEvent [getCause()=" + getCause() + ", getCauseTxt()="
+				+ getCauseTxt() + "]";
+	}
 	public ASTHangupEvent(String switchId, Map<String, String> values) {
 		super(switchId, values);
 		eventType = EventType.Hangup;

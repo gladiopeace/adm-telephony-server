@@ -4,6 +4,12 @@ import com.admtel.telephonyserver.core.Channel;
 
 public class HangupEvent extends ChannelEvent {
 
+	@Override
+	public String toString() {
+		return "HangupEvent [hangCause=" + hangCause + ", hangupCauseStr="
+				+ hangupCauseStr + "]";
+	}
+
 	String hangupCauseStr;
 	int hangCause;
 	

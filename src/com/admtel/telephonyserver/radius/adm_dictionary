@@ -3,6 +3,9 @@ VENDORATTR	9	Cisco-AVPair		1	string
 VENDORATTR 	9	h323-call-origin	26	string
 VENDORATTR	9	h323-setup-time		25	string
 VENDORATTR	9	h323-credit-time	102	string
+VENDORATTR	9	h323-connect-time	28	string
+VENDORATTR	9	h323-disconnect-time	29	string
+VENDORATTR	9	h323-disconnect-cause	30	string
 
 VENDOR	11344	FreeRADIUS
 

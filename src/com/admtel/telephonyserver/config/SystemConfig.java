@@ -133,6 +133,7 @@ public class SystemConfig {
 					definition.setSocketTimeout(subnode.getInt("socket-timeout", 5000));
 					definition.setStartAccounting(subnode.getBoolean("start-accounting", true));
 					definition.setStopAccounting(subnode.getBoolean("stop-accounting", true));
+					definition.setInterimUpdate(subnode.getInt("interim-update",0));
 					futureDefinitions.put(definition.getId(), definition);
 				}
 			}

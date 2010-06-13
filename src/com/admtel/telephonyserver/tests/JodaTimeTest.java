@@ -16,7 +16,7 @@ public class JodaTimeTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println(new Duration (connectedTime, new DateTime()).getMillis());
+		System.out.println(new Duration (connectedTime, new DateTime()).getStandardSeconds());
 
 	}
 

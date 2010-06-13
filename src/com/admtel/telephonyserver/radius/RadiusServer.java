@@ -6,11 +6,11 @@ import java.io.SequenceInputStream;
 import java.net.SocketException;
 
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
 import org.tinyradius.attribute.RadiusAttribute;
 import org.tinyradius.dictionary.Dictionary;
 import org.tinyradius.dictionary.DictionaryParser;
 import org.tinyradius.packet.AccessRequest;
+import org.tinyradius.packet.AccountingRequest;
 import org.tinyradius.packet.RadiusPacket;
 import org.tinyradius.util.RadiusClient;
 import org.tinyradius.util.RadiusException;
@@ -18,12 +18,15 @@ import org.tinyradius.util.RadiusUtil;
 
 import com.admtel.telephonyserver.config.RadiusDefinition;
 import com.admtel.telephonyserver.core.AdmTelephonyServer;
+import com.admtel.telephonyserver.core.Channel;
+import com.admtel.telephonyserver.core.Channel.CallOrigin;
 import com.admtel.telephonyserver.interfaces.Authorizer;
+import com.admtel.telephonyserver.utils.AdmUtils;
 
 public class RadiusServer implements Authorizer{
 	
 	public enum AccountingType {Start, Stop, InterimUpdate};
-	public enum CallOrigin {Answer, Originate};
+	
 	
 	static Logger log = Logger.getLogger(RadiusServer.class);
 
@@ -32,7 +35,6 @@ public class RadiusServer implements Authorizer{
 
 	public RadiusDefinition definition;
 
-	RadiusClient radiusClient;
 	Dictionary dictionary;
 
 	public RadiusServer(RadiusDefinition definition) {
@@ -42,6 +44,15 @@ public class RadiusServer implements Authorizer{
 		InputStream s2 = RadiusServer.class.getClassLoader()
 				.getResourceAsStream(ADM_DICTIONARY);
 		InputStream s = new SequenceInputStream(s1, s2);
+		try {
+			dictionary = DictionaryParser.parseDictionary(s);
+		} catch (IOException e) {
+			log.fatal("Failed to instanciate RadiusServer", e);
+		}
+	}
+
+	protected RadiusClient getRadiusClient(){
+		RadiusClient radiusClient;
 		radiusClient = new RadiusClient(definition.getAddress(), definition
 				.getSecret());
 		radiusClient.setAcctPort(definition.getAcctPort());
@@ -52,24 +63,26 @@ public class RadiusServer implements Authorizer{
 		} catch (SocketException e1) {
 			log.fatal("Failed to instanciate RadiusServer", e1);
 		}
-		try {
-			dictionary = DictionaryParser.parseDictionary(s);
-		} catch (IOException e) {
-			log.fatal("Failed to instanciate RadiusServer", e);
-		}
+		return radiusClient;
 	}
 
 	@Override
-	public AuthorizeResult authorize(String username,
-			String password, String address, String callingStationId,
-			String calledStationId, boolean routing, boolean number) {
-		log.trace(String.format("authorize :%s:%s:%s:%s:%s:%s", username, address, callingStationId, calledStationId, routing, number));
+	public AuthorizeResult authorize(Channel channel, String username,
+			String password, String address, String calledStationId, boolean routing, boolean number) {
+		
+		if (channel==null){
+			log.warn("channel is null");
+			return new AuthorizeResult();
+		}
+		
+		log.trace(String.format("authorize :%s:%s:%s:%s:%s", username, address, calledStationId, routing, number));
 		if (username == null || username.isEmpty()){
 			username="0000";
 		}
 		if(password==null || password.isEmpty()){
 			password="0000";
 		}
+		String callingStationId = channel.getCallingStationId();
 		if (callingStationId == null || callingStationId.isEmpty()){
 			callingStationId="0000";
 		}
@@ -82,7 +95,7 @@ public class RadiusServer implements Authorizer{
 		//ar.setAuthProtocol(AccessRequest.AUTH_PAP); // or AUTH_CHAP
 		ar.setDictionary(dictionary);
 		ar.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
-		ar.addAttribute("Service-Type", "Login-User");
+		ar.addAttribute("Service-Type", channel.getServiceType());
 		ar.addAttribute("Calling-Station-Id", callingStationId);
 		ar.addAttribute("Called-Station-Id", calledStationId);
 		
@@ -99,6 +112,7 @@ public class RadiusServer implements Authorizer{
 		
 		RadiusPacket response;
 		try {
+			RadiusClient radiusClient = getRadiusClient();
 			response = radiusClient.authenticate(ar);
 			response.setDictionary(dictionary);
 			log.debug(response);
@@ -106,6 +120,14 @@ public class RadiusServer implements Authorizer{
 			case RadiusPacket.ACCESS_ACCEPT:{
 					result.authorized = true;
 					RadiusAttribute attr = response.getAttribute("h323-credit-time");
+					String tUsername = username;
+					try{
+						tUsername = response.getAttributeValue("user-name");
+					}
+					catch (IllegalArgumentException e){
+						
+					}
+					result.setUserName(tUsername);
 					if (attr != null){
 						try{
 							result.allowedTime = Integer.valueOf(RadiusUtil.getStringFromUtf8(attr.getAttributeData()));
@@ -123,7 +145,73 @@ public class RadiusServer implements Authorizer{
 		} catch (RadiusException e) {
 			log.error(e.getMessage(), e);
 		}
-		return result;
+		return result;	}
+
+	@Override
+	public boolean accountingInterimUpdate(Channel channel) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean accountingStart(Channel channel) {
+		AccountingRequest acctRequest = new AccountingRequest(channel.getUserName(),
+				AccountingRequest.ACCT_STATUS_TYPE_START);
+		acctRequest.setDictionary(dictionary);
+		acctRequest.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
+		acctRequest.addAttribute("Service-Type", channel.getServiceType());
+		acctRequest.addAttribute("Calling-Station-Id", channel.getCallingStationId());
+		acctRequest.addAttribute("Called-Station-Id", channel.getCalledStationId());
+		acctRequest.addAttribute("Acct-Session-Id", channel.getAcctSessionId());
+		acctRequest.addAttribute("h323-call-origin",(channel.getCallOrigin()==CallOrigin.Inbound?"answer":"originate"));
+		acctRequest.addAttribute("h323-setup-time","h323-setup-time="+AdmUtils.dateToRadiusStr(channel.getSetupTime()));
+		acctRequest.addAttribute("Acct-Delay-Time","0");
+		acctRequest.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
+		acctRequest.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
+		
+		try {
+			getRadiusClient().account(acctRequest);
+		} catch (IOException e) {
+			log.error("", e);
+		} catch (RadiusException e) {
+			log.error("", e);
+		}
+
+		return true;
+	}
+
+	@Override
+	public boolean accountingStop(Channel channel) {
+		AccountingRequest acctRequest = new AccountingRequest(channel.getUserName(),
+				AccountingRequest.ACCT_STATUS_TYPE_STOP);
+		acctRequest.setDictionary(dictionary);
+		acctRequest.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
+		acctRequest.addAttribute("Service-Type", channel.getServiceType());
+		acctRequest.addAttribute("Calling-Station-Id", channel.getCallingStationId());
+		acctRequest.addAttribute("Called-Station-Id", channel.getCalledStationId());
+		acctRequest.addAttribute("Acct-Session-Id", channel.getAcctSessionId());
+		acctRequest.addAttribute("h323-call-origin",(channel.getCallOrigin()==CallOrigin.Inbound?"answer":"originate"));
+		acctRequest.addAttribute("h323-setup-time","h323-setup-time="+AdmUtils.dateToRadiusStr(channel.getSetupTime()));
+		acctRequest.addAttribute("Acct-Delay-Time","0");
+		acctRequest.addAttribute("Acct-Session-Time",Long.toString(channel.getSessionTime()));
+		acctRequest.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
+		acctRequest.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
+		acctRequest.addAttribute("h323-disconnect-cause","h323-disconnect-cause="+channel.getH323DisconnectCause());
+
+		if (channel.getAnswerTime()!=null){
+			acctRequest.addAttribute("h323-connect-time","h323-connect-time="+AdmUtils.dateToRadiusStr(channel.getAnswerTime()));
+		}
+		if (channel.getHangupTime()!=null){
+			acctRequest.addAttribute("h323-disconnect-time","h323-disconnect-time="+AdmUtils.dateToRadiusStr(channel.getHangupTime()));
+		}
+		try {
+			getRadiusClient().account(acctRequest);
+		} catch (IOException e) {
+			log.error("", e);
+		} catch (RadiusException e) {
+			log.error("", e);
+		}
+		return true;
 	}
 	
 	/*public void accounting (AccountingType type, String userName, String serviceType, String acctUniqueSessionId, String acctSessionId, 
