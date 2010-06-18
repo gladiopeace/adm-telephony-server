@@ -19,16 +19,16 @@ import com.admtel.telephonyserver.events.PlayAndGetDigitsStartedEvent;
 import com.admtel.telephonyserver.events.PlaybackEndedEvent;
 import com.admtel.telephonyserver.events.PlaybackFailedEvent;
 import com.admtel.telephonyserver.events.PlaybackStartedEvent;
-import com.admtel.telephonyserver.events.freeswitch.FSChannelCreateEvent;
-import com.admtel.telephonyserver.events.freeswitch.FSChannelDataEvent;
-import com.admtel.telephonyserver.events.freeswitch.FSChannelDestroyEvent;
-import com.admtel.telephonyserver.events.freeswitch.FSChannelEvent;
-import com.admtel.telephonyserver.events.freeswitch.FSChannelOriginateEvent;
-import com.admtel.telephonyserver.events.freeswitch.FSChannelOutgoingEvent;
-import com.admtel.telephonyserver.events.freeswitch.FSCommandReplyEvent;
-import com.admtel.telephonyserver.events.freeswitch.FSDtmfEvent;
-import com.admtel.telephonyserver.events.freeswitch.FSEvent;
-import com.admtel.telephonyserver.events.freeswitch.FSEvent.EventType;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelCreateEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelDataEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelDestroyEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelOriginateEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelOutgoingEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSCommandReplyEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSDtmfEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSEvent.EventType;
 import com.admtel.telephonyserver.utils.AdmUtils;
 import com.admtel.telephonyserver.utils.CodecsUtils;
 import com.admtel.telephonyserver.utils.PromptsUtils;
@@ -90,11 +90,11 @@ public class FSChannel extends Channel {
 				Script script = ScriptManager.getInstance()
 						.createScript(channelData);
 				if (script != null) {
-					listeners.add(script);
+					getListeners().add(script);
 				}
 				// Send outbound alerting event
 				OutboundAlertingEvent ie = new OutboundAlertingEvent(
-						FSChannel.this);
+						FSChannel.this, FSChannel.this.getCallingStationId(), FSChannel.this.getCalledStationId());
 				FSChannel.this.onEvent(ie);
 			}
 				break;
@@ -126,7 +126,7 @@ public class FSChannel extends Channel {
 				Script script = ScriptManager.getInstance()
 						.createScript(channelData);
 				if (script != null) {
-					listeners.add(script);
+					getListeners().add(script);
 				}
 				// Send inbound alerting event
 				InboundAlertingEvent ie = new InboundAlertingEvent(
@@ -443,7 +443,7 @@ public class FSChannel extends Channel {
 			}
 
 			if (fsEvent.getEventType() == EventType.ChannelDestroy) {
-				listeners.clear();
+				getListeners().clear();
 				FSChannel.this._switch.removeChannel(FSChannel.this);
 			}
 			log.debug(String.format(
@@ -469,7 +469,7 @@ public class FSChannel extends Channel {
 
 	@Override
 	public Result internalDial(String address, long timeout) {
-		String translatedAddress = _switch.addressTranslator.translate(address);
+		String translatedAddress = _switch.getAddressTranslator().translate(address);
 		if (translatedAddress != null && translatedAddress.length() > 0) {
 			currentState = new DialingState(translatedAddress, timeout);
 		} else {
@@ -481,9 +481,9 @@ public class FSChannel extends Channel {
 	}
 
 	@Override
-	public Result internalHangup(String cause) {
+	public Result internalHangup(Integer cause) {
 		session.write(String.format(
-				"SendMsg %s\ncall-command: hangup\nhangup-cause: %s", getId(),
+				"SendMsg %s\ncall-command: hangup\nhangup-cause: %d", getId(),
 				cause));		
 		return Result.Ok;
 	}

@@ -8,7 +8,7 @@
 		<enabled>true</enabled>
  		<class>com.admtel.telephonyserver.registrar.SimpleRegistrar</class>
 </registrar>
-<radius>
+<radius><!--
 	<server>
 		<id>first radius server</id>
 		<address>172.16.140.129</address>
@@ -21,7 +21,7 @@
 		<stop-accounting>true</stop-accounting>
 		<interim-update>10</interim-update>
 	</server>
-	<!--<server>
+	--><!--<server>
 	  	<id>Second radius server</id>
 	  	<address>172.16.140.130</address>
 		<auth-port>1812</auth-port>

@@ -9,6 +9,7 @@ public class ChannelData extends VariableMap {
 	public final static String CALLED_NUMBER="CalledNumber";
 	public final static String USERNAME="UserName";
 	public final static String SERVICE_NUMBER="ServiceNumber";
+	public final static String REMOTE_IP="remote_ip";
 	
 	public void setCallerIdName(String callerIdName){
 		addVariable(CALLER_ID_NAME, callerIdName);
@@ -48,5 +49,8 @@ public class ChannelData extends VariableMap {
 	}
 	public String getServiceNumber(){
 		return getVariable(SERVICE_NUMBER);
+	}
+	public String getRemoteIP() {
+		return getVariable(REMOTE_IP);
 	}
 }

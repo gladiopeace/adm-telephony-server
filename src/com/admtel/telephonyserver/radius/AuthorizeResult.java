@@ -1,8 +1,19 @@
 package com.admtel.telephonyserver.radius;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AuthorizeResult {
 	
 	String userName;
+	List<String> routes = new ArrayList<String>();
+	
+	public List<String> getRoutes() {
+		return routes;
+	}
+	public void setRoutes(List<String> routes) {
+		this.routes = routes;
+	}
 	public String getUserName() {
 		return userName;
 	}

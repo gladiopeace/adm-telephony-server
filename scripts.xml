@@ -59,4 +59,11 @@
  	<parameter key="language" value="english"/>
  	</parameters>
  </script>
+ <script name="TransitSwitch">
+  <called>[0-9]*</called>
+  <class>scripts/TransitSwitch.groovy</class>
+  <parameters>
+   <parameter key="language" value="english"/>
+  </parameters>
+ </script>
 </scripts>
