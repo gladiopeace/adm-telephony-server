@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
+import com.admtel.telephonyserver.events.DialStartedEvent;
 import com.admtel.telephonyserver.events.DtmfEvent;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.HangupEvent;
@@ -31,7 +32,7 @@ public abstract class Channel {
 		Inbound, Outbound
 	};
 
-	List<EventListener> listeners = new CopyOnWriteArrayList<EventListener>();
+	private List<EventListener> listeners = new CopyOnWriteArrayList<EventListener>();
 
 	protected State state = State.Idle;
 	protected String id;
@@ -53,7 +54,6 @@ public abstract class Channel {
 	protected DateTime answerTime;
 
 	protected String h323CallOrigin;
-	protected String h323RemoteAddress;
 	protected String h323GwId;
 
 	protected String acctUniqueSessionId = UUID.randomUUID().toString();
@@ -131,11 +131,7 @@ public abstract class Channel {
 	}
 
 	public String getH323RemoteAddress() {
-		return h323RemoteAddress;
-	}
-
-	public void setH323RemoteAddress(String h323RemoteAddress) {
-		this.h323RemoteAddress = h323RemoteAddress;
+		return channelData.getRemoteIP();
 	}
 
 	public String getH323GwId() {
@@ -175,15 +171,15 @@ public abstract class Channel {
 	}
 
 	public void addEventListener(EventListener listener) {
-		listeners.add(listener);
+		getListeners().add(listener);
 	}
 
 	public void removeEventListener(EventListener listener) {
-		listeners.remove(listener);
+		getListeners().remove(listener);
 	}
 
 	public void removeAllEventListeners() {
-		listeners.clear();
+		getListeners().clear();
 	}
 
 	public Channel(Switch _switch, String id) {
@@ -223,7 +219,7 @@ public abstract class Channel {
 	public abstract Result internalPlayAndGetDigits(int max, String prompt,
 			long timeout, String terminators, boolean interruptPlay);
 
-	public abstract Result internalHangup(String cause);
+	public abstract Result internalHangup(Integer integer);
 
 	public abstract Result internalPlayback(String[] prompt, String terminators);
 
@@ -252,8 +248,8 @@ public abstract class Channel {
 		return result;
 	}
 
-	final public Result hangup(String cause) {
-		Result result = internalHangup(cause);
+	final public Result hangup(DisconnectCode disconnectCode) {
+		Result result = internalHangup(disconnectCode.toInteger());
 		if (result == Result.Ok) {
 			state = State.Clearing;
 		}
@@ -413,9 +409,11 @@ public abstract class Channel {
 			setupTime = new DateTime();
 			this.addEventListener(EventsManager.getInstance());
 			break;
+			
 		}
+		
 		try {
-			Iterator<EventListener> it = listeners.iterator();
+			Iterator<EventListener> it = getListeners().iterator();
 			while (it.hasNext()) {
 				it.next().onEvent(e);
 			}
@@ -436,12 +434,21 @@ public abstract class Channel {
 		this.answerTime = answerTime;
 	}
 
+	@Override
 	public String toString() {
-		return String.format("Channel:%s:%s:%s", this.getClass()
-				.getSimpleName(), this.state, this.id);
+		return "Channel [_switch=" + _switch + ", id=" + id + ", state="
+				+ state + "]";
 	}
 
 	public Integer getH323DisconnectCause() {
 		return this.h323DisconnectCause;
+	}
+
+	public void setListeners(List<EventListener> listeners) {
+		this.listeners = listeners;
+	}
+
+	public List<EventListener> getListeners() {
+		return listeners;
 	}
 }

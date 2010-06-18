@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.net.SocketException;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.tinyradius.attribute.RadiusAttribute;
+import org.tinyradius.attribute.VendorSpecificAttribute;
 import org.tinyradius.dictionary.Dictionary;
 import org.tinyradius.dictionary.DictionaryParser;
 import org.tinyradius.packet.AccessRequest;
@@ -115,11 +117,32 @@ public class RadiusServer implements Authorizer{
 			RadiusClient radiusClient = getRadiusClient();
 			response = radiusClient.authenticate(ar);
 			response.setDictionary(dictionary);
-			log.debug(response);
+			
+			//log.debug(response);
 			switch (response.getPacketType()){
 			case RadiusPacket.ACCESS_ACCEPT:{
 					result.authorized = true;
-					RadiusAttribute attr = response.getAttribute("h323-credit-time");
+					
+			
+					List<VendorSpecificAttribute> attributes = response.getAttributes(26);
+					for (VendorSpecificAttribute attribute:attributes){
+						List<RadiusAttribute> subAttributes = attribute.getSubAttributes();
+						for (RadiusAttribute attribute2:subAttributes){
+							//log.debug(attribute2.getAttributeTypeObject().getName()+"====="+RadiusUtil.getStringFromUtf8(attribute2.getAttributeData()));
+							if (attribute2.getAttributeTypeObject().getName().equals("Cisco-Command-Code")){
+								result.routes.add(RadiusUtil.getStringFromUtf8(attribute2.getAttributeData()));
+							}
+							else
+							if (attribute2.getAttributeTypeObject().getName().equals("h323-credit-time")){
+								try{
+									result.allowedTime = Integer.valueOf(RadiusUtil.getStringFromUtf8(attribute2.getAttributeData()));
+								}
+								catch(Exception e){
+									result.allowedTime = 0;
+								}
+							}
+						}
+					}
 					String tUsername = username;
 					try{
 						tUsername = response.getAttributeValue("user-name");
@@ -128,15 +151,6 @@ public class RadiusServer implements Authorizer{
 						
 					}
 					result.setUserName(tUsername);
-					if (attr != null){
-						try{
-							result.allowedTime = Integer.valueOf(RadiusUtil.getStringFromUtf8(attr.getAttributeData()));
-						}
-						finally{
-							result.allowedTime = 0;
-						}
-							
-					}
 				}
 				break;
 			}
@@ -155,6 +169,8 @@ public class RadiusServer implements Authorizer{
 
 	@Override
 	public boolean accountingStart(Channel channel) {
+		
+		log.trace("Sending Accounting-Start message for channel " + channel);
 		AccountingRequest acctRequest = new AccountingRequest(channel.getUserName(),
 				AccountingRequest.ACCT_STATUS_TYPE_START);
 		acctRequest.setDictionary(dictionary);
@@ -168,6 +184,7 @@ public class RadiusServer implements Authorizer{
 		acctRequest.addAttribute("Acct-Delay-Time","0");
 		acctRequest.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
 		acctRequest.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
+		acctRequest.addAttribute("h323-remote-address","h323-remote-address="+channel.getH323RemoteAddress());
 		
 		try {
 			getRadiusClient().account(acctRequest);
@@ -182,6 +199,9 @@ public class RadiusServer implements Authorizer{
 
 	@Override
 	public boolean accountingStop(Channel channel) {
+		
+		log.trace("Sending Accounting-Stop message for channel " + channel);
+		
 		AccountingRequest acctRequest = new AccountingRequest(channel.getUserName(),
 				AccountingRequest.ACCT_STATUS_TYPE_STOP);
 		acctRequest.setDictionary(dictionary);
@@ -197,6 +217,8 @@ public class RadiusServer implements Authorizer{
 		acctRequest.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
 		acctRequest.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
 		acctRequest.addAttribute("h323-disconnect-cause","h323-disconnect-cause="+channel.getH323DisconnectCause());
+		acctRequest.addAttribute("h323-remote-address","h323-remote-address="+channel.getH323RemoteAddress());
+
 
 		if (channel.getAnswerTime()!=null){
 			acctRequest.addAttribute("h323-connect-time","h323-connect-time="+AdmUtils.dateToRadiusStr(channel.getAnswerTime()));

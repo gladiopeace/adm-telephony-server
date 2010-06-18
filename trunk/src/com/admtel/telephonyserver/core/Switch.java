@@ -20,8 +20,8 @@ public abstract class Switch {
 	};
 
 	SwitchDefinition definition;
-	SwitchStatus status;
-	AddressTranslator addressTranslator;
+	private SwitchStatus status;
+	private AddressTranslator addressTranslator;
 
 	private Map<String, Channel> channels = new HashMap<String, Channel>();
 	private Map<String, Channel> synchronizedChannels = Collections
@@ -29,12 +29,12 @@ public abstract class Switch {
 
 	public Switch(SwitchDefinition definition) {
 		this.definition = definition;
-		status = SwitchStatus.NotReady;
-		addressTranslator = SmartClassLoader
+		setStatus(SwitchStatus.NotReady);
+		setAddressTranslator(SmartClassLoader
 				.createInstance(AddressTranslator.class, definition
-						.getAddressTranslatorClass());
-		if (addressTranslator == null) {
-			addressTranslator = new DefaultASTAddressTranslator();
+						.getAddressTranslatorClass()));
+		if (getAddressTranslator() == null) {
+			setAddressTranslator(new DefaultASTAddressTranslator());
 		}
 	}
 
@@ -108,6 +108,18 @@ public abstract class Switch {
 			return false;
 		}
 		return true;
+	}
+
+	public void setStatus(SwitchStatus status) {
+		this.status = status;
+	}
+
+	public void setAddressTranslator(AddressTranslator addressTranslator) {
+		this.addressTranslator = addressTranslator;
+	}
+
+	public AddressTranslator getAddressTranslator() {
+		return addressTranslator;
 	}
 	
 }

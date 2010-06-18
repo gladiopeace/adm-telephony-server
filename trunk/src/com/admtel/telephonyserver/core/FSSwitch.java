@@ -14,16 +14,17 @@ import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.SocketConnector;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
-import com.admtel.telephonyserver.events.asterisk.ASTEvent.EventType;
-import com.admtel.telephonyserver.events.freeswitch.FSChannelCreateEvent;
+import com.admtel.telephonyserver.asterisk.ASTSwitch;
+import com.admtel.telephonyserver.asterisk.events.ASTEvent.EventType;
 import com.admtel.telephonyserver.config.SwitchDefinition;
 import com.admtel.telephonyserver.core.Timers.Timer;
-import com.admtel.telephonyserver.events.freeswitch.FSChannelDataEvent;
-import com.admtel.telephonyserver.events.freeswitch.FSChannelEvent;
-import com.admtel.telephonyserver.events.freeswitch.FSChannelOriginateEvent;
-import com.admtel.telephonyserver.events.freeswitch.FSCommandReplyEvent;
-import com.admtel.telephonyserver.events.freeswitch.FSEvent;
-import com.admtel.telephonyserver.events.freeswitch.FSRegisterEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelCreateEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelDataEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelOriginateEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSCommandReplyEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSRegisterEvent;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.utils.AdmUtils;
@@ -63,7 +64,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 				case CommandReply: {
 					FSCommandReplyEvent cre = (FSCommandReplyEvent) event;
 					if (cre.isSuccess()) {
-						FSSwitch.this.status = SwitchStatus.Ready;
+						FSSwitch.this.setStatus(SwitchStatus.Ready);
 						session.write("event plain all"); // TODO, create new
 															// state to
 						// check for return of event

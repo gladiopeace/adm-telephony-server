@@ -120,7 +120,7 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 			// TODO set hangup time
 		}
 
-		return new AuthorizeResult();
+		return authorizeResult;
 	}
 
 	@Override
