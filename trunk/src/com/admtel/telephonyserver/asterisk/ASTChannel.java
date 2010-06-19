@@ -7,6 +7,9 @@ import org.apache.log4j.Logger;
 import org.apache.mina.core.session.IoSession;
 import org.joda.time.DateTime;
 
+import com.admtel.telephonyserver.asterisk.commands.ASTDialCommand;
+import com.admtel.telephonyserver.asterisk.commands.ASTGetVariableCommand;
+import com.admtel.telephonyserver.asterisk.commands.ASTSetVariableCommand;
 import com.admtel.telephonyserver.asterisk.events.ASTAgiExecEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTAsyncAgiEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTChannelState;
@@ -323,7 +326,8 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 			case AsyncAgi: {
 				ASTAsyncAgiEvent agiEvent = (ASTAsyncAgiEvent) astEvent;
 				if (agiEvent.isStartAgi()) {
-					ASTChannel.this.getVariable("adm_args");
+					ASTGetVariableCommand cmd = new ASTGetVariableCommand(ASTChannel.this, "adm_args");
+					session.write(cmd);
 				}
 			}
 				break;
@@ -334,19 +338,20 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 					if (response.getValue("adm_args") != null) {
 						String admArgs = response.getValue("adm_args");
 						channelData.addDelimitedVars(admArgs, "&");
-						// Create script
-						Script script = ScriptManager.getInstance()
-								.createScript(channelData);
-						if (script != null) {
-							log.debug("Created script " + script);
-							getListeners().add(script);
-						}
-						// Send inbound alerting event
-						InboundAlertingEvent ie = new InboundAlertingEvent(
-								ASTChannel.this);
-						ASTChannel.this.onEvent(ie);
 
 					}
+					// Create script
+					Script script = ScriptManager.getInstance()
+							.createScript(channelData);
+					if (script != null) {
+						log.debug("Created script " + script);
+						getListeners().add(script);
+					}
+					// Send inbound alerting event
+					InboundAlertingEvent ie = new InboundAlertingEvent(
+							ASTChannel.this);
+					ASTChannel.this.onEvent(ie);
+
 				}
 
 			}
@@ -359,7 +364,8 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 	private class OutboundAlertingState extends State {
 
 		public OutboundAlertingState(){
-			ASTChannel.this.getVariable("adm_args");
+			ASTGetVariableCommand cmd = new ASTGetVariableCommand(ASTChannel.this, "adm_args");
+			session.write(cmd);
 		}
 		@Override
 		public boolean onTimer(Object data) {
@@ -652,15 +658,10 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 
 		public DialingState(String address, long timeout) {
 
-			ASTChannel.this.setVariable("_adm_args", "master_channel="+ASTChannel.this.getId());
-			String dialStr = String.format("%s||%d", address, timeout);
-
-			String actionId = getId() + "___Dial";
-			ASTChannel.this.session
-					.write(String
-							.format(
-									"Action: AGI\nChannel: %s\nCommand: EXEC DIAL %s\nActionId: %s\nCommandID: %s",
-									getId(), dialStr, actionId, actionId));
+			ASTSetVariableCommand cmd = new ASTSetVariableCommand(ASTChannel.this,"_adm_args", "master_channel="+ASTChannel.this.getId());
+			session.write(cmd);
+			ASTDialCommand dialCmd = new ASTDialCommand(ASTChannel.this, address, timeout);
+			session.write(dialCmd);
 			result = Result.Ok;
 		}
 
@@ -843,17 +844,6 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 	public void processNativeEvent(ASTEvent astEvent) {
 		log.debug(astEvent + "(" + this + ")");
 		messageHandler.putMessage(astEvent);
-	}
-
-	private void getVariable(String varname) {
-		session.write(String.format(
-				"ACTION: GetVar\nChannel: %s\nVariable: %s\nActionID: %s", this
-						.getId(), varname, getId() + "___GetVar"));
-	}
-	private void setVariable(String varname, String value){
-		session.write(String.format(
-				"ACTION: SetVar\nChannel: %s\nVariable: %s\nValue: %s\nActionID: %s", this
-						.getId(), varname, value, getId() + "___GetVar"));		
 	}
 
 	@Override
