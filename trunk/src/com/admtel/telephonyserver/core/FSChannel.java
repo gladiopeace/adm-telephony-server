@@ -82,13 +82,13 @@ public class FSChannel extends Channel {
 			case ChannelData:{
 				FSChannelDataEvent cde = (FSChannelDataEvent) fsEvent;
 				String admArgs = cde.getValue("variable_adm_args");
-				channelData.addDelimitedVars(admArgs, "&");
-				channelData.setCalledNumber(cde.getCalledIdNum());
-				channelData.setCallerIdNumber(cde.getCallerIdNum());
-				channelData.setCallerIdName(cde.getCallerIdNum());
+				getChannelData().addDelimitedVars(admArgs, "&");
+				getChannelData().setCalledNumber(cde.getCalledIdNum());
+				getChannelData().setCallerIdNumber(cde.getCallerIdNum());
+				getChannelData().setCallerIdName(cde.getCallerIdNum());
 				// Create script
 				Script script = ScriptManager.getInstance()
-						.createScript(channelData);
+						.createScript(getChannelData());
 				if (script != null) {
 					getListeners().add(script);
 				}
@@ -117,14 +117,14 @@ public class FSChannel extends Channel {
 			case ChannelData:{
 				FSChannelDataEvent cde = (FSChannelDataEvent) fsEvent;
 				String admArgs = cde.getValue("variable_adm_args");
-				channelData.addDelimitedVars(admArgs, "&");
-				channelData.setCalledNumber(cde.getCalledIdNum());
-				channelData.setCallerIdNumber(cde.getCallerIdNum());
-				channelData.setCallerIdName(cde.getCallerIdNum());
+				getChannelData().addDelimitedVars(admArgs, "&");
+				getChannelData().setCalledNumber(cde.getCalledIdNum());
+				getChannelData().setCallerIdNumber(cde.getCallerIdNum());
+				getChannelData().setCallerIdName(cde.getCallerIdNum());
 
 				// Create script
 				Script script = ScriptManager.getInstance()
-						.createScript(channelData);
+						.createScript(getChannelData());
 				if (script != null) {
 					getListeners().add(script);
 				}

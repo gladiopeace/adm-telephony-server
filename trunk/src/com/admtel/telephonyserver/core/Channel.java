@@ -41,7 +41,7 @@ public abstract class Channel {
 
 	protected String uniqueId;
 
-	protected ChannelData channelData = new ChannelData();
+	private ChannelData channelData = new ChannelData();
 	protected Participant conferenceParticipant; // information about the
 													// channel when joined in a
 													// conference bridge
@@ -54,7 +54,6 @@ public abstract class Channel {
 	protected DateTime answerTime;
 
 	protected String h323CallOrigin;
-	protected String h323GwId;
 
 	protected String acctUniqueSessionId = UUID.randomUUID().toString();
 	protected String acctSessionId;
@@ -72,7 +71,7 @@ public abstract class Channel {
 	}
 
 	public String getServiceNumber(){
-		return channelData.getServiceNumber();
+		return getChannelData().getServiceNumber();
 	}
 	public String getServiceType() {
 		return serviceType;
@@ -99,11 +98,11 @@ public abstract class Channel {
 	}
 
 	public String getUserName() {
-		return channelData.getUserName();
+		return getChannelData().getUserName();
 	}
 
 	public void setUserName(String userName) {
-		channelData.setUserName(userName);
+		getChannelData().setUserName(userName);
 	}
 
 	public DateTime getSetupTime() {
@@ -131,17 +130,8 @@ public abstract class Channel {
 	}
 
 	public String getH323RemoteAddress() {
-		return channelData.getRemoteIP();
+		return getChannelData().getRemoteIP();
 	}
-
-	public String getH323GwId() {
-		return h323GwId;
-	}
-
-	public void setH323GwId(String h323GwId) {
-		this.h323GwId = h323GwId;
-	}
-
 	public String getAcctUniqueSessionId() {
 		return acctUniqueSessionId;
 	}
@@ -163,11 +153,11 @@ public abstract class Channel {
 	}
 
 	public String getCalledStationId() {
-		return channelData.getCalledNumber();
+		return getChannelData().getCalledNumber();
 	}
 
 	public String getCallingStationId() {
-		return channelData.getCallerIdNumber();
+		return getChannelData().getCallerIdNumber();
 	}
 
 	public void addEventListener(EventListener listener) {
@@ -385,9 +375,9 @@ public abstract class Channel {
 			break;
 		case InboundAlerting: {
 			InboundAlertingEvent ie = (InboundAlertingEvent) e;
-			ie.setCalledIdNumber(channelData.getCalledNumber());
-			ie.setCallerIdNumber(channelData.getCallerIdNumber());
-			ie.setServiceNumber(channelData.getServiceNumber());
+			ie.setCalledIdNumber(getChannelData().getCalledNumber());
+			ie.setCallerIdNumber(getChannelData().getCallerIdNumber());
+			ie.setServiceNumber(getChannelData().getServiceNumber());
 			state = State.InboundAlerting;
 			callOrigin = CallOrigin.Inbound;
 			acctSessionId = UUID.randomUUID().toString();
@@ -450,5 +440,17 @@ public abstract class Channel {
 
 	public List<EventListener> getListeners() {
 		return listeners;
+	}
+
+	public String getLoginIP() {
+		return getChannelData().getLoginIP();
+	}
+
+	public void setChannelData(ChannelData channelData) {
+		this.channelData = channelData;
+	}
+
+	public ChannelData getChannelData() {
+		return channelData;
 	}
 }

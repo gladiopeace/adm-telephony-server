@@ -53,6 +53,7 @@ import com.admtel.telephonyserver.core.Timers;
 public class ASTChannel extends Channel implements TimerNotifiable {
 
 	static Logger log = Logger.getLogger(ASTChannel.class);
+
 	private class PlayingState extends State {
 
 		List<String> prompts = new ArrayList<String>();
@@ -186,39 +187,42 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 		}
 	}
 
-	private class JoinConferenceState extends State{
+	private class JoinConferenceState extends State {
 		String conferenceId;
 		boolean moderator;
 		boolean muted;
 		boolean deaf;
-		
-		public JoinConferenceState(String conferenceId, boolean moderator, boolean muted, boolean deaf){
-			
+
+		public JoinConferenceState(String conferenceId, boolean moderator,
+				boolean muted, boolean deaf) {
+
 			this.conferenceId = conferenceId;
 			this.moderator = moderator;
 			this.muted = muted;
 			this.deaf = deaf;
-			String parameters = "dT";//Dynamically create the conference with talked detection T
-			if (moderator){
-				parameters +="a";
+			String parameters = "dT";// Dynamically create the conference with
+			// talked detection T
+			if (moderator) {
+				parameters += "a";
 			}
-			if (muted){
+			if (muted) {
 				parameters += "m";
 			}
-			if (deaf){
-				parameters +="t";
+			if (deaf) {
+				parameters += "t";
 			}
-	
+
 			String command = String.format("%s|%s|", conferenceId, parameters);
 			String actionId = getId() + "___MeetMe";
 
 			ASTChannel.this.session
-			.write(String
-					.format(
-							"Action: AGI\nChannel: %s\nCommand: EXEC MeetMe %s\nActionId: %s\nCommandID: %s",
-							getId(), command, actionId, actionId));	
-			
+					.write(String
+							.format(
+									"Action: AGI\nChannel: %s\nCommand: EXEC MeetMe %s\nActionId: %s\nCommandID: %s",
+									getId(), command, actionId, actionId));
+
 		}
+
 		@Override
 		public boolean onTimer(Object data) {
 			// TODO Auto-generated method stub
@@ -227,35 +231,43 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 
 		@Override
 		public void processEvent(ASTEvent astEvent) {
-			switch (astEvent.getEventType()){
-			case MeetmeJoin:
-			{
+			switch (astEvent.getEventType()) {
+			case MeetmeJoin: {
 				ASTMeetmeJoinEvent je = (ASTMeetmeJoinEvent) astEvent;
-				ASTChannel.this.conferenceParticipant = new Participant (moderator, muted, deaf);
-				ASTChannel.this.conferenceParticipant.setMemeber(je.getUsernum());
-				if (Conferences.getInstance().joinConference(conferenceId, ASTChannel.this)){
-					ASTChannel.this.conferenceParticipant.setJoinTime(new DateTime());
+				ASTChannel.this.conferenceParticipant = new Participant(
+						moderator, muted, deaf);
+				ASTChannel.this.conferenceParticipant.setMemeber(je
+						.getUsernum());
+				if (Conferences.getInstance().joinConference(conferenceId,
+						ASTChannel.this)) {
+					ASTChannel.this.conferenceParticipant
+							.setJoinTime(new DateTime());
 				}
-				ASTChannel.this.onEvent(new ConferenceJoinedEvent(ASTChannel.this, je.getUsernum(), moderator, muted, deaf));
+				ASTChannel.this.onEvent(new ConferenceJoinedEvent(
+						ASTChannel.this, je.getUsernum(), moderator, muted,
+						deaf));
 			}
 				break;
-			case MeetmeLeave:{
+			case MeetmeLeave: {
 				ASTChannel.this.conferenceParticipant = null;
-				ASTChannel.this.onEvent(new ConferenceLeftEvent(ASTChannel.this));
+				ASTChannel.this
+						.onEvent(new ConferenceLeftEvent(ASTChannel.this));
 			}
 				break;
-			case MeetmeTalking:{
-				ASTMeetmeTalkingEvent mte=(ASTMeetmeTalkingEvent)astEvent;
+			case MeetmeTalking: {
+				ASTMeetmeTalkingEvent mte = (ASTMeetmeTalkingEvent) astEvent;
 				ASTChannel.this.conferenceParticipant.setTalking(mte.isOn());
-				ASTChannel.this.onEvent(new ConferenceTalkEvent(ASTChannel.this, ASTChannel.this.conferenceParticipant.isTalking()));
+				ASTChannel.this.onEvent(new ConferenceTalkEvent(
+						ASTChannel.this, ASTChannel.this.conferenceParticipant
+								.isTalking()));
 			}
 				break;
 			}
-			
-			
+
 		}
-		
+
 	}
+
 	private class NullState extends State {
 
 		@Override
@@ -263,10 +275,10 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 			switch (astEvent.getEventType()) {
 			case NewChannel: {
 				ASTNewChannelEvent nce = (ASTNewChannelEvent) astEvent;
-				channelData.setCalledNumber(nce.getCalledNum());
-				channelData.setCallerIdNumber(nce.getCallerIdNum());
-				channelData.setUserName(nce.getUserName());
-				channelData.setServiceNumber(nce.getCalledNum());
+				getChannelData().setCalledNumber(nce.getCalledNum());
+				getChannelData().setCallerIdNumber(nce.getCallerIdNum());
+				getChannelData().setUserName(nce.getUserName());
+				getChannelData().setServiceNumber(nce.getCalledNum());
 				switch (nce.getChannelState()) {
 				case Ring:
 					currentState = new InboundAlertingState();
@@ -311,6 +323,9 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 
 	private class InboundAlertingState extends State {
 
+		ASTVariableFetcher variableFetcher = new ASTVariableFetcher(
+				ASTChannel.this);
+
 		public InboundAlertingState() {
 		}
 
@@ -326,23 +341,35 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 			case AsyncAgi: {
 				ASTAsyncAgiEvent agiEvent = (ASTAsyncAgiEvent) astEvent;
 				if (agiEvent.isStartAgi()) {
-					ASTGetVariableCommand cmd = new ASTGetVariableCommand(ASTChannel.this, "adm_args");
-					session.write(cmd);
+					// ASTGetVariableCommand cmd = new
+					// ASTGetVariableCommand(ASTChannel.this, "adm_args");
+					// session.write(cmd);
+					variableFetcher.fetch("adm_args", "CHANNEL(peerip)");
 				}
 			}
 				break;
 
-			case Response: {
-				ASTResponseEvent response = (ASTResponseEvent) astEvent;
-				if (response.getRequest().equals("GetVar")) {
-					if (response.getValue("adm_args") != null) {
-						String admArgs = response.getValue("adm_args");
-						channelData.addDelimitedVars(admArgs, "&");
-
+			default: {
+				if (variableFetcher.processASTEvent(astEvent)) { // We got all
+																	// the
+																	// needed
+																	// variables
+																	// for this
+																	// channel
+					if (variableFetcher.getVariable("adm_args") != null) {
+						getChannelData().addDelimitedVars(variableFetcher
+								.getVariable("adm_args"), "&");
 					}
+					if (variableFetcher.getVariable("CHANNEL(peerip)") != null) {
+						getChannelData().setLoginIP(variableFetcher
+								.getVariable("CHANNEL(peerip)"));
+					}
+
+					log.trace(getChannelData());
+
 					// Create script
-					Script script = ScriptManager.getInstance()
-							.createScript(channelData);
+					Script script = ScriptManager.getInstance().createScript(
+							getChannelData());
 					if (script != null) {
 						log.debug("Created script " + script);
 						getListeners().add(script);
@@ -363,10 +390,13 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 
 	private class OutboundAlertingState extends State {
 
-		public OutboundAlertingState(){
-			ASTGetVariableCommand cmd = new ASTGetVariableCommand(ASTChannel.this, "adm_args");
-			session.write(cmd);
+		ASTVariableFetcher variableFetcher = new ASTVariableFetcher(
+				ASTChannel.this);
+
+		public OutboundAlertingState() {
+			variableFetcher.fetch("adm_args", "CHANNEL(peerip)");
 		}
+
 		@Override
 		public boolean onTimer(Object data) {
 			// TODO Auto-generated method stub
@@ -375,51 +405,59 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 
 		@Override
 		public void processEvent(ASTEvent astEvent) {
-			switch (astEvent.getEventType()) {
 
-			case Response: {
-				ASTResponseEvent response = (ASTResponseEvent) astEvent;
-				if (response.getRequest().equals("GetVar")) {
-					if (response.getValue("adm_args") != null) {
-						String admArgs = response.getValue("adm_args");
-						channelData.addDelimitedVars(admArgs, "&");
-						if (channelData.get("master_channel")==null){
-						// Create script
-						Script script = ScriptManager.getInstance()
-								.createScript(channelData);
-						if (script != null) {
-							getListeners().add(script);
-						}
-						}
-						else{
-							
-							//Get the master channel
-							Channel masterChannel = ASTChannel.this._switch.getChannel(channelData.get("master_channel"));
-							if (masterChannel != null){
-								ASTChannel.this.acctUniqueSessionId = masterChannel.getAcctUniqueSessionId();
-								ASTChannel.this.setUserName(masterChannel.getUserName());
-							}
-							
-							// Send outbound alerting event
-							OutboundAlertingEvent oa = new OutboundAlertingEvent(
-									ASTChannel.this, ASTChannel.this.getCallingStationId(), ASTChannel.this.getCalledStationId());
-							ASTChannel.this.onEvent(oa);
-							
-							
-							//In the case of asterisk, we know that we're here only because the channel was
-							// answered
-							
-							//TODO check the logic of this code
-							AnsweredEvent ae = new AnsweredEvent(ASTChannel.this);
-							ASTChannel.this.currentState = new IdleState();
-							ASTChannel.this.onEvent(ae);
-						}
-					}
-							
+			if (variableFetcher.processASTEvent(astEvent)) { // We got all the
+																// needed
+																// variables for
+																// this channel
+				if (variableFetcher.getVariable("adm_args") != null) {
+					getChannelData().addDelimitedVars(variableFetcher
+							.getVariable("adm_args"), "&");
+				}
+				if (variableFetcher.getVariable("CHANNEL(peerip)") != null) {
+					getChannelData().setRemoteIP(variableFetcher
+							.getVariable("CHANNEL(peerip)"));
 				}
 
-			}
-				break;
+				log.trace(getChannelData());
+				if (getChannelData().get("master_channel") == null) {
+					// Create script					
+					Script script = ScriptManager.getInstance().createScript(
+							getChannelData());
+					if (script != null) {
+						getListeners().add(script);
+					}
+				} else {
+
+					// Get the master channel
+					Channel masterChannel = ASTChannel.this._switch
+							.getChannel(getChannelData().get("master_channel"));
+					if (masterChannel != null) {
+						ASTChannel.this.acctUniqueSessionId = masterChannel
+								.getAcctUniqueSessionId();
+						ASTChannel.this
+								.setUserName(masterChannel.getUserName());
+						ASTChannel.this.getChannelData().setLoginIP(masterChannel.getChannelData().getLoginIP());
+						ASTChannel.this.getChannelData().setCalledNumber(masterChannel.getChannelData().getCalledNumber());
+						ASTChannel.this.getChannelData().setCallerIdNumber(masterChannel.getChannelData().getCallerIdNumber());
+					}
+
+				}
+				// Send outbound alerting event
+				OutboundAlertingEvent oa = new OutboundAlertingEvent(
+						ASTChannel.this, ASTChannel.this.getCallingStationId(),
+						ASTChannel.this.getCalledStationId());
+				ASTChannel.this.onEvent(oa);
+
+				// In the case of asterisk, we know that we're here
+				// only because the channel was
+				// answered
+
+				// TODO check the logic of this code
+				AnsweredEvent ae = new AnsweredEvent(ASTChannel.this);
+				ASTChannel.this.currentState = new IdleState();
+				ASTChannel.this.onEvent(ae);
+
 			}
 		}
 
@@ -658,9 +696,12 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 
 		public DialingState(String address, long timeout) {
 
-			ASTSetVariableCommand cmd = new ASTSetVariableCommand(ASTChannel.this,"_adm_args", "master_channel="+ASTChannel.this.getId());
+			ASTSetVariableCommand cmd = new ASTSetVariableCommand(
+					ASTChannel.this, "_adm_args", "master_channel="
+							+ ASTChannel.this.getId());
 			session.write(cmd);
-			ASTDialCommand dialCmd = new ASTDialCommand(ASTChannel.this, address, timeout);
+			ASTDialCommand dialCmd = new ASTDialCommand(ASTChannel.this,
+					address, timeout);
 			session.write(dialCmd);
 			result = Result.Ok;
 		}
@@ -698,9 +739,9 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 
 	State currentState = new NullState();
 	IoSession session;
-	
+
 	ChannelProtocol channelProtocol = ChannelProtocol.Unknown;
-	
+
 	MessageHandler messageHandler = new QueuedMessageHandler() {
 
 		@Override
@@ -724,10 +765,9 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 				ASTHangupEvent asthe = (ASTHangupEvent) astEvent;
 				HangupEvent he = new HangupEvent(ASTChannel.this);
 				he.setHangupCauseStr(asthe.getCauseTxt());
-				try{
+				try {
 					he.setHangCause(Integer.parseInt(asthe.getCause()));
-				}
-				catch (Exception e){
+				} catch (Exception e) {
 					he.setHangCause(16);
 				}
 				ASTChannel.this.onEvent(he);
@@ -760,12 +800,10 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 	public ASTChannel(Switch _switch, String id, IoSession session) {
 		super(_switch, id);
 		this.session = session;
-		
-		if (id.toLowerCase().startsWith("sip")){
+
+		if (id.toLowerCase().startsWith("sip")) {
 			channelProtocol = ChannelProtocol.SIP;
-		}
-		else
-		if (id.toLowerCase().startsWith("iax2")){
+		} else if (id.toLowerCase().startsWith("iax2")) {
 			channelProtocol = ChannelProtocol.IAX2;
 		}
 	}
@@ -783,24 +821,25 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 
 	@Override
 	public Result internalHangup(Integer cause) {
-		
-		//TODO Hangup cause for asterisk is not working
-		
+
+		// TODO Hangup cause for asterisk is not working
+
 		ASTChannel.this.session.write(String.format(
 				"Action: Hangup\nChannel: %s\nCause: %d", getId(), cause));
-		
-		/*String actionId = getId() + "___Hangup";
-		ASTChannel.this.session
-				.write(String
-						.format(
-								"Action: AGI\nChannel: %s\nCommand: EXEC Hangup\nActionId: %s\nCommandID: %s",
-								getId(), actionId, actionId));*/
+
+		/*
+		 * String actionId = getId() + "___Hangup"; ASTChannel.this.session
+		 * .write(String .format(
+		 * "Action: AGI\nChannel: %s\nCommand: EXEC Hangup\nActionId: %s\nCommandID: %s"
+		 * , getId(), actionId, actionId));
+		 */
 		return Result.Ok;
 	}
 
 	@Override
 	public Result internalDial(String address, long timeout) {
-		String translatedAddress = _switch.getAddressTranslator().translate(address);
+		String translatedAddress = _switch.getAddressTranslator().translate(
+				address);
 		if (translatedAddress != null && translatedAddress.length() > 0) {
 			currentState = new DialingState(translatedAddress, timeout);
 		} else {
@@ -856,9 +895,10 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 	}
 
 	@Override
-	public
-	Result internalJoinConference(String conferenceId, boolean moderator, boolean startMuted, boolean startDeaf) {
-		currentState = new JoinConferenceState(conferenceId, moderator, startMuted, startDeaf);//TODO check state
+	public Result internalJoinConference(String conferenceId,
+			boolean moderator, boolean startMuted, boolean startDeaf) {
+		currentState = new JoinConferenceState(conferenceId, moderator,
+				startMuted, startDeaf);// TODO check state
 		return Result.Ok;
 	}
 

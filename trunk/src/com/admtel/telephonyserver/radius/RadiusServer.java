@@ -93,13 +93,16 @@ public class RadiusServer implements Authorizer{
 		}
 		
 		AccessRequest ar = new AccessRequest(username, password);
+		RadiusPacketDecorator arDecorator = new RadiusPacketDecorator(ar);
 		AuthorizeResult result = new AuthorizeResult();
 		//ar.setAuthProtocol(AccessRequest.AUTH_PAP); // or AUTH_CHAP
 		ar.setDictionary(dictionary);
-		ar.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
-		ar.addAttribute("Service-Type", channel.getServiceType());
-		ar.addAttribute("Calling-Station-Id", callingStationId);
-		ar.addAttribute("Called-Station-Id", calledStationId);
+		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
+		arDecorator.addAttribute("Service-Type", channel.getServiceType());
+		arDecorator.addAttribute("Calling-Station-Id", callingStationId);
+		arDecorator.addAttribute("Called-Station-Id", calledStationId);
+		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
+
 		
 		String xpgkRequestType="";
 		if (routing) {
@@ -109,7 +112,7 @@ public class RadiusServer implements Authorizer{
 			xpgkRequestType +=",number";
 		}
 		if (xpgkRequestType != null && !xpgkRequestType.isEmpty()){			
-			ar.addAttribute("Cisco-AVPair", "xpgk-request-type="+xpgkRequestType);
+			arDecorator.addAttribute("Cisco-AVPair", "xpgk-request-type="+xpgkRequestType);
 		}
 		
 		RadiusPacket response;
@@ -173,18 +176,21 @@ public class RadiusServer implements Authorizer{
 		log.trace("Sending Accounting-Start message for channel " + channel);
 		AccountingRequest acctRequest = new AccountingRequest(channel.getUserName(),
 				AccountingRequest.ACCT_STATUS_TYPE_START);
+		
+		RadiusPacketDecorator arDecorator = new RadiusPacketDecorator(acctRequest);
+		
 		acctRequest.setDictionary(dictionary);
-		acctRequest.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
-		acctRequest.addAttribute("Service-Type", channel.getServiceType());
-		acctRequest.addAttribute("Calling-Station-Id", channel.getCallingStationId());
-		acctRequest.addAttribute("Called-Station-Id", channel.getCalledStationId());
-		acctRequest.addAttribute("Acct-Session-Id", channel.getAcctSessionId());
-		acctRequest.addAttribute("h323-call-origin",(channel.getCallOrigin()==CallOrigin.Inbound?"answer":"originate"));
-		acctRequest.addAttribute("h323-setup-time","h323-setup-time="+AdmUtils.dateToRadiusStr(channel.getSetupTime()));
-		acctRequest.addAttribute("Acct-Delay-Time","0");
-		acctRequest.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
-		acctRequest.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
-		acctRequest.addAttribute("h323-remote-address","h323-remote-address="+channel.getH323RemoteAddress());
+		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
+		arDecorator.addAttribute("Service-Type", channel.getServiceType());
+		arDecorator.addAttribute("Calling-Station-Id", channel.getCallingStationId());
+		arDecorator.addAttribute("Called-Station-Id", channel.getCalledStationId());
+		arDecorator.addAttribute("Acct-Session-Id", channel.getAcctSessionId());
+		arDecorator.addAttribute("h323-call-origin",(channel.getCallOrigin()==CallOrigin.Inbound?"answer":"originate"));
+		arDecorator.addAttribute("h323-setup-time","h323-setup-time="+AdmUtils.dateToRadiusStr(channel.getSetupTime()));
+		arDecorator.addAttribute("Acct-Delay-Time","0");
+		arDecorator.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
+		arDecorator.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
+		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
 		
 		try {
 			getRadiusClient().account(acctRequest);
@@ -204,20 +210,24 @@ public class RadiusServer implements Authorizer{
 		
 		AccountingRequest acctRequest = new AccountingRequest(channel.getUserName(),
 				AccountingRequest.ACCT_STATUS_TYPE_STOP);
+		RadiusPacketDecorator arDecorator = new RadiusPacketDecorator(acctRequest);
+
 		acctRequest.setDictionary(dictionary);
-		acctRequest.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
-		acctRequest.addAttribute("Service-Type", channel.getServiceType());
-		acctRequest.addAttribute("Calling-Station-Id", channel.getCallingStationId());
-		acctRequest.addAttribute("Called-Station-Id", channel.getCalledStationId());
-		acctRequest.addAttribute("Acct-Session-Id", channel.getAcctSessionId());
-		acctRequest.addAttribute("h323-call-origin",(channel.getCallOrigin()==CallOrigin.Inbound?"answer":"originate"));
-		acctRequest.addAttribute("h323-setup-time","h323-setup-time="+AdmUtils.dateToRadiusStr(channel.getSetupTime()));
-		acctRequest.addAttribute("Acct-Delay-Time","0");
-		acctRequest.addAttribute("Acct-Session-Time",Long.toString(channel.getSessionTime()));
-		acctRequest.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
-		acctRequest.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
-		acctRequest.addAttribute("h323-disconnect-cause","h323-disconnect-cause="+channel.getH323DisconnectCause());
-		acctRequest.addAttribute("h323-remote-address","h323-remote-address="+channel.getH323RemoteAddress());
+		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
+		arDecorator.addAttribute("Service-Type", channel.getServiceType());
+		arDecorator.addAttribute("Calling-Station-Id", channel.getCallingStationId());
+		arDecorator.addAttribute("Called-Station-Id", channel.getCalledStationId());
+		arDecorator.addAttribute("Acct-Session-Id", channel.getAcctSessionId());
+		arDecorator.addAttribute("h323-call-origin",(channel.getCallOrigin()==CallOrigin.Inbound?"answer":"originate"));
+		arDecorator.addAttribute("h323-setup-time","h323-setup-time="+AdmUtils.dateToRadiusStr(channel.getSetupTime()));
+		arDecorator.addAttribute("Acct-Delay-Time","0");
+		arDecorator.addAttribute("Acct-Session-Time",Long.toString(channel.getSessionTime()));
+		arDecorator.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
+		arDecorator.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
+		arDecorator.addAttribute("h323-disconnect-cause","h323-disconnect-cause="+channel.getH323DisconnectCause());
+		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
+		arDecorator.addAttribute("h323-remote-address", channel.getChannelData().getRemoteIP());
+
 
 
 		if (channel.getAnswerTime()!=null){
