@@ -76,6 +76,9 @@ public class ASTEvent{
 	}
 	protected Map<String, String> values = new HashMap<String,String>();
 	
+	public Map<String, String> getValues() {
+		return values;
+	}
 	public enum EventType{
 		Response, AsyncAgi, NewChannel, NewState, Dtmf, Hangup, AgiExec, OriginateResponse, Dial, Bridge, MeetmeJoin, MeetmeTalking, MeetmeLeave, PeerStatus};
 	

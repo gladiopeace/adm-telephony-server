@@ -10,6 +10,8 @@ public class ChannelData extends VariableMap {
 	public final static String USERNAME="UserName";
 	public final static String SERVICE_NUMBER="ServiceNumber";
 	public final static String REMOTE_IP="remote_ip";
+	public final static String GW_ID="GW_ID";
+	public final static String LOGIN_IP_HOST = "Login-IP-Host";
 	
 	public void setCallerIdName(String callerIdName){
 		addVariable(CALLER_ID_NAME, callerIdName);
@@ -52,5 +54,15 @@ public class ChannelData extends VariableMap {
 	}
 	public String getRemoteIP() {
 		return getVariable(REMOTE_IP);
+	}
+	public void setLoginIP(String variable) {
+		 addVariable(LOGIN_IP_HOST, variable);		
+	}
+	public String getLoginIP() {
+		return getVariable(LOGIN_IP_HOST);
+	}
+	public void setRemoteIP(String variable) {
+		addVariable(REMOTE_IP, variable);
+		
 	}
 }

@@ -1,5 +1,6 @@
 package com.admtel.telephonyserver.asterisk.events;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class ASTResponseEvent extends ASTChannelEvent {
@@ -7,6 +8,18 @@ public class ASTResponseEvent extends ASTChannelEvent {
 	boolean isSuccess = false;
 	String message = "";
 
+	Map<String, String> data = new HashMap<String,String>();
+	
+	public Map<String, String> getData() {
+		return data;
+	}
+
+	@Override
+	public String toString() {
+		return "ASTResponseEvent [isSuccess=" + isSuccess + ", message="
+				+ message + ", request=" + request + ", eventType=" + eventType
+				+ ", values=" + values + "]";
+	}
 	String request="";
 	
 	public ASTResponseEvent(String switchId, Map<String, String> values) {
@@ -31,7 +44,8 @@ public class ASTResponseEvent extends ASTChannelEvent {
 				if (varValue.equals("(null)")){
 					varValue = null;
 				}
-				values.put(varName,varValue);
+				data.put(varName,varValue);
+				
 			}
 		}
 	}
