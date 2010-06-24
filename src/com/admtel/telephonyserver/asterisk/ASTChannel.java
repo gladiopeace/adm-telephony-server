@@ -394,7 +394,7 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 				ASTChannel.this);
 
 		public OutboundAlertingState() {
-			variableFetcher.fetch("adm_args", "CHANNEL(peerip)");
+			variableFetcher.fetch("adm_args", "CHANNEL(peerip)","DIALEDPEERNUMBER");
 		}
 
 		@Override
@@ -415,9 +415,19 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 							.getVariable("adm_args"), "&");
 				}
 				if (variableFetcher.getVariable("CHANNEL(peerip)") != null) {
-					getChannelData().setRemoteIP(variableFetcher
+					getChannelData().setLoginIP(variableFetcher
 							.getVariable("CHANNEL(peerip)"));
 				}
+				if (variableFetcher.getVariable("DIALEDPEERNUMBER") != null){
+					String dialedNumber = ASTChannel.this.getDialedNumberFromDialedPeerNumber(variableFetcher.getVariable("DIALEDPEERNUMBER"));
+					getChannelData().setCalledNumber(dialedNumber);
+				}
+				//TODO calling-station-id
+				
+				ASTChannel.this.getChannelData().setCalledNumber(getChannelData().getCalledNumber());
+				ASTChannel.this.getChannelData().setCallerIdNumber(getChannelData().getCallerIdNumber());
+				ASTChannel.this.getChannelData().setRemoteIP(getChannelData().getLoginIP());
+
 
 				log.trace(getChannelData());
 				if (getChannelData().get("master_channel") == null) {
@@ -437,9 +447,8 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 								.getAcctUniqueSessionId();
 						ASTChannel.this
 								.setUserName(masterChannel.getUserName());
-						ASTChannel.this.getChannelData().setLoginIP(masterChannel.getChannelData().getLoginIP());
-						ASTChannel.this.getChannelData().setCalledNumber(masterChannel.getChannelData().getCalledNumber());
-						ASTChannel.this.getChannelData().setCallerIdNumber(masterChannel.getChannelData().getCallerIdNumber());
+						ASTChannel.this.getChannelData().setDestinationNumberIn(masterChannel.getChannelData().getCalledNumber());
+						ASTChannel.this.getChannelData().setRemoteIP(masterChannel.getChannelData().getLoginIP());
 					}
 
 				}
@@ -806,6 +815,20 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 		} else if (id.toLowerCase().startsWith("iax2")) {
 			channelProtocol = ChannelProtocol.IAX2;
 		}
+	}
+
+	public String getDialedNumberFromDialedPeerNumber(String variable) {
+		String result = variable;
+		switch (channelProtocol){
+		case SIP:{
+			int idx = variable.indexOf("@");
+			if (idx >= 0){
+				result = variable.substring(0, idx);
+			}
+		}
+			break;
+		}
+		return result;
 	}
 
 	@Override
