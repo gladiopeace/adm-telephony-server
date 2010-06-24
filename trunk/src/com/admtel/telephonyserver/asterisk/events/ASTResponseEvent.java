@@ -41,7 +41,7 @@ public class ASTResponseEvent extends ASTChannelEvent {
 			String varName = values.get("Variable");
 			String varValue = values.get("Value");
 			if (varName != null){
-				if (varValue.equals("(null)")){
+				if (varValue == null || varValue.equals("(null)")){
 					varValue = null;
 				}
 				data.put(varName,varValue);

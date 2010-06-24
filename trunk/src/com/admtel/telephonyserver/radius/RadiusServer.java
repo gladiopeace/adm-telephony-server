@@ -173,7 +173,6 @@ public class RadiusServer implements Authorizer{
 	@Override
 	public boolean accountingStart(Channel channel) {
 		
-		log.trace("Sending Accounting-Start message for channel " + channel);
 		AccountingRequest acctRequest = new AccountingRequest(channel.getUserName(),
 				AccountingRequest.ACCT_STATUS_TYPE_START);
 		
@@ -191,6 +190,8 @@ public class RadiusServer implements Authorizer{
 		arDecorator.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
 		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
+		log.trace("Sending Accounting-Start message : " + acctRequest);
+
 		
 		try {
 			getRadiusClient().account(acctRequest);
@@ -205,9 +206,7 @@ public class RadiusServer implements Authorizer{
 
 	@Override
 	public boolean accountingStop(Channel channel) {
-		
-		log.trace("Sending Accounting-Stop message for channel " + channel);
-		
+				
 		AccountingRequest acctRequest = new AccountingRequest(channel.getUserName(),
 				AccountingRequest.ACCT_STATUS_TYPE_STOP);
 		RadiusPacketDecorator arDecorator = new RadiusPacketDecorator(acctRequest);
@@ -227,6 +226,7 @@ public class RadiusServer implements Authorizer{
 		arDecorator.addAttribute("h323-disconnect-cause","h323-disconnect-cause="+channel.getH323DisconnectCause());
 		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
 		arDecorator.addAttribute("h323-remote-address", channel.getChannelData().getRemoteIP());
+		arDecorator.addAttribute("xpgk-dst-number-in", channel.getChannelData().getDestinationNumberIn());
 
 
 
@@ -236,6 +236,8 @@ public class RadiusServer implements Authorizer{
 		if (channel.getHangupTime()!=null){
 			acctRequest.addAttribute("h323-disconnect-time","h323-disconnect-time="+AdmUtils.dateToRadiusStr(channel.getHangupTime()));
 		}
+		log.trace("Sending Accounting-Stop message : " + acctRequest);
+
 		try {
 			getRadiusClient().account(acctRequest);
 		} catch (IOException e) {
