@@ -1,4 +1,4 @@
-package com.admtel.telephonyserver.core;
+package com.admtel.telephonyserver.freeswitch;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
@@ -17,6 +17,14 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import com.admtel.telephonyserver.asterisk.ASTSwitch;
 import com.admtel.telephonyserver.asterisk.events.ASTEvent.EventType;
 import com.admtel.telephonyserver.config.SwitchDefinition;
+import com.admtel.telephonyserver.core.BasicIoMessage;
+import com.admtel.telephonyserver.core.MessageHandler;
+import com.admtel.telephonyserver.core.QueuedMessageHandler;
+import com.admtel.telephonyserver.core.Registrar;
+import com.admtel.telephonyserver.core.Result;
+import com.admtel.telephonyserver.core.SimpleMessageHandler;
+import com.admtel.telephonyserver.core.Switch;
+import com.admtel.telephonyserver.core.Timers;
 import com.admtel.telephonyserver.core.Timers.Timer;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelCreateEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelDataEvent;
@@ -49,8 +57,8 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 	private class LoggingInState extends SimpleMessageHandler {
 
 		public LoggingInState() {
-			String username = FSSwitch.this.definition.getUsername();
-			String password = FSSwitch.this.definition.getPassword();
+			String username = FSSwitch.this.getDefinition().getUsername();
+			String password = FSSwitch.this.getDefinition().getPassword();
 			session.write("auth " + password);
 		}
 
@@ -90,8 +98,8 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 			if (basicIoMessage != null) {
 				FSEvent event = FSEvent.buildEvent(FSSwitch.this.getSwitchId(),
 						basicIoMessage.getMessage());
-				log.debug(String.format("Switch (%s) : \n%s", FSSwitch.this
-						.getSwitchId(), basicIoMessage.getMessage()));
+				/*log.debug(String.format("Switch (%s) : \n%s", FSSwitch.this
+						.getSwitchId(), basicIoMessage.getMessage()));*/
 				if (event == null) {
 					/* log.debug("Didn't create Event for message ..."); */
 					return;
@@ -100,7 +108,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 				case ChannelCreate: {
 					FSChannelCreateEvent cce = (FSChannelCreateEvent) event;
 					FSChannel channel = new FSChannel(FSSwitch.this, cce
-							.getChannelId(), basicIoMessage.session);
+							.getChannelId(), basicIoMessage.getSession());
 					FSSwitch.this.addChannel(channel);
 				}
 					break;
@@ -223,8 +231,8 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 	}
 
 	private boolean connect() {
-		log.debug(String.format("Trying to connect to %s:%d", definition
-				.getAddress(), definition.getPort()));
+		log.debug(String.format("Trying to connect to %s:%d", getDefinition()
+				.getAddress(), getDefinition().getPort()));
 		connector = new NioSocketConnector();
 		connector.getFilterChain().addLast("logger", new LoggingFilter());
 		TextLineCodecFactory textLineCodecFactory = new TextLineCodecFactory(
@@ -237,12 +245,12 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 		try {
 			ConnectFuture connectFuture = connector
-					.connect(new InetSocketAddress(definition.getAddress(),
-							definition.getPort()));
+					.connect(new InetSocketAddress(getDefinition().getAddress(),
+							getDefinition().getPort()));
 			connectFuture.awaitUninterruptibly(CONNECT_TIMEOUT);
 			session = connectFuture.getSession();
-			log.debug(String.format("Connected to %s:%d", definition
-					.getAddress(), definition.getPort()));
+			log.debug(String.format("Connected to %s:%d", getDefinition()
+					.getAddress(), getDefinition().getPort()));
 			return true;
 		} catch (Exception e) {
 			log.warn(AdmUtils.getStackTrace(e));

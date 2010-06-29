@@ -1,8 +1,9 @@
-package com.admtel.telephonyserver.core;
+package com.admtel.telephonyserver.freeswitch;
 
 import org.apache.mina.core.session.IoSession;
 
 import com.admtel.telephonyserver.config.SwitchListenerDefinition;
+import com.admtel.telephonyserver.core.SwitchListener;
 
 public class FSSwitchListener extends SwitchListener {
 

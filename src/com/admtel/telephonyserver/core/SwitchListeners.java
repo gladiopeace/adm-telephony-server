@@ -8,6 +8,7 @@ import com.admtel.telephonyserver.asterisk.ASTSwitchListener;
 import com.admtel.telephonyserver.config.DefinitionChangeListener;
 import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.SwitchListenerDefinition;
+import com.admtel.telephonyserver.freeswitch.FSSwitchListener;
 
 public class SwitchListeners implements DefinitionChangeListener{
 	
