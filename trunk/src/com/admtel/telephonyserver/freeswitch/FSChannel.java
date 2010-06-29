@@ -1,11 +1,19 @@
-package com.admtel.telephonyserver.core;
+package com.admtel.telephonyserver.freeswitch;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.apache.mina.core.session.IoSession;
 
 import com.admtel.telephonyserver.config.SwitchType;
+import com.admtel.telephonyserver.core.Channel;
+import com.admtel.telephonyserver.core.MessageHandler;
+import com.admtel.telephonyserver.core.QueuedMessageHandler;
+import com.admtel.telephonyserver.core.Result;
+import com.admtel.telephonyserver.core.Script;
+import com.admtel.telephonyserver.core.ScriptManager;
+import com.admtel.telephonyserver.core.Switch;
 import com.admtel.telephonyserver.events.AnsweredEvent;
 import com.admtel.telephonyserver.events.DialFailedEvent;
 import com.admtel.telephonyserver.events.DialStartedEvent;
@@ -37,6 +45,8 @@ public class FSChannel extends Channel {
 
 	private IoSession session;
 	private State currentState = new NullState();
+	
+	static Logger log = Logger.getLogger(FSChannel.class);
 	
 	private abstract class State {
 		public abstract void processEvent(FSEvent fsEvent);

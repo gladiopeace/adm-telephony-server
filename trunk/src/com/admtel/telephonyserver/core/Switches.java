@@ -10,6 +10,7 @@ import com.admtel.telephonyserver.asterisk.ASTSwitch;
 import com.admtel.telephonyserver.config.DefinitionChangeListener;
 import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.SwitchDefinition;
+import com.admtel.telephonyserver.freeswitch.FSSwitch;
 
 public class Switches implements DefinitionChangeListener {
 
