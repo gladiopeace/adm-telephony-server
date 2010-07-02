@@ -96,6 +96,9 @@ public class FSChannel extends Channel {
 				getChannelData().setCalledNumber(cde.getCalledIdNum());
 				getChannelData().setCallerIdNumber(cde.getCallerIdNum());
 				getChannelData().setCallerIdName(cde.getCallerIdNum());
+				getChannelData().setUserName(cde.getUserName());
+				getChannelData().setLoginIP(cde.getChannelAddress());
+
 				// Create script
 				Script script = ScriptManager.getInstance()
 						.createScript(getChannelData());
@@ -106,6 +109,22 @@ public class FSChannel extends Channel {
 				OutboundAlertingEvent ie = new OutboundAlertingEvent(
 						FSChannel.this, FSChannel.this.getCallingStationId(), FSChannel.this.getCalledStationId());
 				FSChannel.this.onEvent(ie);
+			}
+				break;
+			case ChannelOutgoing:{
+				FSChannelOutgoingEvent coe = (FSChannelOutgoingEvent) fsEvent;
+				Channel masterChannel  = FSChannel.this._switch.getChannel(coe.getDestinationChannel());
+				if (masterChannel != null){
+					FSChannel.this.setAcctUniqueSessionId(masterChannel.getAcctUniqueSessionId());
+					FSChannel.this.setUserName(masterChannel.getUserName());
+					FSChannel.this.getChannelData().setDestinationNumberIn(masterChannel.getChannelData().getCalledNumber());
+					FSChannel.this.getChannelData().setRemoteIP(masterChannel.getChannelData().getLoginIP());
+				}
+				// Send outbound alerting event
+				OutboundAlertingEvent ie = new OutboundAlertingEvent(
+						FSChannel.this, FSChannel.this.getCallingStationId(), FSChannel.this.getCalledStationId());
+				FSChannel.this.onEvent(ie);
+
 			}
 				break;
 			}
@@ -131,6 +150,9 @@ public class FSChannel extends Channel {
 				getChannelData().setCalledNumber(cde.getCalledIdNum());
 				getChannelData().setCallerIdNumber(cde.getCallerIdNum());
 				getChannelData().setCallerIdName(cde.getCallerIdNum());
+				getChannelData().setUserName(cde.getUserName());
+				getChannelData().setLoginIP(cde.getChannelAddress());
+
 
 				// Create script
 				Script script = ScriptManager.getInstance()
@@ -160,7 +182,7 @@ public class FSChannel extends Channel {
 			case ChannelCreate:
 			{
 				FSChannelCreateEvent cce = (FSChannelCreateEvent) event;
-
+								
 				if (cce.isOutbound()){
 					switch (cce.getChannelState()){
 					case Ringing:
