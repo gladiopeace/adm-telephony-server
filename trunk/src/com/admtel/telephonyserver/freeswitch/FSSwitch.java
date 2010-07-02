@@ -98,8 +98,8 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 			if (basicIoMessage != null) {
 				FSEvent event = FSEvent.buildEvent(FSSwitch.this.getSwitchId(),
 						basicIoMessage.getMessage());
-				/*log.debug(String.format("Switch (%s) : \n%s", FSSwitch.this
-						.getSwitchId(), basicIoMessage.getMessage()));*/
+				log.debug(String.format("Switch (%s) : \n%s", FSSwitch.this
+						.getSwitchId(), basicIoMessage.getMessage()));
 				if (event == null) {
 					/* log.debug("Didn't create Event for message ..."); */
 					return;

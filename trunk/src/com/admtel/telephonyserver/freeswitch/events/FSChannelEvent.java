@@ -30,5 +30,11 @@ public abstract class FSChannelEvent extends FSEvent {
 	public String getCalledIdNum(){
 		return values.get("Channel-Destination-Number");
 	}
+	public String getUserName(){
+		return values.get("Channel-Username");
+	}
+	public String getChannelAddress(){
+		return values.get("Channel-Network-Addr");
+	}
 
 }
