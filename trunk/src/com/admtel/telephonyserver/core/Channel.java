@@ -55,8 +55,8 @@ public abstract class Channel {
 
 	protected String h323CallOrigin;
 
-	protected String acctUniqueSessionId = UUID.randomUUID().toString();
-	protected String acctSessionId;
+	protected String acctUniqueSessionId;
+	protected String acctSessionId = UUID.randomUUID().toString();
 	protected String serviceType = "Login-User";
 	protected Integer h323DisconnectCause=16;//normal call clearing
 
@@ -380,7 +380,6 @@ public abstract class Channel {
 			ie.setServiceNumber(getChannelData().getServiceNumber());
 			state = State.InboundAlerting;
 			callOrigin = CallOrigin.Inbound;
-			acctSessionId = UUID.randomUUID().toString();
 			setupTime = new DateTime();
 			this.addEventListener(EventsManager.getInstance());
 		}
@@ -395,7 +394,6 @@ public abstract class Channel {
 		case OutboundAlerting:
 			state = State.OutboundAlerting;
 			callOrigin = CallOrigin.Outbound;
-			acctSessionId = UUID.randomUUID().toString();
 			setupTime = new DateTime();
 			this.addEventListener(EventsManager.getInstance());
 			break;
