@@ -9,7 +9,7 @@ class MyEventListener implements EventListener {
 	static Logger log = Logger.getLogger(MyEventListener.class)
 	@Override
 	public boolean onEvent(Event event) {
-		log.debug event
+		log.debug "****************" + event
 		return false;
 	}
 
