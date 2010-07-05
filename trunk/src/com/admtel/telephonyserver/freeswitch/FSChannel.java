@@ -1,7 +1,6 @@
 package com.admtel.telephonyserver.freeswitch;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.apache.mina.core.session.IoSession;
@@ -114,6 +113,10 @@ public class FSChannel extends Channel {
 			case ChannelOutgoing:{
 				FSChannelOutgoingEvent coe = (FSChannelOutgoingEvent) fsEvent;
 				Channel masterChannel  = FSChannel.this._switch.getChannel(coe.getDestinationChannel());
+				FSChannel.this.getChannelData().setLoginIP(coe.getChannelAddress());
+				
+				FSChannel.this.getChannelData().setCalledNumber(FSChannel.this.getCalledNumberFromCallerDestinationNumber(coe.getCallerDestinationNumber()));
+				
 				if (masterChannel != null){
 					FSChannel.this.setAcctUniqueSessionId(masterChannel.getAcctUniqueSessionId());
 					FSChannel.this.setUserName(masterChannel.getUserName());
@@ -159,6 +162,9 @@ public class FSChannel extends Channel {
 						.createScript(getChannelData());
 				if (script != null) {
 					getListeners().add(script);
+				}
+				if (FSChannel.this.getAcctUniqueSessionId() == null){
+					FSChannel.this.setAcctUniqueSessionId(UUID.randomUUID().toString());
 				}
 				// Send inbound alerting event
 				InboundAlertingEvent ie = new InboundAlertingEvent(
@@ -488,6 +494,17 @@ public class FSChannel extends Channel {
 	public FSChannel(Switch _switch, String id, IoSession session) {
 		super(_switch, id);
 		setIoSession(session);
+	}
+
+	public String getCalledNumberFromCallerDestinationNumber(
+			String callerDestinationNumber) {
+		
+		//TODO complete for diffrerence format
+		
+		//Take the string up to @
+		if (callerDestinationNumber == null) return null;
+		
+		return callerDestinationNumber.substring(0, callerDestinationNumber.indexOf("@"));
 	}
 
 	public void setIoSession(IoSession session){

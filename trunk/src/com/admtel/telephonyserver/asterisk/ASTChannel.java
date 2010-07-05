@@ -303,8 +303,6 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 					currentState = new OutboundAlertingState();
 					break;
 				case Answer:
-					ASTChannel.this.setAcctUniqueSessionId(UUID.randomUUID()
-							.toString());
 					ASTChannel.this.onEvent(new AnsweredEvent(ASTChannel.this));
 					currentState = new IdleState();
 					break;

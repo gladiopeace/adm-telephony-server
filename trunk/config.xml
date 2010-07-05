@@ -68,7 +68,7 @@
 </cli-listeners>
 
 <switches>
- <!--<switch>
+ <switch>
  	<id>MyFreeswitch</id>
     <address>172.16.140.129</address>
   	<port>8021</port>
@@ -77,7 +77,6 @@
   	<type>freeswitch</type>  
   	<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultFSAddressTranslator</addresstranslator> 	
  </switch>
- -->
  <switch>
   <id>MyAsterisk</id>
   <address>172.16.34.134</address>
@@ -87,6 +86,7 @@
   <type>asterisk</type>
   <addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator</addresstranslator>
  </switch>
+
 </switches>
 
 <scriptfactories>
