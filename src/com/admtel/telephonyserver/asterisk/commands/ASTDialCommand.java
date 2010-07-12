@@ -13,7 +13,7 @@ public class ASTDialCommand extends ASTCommand {
 	}
 	public String toString (){
 		String actionId = channel.getId() + "___Dial";
-		String dialStr = String.format("%s||%d", destination, timeout);
+		String dialStr = String.format("%s,,%d", destination, timeout);
 		return String
 						.format(
 								"Action: AGI\nChannel: %s\nCommand: EXEC DIAL %s\nActionId: %s\nCommandID: %s",
