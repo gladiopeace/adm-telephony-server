@@ -35,7 +35,7 @@ public class AdmTelephonyServer implements DefinitionChangeListener {
 			} catch (Exception e) {
 
 			}
-			log.debug("Server running...");
+			//log.debug("Server running...");
 		}
 	}
 

@@ -209,7 +209,7 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 				parameters += "t";
 			}
 
-			String command = String.format("%s|%s|", conferenceId, parameters);
+			String command = String.format("%s,%s,", conferenceId, parameters);
 			String actionId = getId() + "___MeetMe";
 
 			ASTChannel.this.session
@@ -365,8 +365,8 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 			}
 				break;
 
-			default: {
-				if (variableFetcher.processASTEvent(astEvent)) { // We got all
+			case Response: {				
+				if (variableFetcher != null && variableFetcher.processASTEvent(astEvent)) { // We got all
 					// the
 					// needed
 					// variables
@@ -398,7 +398,7 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 					InboundAlertingEvent ie = new InboundAlertingEvent(
 							ASTChannel.this);
 					ASTChannel.this.onEvent(ie);
-
+					variableFetcher = null;
 				}
 
 			}
@@ -919,8 +919,8 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 	@Override
 	synchronized public boolean onTimer(Object data) {
 		log.debug("Got timer .... " + data);
-		if (currentState != null) {
-			return currentState.onTimer(data);
+		if (data instanceof State) {
+			return ((State)data).onTimer(data);
 		}
 		return false;
 	}

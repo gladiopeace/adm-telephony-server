@@ -144,10 +144,12 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 	}
 
 	private void onIncomingEvent(InboundAlertingEvent event) {
+		log.trace(event);
 		accountingStart(event.getChannel());
 	}
 
 	private void onHangupEvent(HangupEvent event) {
+		log.trace(event);
 		accountingStop(event.getChannel());
 	}
 
