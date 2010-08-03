@@ -30,6 +30,8 @@ public abstract class Switch {
 	public Switch(SwitchDefinition definition) {
 		this.definition = definition;
 		setStatus(SwitchStatus.NotReady);
+		
+		//TODO reload addressTranslator to pick up modifications
 		setAddressTranslator(SmartClassLoader
 				.createInstance(AddressTranslator.class, definition
 						.getAddressTranslatorClass()));
