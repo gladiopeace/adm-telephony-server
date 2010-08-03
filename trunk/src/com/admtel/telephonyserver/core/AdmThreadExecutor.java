@@ -5,19 +5,17 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class AdmThreadExecutor {
 
-	private static AdmThreadExecutor instance = null;
-
-	ThreadPoolExecutor executor;
+	public ThreadPoolExecutor executor;
 
 	private AdmThreadExecutor() {
 		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(AdmTelephonyServer.getInstance().getDefinition().getMaxThreads());
 	}
 
+	private static class SingletonHolder {
+		final private static AdmThreadExecutor instance = new AdmThreadExecutor();
+	}
 	public static AdmThreadExecutor getInstance() {
-		if (instance == null) {
-			instance = new AdmThreadExecutor();
-		}
-		return instance;
+		return SingletonHolder.instance;
 	}
 
 	public void execute(Runnable task) {
@@ -37,4 +35,5 @@ public class AdmThreadExecutor {
 								.getLargestPoolSize(), executor
 								.getMaximumPoolSize(), executor.getPoolSize());
 	}
+
 }

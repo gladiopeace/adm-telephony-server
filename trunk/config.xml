@@ -67,6 +67,21 @@
  </cli-listener>
 </cli-listeners>
 
+<http-servers>
+ <http-server>
+  <id>Freeswitch Configurator</id>
+  <address>172.16.140.1</address>
+  <port>8057</port>
+  <adm-servlet>scripts/FreeSwitchConfigurator.groovy</adm-servlet>
+ </http-server>
+<!-- <http-server>-->
+<!--  <id>Manager</id>-->
+<!--  <address>172.16.140.1</address>-->
+<!--  <port>8058</port>-->
+<!--  <adm-servlet>scripts/HttpManager.groovy</adm-servlet>-->
+<!-- </http-server>-->
+</http-servers>
+
 <switches>
  <switch>
  	<id>MyFreeswitch</id>
@@ -106,4 +121,6 @@
 <!--	 <class>scripts/MyEventListener.groovy</class>-->
 <!--	</event-listener>-->
 <!--</event-listeners>-->
+
+
 </config>
