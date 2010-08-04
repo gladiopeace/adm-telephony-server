@@ -38,6 +38,9 @@ public class SmartClassLoader {
 			
 			return c;  
 		}
+		else if (className.startsWith("//groovy")){
+			return groovyClassLoader.parseClass(className);
+		}
 		else{
 			try{
 				return classLoader.loadClass(className);

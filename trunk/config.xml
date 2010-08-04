@@ -9,18 +9,18 @@
  		<class>com.admtel.telephonyserver.registrar.SimpleRegistrar</class>
 </registrar>
 <radius>
-	<server>
-		<id>first radius server</id>
-		<address>172.16.140.129</address>
-		<auth-port>1812</auth-port>
-		<acct-port>1813</acct-port>
-		<secret>meravoip</secret>
-		<retry-count>5</retry-count>
-		<socket-timeout>5000</socket-timeout>
-		<start-accounting>true</start-accounting>
-		<stop-accounting>true</stop-accounting>
-		<interim-update>10</interim-update>
-	</server>
+<!--	<server>-->
+<!--		<id>first radius server</id>-->
+<!--		<address>172.16.140.129</address>-->
+<!--		<auth-port>1812</auth-port>-->
+<!--		<acct-port>1813</acct-port>-->
+<!--		<secret>meravoip</secret>-->
+<!--		<retry-count>5</retry-count>-->
+<!--		<socket-timeout>5000</socket-timeout>-->
+<!--		<start-accounting>true</start-accounting>-->
+<!--		<stop-accounting>true</stop-accounting>-->
+<!--		<interim-update>10</interim-update>-->
+<!--	</server>-->
 	<!--<server>
 	  	<id>Second radius server</id>
 	  	<address>172.16.140.130</address>
@@ -105,6 +105,9 @@
 </switches>
 
 <scriptfactories>
+ <scriptfactory>
+  <class>scripts/AdmScriptFactory.groovy</class>
+ </scriptfactory>
  <scriptfactory>
   <class>com.admtel.telephonyserver.scriptfactories.VariableScriptFactory</class>
  </scriptfactory>

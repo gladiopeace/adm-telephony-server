@@ -16,8 +16,6 @@ class FreeSwitchConfigurator implements AdmServlet {
 		def sql = Sql.newInstance("jdbc:postgresql://localhost:5432/adm_appserver", "tester",
 				"tester1234", "org.postgresql.Driver")
 		
-		
-		println request
 		sql.eachRow("select * from subscriber where subscriber.extension=? and subscriber.domain=?",
 				[mUser,mDomain], 
 				
@@ -49,7 +47,6 @@ class FreeSwitchConfigurator implements AdmServlet {
 						}
 					}
 					response.appendBody(writer.toString())		
-					println writer.toString()			
 				} );
 		
 	}
