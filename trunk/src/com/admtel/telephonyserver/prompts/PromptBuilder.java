@@ -1,5 +1,7 @@
 package com.admtel.telephonyserver.prompts;
 
+import java.util.List;
+
 public interface PromptBuilder {
-	String[] numberToPrompt(Long number);
+	List<String> numberToPrompt(Long number);
 }

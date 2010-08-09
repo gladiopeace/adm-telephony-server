@@ -124,6 +124,11 @@
 <!--	 <class>scripts/MyEventListener.groovy</class>-->
 <!--	</event-listener>-->
 <!--</event-listeners>-->
-
+<prompt-builders>
+ <prompt-builder>
+	<language>en</language>
+ 	<class>com.admtel.telephonyserver.prompts.EnglishPromptBuilder</class>
+ </prompt-builder>
+</prompt-builders>
 
 </config>

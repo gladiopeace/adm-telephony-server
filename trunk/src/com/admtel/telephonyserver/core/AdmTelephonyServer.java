@@ -1,5 +1,7 @@
 package com.admtel.telephonyserver.core;
 
+import java.util.Locale;
+
 import org.apache.log4j.Logger;
 
 import com.admtel.telephonyserver.cli.CLI_Connections;
@@ -8,6 +10,7 @@ import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.ServerDefinition;
 import com.admtel.telephonyserver.config.SystemConfig;
 import com.admtel.telephonyserver.httpserver.HttpServers;
+import com.admtel.telephonyserver.prompts.PromptBuilderFactory;
 import com.admtel.telephonyserver.radius.RadiusServers;
 
 public class AdmTelephonyServer implements DefinitionChangeListener {
@@ -29,6 +32,10 @@ public class AdmTelephonyServer implements DefinitionChangeListener {
 	public static void main(String[] args) {
 		log.debug("Adm Telephony Server started ...");
 		getInstance().start();
+		
+		//TODO remove, for testing only
+		log.trace("Prompt builder " + PromptBuilderFactory.getInstance().getPromptBuilder(Locale.ENGLISH));
+		
 		while (true) {
 			try {
 				Thread.sleep(30000);
@@ -56,6 +63,7 @@ public class AdmTelephonyServer implements DefinitionChangeListener {
 		sysConfig.addDefinitionChangeListener(Registrar.getInstance());
 		sysConfig.addDefinitionChangeListener(EventsManager.getInstance());
 		sysConfig.addDefinitionChangeListener(HttpServers.getInstance());
+		sysConfig.addDefinitionChangeListener(PromptBuilderFactory.getInstance());
 		
 		SystemConfig.getInstance().load();
 	}
