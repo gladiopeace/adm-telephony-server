@@ -237,6 +237,29 @@ public class SystemConfig {
 
 		}		
 	}
+	public void loadPromptBuildersDefinition(){
+		int counter = 0;
+		SubnodeConfiguration subnode;
+		while (true) {
+			try {
+				subnode = config.configurationAt(String.format(
+						"prompt-builders.prompt-builder(%d)", counter));
+				if (subnode != null) {
+					PromptBuilderDefinition definition = new PromptBuilderDefinition();
+					definition.setClassName(subnode.getString("class"));
+					definition.setLanguage(subnode.getString("language"));
+					futureDefinitions.put(definition.getId(), definition);
+				} else {
+					return;
+				}
+			} catch (Exception e) {
+				log.warn(e.getMessage());
+				return;
+			}
+			counter++;
+
+		}				
+	}
 	public void load() {
 		log.debug("Loading System configuration ...");
 		futureDefinitions.clear();
@@ -250,6 +273,7 @@ public class SystemConfig {
 		loadRegistrarDefinition();
 		loadEventListenersDefinition();
 		this.loadHTTPServerDefinition();
+		this.loadPromptBuildersDefinition();
 		// Dump the loaded configurations
 
 		for (DefinitionInterface definition : futureDefinitions.values()) {

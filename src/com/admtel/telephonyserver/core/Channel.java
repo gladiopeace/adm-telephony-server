@@ -2,6 +2,7 @@ package com.admtel.telephonyserver.core;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -59,6 +60,16 @@ public abstract class Channel {
 	protected String acctSessionId = UUID.randomUUID().toString();
 	protected String serviceType = "Login-User";
 	protected Integer h323DisconnectCause=16;//normal call clearing
+	
+	protected Locale language;
+
+	public Locale getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(Locale language) {
+		this.language = language;
+	}
 
 	public long getSessionTime() {
 		if (answerTime == null)
@@ -176,6 +187,7 @@ public abstract class Channel {
 		this._switch = _switch;
 		this.id = id;
 		this.uniqueId = UUID.randomUUID().toString();
+		language = Locale.ENGLISH;
 	}
 
 	public String getUniqueId() {
