@@ -29,7 +29,7 @@ public class EnglishPromptBuilder implements PromptBuilder {
 				Long value = currentNumber / 100;
 				
 				result.add(value.toString());
-				result.add("hundered");
+				result.add("hundred");
 				currentNumber = remainder;
 			}
 			else

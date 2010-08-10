@@ -4,7 +4,9 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 
+import com.admtel.telephonyserver.prompts.ArabicPromptBuilder;
 import com.admtel.telephonyserver.prompts.EnglishPromptBuilder;
+import com.admtel.telephonyserver.prompts.FrenchPromptBuilder;
 
 public class PromptBuilderTest {
 
@@ -14,11 +16,11 @@ public class PromptBuilderTest {
 	
 	
 	public static void main(String[] args) {
-		EnglishPromptBuilder pb = new EnglishPromptBuilder();
+		ArabicPromptBuilder pb = new ArabicPromptBuilder();
 		Logger log = Logger.getLogger(PromptBuilderTest.class);
 		Random rnd = new Random(System.currentTimeMillis());
-		for (int i = 0;i <1000;i++){
-			int number = rnd.nextInt(10000000);
+		for (int i = 0;i <100;i++){
+			int number = rnd.nextInt(999999);
 			log.trace("numberToPrompt for " + number +" is " + java.util.Arrays.toString(pb.numberToPrompt((long)number).toArray()));
 		}
 	}
