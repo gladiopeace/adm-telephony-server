@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import com.admtel.telephonyserver.prompts.ArabicPromptBuilder;
 import com.admtel.telephonyserver.prompts.EnglishPromptBuilder;
 import com.admtel.telephonyserver.prompts.FrenchPromptBuilder;
+import com.admtel.telephonyserver.prompts.PromptBuilder;
 
 public class PromptBuilderTest {
 
@@ -16,7 +17,7 @@ public class PromptBuilderTest {
 	
 	
 	public static void main(String[] args) {
-		ArabicPromptBuilder pb = new ArabicPromptBuilder();
+		PromptBuilder pb = new ArabicPromptBuilder();
 		Logger log = Logger.getLogger(PromptBuilderTest.class);
 		Random rnd = new Random(System.currentTimeMillis());
 		for (int i = 0;i <100;i++){
