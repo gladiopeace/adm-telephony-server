@@ -20,6 +20,7 @@ import com.admtel.telephonyserver.interfaces.EventListener;
 import com.admtel.telephonyserver.radius.RadiusServers;
 import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.utils.AdmUtils;
+import com.admtel.telephonyserver.utils.PromptsUtils;
 
 public abstract class Channel {
 
@@ -60,6 +61,8 @@ public abstract class Channel {
 	protected String acctSessionId = UUID.randomUUID().toString();
 	protected String serviceType = "Login-User";
 	protected Integer h323DisconnectCause=16;//normal call clearing
+	
+	protected String baseDirectory = AdmTelephonyServer.getInstance().getDefinition().getBaseDirectory();
 	
 	protected Locale language;
 
@@ -242,6 +245,7 @@ public abstract class Channel {
 					state));
 			return Result.ChannelInvalidState;
 		}
+		prompt = PromptsUtils.prepend(prompt, baseDirectory,"/sounds/", language.toString(),"/");
 		Result result = internalPlayAndGetDigits(max, prompt, timeout,
 				terminators, true);
 		if (result == Result.Ok) {
@@ -327,6 +331,7 @@ public abstract class Channel {
 					state));
 			return Result.ChannelInvalidState;
 		}
+		prompt = PromptsUtils.prepend(prompt, baseDirectory,"/sounds/", language.toString(),"/");
 		state = State.MediaBusy;
 		Result result = internalPlayAndGetDigits(max, prompt, timeout,
 				terminators, true);

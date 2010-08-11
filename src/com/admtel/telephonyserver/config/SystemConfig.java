@@ -52,6 +52,7 @@ public class SystemConfig {
 		ServerDefinition serverDefinition = new ServerDefinition();
 		serverDefinition.setMaxThreads(config.getInt("server.maxthreads"));
 		serverDefinition.setAddress(config.getString("server.address"));
+		serverDefinition.setBaseDirectory(config.getString("server.base-directory"));
 		futureDefinitions.put(serverDefinition.getId(), serverDefinition);
 	}
 	public void loadRegistrarDefinition(){

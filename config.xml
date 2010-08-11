@@ -3,6 +3,7 @@
 <server>
 	<maxthreads>10</maxthreads>
 	<address>172.16.140.1</address>	
+	<base-directory>/usr/local/adm</base-directory>
 </server>
 <registrar>
 		<enabled>true</enabled>
@@ -128,6 +129,14 @@
  <prompt-builder>
 	<language>en</language>
  	<class>com.admtel.telephonyserver.prompts.EnglishPromptBuilder</class>
+ </prompt-builder>
+ <prompt-builder>
+ 	<language>ar</language>
+ 	<class>com.admtel.telephonyserver.prompts.ArabicPromptBuilder</class>
+ </prompt-builder>
+ <prompt-builder>
+ 	<language>fr</language>
+ 	<class>com.admtel.telephonyserver.prompts.FrenchPromptBuilder</class>
  </prompt-builder>
 </prompt-builders>
 
