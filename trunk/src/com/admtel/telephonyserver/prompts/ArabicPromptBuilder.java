@@ -1,15 +1,23 @@
 package com.admtel.telephonyserver.prompts;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArabicPromptBuilder implements PromptBuilder {
+public class ArabicPromptBuilder extends GenericPromptBuilder {
 
 	@Override
 	public List<String> numberToPrompt(Long number) {
 		List<String> result = new ArrayList<String>();
 
-		Long currentNumber = number;
+		Long currentNumber = Math.abs(number);
+		if (number<0){
+			result.add("minus");
+			
+		}
+		if (number == 0) {
+			result.add("0");
+		}
 		while (currentNumber > 0){
 			if (result.size() >0 ){
 				result.add("and");
@@ -87,6 +95,12 @@ public class ArabicPromptBuilder implements PromptBuilder {
 			}
 		}
 		return result;
+	}
+
+	@Override
+	public List<String> currencyToPrompt(BigDecimal amount) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

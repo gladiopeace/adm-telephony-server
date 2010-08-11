@@ -14,15 +14,18 @@ public class PromptBuilderTest {
 	/**
 	 * @param args
 	 */
-	
-	
+
 	public static void main(String[] args) {
 		PromptBuilder pb = new ArabicPromptBuilder();
 		Logger log = Logger.getLogger(PromptBuilderTest.class);
 		Random rnd = new Random(System.currentTimeMillis());
-		for (int i = 0;i <100;i++){
+		for (int i = 0; i < 100; i++) {
 			int number = rnd.nextInt(999999);
-			log.trace("numberToPrompt for " + number +" is " + java.util.Arrays.toString(pb.numberToPrompt((long)number).toArray()));
+			log.trace("numberToPrompt for "
+					+ number
+					+ " is "
+					+ java.util.Arrays.toString(pb
+							.numberToPrompt((long) number).toArray()));
 		}
 	}
 

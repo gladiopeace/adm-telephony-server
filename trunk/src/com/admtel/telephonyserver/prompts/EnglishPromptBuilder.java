@@ -1,16 +1,24 @@
 package com.admtel.telephonyserver.prompts;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EnglishPromptBuilder implements PromptBuilder {
+public class EnglishPromptBuilder extends GenericPromptBuilder  {
 
 	@Override
 	public List<String> numberToPrompt(Long number) {
 		
 		List<String> result = new ArrayList<String>();
-
-		Long currentNumber = number;
+		Long currentNumber = Math.abs(number);
+		if (number == 0) {
+			result.add("0");
+		}
+		if (number<0){
+			result.add("minus");
+			
+		}
 		while (currentNumber > 0){
 			if (currentNumber <= 20){
 				result.add(currentNumber.toString());

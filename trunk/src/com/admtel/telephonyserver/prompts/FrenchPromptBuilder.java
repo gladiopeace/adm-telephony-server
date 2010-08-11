@@ -1,15 +1,23 @@
 package com.admtel.telephonyserver.prompts;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FrenchPromptBuilder implements PromptBuilder {
+public class FrenchPromptBuilder extends GenericPromptBuilder  {
 
 	@Override
 	public List<String> numberToPrompt(Long number) {
 		List<String> result = new ArrayList<String>();
 
-		Long currentNumber = number;
+		Long currentNumber = Math.abs(number);
+		if (number<0){
+			result.add("minus");
+			
+		}
+		if (number == 0) {
+			result.add("0");
+		}
 		while (currentNumber > 0) {
 			if (currentNumber <= 20) {
 				if (currentNumber == 1 && result.size() > 0) { // 21:
@@ -56,6 +64,6 @@ public class FrenchPromptBuilder implements PromptBuilder {
 			}
 		}
 		return result;
-	}
+	}	
 
 }

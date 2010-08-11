@@ -4,8 +4,16 @@ public class ServerDefinition implements DefinitionInterface {
 
 	int maxThreads = 10;
 	String address = "127.0.0.1";
+	String baseDirectory = "/usr/local/adm";
+	
 	public String getAddress() {
 		return address;
+	}
+	public String getBaseDirectory() {
+		return baseDirectory;
+	}
+	public void setBaseDirectory(String baseDirectory) {
+		this.baseDirectory = baseDirectory;
 	}
 	public void setAddress(String address) {
 		this.address = address;
@@ -25,6 +33,8 @@ public class ServerDefinition implements DefinitionInterface {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((address == null) ? 0 : address.hashCode());
+		result = prime * result
+				+ ((baseDirectory == null) ? 0 : baseDirectory.hashCode());
 		result = prime * result + maxThreads;
 		return result;
 	}
@@ -42,6 +52,11 @@ public class ServerDefinition implements DefinitionInterface {
 				return false;
 		} else if (!address.equals(other.address))
 			return false;
+		if (baseDirectory == null) {
+			if (other.baseDirectory != null)
+				return false;
+		} else if (!baseDirectory.equals(other.baseDirectory))
+			return false;
 		if (maxThreads != other.maxThreads)
 			return false;
 		return true;
@@ -49,7 +64,7 @@ public class ServerDefinition implements DefinitionInterface {
 	
 	@Override
 	public String toString() {
-		return "ServerDefinition [address=" + address + ", maxThreads="
-				+ maxThreads + "]";
+		return "ServerDefinition [address=" + address + ", baseDirectory="
+				+ baseDirectory + ", maxThreads=" + maxThreads + "]";
 	}
 }

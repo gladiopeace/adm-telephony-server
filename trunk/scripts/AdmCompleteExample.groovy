@@ -1,13 +1,9 @@
+import com.admtel.telephonyserver.prompts.PromptBuilder
+import com.admtel.telephonyserver.core.*
+import com.admtel.telephonyserver.events.*
+import com.admtel.telephonyserver.radius.*;
 import com.admtel.telephonyserver.events.Event.EventType;
-
-import com.admtel.telephonyserver.core.Channel;
-import com.admtel.telephonyserver.core.Script;
-import com.admtel.telephonyserver.events.Event;
-import com.admtel.telephonyserver.events.InboundAlertingEvent;
-import com.admtel.telephonyserver.events.PlayAndGetDigitsEndedEvent;
-import com.admtel.telephonyserver.events.OutboundAlertingEvent;
-import com.admtel.telephonyserver.radius.AuthorizeResult;
-import com.admtel.telephonyserver.radius.Radius;
+import com.admtel.telephonyserver.prompts.*;
 
 class AdmCompleteExample extends Script {
 	
@@ -88,10 +84,15 @@ class AdmCompleteExample extends Script {
 	void processAnswering_State(Event event){
 		switch (event.getEventType()){
 			case EventType.Answered:
-			String[] prompts =["/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-sample_submenu",
-			"/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-account_number",
-			"/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-sample_submenu"]
-			a.playAndGetDigits(10, prompts, 10000, "#")
+			PromptBuilder pb = PromptBuilderFactory.getInstance().getPromptBuilder(a.getLanguage())
+			def prompts = pb.currencyToPrompt(new BigDecimal(120.34))
+			prompts += (pb.numberToPrompt(-245))
+			a.playAndGetDigits(10, (String[])prompts, 1000, "#")
+			
+//			String[] prompts=	["/us/callie/ivr/8000/ivr-sample_submenu",
+//			"/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-account_number",
+//			"/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-sample_submenu"]
+//			a.playAndGetDigits(10, prompts, 10000, "#")
 			state = "Playing"
 			break
 		}
