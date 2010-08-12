@@ -8,35 +8,7 @@ public class RadiusDefinition implements DefinitionInterface {
 	int retryCount;
 	int socketTimeout;
 	
-	Boolean startAccounting;
-	Boolean stopAccounting;
-	int interimUpdate;
 	
-
-	public int getInterimUpdate() {
-		return interimUpdate;
-	}
-
-	public void setInterimUpdate(int interimUpdate) {
-		this.interimUpdate = interimUpdate;
-	}
-
-	public Boolean getStartAccounting() {
-		return startAccounting;
-	}
-
-	public void setStartAccounting(Boolean startAccounting) {
-		this.startAccounting = startAccounting;
-	}
-
-	public Boolean getStopAccounting() {
-		return stopAccounting;
-	}
-
-	public void setStopAccounting(Boolean stopAccounting) {
-		this.stopAccounting = stopAccounting;
-	}
-
 	public int getRetryCount() {
 		return retryCount;
 	}
@@ -57,10 +29,8 @@ public class RadiusDefinition implements DefinitionInterface {
 	public String toString() {
 		return "RadiusDefinition [acctPort=" + acctPort + ", address="
 				+ address + ", authPort=" + authPort + ", id=" + id
-				+ ", interimUpdate=" + interimUpdate + ", retryCount="
-				+ retryCount + ", secret=" + secret + ", socketTimeout="
-				+ socketTimeout + ", startAccounting=" + startAccounting
-				+ ", stopAccounting=" + stopAccounting + "]";
+				+ ", retryCount=" + retryCount + ", secret=" + secret
+				+ ", socketTimeout=" + socketTimeout + "]";
 	}
 
 	@Override
@@ -71,14 +41,9 @@ public class RadiusDefinition implements DefinitionInterface {
 		result = prime * result + ((address == null) ? 0 : address.hashCode());
 		result = prime * result + authPort;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + interimUpdate;
 		result = prime * result + retryCount;
 		result = prime * result + ((secret == null) ? 0 : secret.hashCode());
 		result = prime * result + socketTimeout;
-		result = prime * result
-				+ ((startAccounting == null) ? 0 : startAccounting.hashCode());
-		result = prime * result
-				+ ((stopAccounting == null) ? 0 : stopAccounting.hashCode());
 		return result;
 	}
 
@@ -105,8 +70,6 @@ public class RadiusDefinition implements DefinitionInterface {
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		if (interimUpdate != other.interimUpdate)
-			return false;
 		if (retryCount != other.retryCount)
 			return false;
 		if (secret == null) {
@@ -115,16 +78,6 @@ public class RadiusDefinition implements DefinitionInterface {
 		} else if (!secret.equals(other.secret))
 			return false;
 		if (socketTimeout != other.socketTimeout)
-			return false;
-		if (startAccounting == null) {
-			if (other.startAccounting != null)
-				return false;
-		} else if (!startAccounting.equals(other.startAccounting))
-			return false;
-		if (stopAccounting == null) {
-			if (other.stopAccounting != null)
-				return false;
-		} else if (!stopAccounting.equals(other.stopAccounting))
 			return false;
 		return true;
 	}

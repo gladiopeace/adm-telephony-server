@@ -155,8 +155,12 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 
 	@Override
 	public boolean accountingInterimUpdate(Channel channel) {
-		// TODO Auto-generated method stub
-		return false;
+		if (!isEnabled()) return false;
+		RadiusServer radiusServer = getAvailableServer();
+		if (radiusServer != null){
+			radiusServer.accountingInterimUpdate(channel);
+		}
+		return true;
 	}
 
 	@Override

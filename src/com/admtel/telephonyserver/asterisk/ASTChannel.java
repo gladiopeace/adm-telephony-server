@@ -47,7 +47,7 @@ import com.admtel.telephonyserver.core.ScriptManager;
 import com.admtel.telephonyserver.core.Switch;
 import com.admtel.telephonyserver.core.Timers;
 
-public class ASTChannel extends Channel implements TimerNotifiable {
+public class ASTChannel extends Channel{
 
 	static Logger log = Logger.getLogger(ASTChannel.class);
 
@@ -918,11 +918,12 @@ public class ASTChannel extends Channel implements TimerNotifiable {
 
 	@Override
 	synchronized public boolean onTimer(Object data) {
+		boolean result = super.onTimer(data);
 		log.debug("Got timer .... " + data);
 		if (data instanceof State) {
 			return ((State)data).onTimer(data);
 		}
-		return false;
+		return result;
 	}
 
 	@Override

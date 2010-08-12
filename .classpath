@@ -17,5 +17,6 @@
 	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/TinyRadius-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/postgresql-8.3-604.jdbc3.jar"/>
+	<classpathentry kind="lib" path="lib/groovyws-standalone-0.5.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

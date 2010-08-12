@@ -58,6 +58,8 @@ public abstract class Script implements EventListener{
 	}
 
 	final public boolean onEvent(Event event) {
+		
+		try{
 		log.trace("Script " + this + ", got event " + event);
 
 		switch (event.getEventType()) {
@@ -94,14 +96,23 @@ public abstract class Script implements EventListener{
 
 		processEvent(event);
 
+		}
+		catch (Exception e){
+			log.fatal(e.getMessage());
+		}
+		finally{
+			internalStop();
+		}
+		return true;
+	}
+	private void internalStop(){
 		if (channels.size() == 0) {
 			log.debug(" *********** Script " + this
 					+ ", no more channels, stopping ...");
 			scriptState = ScriptState.Stopped;
 			onStop();
 			Scripts.getInstance().remove(this);
-		}
-		return true;
+		}		
 	}
 	
 	//Registrar functions

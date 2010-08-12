@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
+import com.admtel.telephonyserver.core.Timers.Timer;
 import com.admtel.telephonyserver.events.DialStartedEvent;
 import com.admtel.telephonyserver.events.DtmfEvent;
 import com.admtel.telephonyserver.events.Event;
@@ -17,18 +18,26 @@ import com.admtel.telephonyserver.events.HangupEvent;
 import com.admtel.telephonyserver.events.InboundAlertingEvent;
 import com.admtel.telephonyserver.events.Event.EventType;
 import com.admtel.telephonyserver.interfaces.EventListener;
+import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.radius.RadiusServers;
 import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.utils.AdmUtils;
 import com.admtel.telephonyserver.utils.PromptsUtils;
 
-public abstract class Channel {
+public abstract class Channel implements TimerNotifiable {
 
 	static Logger log = Logger.getLogger(Channel.class);
 
 	public enum State {
 		Null, InboundAlerting, Idle, Clearing, Answering, OutboundAlerting, MediaBusy, Busy, Conferenced,
 	}
+
+	private enum TimersDefs {
+		HangupTimer, InterimUpdateTimer
+	}
+	
+	Timer hangupTimer;
+	Timer interimUpdateTimer;
 
 	public enum CallOrigin {
 		Inbound, Outbound
@@ -45,12 +54,12 @@ public abstract class Channel {
 
 	private ChannelData channelData = new ChannelData();
 	protected Participant conferenceParticipant; // information about the
-													// channel when joined in a
-													// conference bridge
+	// channel when joined in a
+	// conference bridge
 
 	protected DateTime createdTime = new DateTime();
 	protected CallOrigin callOrigin = CallOrigin.Inbound;
-	// Radius needed attributes	
+	// Radius needed attributes
 	protected DateTime setupTime;
 	protected DateTime hangupTime;
 	protected DateTime answerTime;
@@ -60,10 +69,11 @@ public abstract class Channel {
 	protected String acctUniqueSessionId;
 	protected String acctSessionId = UUID.randomUUID().toString();
 	protected String serviceType = "Login-User";
-	protected Integer h323DisconnectCause=16;//normal call clearing
-	
-	protected String baseDirectory = AdmTelephonyServer.getInstance().getDefinition().getBaseDirectory();
-	
+	protected Integer h323DisconnectCause = 16;// normal call clearing
+
+	protected String baseDirectory = AdmTelephonyServer.getInstance()
+			.getDefinition().getBaseDirectory();
+
 	protected Locale language;
 
 	public Locale getLanguage() {
@@ -72,6 +82,11 @@ public abstract class Channel {
 
 	public void setLanguage(Locale language) {
 		this.language = language;
+	}
+
+	public void setHangupAfter(long msTimeout) {
+		hangupTimer = Timers.getInstance().startTimer(this, msTimeout, true,
+				TimersDefs.HangupTimer);
 	}
 
 	public long getSessionTime() {
@@ -84,9 +99,10 @@ public abstract class Channel {
 		return new Duration(answerTime, new DateTime()).getStandardSeconds();
 	}
 
-	public String getServiceNumber(){
+	public String getServiceNumber() {
 		return getChannelData().getServiceNumber();
 	}
+
 	public String getServiceType() {
 		return serviceType;
 	}
@@ -146,6 +162,7 @@ public abstract class Channel {
 	public String getH323RemoteAddress() {
 		return getChannelData().getRemoteIP();
 	}
+
 	public String getAcctUniqueSessionId() {
 		return acctUniqueSessionId;
 	}
@@ -245,7 +262,8 @@ public abstract class Channel {
 					state));
 			return Result.ChannelInvalidState;
 		}
-		prompt = PromptsUtils.prepend(prompt, baseDirectory,"/sounds/", language.toString(),"/");
+		prompt = PromptsUtils.prepend(prompt, baseDirectory, "/sounds/",
+				language.toString(), "/");
 		Result result = internalPlayAndGetDigits(max, prompt, timeout,
 				terminators, true);
 		if (result == Result.Ok) {
@@ -268,6 +286,9 @@ public abstract class Channel {
 					this, state));
 			return Result.ChannelInvalidState;
 		}
+		prompt = PromptsUtils.prepend(prompt, baseDirectory, "/sounds/",
+				language.toString(), "/");
+
 		Result result = internalPlayback(prompt, terminators);
 		if (result == Result.Ok) {
 			state = State.MediaBusy;
@@ -281,6 +302,9 @@ public abstract class Channel {
 					this, state));
 			return Result.ChannelInvalidState;
 		}
+		prompt = PromptsUtils.prepend(prompt, baseDirectory, "/sounds/",
+				language.toString(), "/");
+
 		Result result = internalPlayback(prompt, terminators);
 		if (result == Result.Ok) {
 			state = State.MediaBusy;
@@ -331,7 +355,8 @@ public abstract class Channel {
 					state));
 			return Result.ChannelInvalidState;
 		}
-		prompt = PromptsUtils.prepend(prompt, baseDirectory,"/sounds/", language.toString(),"/");
+		prompt = PromptsUtils.prepend(prompt, baseDirectory, "/sounds/",
+				language.toString(), "/");
 		state = State.MediaBusy;
 		Result result = internalPlayAndGetDigits(max, prompt, timeout,
 				terminators, true);
@@ -388,7 +413,14 @@ public abstract class Channel {
 			break;
 		case Answered:
 			state = State.Idle;
-			answerTime = new DateTime();
+			setAnswerTime(new DateTime());
+			sendInterimUpdate();
+			interimUpdateTimer = Timers.getInstance().startTimer(
+					this,
+					AdmTelephonyServer.getInstance().getDefinition()
+							.getInterimUpdate() * 1000, false,
+					TimersDefs.InterimUpdateTimer);
+
 			break;
 		case InboundAlerting: {
 			InboundAlertingEvent ie = (InboundAlertingEvent) e;
@@ -401,11 +433,11 @@ public abstract class Channel {
 			this.addEventListener(EventsManager.getInstance());
 		}
 			break;
-		case Hangup:
-		{
+		case Hangup: {
 			HangupEvent he = (HangupEvent) e;
 			hangupTime = new DateTime();
 			h323DisconnectCause = he.getHangCause();
+			stopTimers();
 		}
 			break;
 		case OutboundAlerting:
@@ -414,9 +446,9 @@ public abstract class Channel {
 			setupTime = new DateTime();
 			this.addEventListener(EventsManager.getInstance());
 			break;
-			
+
 		}
-		
+
 		try {
 			Iterator<EventListener> it = getListeners().iterator();
 			while (it.hasNext()) {
@@ -429,6 +461,12 @@ public abstract class Channel {
 			removeAllEventListeners();
 		}
 		return false;
+	}
+
+	private void stopTimers() {
+		Timers.getInstance().stopTimer(hangupTimer);
+		Timers.getInstance().stopTimer(interimUpdateTimer);
+		
 	}
 
 	public DateTime getAnswerTime() {
@@ -467,5 +505,25 @@ public abstract class Channel {
 
 	public ChannelData getChannelData() {
 		return channelData;
+	}
+
+	@Override
+	public boolean onTimer(Object data) {
+		if (data instanceof TimersDefs) {
+			TimersDefs td = (TimersDefs) data;
+			switch (td) {
+			case HangupTimer:
+				hangup(DisconnectCode.Normal);
+				break;
+			case InterimUpdateTimer:
+				sendInterimUpdate();
+				return false; // Don't remove the timer
+			}
+		}
+		return true;
+	}
+
+	private void sendInterimUpdate() {
+		RadiusServers.getInstance().accountingInterimUpdate(this);
 	}
 }
