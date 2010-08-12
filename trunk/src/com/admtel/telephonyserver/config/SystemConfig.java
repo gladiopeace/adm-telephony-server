@@ -52,15 +52,28 @@ public class SystemConfig {
 		ServerDefinition serverDefinition = new ServerDefinition();
 		serverDefinition.setMaxThreads(config.getInt("server.maxthreads"));
 		serverDefinition.setAddress(config.getString("server.address"));
-		serverDefinition.setBaseDirectory(config.getString("server.base-directory"));
+		serverDefinition.setBaseDirectory(config
+				.getString("server.base-directory"));
+		serverDefinition.setStartAccounting(config.getBoolean(
+				"server.radius-start-accounting", true));
+		serverDefinition.setStopAccounting(config.getBoolean(
+				"server.radius-stop-accounting", true));
+		serverDefinition.setInterimUpdate(config
+				.getInt(
+				"server.radius-interim-update", 0));
+
 		futureDefinitions.put(serverDefinition.getId(), serverDefinition);
 	}
-	public void loadRegistrarDefinition(){
+
+	public void loadRegistrarDefinition() {
 		RegistrarDefinition registrarDefinition = new RegistrarDefinition();
-		registrarDefinition.setClassName(config.getString("registrar.class", "com.admtel.telephonyserver.registrar.SimpleRegistrar"));
-		registrarDefinition.setEnabled(config.getBoolean("registrar.enabled", true));
+		registrarDefinition.setClassName(config.getString("registrar.class",
+				"com.admtel.telephonyserver.registrar.SimpleRegistrar"));
+		registrarDefinition.setEnabled(config.getBoolean("registrar.enabled",
+				true));
 		futureDefinitions.put(registrarDefinition.getId(), registrarDefinition);
 	}
+
 	public void loadSwitchListenersDefinition() {
 		int counter = 0;
 		SubnodeConfiguration subnode;
@@ -103,7 +116,8 @@ public class SystemConfig {
 					definition.setPassword(subnode.getString("password"));
 					definition.setSwitchType(SwitchType.fromString(subnode
 							.getString("type")));
-					definition.setAddressTranslatorClass(subnode.getString("addresstranslator"));
+					definition.setAddressTranslatorClass(subnode
+							.getString("addresstranslator"));
 					futureDefinitions.put(definition.getId(), definition);
 				} else {
 					return;
@@ -117,56 +131,57 @@ public class SystemConfig {
 		}
 	}
 
-	public void loadRadiusDefinition(){
-		int counter=0;
+	public void loadRadiusDefinition() {
+		int counter = 0;
 		SubnodeConfiguration subnode;
-		while (true){
-			try{
-				subnode = config.configurationAt(String.format("radius.server(%d)", counter));
-				if (subnode != null){
+		while (true) {
+			try {
+				subnode = config.configurationAt(String.format(
+						"radius.server(%d)", counter));
+				if (subnode != null) {
 					RadiusDefinition definition = new RadiusDefinition();
 					definition.setId(subnode.getString("id"));
 					definition.setAddress(subnode.getString("address"));
 					definition.setAuthPort(subnode.getInt("auth-port", 1812));
 					definition.setAcctPort(subnode.getInt("acct-port", 1813));
 					definition.setSecret(subnode.getString("secret"));
-					definition.setRetryCount(subnode.getInt("retry-count",5));
-					definition.setSocketTimeout(subnode.getInt("socket-timeout", 5000));
-					definition.setStartAccounting(subnode.getBoolean("start-accounting", true));
-					definition.setStopAccounting(subnode.getBoolean("stop-accounting", true));
-					definition.setInterimUpdate(subnode.getInt("interim-update",0));
+					definition.setRetryCount(subnode.getInt("retry-count", 5));
+					definition.setSocketTimeout(subnode.getInt(
+							"socket-timeout", 5000));
 					futureDefinitions.put(definition.getId(), definition);
 				}
-			}
-			catch (Exception e){
+			} catch (Exception e) {
 				log.warn(e.getMessage());
 				return;
 			}
 			counter++;
 		}
 	}
-	public void loadHTTPServerDefinition(){
-		int counter=0;
+
+	public void loadHTTPServerDefinition() {
+		int counter = 0;
 		SubnodeConfiguration subnode;
-		while (true){
-			try{
-				subnode = config.configurationAt(String.format("http-servers.http-server(%d)", counter));
-				if (subnode != null){
+		while (true) {
+			try {
+				subnode = config.configurationAt(String.format(
+						"http-servers.http-server(%d)", counter));
+				if (subnode != null) {
 					HttpServerDefinition definition = new HttpServerDefinition();
 					definition.setId(subnode.getString("id"));
 					definition.setAddress(subnode.getString("address"));
 					definition.setPort(subnode.getInt("port"));
-					definition.setAdmServletClass(subnode.getString("adm-servlet"));
+					definition.setAdmServletClass(subnode
+							.getString("adm-servlet"));
 					futureDefinitions.put(definition.getId(), definition);
 				}
-			}
-			catch (Exception e){
+			} catch (Exception e) {
 				log.warn(e.getMessage());
 				return;
 			}
 			counter++;
-		}		
+		}
 	}
+
 	public void loadCLI_ListenersDefinition() {
 		int counter = 0;
 		SubnodeConfiguration subnode;
@@ -216,7 +231,7 @@ public class SystemConfig {
 		}
 	}
 
-	public void loadEventListenersDefinition(){
+	public void loadEventListenersDefinition() {
 		int counter = 0;
 		SubnodeConfiguration subnode;
 		while (true) {
@@ -236,9 +251,10 @@ public class SystemConfig {
 			}
 			counter++;
 
-		}		
+		}
 	}
-	public void loadPromptBuildersDefinition(){
+
+	public void loadPromptBuildersDefinition() {
 		int counter = 0;
 		SubnodeConfiguration subnode;
 		while (true) {
@@ -259,8 +275,9 @@ public class SystemConfig {
 			}
 			counter++;
 
-		}				
+		}
 	}
+
 	public void load() {
 		log.debug("Loading System configuration ...");
 		futureDefinitions.clear();

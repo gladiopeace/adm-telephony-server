@@ -3,9 +3,15 @@ package com.admtel.telephonyserver.core;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.log4j.Logger;
+
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 
 public class Timers extends Thread{
+	
+	static Logger log = Logger.getLogger(Timers.class);
+	
 	private static class SingletonHolder{
 		private final static Timers instance = new Timers();
 	}
@@ -68,15 +74,20 @@ public class Timers extends Thread{
 		return SingletonHolder.instance;
 	}
 	public Timer startTimer(TimerNotifiable notifiable, long duration, boolean oneShot, Object data){
+		log.trace("Timer " + data + ", for " + notifiable+", added");
+		if (duration == 0){
+			return null;
+		}
 		Timer timer= new Timer(notifiable, duration, oneShot, data);
 		listeners.add(timer);
 		return timer;
 	}
 	
 	public void stopTimer(Timer timer)
-	{
+	{		
 		if (timer != null){
 			timer.remove = true;
+			log.trace("Timer " + timer + ", for " + timer.getNotifiable()+", removed");
 		}
 	}
 	@Override

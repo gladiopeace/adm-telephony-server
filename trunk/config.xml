@@ -4,24 +4,24 @@
 	<maxthreads>10</maxthreads>
 	<address>172.16.140.1</address>	
 	<base-directory>/usr/local/adm</base-directory>
+	<radius-start-accounting>true</radius-start-accounting>
+	<radius-stop-accounting>true</radius-stop-accounting>
+	<radius-interim-update>10</radius-interim-update>
 </server>
 <registrar>
 		<enabled>true</enabled>
  		<class>com.admtel.telephonyserver.registrar.SimpleRegistrar</class>
 </registrar>
 <radius>
-<!--	<server>-->
-<!--		<id>first radius server</id>-->
-<!--		<address>172.16.140.129</address>-->
-<!--		<auth-port>1812</auth-port>-->
-<!--		<acct-port>1813</acct-port>-->
-<!--		<secret>meravoip</secret>-->
-<!--		<retry-count>5</retry-count>-->
-<!--		<socket-timeout>5000</socket-timeout>-->
-<!--		<start-accounting>true</start-accounting>-->
-<!--		<stop-accounting>true</stop-accounting>-->
-<!--		<interim-update>10</interim-update>-->
-<!--	</server>-->
+	<server>
+		<id>first radius server</id>
+		<address>172.16.140.129</address>
+		<auth-port>1812</auth-port>
+		<acct-port>1813</acct-port>
+		<secret>meravoip</secret>
+		<retry-count>5</retry-count>
+		<socket-timeout>5000</socket-timeout>
+	</server>
 	<!--<server>
 	  	<id>Second radius server</id>
 	  	<address>172.16.140.130</address>
@@ -73,7 +73,7 @@
   <id>Freeswitch Configurator</id>
   <address>172.16.140.1</address>
   <port>8057</port>
-  <adm-servlet>scripts/FreeSwitchConfigurator.groovy</adm-servlet>
+  <adm-servlet>scripts/WSFreeSwitchConfigurator.groovy</adm-servlet>
  </http-server>
 <!-- <http-server>-->
 <!--  <id>Manager</id>-->

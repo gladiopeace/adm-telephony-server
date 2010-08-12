@@ -166,8 +166,40 @@ public class RadiusServer implements Authorizer{
 
 	@Override
 	public boolean accountingInterimUpdate(Channel channel) {
-		// TODO Auto-generated method stub
-		return false;
+		AccountingRequest acctRequest = new AccountingRequest(channel.getUserName(),
+				AccountingRequest.ACCT_STATUS_TYPE_INTERIM_UPDATE);
+		
+		RadiusPacketDecorator arDecorator = new RadiusPacketDecorator(acctRequest);
+		
+		acctRequest.setDictionary(dictionary);
+		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
+		arDecorator.addAttribute("Service-Type", channel.getServiceType());
+		arDecorator.addAttribute("Calling-Station-Id", channel.getCallingStationId());
+		arDecorator.addAttribute("Called-Station-Id", channel.getCalledStationId());
+		arDecorator.addAttribute("Acct-Session-Id", channel.getAcctSessionId());
+		arDecorator.addAttribute("h323-call-origin",(channel.getCallOrigin()==CallOrigin.Inbound?"answer":"originate"));
+		arDecorator.addAttribute("h323-setup-time","h323-setup-time="+AdmUtils.dateToRadiusStr(channel.getSetupTime()));
+		arDecorator.addAttribute("Acct-Delay-Time","0");
+		arDecorator.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
+		arDecorator.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
+		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
+
+		if (channel.getAnswerTime()!=null){
+			arDecorator.addAttribute("h323-connect-time","h323-connect-time="+AdmUtils.dateToRadiusStr(channel.getAnswerTime()));
+		}
+
+		log.trace("Sending Accounting-Start message : " + acctRequest);
+
+		
+		try {
+			getRadiusClient().account(acctRequest);
+		} catch (IOException e) {
+			log.error("", e);
+		} catch (RadiusException e) {
+			log.error("", e);
+		}
+
+		return true;
 	}
 
 	@Override
@@ -231,10 +263,10 @@ public class RadiusServer implements Authorizer{
 
 
 		if (channel.getAnswerTime()!=null){
-			acctRequest.addAttribute("h323-connect-time","h323-connect-time="+AdmUtils.dateToRadiusStr(channel.getAnswerTime()));
+			arDecorator.addAttribute("h323-connect-time","h323-connect-time="+AdmUtils.dateToRadiusStr(channel.getAnswerTime()));
 		}
 		if (channel.getHangupTime()!=null){
-			acctRequest.addAttribute("h323-disconnect-time","h323-disconnect-time="+AdmUtils.dateToRadiusStr(channel.getHangupTime()));
+			arDecorator.addAttribute("h323-disconnect-time","h323-disconnect-time="+AdmUtils.dateToRadiusStr(channel.getHangupTime()));
 		}
 		log.trace("Sending Accounting-Stop message : " + acctRequest);
 

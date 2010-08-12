@@ -84,10 +84,17 @@ class AdmCompleteExample extends Script {
 	void processAnswering_State(Event event){
 		switch (event.getEventType()){
 			case EventType.Answered:
+			a.setHangupAfter(50000);
 			PromptBuilder pb = PromptBuilderFactory.getInstance().getPromptBuilder(a.getLanguage())
 			def prompts = pb.currencyToPrompt(new BigDecimal(120.34))
-			prompts += (pb.numberToPrompt(-245))
+			prompts += (pb.numberToPrompt(13245))
+			prompts += (pb.numberToPrompt(33245))
+			prompts += (pb.numberToPrompt(34245))
+			println prompts
 			a.playAndGetDigits(10, (String[])prompts, 1000, "#")
+			
+			println "*******" + prompts
+			
 			
 //			String[] prompts=	["/us/callie/ivr/8000/ivr-sample_submenu",
 //			"/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-account_number",
