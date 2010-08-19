@@ -12,6 +12,8 @@ public class LocaleTest {
 		
 		Locale mLocal = new Locale("arw","SA");
 		System.out.println(mLocal);
+		Locale lLocal = new Locale("EN","us");
+		System.out.println(lLocal);
 	}
 
 }
