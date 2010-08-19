@@ -18,7 +18,7 @@ class WSFreeSwitchConfigurator implements AdmServlet {
 
 		def proxy = new WSClient("http://localhost:8080/adm-appserver/AppServerAPI?WSDL", this.class.classLoader)
 		proxy.initialize()
-		def subscriberDTO = proxy.getSubscriberByUsername(TOKEN, mUser)
+		def subscriberDTO = proxy.getSubscriberByName(TOKEN, mUser)
 		
 		
 		
