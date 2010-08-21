@@ -10,11 +10,14 @@ import com.admtel.telephonyserver.config.DefinitionChangeListener;
 import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.RadiusDefinition;
 import com.admtel.telephonyserver.core.Channel;
+import com.admtel.telephonyserver.core.Conference;
 import com.admtel.telephonyserver.core.EventsManager;
+import com.admtel.telephonyserver.core.Participant;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.HangupEvent;
 import com.admtel.telephonyserver.events.InboundAlertingEvent;
 import com.admtel.telephonyserver.events.OutboundAlertingEvent;
+import com.admtel.telephonyserver.events.Event.EventType;
 import com.admtel.telephonyserver.interfaces.Authorizer;
 import com.admtel.telephonyserver.interfaces.EventListener;
 
@@ -29,7 +32,6 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 	Random rnd = new Random(System.currentTimeMillis());
 
 	private RadiusServers() {
-		EventsManager.getInstance().addEventListener(this.getClass().toString(), this);
 	}
 
 	private boolean isEnabled(){
@@ -179,6 +181,39 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 		RadiusServer radiusServer = getAvailableServer();
 		if (radiusServer != null){
 			radiusServer.accountingStop(channel);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean accountingInterimUpdate(Channel channel,
+			Conference conference, Participant participant) {
+		if (!isEnabled()) return false;
+		RadiusServer radiusServer = getAvailableServer();
+		if (radiusServer != null){
+			radiusServer.accountingInterimUpdate(channel, conference, participant);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean accountingStart(Channel channel, Conference conference,
+			Participant participant) {
+		if (!isEnabled()) return false;
+		RadiusServer radiusServer = getAvailableServer();
+		if (radiusServer != null){
+			radiusServer.accountingStart(channel, conference, participant);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean accountingStop(Channel channel, Conference conference,
+			Participant participant) {
+		if (!isEnabled()) return false;
+		RadiusServer radiusServer = getAvailableServer();
+		if (radiusServer != null){
+			radiusServer.accountingStop(channel, conference, participant);
 		}
 		return true;
 	}

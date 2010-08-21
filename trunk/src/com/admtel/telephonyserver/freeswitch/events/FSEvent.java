@@ -68,6 +68,16 @@ public class FSEvent {
 					else if (eventSubclass.equals("sofia::unregister")){
 						return new FSRegisterEvent(switchId, map, false);
 					}
+					else if (eventSubclass.equalsIgnoreCase("conference::maintenance")){
+						String action = map.get("Action");
+						if (action.equals("add-member")){
+							return new FSConferenceJoinedEvent(switchId, map);
+						}						
+						else
+						if (action.equals("del-member")){
+							return new FSConferenceRemovedEvent(switchId, map);
+						}
+					}
 				}
 
 			} else {
@@ -104,7 +114,7 @@ public class FSEvent {
 
 	public enum EventType {
 		AuthRequest, CommandReply, HeartBeat, ChannelExecute, ChannelExecuteComplete, ChannelData, SessionDisconnect, ChannelDestroy, DTMF, ChannelHangup, ChannelAnswered, ChannelCreate, ChannelOutgoing, ChannelState, ChannelOriginate,
-		FsRegister
+		FsRegister, ConferenceJoined, ConferenceRemoved
 	}
 
 	EventType eventType;

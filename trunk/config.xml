@@ -91,24 +91,24 @@
 </http-servers>
 
 <switches>
-<!-- <switch>-->
-<!-- 	<id>MyFreeswitch</id>-->
-<!--    <address>172.16.140.129</address>-->
-<!--  	<port>8021</port>-->
-<!--  	<username>admin</username>-->
-<!--  	<password>admin</password>-->
-<!--  	<type>freeswitch</type>  -->
-<!--  	<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultFSAddressTranslator</addresstranslator> 	-->
-<!-- </switch>-->
  <switch>
-  <id>MyAsterisk</id>
-  <address>172.16.34.134</address>
-  <port>5038</port>
-  <username>admin</username>
-  <password>voicelynx1201</password>
-  <type>asterisk</type>
-  <addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator</addresstranslator>
+ 	<id>MyFreeswitch</id>
+    <address>172.16.140.129</address>
+  	<port>8021</port>
+  	<username>admin</username>
+  	<password>admin</password>
+  	<type>freeswitch</type>  
+  	<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultFSAddressTranslator</addresstranslator> 	
  </switch>
+<!-- <switch>-->
+<!--  <id>MyAsterisk</id>-->
+<!--  <address>172.16.34.134</address>-->
+<!--  <port>5038</port>-->
+<!--  <username>admin</username>-->
+<!--  <password>voicelynx1201</password>-->
+<!--  <type>asterisk</type>-->
+<!--  <addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator</addresstranslator>-->
+<!-- </switch>-->
 
 </switches>
 
