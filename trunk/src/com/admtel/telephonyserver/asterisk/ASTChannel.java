@@ -17,6 +17,7 @@ import com.admtel.telephonyserver.asterisk.events.ASTDtmfEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTHangupEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTMeetmeJoinEvent;
+import com.admtel.telephonyserver.asterisk.events.ASTMeetmeLeaveEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTMeetmeTalkingEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTNewChannelEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTNewStateEvent;
@@ -37,7 +38,7 @@ import com.admtel.telephonyserver.events.PlaybackStartedEvent;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.core.Channel;
 import com.admtel.telephonyserver.core.ChannelProtocol;
-import com.admtel.telephonyserver.core.Conferences;
+import com.admtel.telephonyserver.core.ConferenceManager;
 import com.admtel.telephonyserver.core.MessageHandler;
 import com.admtel.telephonyserver.core.Participant;
 import com.admtel.telephonyserver.core.QueuedMessageHandler;
@@ -231,32 +232,21 @@ public class ASTChannel extends Channel{
 			switch (astEvent.getEventType()) {
 			case MeetmeJoin: {
 				ASTMeetmeJoinEvent je = (ASTMeetmeJoinEvent) astEvent;
-				ASTChannel.this.conferenceParticipant = new Participant(
-						moderator, muted, deaf);
-				ASTChannel.this.conferenceParticipant.setMemeber(je
-						.getUsernum());
-				if (Conferences.getInstance().joinConference(conferenceId,
-						ASTChannel.this)) {
-					ASTChannel.this.conferenceParticipant
-							.setJoinTime(new DateTime());
-				}
 				ASTChannel.this.onEvent(new ConferenceJoinedEvent(
-						ASTChannel.this, je.getUsernum(), moderator, muted,
+						ASTChannel.this,je.getMeetme(), je.getUsernum(), moderator, muted,
 						deaf));
 			}
 				break;
 			case MeetmeLeave: {
-				ASTChannel.this.conferenceParticipant = null;
+				ASTMeetmeLeaveEvent mle = (ASTMeetmeLeaveEvent) astEvent;
 				ASTChannel.this
-						.onEvent(new ConferenceLeftEvent(ASTChannel.this));
+						.onEvent(new ConferenceLeftEvent(ASTChannel.this, mle.getMeetme(), mle.getUsernum()));
 			}
 				break;
 			case MeetmeTalking: {
 				ASTMeetmeTalkingEvent mte = (ASTMeetmeTalkingEvent) astEvent;
-				ASTChannel.this.conferenceParticipant.setTalking(mte.isOn());
 				ASTChannel.this.onEvent(new ConferenceTalkEvent(
-						ASTChannel.this, ASTChannel.this.conferenceParticipant
-								.isTalking()));
+						ASTChannel.this, mte.getMeetme(), mte.getUsernum(), mte.isOn()));
 			}
 				break;
 			}

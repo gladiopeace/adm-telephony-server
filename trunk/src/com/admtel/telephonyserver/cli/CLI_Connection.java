@@ -21,7 +21,7 @@ import com.admtel.telephonyserver.config.CLI_ListenerDefinition;
 import com.admtel.telephonyserver.core.AdmThreadExecutor;
 import com.admtel.telephonyserver.core.Channel;
 import com.admtel.telephonyserver.core.Conference;
-import com.admtel.telephonyserver.core.Conferences;
+import com.admtel.telephonyserver.core.ConferenceManager;
 import com.admtel.telephonyserver.core.Registrar;
 import com.admtel.telephonyserver.core.Script;
 import com.admtel.telephonyserver.core.Scripts;
@@ -139,12 +139,12 @@ public class CLI_Connection extends IoHandlerAdapter {
 	}
 
 	private void showConferences(IoSession session) {
-		Collection<Conference> conferences = Conferences.getInstance().getAll();
+		Collection<Conference> conferences = ConferenceManager.getInstance().getAll();
 		Iterator<Conference> it = conferences.iterator();
 		session.write("Conferences\n");
 		while (it.hasNext()){
 			Conference c = it.next();
-			session.write(String.format("%s\n", c.dump()));
+			session.write(String.format("%s\n", c.toString())); //TODO proper dumping
 		}
 		
 	}

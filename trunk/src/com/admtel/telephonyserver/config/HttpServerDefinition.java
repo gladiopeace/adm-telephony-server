@@ -2,20 +2,22 @@ package com.admtel.telephonyserver.config;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.admtel.telephonyserver.httpserver.AdmServlet;
 
 public class HttpServerDefinition implements DefinitionInterface {
 
 	String id;
 	String address;
 	int port;
-	String admServletClass;
 	
-	public String getAdmServletClass() {
-		return admServletClass;
+	Map<String, AdmServlet> admServlets = new HashMap<String, AdmServlet>();	
+
+	public Map<String, AdmServlet> getAdmServlets() {
+		return admServlets;
 	}
 
-	public void setAdmServletClass(String admServletClass) {
-		this.admServletClass = admServletClass;
+	public void setAdmServlets(Map<String, AdmServlet> admServlets) {
+		this.admServlets = admServlets;
 	}
 
 	@Override
@@ -33,7 +35,7 @@ public class HttpServerDefinition implements DefinitionInterface {
 		int result = 1;
 		result = prime * result + ((address == null) ? 0 : address.hashCode());
 		result = prime * result
-				+ ((admServletClass == null) ? 0 : admServletClass.hashCode());
+				+ ((admServlets == null) ? 0 : admServlets.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + port;
 		return result;
@@ -53,10 +55,10 @@ public class HttpServerDefinition implements DefinitionInterface {
 				return false;
 		} else if (!address.equals(other.address))
 			return false;
-		if (admServletClass == null) {
-			if (other.admServletClass != null)
+		if (admServlets == null) {
+			if (other.admServlets != null)
 				return false;
-		} else if (!admServletClass.equals(other.admServletClass))
+		} else if (!admServlets.equals(other.admServlets))
 			return false;
 		if (id == null) {
 			if (other.id != null)

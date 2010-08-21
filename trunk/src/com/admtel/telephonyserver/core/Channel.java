@@ -53,9 +53,6 @@ public abstract class Channel implements TimerNotifiable {
 	protected String uniqueId;
 
 	private ChannelData channelData = new ChannelData();
-	protected Participant conferenceParticipant; // information about the
-	// channel when joined in a
-	// conference bridge
 
 	protected DateTime createdTime = new DateTime();
 	protected CallOrigin callOrigin = CallOrigin.Inbound;
@@ -68,7 +65,6 @@ public abstract class Channel implements TimerNotifiable {
 
 	protected String acctUniqueSessionId;
 	protected String acctSessionId = UUID.randomUUID().toString();
-	protected String serviceType = "Login-User";
 	protected Integer h323DisconnectCause = 16;// normal call clearing
 
 	protected String baseDirectory = AdmTelephonyServer.getInstance()
@@ -101,14 +97,6 @@ public abstract class Channel implements TimerNotifiable {
 
 	public String getServiceNumber() {
 		return getChannelData().getServiceNumber();
-	}
-
-	public String getServiceType() {
-		return serviceType;
-	}
-
-	public void setServiceType(String serviceType) {
-		this.serviceType = serviceType;
 	}
 
 	public CallOrigin getCallOrigin() {

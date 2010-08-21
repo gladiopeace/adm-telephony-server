@@ -52,6 +52,9 @@ public class AdmTelephonyServer implements DefinitionChangeListener {
 		
 		SystemConfig sysConfig = SystemConfig.getInstance();
 		
+		//static listeners
+		EventsManager.getInstance().addEventListener("ConferenceManager_Singleton", ConferenceManager.getInstance());
+		
 		sysConfig.addDefinitionChangeListener(
 				Switches.getInstance());
 		sysConfig.addDefinitionChangeListener(

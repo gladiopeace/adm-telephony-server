@@ -5,7 +5,7 @@ import com.admtel.telephonyserver.radius.AuthorizeResult;
 
 public interface Authorizer {
 	public AuthorizeResult authorize(Channel channel, String username,
-			String password, String address,
+			String password, String address, String serviceType,
 			String calledStationId, boolean routing, boolean number);
 	public boolean accountingStart(Channel channel);
 	public boolean accountingInterimUpdate(Channel channel);

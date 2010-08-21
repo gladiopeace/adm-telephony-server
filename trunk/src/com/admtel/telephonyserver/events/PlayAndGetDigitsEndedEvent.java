@@ -4,6 +4,30 @@ import com.admtel.telephonyserver.core.Channel;
 
 public class PlayAndGetDigitsEndedEvent extends ChannelEvent {
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("PlayAndGetDigitsEndedEvent [");
+		if (digits != null) {
+			builder.append("digits=");
+			builder.append(digits);
+			builder.append(", ");
+		}
+		if (interruptedFile != null) {
+			builder.append("interruptedFile=");
+			builder.append(interruptedFile);
+			builder.append(", ");
+		}
+		builder.append("success=");
+		builder.append(success);
+		builder.append(", ");
+		if (terminatingDigit != null) {
+			builder.append("terminatingDigit=");
+			builder.append(terminatingDigit);
+		}
+		builder.append("]");
+		return builder.toString();
+	}
 	String digits="";
 	boolean success;
 	String terminatingDigit="";

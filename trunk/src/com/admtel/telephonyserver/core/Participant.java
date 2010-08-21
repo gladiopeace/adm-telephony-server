@@ -40,8 +40,9 @@ public class Participant {
 	public boolean isTalking(){
 		return this.talking;
 	}
-	public Participant(boolean moderator, boolean muted, boolean deaf) {
+	public Participant(String memberId, boolean moderator, boolean muted, boolean deaf) {
 		super();		
+		this.memberId = memberId;
 		this.muted = muted;
 		this.moderator = moderator;
 		this.deaf = deaf;
