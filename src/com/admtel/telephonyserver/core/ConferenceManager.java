@@ -12,6 +12,7 @@ import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.Event.EventType;
 import com.admtel.telephonyserver.interfaces.EventListener;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
+import com.admtel.telephonyserver.radius.RadiusServers;
 
 public class ConferenceManager implements TimerNotifiable, EventListener{
 	
@@ -51,6 +52,9 @@ public class ConferenceManager implements TimerNotifiable, EventListener{
 		case ConferenceJoined:{
 			ConferenceJoinedEvent cje = (ConferenceJoinedEvent) event;
 			Conference c = conferences.get(cje.getConferenceId());
+			
+			RadiusServers.getInstance().accountingStart(cje.getChannel(), c, c.getParticipant(cje.getChannel()));
+			
 			if (c == null){
 				c = new Conference (cje.getConferenceId());
 				synchronizedConferences.put(cje.getConferenceId(), c);
@@ -61,6 +65,9 @@ public class ConferenceManager implements TimerNotifiable, EventListener{
 		case ConferenceLeft:{
 			ConferenceLeftEvent cle = (ConferenceLeftEvent) event;
 			Conference c = conferences.get(cle.getConferenceId());
+			
+			RadiusServers.getInstance().accountingStop(cle.getChannel(), c, c.getParticipant(cle.getChannel()));
+			
 			if (c != null){
 				c.onConferenceLeft(cle);
 				if (c.getParcitipantsCount() == 0){

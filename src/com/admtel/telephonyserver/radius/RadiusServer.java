@@ -7,6 +7,8 @@ import java.net.SocketException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.Period;
 import org.tinyradius.attribute.RadiusAttribute;
 import org.tinyradius.attribute.VendorSpecificAttribute;
 import org.tinyradius.dictionary.Dictionary;
@@ -21,6 +23,8 @@ import org.tinyradius.util.RadiusUtil;
 import com.admtel.telephonyserver.config.RadiusDefinition;
 import com.admtel.telephonyserver.core.AdmTelephonyServer;
 import com.admtel.telephonyserver.core.Channel;
+import com.admtel.telephonyserver.core.Conference;
+import com.admtel.telephonyserver.core.Participant;
 import com.admtel.telephonyserver.core.Channel.CallOrigin;
 import com.admtel.telephonyserver.interfaces.Authorizer;
 import com.admtel.telephonyserver.utils.AdmUtils;
@@ -279,10 +283,125 @@ public class RadiusServer implements Authorizer{
 		}
 		return true;
 	}
-	
-	/*public void accounting (AccountingType type, String userName, String serviceType, String acctUniqueSessionId, String acctSessionId, 
-			int accountDelayTime, String calledStationId, String callingStationId, CallOrigin callOrigin, DateTime setupTime, String gwId, String remoteAddress, ){
-		
-	}*/
 
+	@Override
+	public boolean accountingInterimUpdate(Channel channel,
+			Conference conference, Participant participant) {
+		AccountingRequest acctRequest = new AccountingRequest(conference.getId(),
+				AccountingRequest.ACCT_STATUS_TYPE_INTERIM_UPDATE);
+		
+		RadiusPacketDecorator arDecorator = new RadiusPacketDecorator(acctRequest);
+		
+		acctRequest.setDictionary(dictionary);
+		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
+		arDecorator.addAttribute("Service-Type", "Conference");
+		arDecorator.addAttribute("Calling-Station-Id", channel.getCallingStationId());
+		arDecorator.addAttribute("Called-Station-Id", channel.getCalledStationId());
+		arDecorator.addAttribute("Acct-Session-Id", participant.getUniqueId());
+		arDecorator.addAttribute("h323-call-origin",(channel.getCallOrigin()==CallOrigin.Inbound?"answer":"originate"));
+		arDecorator.addAttribute("h323-setup-time","h323-setup-time="+AdmUtils.dateToRadiusStr(channel.getSetupTime()));
+		arDecorator.addAttribute("Acct-Delay-Time","0");
+		arDecorator.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
+		arDecorator.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
+		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
+
+		if (participant.getJoinTime()!=null){
+			arDecorator.addAttribute("h323-connect-time","h323-connect-time="+AdmUtils.dateToRadiusStr(participant.getJoinTime()));
+		}
+
+		log.trace("Sending Accounting-Start message : " + acctRequest);
+
+		
+		try {
+			getRadiusClient().account(acctRequest);
+		} catch (IOException e) {
+			log.error("", e);
+		} catch (RadiusException e) {
+			log.error("", e);
+		}
+
+		return true;
+	}
+
+	@Override
+	public boolean accountingStart(Channel channel, Conference conference, Participant participant) {
+		AccountingRequest acctRequest = new AccountingRequest(conference.getId(),
+				AccountingRequest.ACCT_STATUS_TYPE_START);
+		
+		RadiusPacketDecorator arDecorator = new RadiusPacketDecorator(acctRequest);
+		
+		acctRequest.setDictionary(dictionary);
+		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
+		arDecorator.addAttribute("Service-Type", "Conference");
+		arDecorator.addAttribute("Calling-Station-Id", channel.getCallingStationId());
+		arDecorator.addAttribute("Called-Station-Id", channel.getCalledStationId());
+		arDecorator.addAttribute("Acct-Session-Id", participant.getUniqueId());
+		arDecorator.addAttribute("h323-call-origin",(channel.getCallOrigin()==CallOrigin.Inbound?"answer":"originate"));
+		arDecorator.addAttribute("h323-setup-time","h323-setup-time="+AdmUtils.dateToRadiusStr(channel.getSetupTime()));
+		arDecorator.addAttribute("Acct-Delay-Time","0");
+		arDecorator.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
+		arDecorator.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
+		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
+		arDecorator.addAttribute("Cisco-AV-Pair", "conference="+conference.getId());
+
+		log.trace("Sending Accounting-Start message : " + acctRequest);
+
+		
+		try {
+			getRadiusClient().account(acctRequest);
+		} catch (IOException e) {
+			log.error("", e);
+		} catch (RadiusException e) {
+			log.error("", e);
+		}
+
+		return true;
+	}
+
+	@Override
+	public boolean accountingStop(Channel channel, Conference conference, Participant participant) {
+		AccountingRequest acctRequest = new AccountingRequest(channel.getUserName(),
+				AccountingRequest.ACCT_STATUS_TYPE_STOP);
+		RadiusPacketDecorator arDecorator = new RadiusPacketDecorator(acctRequest);
+
+		DateTime now = new DateTime();
+		long sessionTime = new Period (participant.getJoinTime(), now).toStandardSeconds().getSeconds();
+
+		acctRequest.setDictionary(dictionary);
+		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
+		arDecorator.addAttribute("Service-Type", "Conference");
+		arDecorator.addAttribute("Calling-Station-Id", channel.getCallingStationId());
+		arDecorator.addAttribute("Called-Station-Id", channel.getCalledStationId());
+		arDecorator.addAttribute("Acct-Session-Id", participant.getUniqueId());
+		arDecorator.addAttribute("h323-call-origin",(channel.getCallOrigin()==CallOrigin.Inbound?"answer":"originate"));
+		arDecorator.addAttribute("h323-setup-time","h323-setup-time="+AdmUtils.dateToRadiusStr(channel.getSetupTime()));
+		arDecorator.addAttribute("Acct-Delay-Time","0");
+		arDecorator.addAttribute("Acct-Session-Time",Long.toString(sessionTime));
+		arDecorator.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
+		arDecorator.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
+		arDecorator.addAttribute("h323-disconnect-cause","h323-disconnect-cause=16");
+		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
+		arDecorator.addAttribute("h323-remote-address", channel.getChannelData().getRemoteIP());
+		arDecorator.addAttribute("xpgk-dst-number-in", channel.getChannelData().getDestinationNumberIn());
+
+
+
+		if (channel.getAnswerTime()!=null){
+			arDecorator.addAttribute("h323-connect-time","h323-connect-time="+AdmUtils.dateToRadiusStr(participant.getJoinTime()));
+		}
+		if (channel.getHangupTime()!=null){
+			arDecorator.addAttribute("h323-disconnect-time","h323-disconnect-time="+AdmUtils.dateToRadiusStr(now));
+		}
+		log.trace("Sending Accounting-Stop message : " + acctRequest);
+
+		try {
+			getRadiusClient().account(acctRequest);
+		} catch (IOException e) {
+			log.error("", e);
+		} catch (RadiusException e) {
+			log.error("", e);
+		}
+		return true;
+	}
+	
 }

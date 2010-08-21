@@ -87,5 +87,9 @@ public class Conference implements TimerNotifiable{
 		builder.append("]");
 		return builder.toString();
 	}
+
+	public Participant getParticipant(Channel channel) {
+		return participants.get(channel);
+	}
 	
 }

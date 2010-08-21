@@ -52,7 +52,9 @@ public class AdmTelephonyServer implements DefinitionChangeListener {
 		
 		SystemConfig sysConfig = SystemConfig.getInstance();
 		
-		//static listeners
+		//static listeners, order is important as conferencemanager might removed objects needed by RadiusServers
+		
+		EventsManager.getInstance().addEventListener(RadiusServers.getInstance().toString(), RadiusServers.getInstance());
 		EventsManager.getInstance().addEventListener("ConferenceManager_Singleton", ConferenceManager.getInstance());
 		
 		sysConfig.addDefinitionChangeListener(

@@ -12,6 +12,18 @@ public class Participant {
 	boolean deaf;	
 	String memberId; //Given to us by the switch
 	DateTime joinTime;
+	public String getMemberId() {
+		return memberId;
+	}
+	public void setMemberId(String memberId) {
+		this.memberId = memberId;
+	}
+	public DateTime getJoinTime() {
+		return joinTime;
+	}
+	public void setUniqueId(String uniqueId) {
+		this.uniqueId = uniqueId;
+	}
 	boolean talking;
 	
 	String uniqueId;

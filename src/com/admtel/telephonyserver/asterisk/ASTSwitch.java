@@ -178,8 +178,8 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	@Override
 	public void sessionClosed(IoSession session) throws Exception {
-		// TODO Auto-generated method stub
-
+		log.warn("Disconnected from switch " + getDefinition().getId());
+		start();
 	}
 
 	@Override
