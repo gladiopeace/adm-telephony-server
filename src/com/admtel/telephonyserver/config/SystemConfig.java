@@ -1,6 +1,7 @@
 package com.admtel.telephonyserver.config;
 
 import java.util.ArrayList;
+
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,10 @@ import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.log4j.Logger;
+
+import com.admtel.telephonyserver.core.SmartClassLoader;
+import com.admtel.telephonyserver.httpserver.AdmServlet;
+import com.admtel.telephonyserver.httpserver.DefaultAdmServlet;
 
 public class SystemConfig {
 
@@ -170,8 +175,25 @@ public class SystemConfig {
 					definition.setId(subnode.getString("id"));
 					definition.setAddress(subnode.getString("address"));
 					definition.setPort(subnode.getInt("port"));
-					definition.setAdmServletClass(subnode
-							.getString("adm-servlet"));
+					int servletCounter = 0;
+					while (true){
+						try{
+							SubnodeConfiguration servletSubnode = subnode.configurationAt(String.format("adm-servlet(%d)", servletCounter));
+							if (servletSubnode != null){
+								//TODO cache servlets instances
+								AdmServlet admServlet = SmartClassLoader.createInstance(AdmServlet.class, servletSubnode.getString("class"));
+								if (admServlet == null){
+									admServlet = new DefaultAdmServlet();
+								}
+								definition.getAdmServlets().put(servletSubnode.getString("path"), admServlet);
+							}
+						}
+						catch (Exception e){
+							log.warn(e.getMessage());
+							break;
+						}
+						servletCounter ++;
+					}
 					futureDefinitions.put(definition.getId(), definition);
 				}
 			} catch (Exception e) {

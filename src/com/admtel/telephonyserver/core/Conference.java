@@ -1,82 +1,91 @@
 package com.admtel.telephonyserver.core;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
 
+import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
-import com.admtel.telephonyserver.events.Event;
-import com.admtel.telephonyserver.interfaces.EventListener;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 
-public class Conference implements EventListener, TimerNotifiable{
+public class Conference implements TimerNotifiable{
 	String id;	
 	DateTime createTime;
 	
-	Map<String, Channel> channels = new HashMap<String, Channel>();
-	Map<String, Channel> synchronizedChannels = Collections.synchronizedMap(channels);
+	Map<Channel, Participant> participants = new HashMap<Channel, Participant>();
+	Map<Channel, Participant> synchronizedParticipants = Collections.synchronizedMap(participants);
 	
 	public Conference(String id){
 		this.id = id;
 		createTime = new DateTime();
 		Timers.getInstance().startTimer(this, 10000, true, null);
 	}
-	
+
 	@Override
-	public boolean onEvent(Event event) {
-		switch (event.getEventType()){
-		case ConferenceJoined:
-			break;
-		case ConferenceLeft:{
-			ConferenceLeftEvent cle = (ConferenceLeftEvent) event;
-			removeChannel(cle.getChannel());
-		}
-			break;
-		}
+	public boolean onTimer(Object data) {
+		// TODO Auto-generated method stub
 		return false;
 	}
+
+	public void onConferenceJoined(ConferenceJoinedEvent cje) {
+		
+		//TODO send radius start accounting
+		
+		Participant p = new Participant(cje.getParticipantId(), cje.isModerator(), cje.isMuted(), cje.isDeaf());
+		p.setJoinTime(new DateTime());
+		synchronizedParticipants.put(cje.getChannel(), p);
+		
+	}
+
+	public void onConferenceLeft(ConferenceLeftEvent cle) {
+		//TODO send radius stop accounting
+		synchronizedParticipants.remove(cle.getChannel());				
+	}
+	public long getParcitipantsCount(){
+		return participants.size();
+	}
+
 	public String getId() {
 		return id;
 	}
 
-	public void removeChannel(Channel channel){
-		if (channel != null && channels.containsKey(channel.getUniqueId())){
-			channel.removeEventListener(this);
-			synchronizedChannels.remove(channel.getUniqueId());
-		}
+	public void setId(String id) {
+		this.id = id;
 	}
-	public void addChannel (Channel channel){
-		if (channel != null){
-			if (!channels.containsKey(channel.getUniqueId())){
-				synchronizedChannels.put(channel.getUniqueId(), channel);
-				channel.addEventListener(this);
-			}
-			
-		}
-		return;
+
+	public DateTime getCreateTime() {
+		return createTime;
 	}
+
+	public void setCreateTime(DateTime createTime) {
+		this.createTime = createTime;
+	}
+
 	@Override
-	public boolean onTimer(Object data) {
-		return true;
+	public String toString() {
+		final int maxLen = 8;
+		return (createTime != null ? "createTime=" + createTime + " \\n, " : "")
+				+ (id != null ? "id=" + id + " \\n, " : "")
+				+ (participants != null ? "participants="
+						+ toString(participants.entrySet(), maxLen) : "");
 	}
 
-	public String dump() {
-		String result="";
-		Iterator<Channel> it = channels.values().iterator();
-		while (it.hasNext()){
-			Channel c = it.next();
-			result+=String.format("\t%s\t%s\t%s\tTalking(%s)\n", c.getSwitch().definition.getId(), c.getId(), c.conferenceParticipant.memberId, c.conferenceParticipant.talking);
+	private String toString(Collection<?> collection, int maxLen) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("[");
+		int i = 0;
+		for (Iterator<?> iterator = collection.iterator(); iterator.hasNext()
+				&& i < maxLen; i++) {
+			if (i > 0)
+				builder.append(", ");
+			builder.append(iterator.next());
 		}
-		return result;
+		builder.append("]");
+		return builder.toString();
 	}
-
-	public String getSwitchId() {
-		return null;
-	}	
+	
 }

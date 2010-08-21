@@ -70,7 +70,7 @@ public class RadiusServer implements Authorizer{
 
 	@Override
 	public AuthorizeResult authorize(Channel channel, String username,
-			String password, String address, String calledStationId, boolean routing, boolean number) {
+			String password, String address, String serviceType, String calledStationId, boolean routing, boolean number) {
 		
 		if (channel==null){
 			log.warn("channel is null");
@@ -98,7 +98,7 @@ public class RadiusServer implements Authorizer{
 		//ar.setAuthProtocol(AccessRequest.AUTH_PAP); // or AUTH_CHAP
 		ar.setDictionary(dictionary);
 		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
-		arDecorator.addAttribute("Service-Type", channel.getServiceType());
+		arDecorator.addAttribute("Service-Type", serviceType);
 		arDecorator.addAttribute("Calling-Station-Id", callingStationId);
 		arDecorator.addAttribute("Called-Station-Id", calledStationId);
 		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
@@ -173,7 +173,7 @@ public class RadiusServer implements Authorizer{
 		
 		acctRequest.setDictionary(dictionary);
 		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
-		arDecorator.addAttribute("Service-Type", channel.getServiceType());
+		arDecorator.addAttribute("Service-Type", "Login-User");
 		arDecorator.addAttribute("Calling-Station-Id", channel.getCallingStationId());
 		arDecorator.addAttribute("Called-Station-Id", channel.getCalledStationId());
 		arDecorator.addAttribute("Acct-Session-Id", channel.getAcctSessionId());
@@ -212,7 +212,7 @@ public class RadiusServer implements Authorizer{
 		
 		acctRequest.setDictionary(dictionary);
 		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
-		arDecorator.addAttribute("Service-Type", channel.getServiceType());
+		arDecorator.addAttribute("Service-Type", "Login-User");
 		arDecorator.addAttribute("Calling-Station-Id", channel.getCallingStationId());
 		arDecorator.addAttribute("Called-Station-Id", channel.getCalledStationId());
 		arDecorator.addAttribute("Acct-Session-Id", channel.getAcctSessionId());
@@ -245,7 +245,7 @@ public class RadiusServer implements Authorizer{
 
 		acctRequest.setDictionary(dictionary);
 		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
-		arDecorator.addAttribute("Service-Type", channel.getServiceType());
+		arDecorator.addAttribute("Service-Type", "Login-User");
 		arDecorator.addAttribute("Calling-Station-Id", channel.getCallingStationId());
 		arDecorator.addAttribute("Called-Station-Id", channel.getCalledStationId());
 		arDecorator.addAttribute("Acct-Session-Id", channel.getAcctSessionId());

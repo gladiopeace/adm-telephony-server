@@ -27,22 +27,17 @@ public class HttpServer implements IoHandler {
 		Running, Stopped
 	};
 
+	static AdmServlet admServlet = new DefaultAdmServlet();
+	
 	Status status;
 	private NioSocketAcceptor acceptor;
 	private HttpServerDefinition definition;
-	private AdmServlet admServlet;
 
 	static Logger log = Logger.getLogger(HttpServer.class);
 
 	public HttpServer(HttpServerDefinition definition) {
 		this.definition = definition;
 
-		// TODO refresh servlet
-		admServlet = SmartClassLoader.createInstance(AdmServlet.class,
-				definition.getAdmServletClass());
-		if (admServlet == null) {
-			admServlet = new DefaultAdmServlet();
-		}
 	}
 
 	@Override
@@ -63,7 +58,11 @@ public class HttpServer implements IoHandler {
 		HttpRequestMessage request = (HttpRequestMessage) message;
 
 		try {
-			admServlet.process(request, response);
+			AdmServlet servlet = definition.getAdmServlets().get(request.getContext());
+			if (servlet == null){
+				servlet = admServlet;
+			}
+			servlet.process(request, response);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}

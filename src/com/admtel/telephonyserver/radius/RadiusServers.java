@@ -102,7 +102,7 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 
 	@Override
 	public AuthorizeResult authorize(Channel channel, String username,
-			String password, String address,
+			String password, String address, String serviceType,
 			String calledStationId, boolean routing, boolean number) {
 
 		if (channel == null) {
@@ -113,7 +113,7 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 			return new AuthorizeResult();
 		}
 		AuthorizeResult authorizeResult = getAvailableServer().authorize(
-				channel, username, password, address,
+				channel, username, password, address, serviceType,
 				calledStationId, routing, number);
 		if (authorizeResult.getAuthorized()) {
 			channel.setUserName(authorizeResult.getUserName());
