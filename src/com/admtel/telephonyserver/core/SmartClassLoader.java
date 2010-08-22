@@ -23,7 +23,9 @@ public class SmartClassLoader {
 		classLoader = SmartClassLoader.class.getClassLoader(); 
 		groovyClassLoader = new GroovyClassLoader(classLoader);
 		try {
-			groovyScriptEngine = new GroovyScriptEngine(".");
+			//TODO parameterize the roots
+			String []roots = {".","./scripts"};
+			groovyScriptEngine = new GroovyScriptEngine(roots);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			log.fatal(e.toString());

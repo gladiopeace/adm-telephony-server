@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
 import com.admtel.telephonyserver.events.Event;
@@ -16,8 +18,11 @@ import com.admtel.telephonyserver.radius.RadiusServers;
 
 public class ConferenceManager implements TimerNotifiable, EventListener{
 	
+	static Logger log = Logger.getLogger(ConferenceManager.class);
+	
 	Map<String, Conference> conferences = new HashMap<String, Conference>();
 	Map<String, Conference> synchronizedConferences = Collections.synchronizedMap(conferences);
+	
 	private ConferenceManager(){
 		Timers.getInstance().startTimer(this, 5000, true, null);
 	}
@@ -50,25 +55,32 @@ public class ConferenceManager implements TimerNotifiable, EventListener{
 	public boolean onEvent(Event event) {
 		switch (event.getEventType()){
 		case ConferenceJoined:{
+			
+			log.trace(event);
+			
 			ConferenceJoinedEvent cje = (ConferenceJoinedEvent) event;
 			Conference c = conferences.get(cje.getConferenceId());
-			
-			RadiusServers.getInstance().accountingStart(cje.getChannel(), c, c.getParticipant(cje.getChannel()));
-			
+						
 			if (c == null){
 				c = new Conference (cje.getConferenceId());
 				synchronizedConferences.put(cje.getConferenceId(), c);
 			}
 			c.onConferenceJoined (cje);
+
+			RadiusServers.getInstance().accountingStart(cje.getChannel(), c, c.getParticipant(cje.getChannel()));
+
 		}
 			break;
 		case ConferenceLeft:{
+			
+			log.trace(event);
+			
 			ConferenceLeftEvent cle = (ConferenceLeftEvent) event;
 			Conference c = conferences.get(cle.getConferenceId());
 			
-			RadiusServers.getInstance().accountingStop(cle.getChannel(), c, c.getParticipant(cle.getChannel()));
 			
 			if (c != null){
+				RadiusServers.getInstance().accountingStop(cle.getChannel(), c, c.getParticipant(cle.getChannel()));
 				c.onConferenceLeft(cle);
 				if (c.getParcitipantsCount() == 0){
 					synchronizedConferences.remove(c.getId());

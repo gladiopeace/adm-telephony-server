@@ -1,3 +1,5 @@
+VALUE		Service-Type		Conference		1216
+
 VENDOR		9	CISCO
 VENDORATTR	9	Cisco-AVPair		1	string
 VENDORATTR 	9	h323-call-origin	26	string

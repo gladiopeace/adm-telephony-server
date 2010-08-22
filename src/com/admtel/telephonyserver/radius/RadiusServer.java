@@ -342,7 +342,6 @@ public class RadiusServer implements Authorizer{
 		arDecorator.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
 		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
-		arDecorator.addAttribute("Cisco-AV-Pair", "conference="+conference.getId());
 
 		log.trace("Sending Accounting-Start message : " + acctRequest);
 
