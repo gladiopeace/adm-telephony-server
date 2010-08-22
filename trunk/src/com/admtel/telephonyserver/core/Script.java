@@ -98,7 +98,7 @@ public abstract class Script implements EventListener{
 
 		}
 		catch (Exception e){
-			log.fatal(e.getMessage());
+			log.fatal(e.getMessage(), e);
 		}
 		finally{
 			internalStop();
