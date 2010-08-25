@@ -1,7 +1,9 @@
 package com.admtel.telephonyserver.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -43,6 +45,15 @@ public class Switches implements DefinitionChangeListener {
 	}
 	public Collection<Switch>getAll(){
 		return idMap.values();
+	}
+	
+	public List<Channel> getAllChannels(){
+		Collection<Switch> switches = idMap.values();
+		List<Channel> result = new ArrayList<Channel>();
+		for (Switch _switch:switches){
+			result.addAll(_switch.getAllChannels());
+		}
+		return result;
 	}
 	public Switch getByAddress(String address) {
 		if (address == null)

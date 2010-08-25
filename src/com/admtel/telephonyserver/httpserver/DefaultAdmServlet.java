@@ -7,6 +7,7 @@ public class DefaultAdmServlet implements AdmServlet {
 
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response) {
+
 		Map<String, String[]> headers = request.getHeaders();
 		 Iterator<Map.Entry<String, String[]>> it = headers.entrySet().iterator();
 		    while (it.hasNext()) {
@@ -18,10 +19,8 @@ public class DefaultAdmServlet implements AdmServlet {
 		        			response.appendBody(",");
 		        		}
 		        	}
-		        response.appendBody("<br/>");
+		        response.appendBody("<br/>");		        
 		    }
-		
-
 	}
 
 }

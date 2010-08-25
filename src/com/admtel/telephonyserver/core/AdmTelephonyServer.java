@@ -33,6 +33,7 @@ public class AdmTelephonyServer implements DefinitionChangeListener {
 		log.debug("Adm Telephony Server started ...");
 		getInstance().start();
 		
+		
 		//TODO remove, for testing only
 		log.trace("Prompt builder " + PromptBuilderFactory.getInstance().getPromptBuilder(Locale.ENGLISH));
 		
@@ -69,7 +70,7 @@ public class AdmTelephonyServer implements DefinitionChangeListener {
 		sysConfig.addDefinitionChangeListener(EventsManager.getInstance());
 		sysConfig.addDefinitionChangeListener(HttpServers.getInstance());
 		sysConfig.addDefinitionChangeListener(PromptBuilderFactory.getInstance());
-		
+		sysConfig.addDefinitionChangeListener(BeansManager.getInstance());
 		SystemConfig.getInstance().load();
 	}
 

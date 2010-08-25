@@ -13,15 +13,15 @@
  		<class>com.admtel.telephonyserver.registrar.SimpleRegistrar</class>
 </registrar>
 <radius>
-	<server>
-		<id>first radius server</id>
-		<address>172.16.140.129</address>
-		<auth-port>1812</auth-port>
-		<acct-port>1813</acct-port>
-		<secret>meravoip</secret>
-		<retry-count>5</retry-count>
-		<socket-timeout>5000</socket-timeout>
-	</server>
+<!--	<server>-->
+<!--		<id>first radius server</id>-->
+<!--		<address>172.16.140.129</address>-->
+<!--		<auth-port>1812</auth-port>-->
+<!--		<acct-port>1813</acct-port>-->
+<!--		<secret>meravoip</secret>-->
+<!--		<retry-count>5</retry-count>-->
+<!--		<socket-timeout>5000</socket-timeout>-->
+<!--	</server>-->
 	<!--
 	<server>
 	  	<id>Second radius server</id>
@@ -82,6 +82,10 @@
 		<path>test</path> 
 		<class>scripts/TestAdmServlet.groovy</class>
 	</adm-servlet>	
+	<adm-servlet>
+		<path>Web</path>
+		<class>scripts/web/WebConfServlet.groovy</class>
+	</adm-servlet>
  </http-server>
 <!-- <http-server>-->
 <!--  <id>Manager</id>-->
@@ -92,24 +96,24 @@
 </http-servers>
 
 <switches>
-<!-- <switch>-->
-<!-- 	<id>MyFreeswitch</id>-->
-<!--    <address>172.16.140.129</address>-->
-<!--  	<port>8021</port>-->
-<!--  	<username>admin</username>-->
-<!--  	<password>admin</password>-->
-<!--  	<type>freeswitch</type>  -->
-<!--  	<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultFSAddressTranslator</addresstranslator> 	-->
-<!-- </switch>-->
  <switch>
-  <id>MyAsterisk</id>
-  <address>172.16.34.134</address>
-  <port>5038</port>
-  <username>admin</username>
-  <password>voicelynx1201</password>
-  <type>asterisk</type>
-  <addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator</addresstranslator>
+ 	<id>MyFreeswitch</id>
+    <address>172.16.140.129</address>
+  	<port>8021</port>
+  	<username>admin</username>
+  	<password>admin</password>
+  	<type>freeswitch</type>  
+  	<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultFSAddressTranslator</addresstranslator> 	
  </switch>
+<!-- <switch>-->
+<!--  <id>MyAsterisk</id>-->
+<!--  <address>172.16.34.134</address>-->
+<!--  <port>5038</port>-->
+<!--  <username>admin</username>-->
+<!--  <password>voicelynx1201</password>-->
+<!--  <type>asterisk</type>-->
+<!--  <addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator</addresstranslator>-->
+<!-- </switch>-->
 
 </switches>
 
@@ -133,6 +137,7 @@
 	 <class>scripts/MyEventListener.groovy</class>
 	</event-listener>
 </event-listeners>
+
 <prompt-builders>
  <prompt-builder>
 	<language>en</language>
@@ -148,4 +153,9 @@
  </prompt-builder>
 </prompt-builders>
 
+<beans>
+<!-- <bean>-->
+<!-- 	<class>scripts/AtsWS.groovy</class>-->
+<!-- </bean>-->
+</beans>
 </config>

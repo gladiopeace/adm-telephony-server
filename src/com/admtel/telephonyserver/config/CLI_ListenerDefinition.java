@@ -95,8 +95,12 @@ public class CLI_ListenerDefinition implements DefinitionInterface{
 		}
 		return true;
 	}
-	public String toString(){
-		return super.toString()+":"+this.address+":"+this.port;
+	@Override
+	public String toString() {
+		return (address != null ? "address=" + address + " \\n, " : "")
+				+ (password != null ? "password=" + password + " \\n, " : "")
+				+ "port=" + port + " \\n, "
+				+ (username != null ? "username=" + username : "");
 	}
 
 }

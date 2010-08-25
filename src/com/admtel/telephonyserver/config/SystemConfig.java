@@ -180,12 +180,8 @@ public class SystemConfig {
 						try{
 							SubnodeConfiguration servletSubnode = subnode.configurationAt(String.format("adm-servlet(%d)", servletCounter));
 							if (servletSubnode != null){
-								//TODO cache servlets instances
-								AdmServlet admServlet = SmartClassLoader.createInstance(AdmServlet.class, servletSubnode.getString("class"));
-								if (admServlet == null){
-									admServlet = new DefaultAdmServlet();
-								}
-								definition.getAdmServlets().put(servletSubnode.getString("path"), admServlet);
+
+								definition.getAdmServlets().put(servletSubnode.getString("path"), servletSubnode.getString("class"));
 							}
 						}
 						catch (Exception e){
@@ -275,6 +271,29 @@ public class SystemConfig {
 
 		}
 	}
+	
+	public void loadBeans() {
+		int counter = 0;
+		SubnodeConfiguration subnode;
+		while (true) {
+			try {
+				subnode = config.configurationAt(String.format(
+						"beans.bean(%d)", counter));
+				if (subnode != null) {
+					BeanDefinition definition = new BeanDefinition();
+					definition.setClassName(subnode.getString("class"));
+					futureDefinitions.put(definition.getId(), definition);
+				} else {
+					return;
+				}
+			} catch (Exception e) {
+				log.warn(e.getMessage());
+				return;
+			}
+			counter++;
+
+		}
+	}
 
 	public void loadPromptBuildersDefinition() {
 		int counter = 0;
@@ -312,8 +331,9 @@ public class SystemConfig {
 		loadRadiusDefinition();
 		loadRegistrarDefinition();
 		loadEventListenersDefinition();
-		this.loadHTTPServerDefinition();
-		this.loadPromptBuildersDefinition();
+		loadHTTPServerDefinition();
+		loadPromptBuildersDefinition();
+		loadBeans();
 		// Dump the loaded configurations
 
 		for (DefinitionInterface definition : futureDefinitions.values()) {
