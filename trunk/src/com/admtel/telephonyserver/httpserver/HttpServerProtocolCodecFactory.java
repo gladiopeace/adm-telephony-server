@@ -20,6 +20,7 @@
 package com.admtel.telephonyserver.httpserver;
 
 import org.apache.mina.filter.codec.demux.DemuxingProtocolCodecFactory;
+import org.apache.mina.filter.codec.textline.TextLineEncoder;
 
 /**
  * Provides a protocol codec for HTTP server.
@@ -31,6 +32,6 @@ public class HttpServerProtocolCodecFactory extends
         DemuxingProtocolCodecFactory {
     public HttpServerProtocolCodecFactory() {
     	super.addMessageDecoder(HttpRequestDecoder.class);
-    	super.addMessageEncoder(HttpResponseMessage.class, HttpResponseEncoder.class);
+    	super.addMessageEncoder(HttpResponseMessage.class, HttpResponseEncoder.class);    	
     }
 }

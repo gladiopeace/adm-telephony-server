@@ -1,14 +1,17 @@
-import com.admtel.telephonyserver.httpserver.HttpRequestMessage;
-import com.admtel.telephonyserver.httpserver.HttpResponseMessage;
+import com.admtel.telephonyserver.httpserver.*;
 
-import com.admtel.telephonyserver.httpserver.AdmServlet;
-
-class WSFreeSwitchConfigurator implements AdmServlet {
+class TestAdmServlet implements AdmServlet {
 	
 	@Override
-	public void process(HttpRequestMessage request, HttpResponseMessage response){		
+	public Object process(HttpRequestMessage request){		
+
+		HttpResponseMessage response = new HttpResponseMessage();
+		response.setContentType("text/html");
+		response.setResponseCode(HttpResponseMessage.HTTP_STATUS_SUCCESS);
+
+		response.appendBody("I am the test servlet")	
 		
-		response.appendBody("I am the test servlet")		
+		return response
 		
 	}
 }

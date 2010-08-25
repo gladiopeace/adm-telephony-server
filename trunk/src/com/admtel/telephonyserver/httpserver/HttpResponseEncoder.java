@@ -35,72 +35,74 @@ import org.apache.mina.filter.codec.demux.MessageEncoder;
 
 /**
  * A {@link MessageEncoder} that encodes {@link HttpResponseMessage}.
- *
+ * 
  * @author The Apache Directory Project (mina-dev@directory.apache.org)
- * @version $Rev: 555855 $, $Date: 2007-07-13 12:19:00 +0900 (Fri, 13 Jul 2007) $
+ * @version $Rev: 555855 $, $Date: 2007-07-13 12:19:00 +0900 (Fri, 13 Jul 2007)
+ *          $
  */
 public class HttpResponseEncoder implements MessageEncoder {
-    private static final Set<Class<?>> TYPES;
+	private static final Set<Class<?>> TYPES;
 
-    static {
-        Set<Class<?>> types = new HashSet<Class<?>>();
-        types.add(HttpResponseMessage.class);
-        TYPES = Collections.unmodifiableSet(types);
-    }
+	static {
+		Set<Class<?>> types = new HashSet<Class<?>>();
+		types.add(HttpResponseMessage.class);
+		TYPES = Collections.unmodifiableSet(types);
+	}
 
-    private static final byte[] CRLF = new byte[] { 0x0D, 0x0A };
+	private static final byte[] CRLF = new byte[] { 0x0D, 0x0A };
 
-    public HttpResponseEncoder() {
-    }
+	public HttpResponseEncoder() {
+	}
 
-    public void encode(IoSession session, Object message,
-            ProtocolEncoderOutput out) throws Exception {
-        HttpResponseMessage msg = (HttpResponseMessage) message;
-        IoBuffer buf = IoBuffer.allocate(256);
-        // Enable auto-expand for easier encoding
-        buf.setAutoExpand(true);
+	public void encode(IoSession session, Object message,
+			ProtocolEncoderOutput out) throws Exception {
+		HttpResponseMessage msg = (HttpResponseMessage) message;
+		IoBuffer buf = IoBuffer.allocate(256);
+		// Enable auto-expand for easier encoding
+		buf.setAutoExpand(true);
 
-        try {
-            // output all headers except the content length
-            CharsetEncoder encoder = Charset.defaultCharset().newEncoder();
-            buf.putString("HTTP/1.1 ", encoder);
-            buf.putString(String.valueOf(msg.getResponseCode()), encoder);
-            switch (msg.getResponseCode()) {
-            case HttpResponseMessage.HTTP_STATUS_SUCCESS:
-                buf.putString(" OK", encoder);
-                break;
-            case HttpResponseMessage.HTTP_STATUS_NOT_FOUND:
-                buf.putString(" Not Found", encoder);
-                break;
-            }
-            buf.put(CRLF);
-            for (Iterator it = msg.getHeaders().entrySet().iterator(); it
-                    .hasNext();) {
-                Entry entry = (Entry) it.next();
-                buf.putString((String) entry.getKey(), encoder);
-                buf.putString(": ", encoder);
-                buf.putString((String) entry.getValue(), encoder);
-                buf.put(CRLF);
-            }
-            // now the content length is the body length
-            buf.putString("Content-Length: ", encoder);
-            buf.putString(String.valueOf(msg.getBodyLength()), encoder);
-            buf.put(CRLF);
-            buf.put(CRLF);
-            // add body
-            buf.put(msg.getBody());
-            //System.out.println("\n+++++++");
-            //for (int i=0; i<buf.position();i++)System.out.print(new String(new byte[]{buf.get(i)}));
-            //System.out.println("\n+++++++");
-        } catch (CharacterCodingException ex) {
-            ex.printStackTrace();
-        }
+		try {
+			// output all headers except the content length
+			CharsetEncoder encoder = Charset.defaultCharset().newEncoder();
+			buf.putString("HTTP/1.1 ", encoder);
+			buf.putString(String.valueOf(msg.getResponseCode()), encoder);
+			switch (msg.getResponseCode()) {
+			case HttpResponseMessage.HTTP_STATUS_SUCCESS:
+				buf.putString(" OK", encoder);
+				break;
+			case HttpResponseMessage.HTTP_STATUS_NOT_FOUND:
+				buf.putString(" Not Found", encoder);
+				break;
+			}
+			buf.put(CRLF);
+			for (Iterator it = msg.getHeaders().entrySet().iterator(); it
+					.hasNext();) {
+				Entry entry = (Entry) it.next();
+				buf.putString((String) entry.getKey(), encoder);
+				buf.putString(": ", encoder);
+				buf.putString((String) entry.getValue(), encoder);
+				buf.put(CRLF);
+			}
+			// now the content length is the body length
+			buf.putString("Content-Length: ", encoder);
+			buf.putString(String.valueOf(msg.getBodyLength()), encoder);
+			buf.put(CRLF);
+			buf.put(CRLF);
+			// add body
+			buf.put(msg.getBody());
+			// System.out.println("\n+++++++");
+			// for (int i=0; i<buf.position();i++)System.out.print(new
+			// String(new byte[]{buf.get(i)}));
+			// System.out.println("\n+++++++");
+		} catch (CharacterCodingException ex) {
+			ex.printStackTrace();
+		}
 
-        buf.flip();
-        out.write(buf);
-    }
+		buf.flip();
+		out.write(buf);
+	}
 
-    public Set<Class<?>> getMessageTypes() {
-        return TYPES;
-    }
+	public Set<Class<?>> getMessageTypes() {
+		return TYPES;
+	}
 }

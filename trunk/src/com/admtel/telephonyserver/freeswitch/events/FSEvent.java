@@ -78,6 +78,9 @@ public class FSEvent {
 							return new FSConferenceRemovedEvent(switchId, map);
 						}
 					}
+					else if (eventSubclass.equals("fifo::info")){
+						return new FSQueueEvent (switchId, map);
+					}
 				}
 
 			} else {
@@ -114,7 +117,7 @@ public class FSEvent {
 
 	public enum EventType {
 		AuthRequest, CommandReply, HeartBeat, ChannelExecute, ChannelExecuteComplete, ChannelData, SessionDisconnect, ChannelDestroy, DTMF, ChannelHangup, ChannelAnswered, ChannelCreate, ChannelOutgoing, ChannelState, ChannelOriginate,
-		FsRegister, ConferenceJoined, ConferenceRemoved
+		FsRegister, ConferenceJoined, ConferenceRemoved, Queue
 	}
 
 	EventType eventType;

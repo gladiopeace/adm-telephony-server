@@ -1,11 +1,21 @@
 package com.admtel.telephonyserver.config;
 
-public class EventListenerDefinition implements DefinitionInterface {
+public class BeanDefinition implements DefinitionInterface {
 
 	String className;
 	@Override
 	public String getId() {
 		return className;
+	}
+	@Override
+	public String toString() {
+		return (className != null ? "className=" + className : "");
+	}
+	public String getClassName() {
+		return className;
+	}
+	public void setClassName(String className) {
+		this.className = className;
 	}
 	@Override
 	public int hashCode() {
@@ -23,23 +33,13 @@ public class EventListenerDefinition implements DefinitionInterface {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		EventListenerDefinition other = (EventListenerDefinition) obj;
+		BeanDefinition other = (BeanDefinition) obj;
 		if (className == null) {
 			if (other.className != null)
 				return false;
 		} else if (!className.equals(other.className))
 			return false;
 		return true;
-	}
-	@Override
-	public String toString() {
-		return (className != null ? "className=" + className : "");
-	}
-	public String getClassName() {
-		return className;
-	}
-	public void setClassName(String className) {
-		this.className = className;
 	}
 
 }

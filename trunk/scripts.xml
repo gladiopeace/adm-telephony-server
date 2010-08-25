@@ -66,9 +66,19 @@
  		<parameter key="language" value="english"/>
  	</parameters>
  </script>
- <script name="TransitSwitch">
+ 
+  <script name="ContactCenterScript">
+ 	<called>801333</called>
+ 	<class>scripts/ContactCenterScript.groovy</class>
+ 	<parameters>
+ 		<parameter key="language" value="english"/>
+ 	</parameters>
+ </script>
+ 
+ 
+ <script name="SoftSwitch">
   <called>[0-9]*</called>
-  <class>scripts/TransitSwitch.groovy</class>
+  <class>scripts/SoftSwitch.groovy</class>
   <parameters>
    <parameter key="language" value="english"/>
   </parameters>

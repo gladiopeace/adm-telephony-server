@@ -50,15 +50,17 @@ public class HttpServer implements IoHandler {
 	public void messageReceived(IoSession session, Object message)
 			throws Exception {
 		// Check that we can service the request context
-		HttpResponseMessage response = new HttpResponseMessage();
-		response.setContentType("text/html");
-		response.setResponseCode(HttpResponseMessage.HTTP_STATUS_SUCCESS);
 		// response.appendBody("<html><body>");
 
 		HttpRequestMessage request = (HttpRequestMessage) message;
 
+		HttpResponseMessage response = new HttpResponseMessage();
+		response.setContentType("text/html");
+		response.setResponseCode(HttpResponseMessage.HTTP_STATUS_SUCCESS);
+
+
 		try {
-			AdmServlet servlet = definition.getAdmServlets().get(request.getContext());
+			AdmServlet servlet = SmartClassLoader.createInstance(AdmServlet.class, definition.getAdmServlets().get(request.getContext()));
 			if (servlet == null){
 				servlet = admServlet;
 			}
@@ -84,10 +86,7 @@ public class HttpServer implements IoHandler {
 		// response.appendBody(String.format(
 		// "<html><body><h1>UNKNOWN REQUEST %d</h1></body></html>",
 		// HttpResponseMessage.HTTP_STATUS_NOT_FOUND));
-
-		if (response != null) {
-			session.write(response);
-		}
+		session.write(response);
 	}
 
 	@Override

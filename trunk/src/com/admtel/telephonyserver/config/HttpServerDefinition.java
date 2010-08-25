@@ -10,13 +10,13 @@ public class HttpServerDefinition implements DefinitionInterface {
 	String address;
 	int port;
 	
-	Map<String, AdmServlet> admServlets = new HashMap<String, AdmServlet>();	
+	Map<String, String> admServlets = new HashMap<String, String>();	
 
-	public Map<String, AdmServlet> getAdmServlets() {
+	public Map<String, String> getAdmServlets() {
 		return admServlets;
 	}
 
-	public void setAdmServlets(Map<String, AdmServlet> admServlets) {
+	public void setAdmServlets(Map<String, String> admServlets) {
 		this.admServlets = admServlets;
 	}
 

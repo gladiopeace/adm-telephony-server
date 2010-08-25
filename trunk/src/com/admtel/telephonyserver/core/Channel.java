@@ -29,7 +29,7 @@ public abstract class Channel implements TimerNotifiable {
 	static Logger log = Logger.getLogger(Channel.class);
 
 	public enum State {
-		Null, InboundAlerting, Idle, Clearing, Answering, OutboundAlerting, MediaBusy, Busy, Conferenced,
+		Null, InboundAlerting, Idle, Clearing, Answering, OutboundAlerting, MediaBusy, Busy, Conferenced, Queued,
 	}
 
 	private enum TimersDefs {
@@ -241,6 +241,14 @@ public abstract class Channel implements TimerNotifiable {
 			long timeout, String terminators, boolean interruptPlay);
 
 	public abstract Result internalDial(String address, long timeout);
+	
+	public abstract Result internalQueue(String queueName);
+	
+	final public Result queue(String queueName){ //TODO add more parameters
+		Result result = internalQueue(queueName);
+		
+		return result;
+	}
 
 	final public Result playAndGetDigits(int max, String prompt, long timeout,
 			String terminators) {
@@ -397,6 +405,7 @@ public abstract class Channel implements TimerNotifiable {
 		case AnswerFailed:
 		case PlaybackFailed:
 		case PlayAndGetDigitsFailed:
+		case QueueLeft:
 			state = State.Idle;
 			break;
 		case Answered:
@@ -433,6 +442,9 @@ public abstract class Channel implements TimerNotifiable {
 			callOrigin = CallOrigin.Outbound;
 			setupTime = new DateTime();
 			this.addEventListener(EventsManager.getInstance());
+			break;
+		case QueueJoined:
+			state = State.Queued;
 			break;
 
 		}

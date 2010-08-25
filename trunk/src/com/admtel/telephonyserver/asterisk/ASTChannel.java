@@ -927,4 +927,10 @@ public class ASTChannel extends Channel{
 	public String getSwitchId() {
 		return null;
 	}
+
+	@Override
+	public Result internalQueue(String queueName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
