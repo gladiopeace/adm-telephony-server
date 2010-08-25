@@ -4,6 +4,7 @@
 	<maxthreads>10</maxthreads>
 	<address>172.16.140.1</address>	
 	<base-directory>/usr/local/adm</base-directory>
+	<script-path>.;./scripts</script-path>
 	<radius-start-accounting>true</radius-start-accounting>
 	<radius-stop-accounting>true</radius-stop-accounting>
 	<radius-interim-update>10</radius-interim-update>
@@ -83,8 +84,8 @@
 		<class>scripts/TestAdmServlet.groovy</class>
 	</adm-servlet>	
 	<adm-servlet>
-		<path>Web</path>
-		<class>scripts/web/WebConfServlet.groovy</class>
+		<path>webconf</path>
+		<class>scripts/webconf/WebConfServlet.groovy</class>
 	</adm-servlet>
  </http-server>
 <!-- <http-server>-->

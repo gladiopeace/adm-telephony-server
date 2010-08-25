@@ -59,6 +59,7 @@ public class SystemConfig {
 		serverDefinition.setAddress(config.getString("server.address"));
 		serverDefinition.setBaseDirectory(config
 				.getString("server.base-directory"));
+		serverDefinition.setScriptPath(config.getString("server.script-path"));
 		serverDefinition.setStartAccounting(config.getBoolean(
 				"server.radius-start-accounting", true));
 		serverDefinition.setStopAccounting(config.getBoolean(

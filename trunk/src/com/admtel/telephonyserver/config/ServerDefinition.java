@@ -8,8 +8,15 @@ public class ServerDefinition implements DefinitionInterface {
 	Boolean startAccounting = true;
 	Boolean stopAccounting = true;
 	int interimUpdate =10;
+	String scriptPath=".;./scripts";
 
 	
+	public String getScriptPath() {
+		return scriptPath;
+	}
+	public void setScriptPath(String scriptPath) {
+		this.scriptPath = scriptPath;
+	}
 	public Boolean getStartAccounting() {
 		return startAccounting;
 	}
@@ -60,6 +67,8 @@ public class ServerDefinition implements DefinitionInterface {
 		result = prime * result + interimUpdate;
 		result = prime * result + maxThreads;
 		result = prime * result
+				+ ((scriptPath == null) ? 0 : scriptPath.hashCode());
+		result = prime * result
 				+ ((startAccounting == null) ? 0 : startAccounting.hashCode());
 		result = prime * result
 				+ ((stopAccounting == null) ? 0 : stopAccounting.hashCode());
@@ -88,6 +97,11 @@ public class ServerDefinition implements DefinitionInterface {
 			return false;
 		if (maxThreads != other.maxThreads)
 			return false;
+		if (scriptPath == null) {
+			if (other.scriptPath != null)
+				return false;
+		} else if (!scriptPath.equals(other.scriptPath))
+			return false;
 		if (startAccounting == null) {
 			if (other.startAccounting != null)
 				return false;
@@ -103,9 +117,19 @@ public class ServerDefinition implements DefinitionInterface {
 	
 	@Override
 	public String toString() {
-		return "ServerDefinition [address=" + address + ", baseDirectory="
-				+ baseDirectory + ", interimUpdate=" + interimUpdate
-				+ ", maxThreads=" + maxThreads + ", startAccounting="
-				+ startAccounting + ", stopAccounting=" + stopAccounting + "]";
+		return "ServerDefinition ["
+				+ (address != null ? "address=" + address + ", " : "")
+				+ (baseDirectory != null ? "baseDirectory=" + baseDirectory
+						+ ", " : "")
+				+ "interimUpdate="
+				+ interimUpdate
+				+ ", maxThreads="
+				+ maxThreads
+				+ ", "
+				+ (scriptPath != null ? "scriptPath=" + scriptPath + ", " : "")
+				+ (startAccounting != null ? "startAccounting="
+						+ startAccounting + ", " : "")
+				+ (stopAccounting != null ? "stopAccounting=" + stopAccounting
+						: "") + "]";
 	}
 }

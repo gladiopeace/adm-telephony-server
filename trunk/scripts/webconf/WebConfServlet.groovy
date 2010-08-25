@@ -16,7 +16,7 @@ class WebConfServlet implements AdmServlet {
 	
 	static{
 		config = new Configuration()
-		config.setDirectoryForTemplateLoading(new File("./scripts/web_conf"))
+		config.setDirectoryForTemplateLoading(new File("./scripts/webconf"))
 	}
 	
 	def index(request){
@@ -44,6 +44,9 @@ class WebConfServlet implements AdmServlet {
 
 		
 		def action = request.getParameter("action")
+		if (!(action?.length()>0)){
+			action = 'index'
+		}
 		Template t = config.getTemplate("${action}.ftl")				
 		def model = "${action}"(request)
 		model['context'] = request.getContext()
