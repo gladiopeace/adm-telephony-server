@@ -23,9 +23,13 @@ public class SmartClassLoader {
 		classLoader = SmartClassLoader.class.getClassLoader(); 
 		groovyClassLoader = new GroovyClassLoader(classLoader);
 		try {
-			//TODO parameterize the roots
-			String []roots = {".","./scripts"};
+
+			String[] roots = AdmTelephonyServer.getInstance().getDefinition().getScriptPath().split(";");			
 			groovyScriptEngine = new GroovyScriptEngine(roots);
+			log.trace("Starting GroovyScriptEngine with root = ");
+			for (int i=0;i<roots.length;i++){
+				log.trace("root["+i+"]="+roots[i]);
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			log.fatal(e.toString());
