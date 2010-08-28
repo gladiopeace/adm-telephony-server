@@ -242,10 +242,10 @@ public abstract class Channel implements TimerNotifiable {
 
 	public abstract Result internalDial(String address, long timeout);
 	
-	public abstract Result internalQueue(String queueName);
+	public abstract Result internalQueue(String queueName, boolean agent);
 	
-	final public Result queue(String queueName){ //TODO add more parameters
-		Result result = internalQueue(queueName);
+	final public Result queue(String queueName, boolean agent){ //TODO add more parameters
+		Result result = internalQueue(queueName, agent);
 		
 		return result;
 	}

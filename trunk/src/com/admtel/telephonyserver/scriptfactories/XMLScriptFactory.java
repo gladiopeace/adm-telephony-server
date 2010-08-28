@@ -25,7 +25,7 @@ public class XMLScriptFactory implements ScriptFactory, Loadable {
 
 	private List<ScriptData> scripts = new ArrayList<ScriptData>();
 
-	class ScriptData {
+	static class ScriptData {
 		public String name;
 		public String called;
 		public String className;

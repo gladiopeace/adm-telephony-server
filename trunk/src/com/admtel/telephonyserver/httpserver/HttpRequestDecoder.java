@@ -155,6 +155,7 @@ public class HttpRequestDecoder extends MessageDecoderAdapter {
             // Get request URL.
             String line = rdr.readLine();
             String[] url = line.split(" ");
+            if (url == null) return map;
             if (url.length < 3)
                 return map;
 

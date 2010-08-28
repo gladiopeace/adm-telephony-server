@@ -32,13 +32,13 @@ class WSFreeSwitchConfigurator implements AdmServlet {
 			log.trace("proxy initialized")
 			wsClients.set(proxy)
 		}
-		def subscriberDTO = proxy.getSubscriberByName(TOKEN, mUser)
-		if (subscriberDTO == null){
+		def userDTO = proxy.getUserByName(TOKEN, mUser)
+		if (userDTO == null){
 			log.warn("Couldn't find user ${mUser}")
 			 return null;
 		}
 		
-		log.trace("received result ${subscriberDTO.username}:${subscriberDTO.password}")
+		log.trace("received result ${userDTO.username}:${userDTO.password}")
 		
 		
 		
@@ -57,7 +57,7 @@ class WSFreeSwitchConfigurator implements AdmServlet {
 							users{
 								user(id:mUser){
 									params{
-										param(name:"password", value:subscriberDTO.password)
+										param(name:"password", value:userDTO.password)
 									}
 								}
 							}

@@ -2,6 +2,8 @@ import com.admtel.telephonyserver.core.*;
 
 import java.io.StringWriter;
 
+import org.apache.log4j.Logger;
+
 import com.admtel.telephonyserver.httpserver.HttpRequestMessage;
 import com.admtel.telephonyserver.httpserver.HttpResponseMessage;
 
@@ -13,18 +15,20 @@ class WebConfServlet implements AdmServlet {
 	
 	
 	static Configuration config = null;
+	static Logger log = Logger.getLogger(WebConfServlet.class)
 	
 	static{
 		config = new Configuration()
-		config.setDirectoryForTemplateLoading(new File("./scripts/webconf"))
+		try{
+			config.setDirectoryForTemplateLoading(new File("./scripts/web"))
+		}
+		catch (Exception e){
+			log.fatal(e.getMessage(), e)
+		}
 	}
 	
 	def index(request){
-
-		List<Channel> channels =  Switches.getInstance().getAllChannels();
-		def root =["channels":channels]
-		println request.getParameter("action")
-		return root
+		[index:"welcome"]
 	}
 	
 	def hangup(request){
@@ -38,6 +42,13 @@ class WebConfServlet implements AdmServlet {
 		[m:'']
 	}
 	
+	def channels(request){
+		List<Channel> channels =  Switches.getInstance().getAllChannels();
+		def root =["channels":channels]
+		println request.getParameter("action")
+		return root
+	}
+	
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
 		
@@ -47,11 +58,18 @@ class WebConfServlet implements AdmServlet {
 		if (!(action?.length()>0)){
 			action = 'index'
 		}
-		Template t = config.getTemplate("${action}.ftl")				
-		def model = "${action}"(request)
-		model['context'] = request.getContext()
-		StringWriter writer = new StringWriter()		
-		t.process(model, writer)
-		response.appendBody(writer.toString())
+		try{
+			Template t = config.getTemplate("${action}.ftl")			
+			def model = "${action}"(request)
+			model['context'] = request.getContext()
+			StringWriter writer = new StringWriter()
+			t.process(model, writer)
+			response.appendBody(writer.toString())	
+		}	
+		catch (Exception e){
+			log.fatal(e.getMessage(), e)
+			response.appendBody(e.getMessage())
+		}
+					
 	}
 }

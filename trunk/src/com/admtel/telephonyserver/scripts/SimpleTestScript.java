@@ -121,6 +121,7 @@ public class SimpleTestScript extends Script {
 			// log.error("Could not play and get digits");
 			// }
 		}
+		break;
 		case PlayAndGetDigitsEnded:{
 			PlayAndGetDigitsEndedEvent event = (PlayAndGetDigitsEndedEvent) e;
 			log.debug("Got digits " + event.getDigits());
