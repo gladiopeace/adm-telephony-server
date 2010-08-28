@@ -6,16 +6,14 @@
   </head>
   <body>
     <h1>${title?html}</h1>
-    <hr>
-    <#nested>
-    <hr>
-    <table border="0" cellspacing=0 cellpadding=0 width="100%">
-      <tr valign="middle">
-        <td align="left">
-		</td>          
-        <td align="right">
-        </td>  
-
+    <table>
+    	<tr>
+    	 <td>
+    	 </td>
+    	 <td>
+    	     <#nested>
+    	 </td>
+    	</tr>
     </table>
   </body>
   </html>

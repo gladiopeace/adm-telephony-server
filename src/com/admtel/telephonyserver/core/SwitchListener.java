@@ -122,7 +122,12 @@ public abstract class SwitchListener implements IoHandler{
 			ip = ip.substring(1);
 		}
 		Switch _switch = Switches.getInstance().getByAddress(ip);
-		log.debug(String.format("Authorizing switch @ %s, got %s", ip, _switch.getDefinition().getId()));
+		if (_switch != null){
+			log.debug(String.format("Authorizing switch @ %s, got %s", ip, _switch.getDefinition().getId()));
+		}
+		else{
+			log.debug(String.format("Connection from %s not authorized", ip));
+		}
 		return _switch;
 	}
 	public SwitchListenerDefinition getDefinition(){

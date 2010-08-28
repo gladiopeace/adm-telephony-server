@@ -27,16 +27,18 @@ The agents can dial in to extension 7010 and wait. Callers can be routed/transfe
 public class FSQueueCommand extends FSCommand {
 
 	private String queueName;
+	private Boolean isAgent;
 
-	public FSQueueCommand(FSChannel channel, String queueName) {
+	public FSQueueCommand(FSChannel channel, String queueName, Boolean isAgent) {
 		super(channel);
 		this.queueName = queueName;
+		this.isAgent = isAgent;
 	}
 	public String toString(){
 		return String
 		.format(
-				"SendMsg %s\ncall-command: %s\nexecute-app-name: %s\nexecute-app-arg: %s\n",
-				channel.getId(), "execute", "fifo", queueName +" in"); //TODO more parameters
+				"SendMsg %s\ncall-command: %s\nexecute-app-name: %s\nexecute-app-arg: %s %s\n",
+				channel.getId(), "execute", "fifo", queueName,(isAgent?"out wait":"in")); //TODO more parameters
 	}
 
 }

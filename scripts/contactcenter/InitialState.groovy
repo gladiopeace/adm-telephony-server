@@ -23,7 +23,7 @@ public class InitialState{
 		this
 	}
 	def onAnswered(AnsweredEvent e){
-		[script, e.getChannel(), "MyQueue"] as QueueState
+		[script, e.getChannel(), '6500'] as QueueState
 	}
 }
 

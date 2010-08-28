@@ -9,6 +9,7 @@ import org.apache.mina.core.session.IoSession;
 import org.joda.time.DateTime;
 
 import com.admtel.telephonyserver.asterisk.commands.ASTDialCommand;
+import com.admtel.telephonyserver.asterisk.commands.ASTQueueCommand;
 import com.admtel.telephonyserver.asterisk.events.ASTAgiExecEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTAsyncAgiEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTChannelState;
@@ -16,6 +17,8 @@ import com.admtel.telephonyserver.asterisk.events.ASTDialEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTDtmfEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTHangupEvent;
+import com.admtel.telephonyserver.asterisk.events.ASTJoinEvent;
+import com.admtel.telephonyserver.asterisk.events.ASTLeaveEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTMeetmeJoinEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTMeetmeLeaveEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTMeetmeTalkingEvent;
@@ -35,6 +38,8 @@ import com.admtel.telephonyserver.events.PlayAndGetDigitsEndedEvent;
 import com.admtel.telephonyserver.events.PlayAndGetDigitsStartedEvent;
 import com.admtel.telephonyserver.events.PlaybackEndedEvent;
 import com.admtel.telephonyserver.events.PlaybackStartedEvent;
+import com.admtel.telephonyserver.events.QueueJoinedEvent;
+import com.admtel.telephonyserver.events.QueueLeftEvent;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.core.Channel;
 import com.admtel.telephonyserver.core.ChannelProtocol;
@@ -464,10 +469,10 @@ public class ASTChannel extends Channel{
 				// only because the channel was
 				// answered
 
-				// TODO check the logic of this code
+/*				// TODO check the logic of this code
 				AnsweredEvent ae = new AnsweredEvent(ASTChannel.this);
 				ASTChannel.this.currentState = new IdleState();
-				ASTChannel.this.onEvent(ae);
+				ASTChannel.this.onEvent(ae);*/
 
 			}
 		}
@@ -741,6 +746,43 @@ public class ASTChannel extends Channel{
 
 	}
 
+	private class QueueState extends State{
+
+		private String queueName;
+		private boolean isAgent;
+
+		public QueueState(String queueName, boolean isAgent){
+			this.queueName = queueName;
+			this.isAgent = isAgent;
+			ASTQueueCommand queueCmd = new ASTQueueCommand(ASTChannel.this, queueName);
+			session.write(queueCmd);
+			result = Result.Ok;
+		}
+		@Override
+		public boolean onTimer(Object data) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public void processEvent(ASTEvent astEvent) {
+			switch (astEvent.getEventType()){
+			case Join:
+			{
+				ASTJoinEvent je = (ASTJoinEvent) astEvent;
+				ASTChannel.this.onEvent(new QueueJoinedEvent(ASTChannel.this, je.getQueue(), isAgent));
+			}
+				break;
+			case Leave:{
+				ASTLeaveEvent le = (ASTLeaveEvent) astEvent;
+				ASTChannel.this.onEvent(new QueueLeftEvent(ASTChannel.this, le.getQueue(), isAgent, "Uknown"));
+			}
+				break;
+			}
+			
+		}
+		
+	}
 	// END STATES LOGIC
 	// ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -758,8 +800,6 @@ public class ASTChannel extends Channel{
 				return;
 			}
 			ASTEvent astEvent = (ASTEvent) message;
-			if (astEvent == null)
-				return;
 			log
 					.debug(String
 							.format(
@@ -929,8 +969,8 @@ public class ASTChannel extends Channel{
 	}
 
 	@Override
-	public Result internalQueue(String queueName) {
-		// TODO Auto-generated method stub
-		return null;
+	public Result internalQueue(String queueName, boolean isAgent) {
+		currentState = new QueueState(queueName, isAgent);
+		return Result.Ok;
 	}
 }

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 
@@ -21,6 +22,7 @@ public class Switches implements DefinitionChangeListener {
 	Map<String, Switch> idMap = new HashMap<String, Switch>();
 	Map<String, Switch> addressMap = new HashMap<String, Switch>();
 
+	Random rnd = new Random(System.currentTimeMillis());
 	
 	private Switches() {
 
@@ -111,5 +113,15 @@ public class Switches implements DefinitionChangeListener {
 			//TODO
 		}
 
+	}
+	public Switch getRandom(){
+		Collection<Switch> switches = getAll();
+		int index = rnd.nextInt(switches.size());
+		for (Switch _switch: switches){
+			if (index == 0)
+				return _switch;
+			index --;
+		}
+		return null;
 	}
 }

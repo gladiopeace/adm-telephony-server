@@ -502,11 +502,13 @@ public class FSChannel extends Channel {
 
 		
 		private String queueName;
+		private Boolean isAgent;
 
-		public QueueState(String queueName){
-			FSQueueCommand queueCmd = new FSQueueCommand(FSChannel.this, queueName);
-			session.write(queueCmd);
+		public QueueState(String queueName, boolean agent){
+			this.isAgent = agent;
 			this.queueName = queueName;
+			FSQueueCommand queueCmd = new FSQueueCommand(FSChannel.this, queueName, isAgent);
+			session.write(queueCmd);			
 		}
 		@Override
 		public boolean onTimer(Object data) {
@@ -529,10 +531,10 @@ public class FSChannel extends Channel {
 				FSQueueEvent queueEvent = (FSQueueEvent) event;
 				switch (queueEvent.getAction()){
 				case Push:
-					FSChannel.this.onEvent(new QueueJoinedEvent(FSChannel.this, queueEvent.getQueueName()));
+					FSChannel.this.onEvent(new QueueJoinedEvent(FSChannel.this, queueEvent.getQueueName(), isAgent));
 					break;
 				case Abort:
-					FSChannel.this.onEvent(new QueueLeftEvent(FSChannel.this, queueEvent.getQueueName(),queueEvent.getStatus()));
+					FSChannel.this.onEvent(new QueueLeftEvent(FSChannel.this, queueEvent.getQueueName(), isAgent, queueEvent.getStatus()));
 					break;
 					//TODO leave
 				}
@@ -553,8 +555,7 @@ public class FSChannel extends Channel {
 				return;
 			}
 			FSEvent fsEvent = (FSEvent) message;
-			if (fsEvent == null)
-				return;
+
 			log
 					.debug(String
 							.format(
@@ -700,8 +701,8 @@ public class FSChannel extends Channel {
 	}
 
 	@Override
-	public Result internalQueue(String queueName) {
-		currentState = new QueueState(queueName);
+	public Result internalQueue(String queueName, boolean agent) {
+		currentState = new QueueState(queueName, agent);
 		return currentState.getResult();
 	}
 

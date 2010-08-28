@@ -85,7 +85,11 @@
 	</adm-servlet>	
 	<adm-servlet>
 		<path>webconf</path>
-		<class>scripts/webconf/WebConfServlet.groovy</class>
+		<class>scripts/web/WebConfServlet.groovy</class>
+	</adm-servlet>
+	<adm-servlet>
+		<path>webapi</path>
+		<class>scripts/webapi/WebAPI.groovy</class>
 	</adm-servlet>
  </http-server>
 <!-- <http-server>-->
@@ -106,22 +110,22 @@
   	<type>freeswitch</type>  
   	<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultFSAddressTranslator</addresstranslator> 	
  </switch>
-<!-- <switch>-->
-<!--  <id>MyAsterisk</id>-->
-<!--  <address>172.16.34.134</address>-->
-<!--  <port>5038</port>-->
-<!--  <username>admin</username>-->
-<!--  <password>voicelynx1201</password>-->
-<!--  <type>asterisk</type>-->
-<!--  <addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator</addresstranslator>-->
-<!-- </switch>-->
+ <switch>
+  <id>MyAsterisk</id>
+  <address>172.16.34.134</address>
+  <port>5038</port>
+  <username>admin</username>
+  <password>voicelynx1201</password>
+  <type>asterisk</type>
+  <addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator</addresstranslator>
+ </switch>
 
 </switches>
 
 <scriptfactories>
- <scriptfactory>
-  <class>scripts/AdmScriptFactory.groovy</class>
- </scriptfactory>
+<!-- <scriptfactory>-->
+<!--  <class>scripts/AdmScriptFactory.groovy</class>-->
+<!-- </scriptfactory>-->
  <scriptfactory>
   <class>com.admtel.telephonyserver.scriptfactories.VariableScriptFactory</class>
  </scriptfactory>

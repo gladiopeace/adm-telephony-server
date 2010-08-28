@@ -16,7 +16,7 @@ public class Timers extends Thread{
 		private final static Timers instance = new Timers();
 	}
 	
-	 public class Timer{
+	public class Timer{
 		long duration;
 		boolean oneShot;
 		TimerNotifiable notifiable;

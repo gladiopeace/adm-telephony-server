@@ -84,21 +84,38 @@ public class GetConferencePin{
 	static final Logger log = Logger.getLogger(GetConferencePin.class);
 	
 	ConferenceScript script
-
+	def conferenceDTO
+	
 	GetConferencePin(script, channel){
 		this.script = script
 		channel.playAndGetDigits(4,"conference/conf-getpin", 5000,"")
+		conferenceDTO = script.conferenceDTO
 	}
 	
 	def onPlayAndGetDigitsEnded(PlayAndGetDigitsEndedEvent e){
 		
 		log.trace ("GetConferencePin got ${e.getDigits()}")
-		if (e.getDigits() == script.conferenceDTO.getAdminPassword()){
+		
+		println "********** " + conferenceDTO.managed
+		if (e.getDigits() == conferenceDTO.getAdminPassword()){
 			[script, e.getChannel()] as JoinConference
 		}
 		else
-		if (e.getDigits() == script.conferenceDTO.getUserPassword()){
-			[script, e.getChannel()] as JoinConference
+		if (e.getDigits() == conferenceDTO.getUserPassword()){
+			if (conferenceDTO.managed){
+				[script, e.getChannel(), false] as JoinQueue
+			}
+			else{
+				[script, e.getChannel()] as JoinConference
+			}			
+		}
+		else if (e.getDigits() == conferenceDTO.getManagerPassword()){
+			if (conferenceDTO.managed){
+				[script, e.getChannel(), true] as JoinQueue
+			}
+			else{
+				[script, e.getChannel()] as InvalidConferencePin
+			}
 		}
 		else{
 			[script, e.getChannel()] as InvalidConferencePin 
@@ -118,6 +135,20 @@ public class InvalidConferencePin{
 	}
 	def onPlaybackEnded(PlaybackEndedEvent e){
 		[script, e.getChannel()] as GetConferencePin
+	}
+}
+
+public class JoinQueue{
+	ConferenceScript script
+	
+	JoinQueue(script, channel, isAgent){
+		this.script = script
+		channel.queue (script.conferenceDTO.getConferenceNumber(), isAgent)
+	}
+	def onQueueLeft (QueueLeftEvent e){
+		if (!e.isAgent()){
+			[script, e.getChannel()] as JoinConference
+		}
 	}
 }
 
