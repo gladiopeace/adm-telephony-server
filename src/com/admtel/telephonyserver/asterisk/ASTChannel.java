@@ -290,6 +290,7 @@ public class ASTChannel extends Channel{
 				getChannelData().setCallerIdNumber(nce.getCallerIdNum());
 				getChannelData().setUserName(nce.getUserName());
 				getChannelData().setServiceNumber(nce.getCalledNum());
+				getChannelData().setAccountCode(nce.getAccountCode());
 				switch (nce.getChannelState()) {
 				case Ring:
 					currentState = new InboundAlertingState();

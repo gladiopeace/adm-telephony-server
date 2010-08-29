@@ -52,5 +52,4 @@ public class CLI_Connections implements DefinitionChangeListener{
 		// TODO Auto-generated method stub
 		
 	}
-	
 }

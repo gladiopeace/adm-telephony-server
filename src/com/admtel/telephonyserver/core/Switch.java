@@ -31,13 +31,6 @@ public abstract class Switch {
 		this.definition = definition;
 		setStatus(SwitchStatus.NotReady);
 		
-		//TODO reload addressTranslator to pick up modifications
-		setAddressTranslator(SmartClassLoader
-				.createInstance(AddressTranslator.class, definition
-						.getAddressTranslatorClass()));
-		if (getAddressTranslator() == null) {
-			setAddressTranslator(new DefaultASTAddressTranslator());
-		}
 	}
 
 	public SwitchDefinition getDefinition() {
@@ -71,7 +64,16 @@ public abstract class Switch {
 		return channels.values();
 	}
 
-	abstract public void start();
+	public void start(){
+		//TODO reload addressTranslator to pick up modifications
+		setAddressTranslator(SmartClassLoader
+				.createInstance(AddressTranslator.class, definition
+						.getAddressTranslatorClass()));
+		if (getAddressTranslator() == null) {
+			setAddressTranslator(new DefaultASTAddressTranslator());
+		}
+
+	}
 
 	public SwitchStatus getStatus() {
 		return status;

@@ -69,24 +69,16 @@ public class XMLScriptFactory implements ScriptFactory, Loadable {
 			log.debug("CreateScript, checking scriptData {" + scriptData+"}" );
 			if (scriptData.matches(channelData.getCalledNumber())) {
 				if (scriptData.className != null) {
-					Class c = SmartClassLoader.getClass(scriptData.className);
-					if (c == null) {
-						log.warn("Application " + scriptData.className
-								+ ", not found");
-						return null;
-					}
 					try {
-						Script script = (Script) c.newInstance();
+						Script script = (Script) SmartClassLoader.createInstance(Script.class, scriptData.className);
 						if (script != null) {
 							log.debug(String.format(
 									"Created script for (%s) - script (%s)",
 									channelData.toString(), script));
 						}
 						return script;
-					} catch (InstantiationException e) {
-						log.fatal(e.getMessage());
-					} catch (IllegalAccessException e) {
-						log.fatal(e.getMessage());
+					} catch (Exception e) {
+						log.fatal(e.getMessage(), e);
 					}
 				}
 			}

@@ -36,5 +36,8 @@ public abstract class FSChannelEvent extends FSEvent {
 	public String getChannelAddress(){
 		return values.get("Channel-Network-Addr");
 	}
+	public String getAccountCode(){
+		return values.get("variable_accountcode");
+	}
 
 }

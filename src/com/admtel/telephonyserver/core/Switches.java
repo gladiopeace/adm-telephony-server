@@ -80,12 +80,17 @@ public class Switches implements DefinitionChangeListener {
 			
 			log.debug(String.format("Loading switch %s", definition.getId()));
 			
+			if (getById(definition.getId()) != null){
+				log.debug(String.format("Switch %s, already loaded", definition.getId()));
+				return;
+			}
+			
 			switch (switchDefinition.getSwitchType()){
 			case Asterisk:
 			{
 				ASTSwitch _switch = new ASTSwitch(switchDefinition);
 				put(_switch);
-				_switch.start();	
+				_switch.start();
 			}
 				break;
 			case Freeswitch:

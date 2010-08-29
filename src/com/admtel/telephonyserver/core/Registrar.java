@@ -80,5 +80,4 @@ public class Registrar implements DefinitionChangeListener, RegistrarInterface {
 	public long getCount() {
 		return registrar.getCount();
 	}
-
 }

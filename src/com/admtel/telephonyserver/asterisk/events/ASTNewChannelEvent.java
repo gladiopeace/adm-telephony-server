@@ -18,10 +18,13 @@ public class ASTNewChannelEvent extends ASTChannelEvent {
 		return values.get("Exten");
 	}
 	public String getUserName() {
-		String username = values.get("AccountCode");
+		String username = values.get("CallerIDName");
 		if (username == null){
 			username = getCallerIdNum();
 		}
 		return username;
+	}
+	public String getAccountCode(){
+		return values.get("AccountCode");
 	}
 }

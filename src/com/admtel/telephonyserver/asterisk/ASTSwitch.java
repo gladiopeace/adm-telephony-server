@@ -203,6 +203,7 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	@Override
 	public void start() {
+		super.start();
 		reconnectTimer = Timers.getInstance().startTimer(this, RECONNECT_AFTER,
 				false, null);
 	}

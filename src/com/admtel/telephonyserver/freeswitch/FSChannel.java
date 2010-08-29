@@ -178,6 +178,7 @@ public class FSChannel extends Channel {
 				getChannelData().setCallerIdName(cde.getCallerIdNum());
 				getChannelData().setUserName(cde.getUserName());
 				getChannelData().setLoginIP(cde.getChannelAddress());
+				getChannelData().setAccountCode(cde.getAccountCode());
 
 				// Create script
 				Script script = ScriptManager.getInstance().createScript(

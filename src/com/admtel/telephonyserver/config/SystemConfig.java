@@ -18,12 +18,14 @@ import com.admtel.telephonyserver.httpserver.DefaultAdmServlet;
 public class SystemConfig {
 
 	static Logger log = Logger.getLogger(SystemConfig.class);
-
+	
 	XMLConfiguration config;
 	Map<String, DefinitionInterface> currentDefinitions = new Hashtable<String, DefinitionInterface>();
 	Map<String, DefinitionInterface> futureDefinitions = new Hashtable<String, DefinitionInterface>();
 
 	List<DefinitionChangeListener> definitionChangeListeners = new ArrayList<DefinitionChangeListener>();
+
+	public ServerDefinition serverDefinition;
 
 	public void addDefinitionChangeListener(DefinitionChangeListener listener) {
 		this.definitionChangeListeners.add(listener);
@@ -67,8 +69,7 @@ public class SystemConfig {
 		serverDefinition.setInterimUpdate(config
 				.getInt(
 				"server.radius-interim-update", 0));
-
-		futureDefinitions.put(serverDefinition.getId(), serverDefinition);
+		this.serverDefinition = serverDefinition;
 	}
 
 	public void loadRegistrarDefinition() {
@@ -379,8 +380,7 @@ public class SystemConfig {
 		for (DefinitionInterface definition : currentDefinitions.values()) {
 			log.trace("Current definitions "
 					+ String.format(definition.toString()));
-		}
-
+		}		
 		log.debug("Loaded System Configuration ...");
 	}
 

@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.codehaus.groovy.control.CompilerConfiguration;
 
+import com.admtel.telephonyserver.config.SystemConfig;
 import com.admtel.telephonyserver.utils.AdmUtils;
 
 
@@ -16,15 +17,17 @@ public class SmartClassLoader {
 	
 	static Logger log = Logger.getLogger(SmartClassLoader.class);
 	
-	static GroovyClassLoader groovyClassLoader;
-	static GroovyScriptEngine groovyScriptEngine;
-	static ClassLoader classLoader;
-	static {
+	GroovyClassLoader groovyClassLoader;
+	GroovyScriptEngine groovyScriptEngine;
+	ClassLoader classLoader;
+	
+	private SmartClassLoader(){
 		classLoader = SmartClassLoader.class.getClassLoader(); 
 		groovyClassLoader = new GroovyClassLoader(classLoader);
 		try {
 
-			String[] roots = AdmTelephonyServer.getInstance().getDefinition().getScriptPath().split(";");			
+			String[] roots = SystemConfig.getInstance().serverDefinition.getScriptPath().split(";");
+			
 			groovyScriptEngine = new GroovyScriptEngine(roots);
 			log.trace("Starting GroovyScriptEngine with root = ");
 			for (int i=0;i<roots.length;i++){
@@ -33,9 +36,18 @@ public class SmartClassLoader {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			log.fatal(e.toString());
-		}
+		}		
 	}
-	public static Class getClass(String className){
+	
+	private static class SingletonHolder {
+		private static SmartClassLoader _instance = new SmartClassLoader();
+	}
+	
+	public static SmartClassLoader getInstance(){
+		return SingletonHolder._instance;
+	}
+	
+	public Class getClassI(String className){
 		if (className == null) return null;
 		try{
 		if (className.endsWith(".groovy")){
@@ -55,24 +67,28 @@ public class SmartClassLoader {
 		}
 		}
 		catch (Exception e){
-			log.fatal(AdmUtils.getStackTrace(e));
+			log.fatal(e.getMessage(), e);
 		}
 		return null;
 	}	
 	
-	public static <T> T createInstance(Class<T> classType, String className){
-		Class c = getClass(className);
+	public <T> T createInstanceI(Class<T> classType, String className){
+		Class c = getClassI(className);
 		if (c == null) return null;
 		if (classType.isAssignableFrom(c)){
 			try {
 				return (T)c.newInstance();
-			} catch (InstantiationException e) {
-				log.fatal(AdmUtils.getStackTrace(e));
-			} catch (IllegalAccessException e) {
-				log.fatal(AdmUtils.getStackTrace(e));
+			} catch (Exception e) {
+				log.fatal(e.getMessage(), e);
 			}
 		}
 		return null;
 		
 	}
+	
+	
+	static public <T> T createInstance(Class<T> classType, String className){
+		return SmartClassLoader.getInstance().createInstanceI(classType, className);
+	}
+	
 }
