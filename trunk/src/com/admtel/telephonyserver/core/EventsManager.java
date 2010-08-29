@@ -68,6 +68,5 @@ public class EventsManager implements EventListener, DefinitionChangeListener{
 			definitionAdded(newDefinition);
 		}
 		
-	}
-	
+	}	
 }

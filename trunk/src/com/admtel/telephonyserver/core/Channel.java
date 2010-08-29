@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
+import com.admtel.telephonyserver.config.SystemConfig;
 import com.admtel.telephonyserver.core.Timers.Timer;
 import com.admtel.telephonyserver.events.DialStartedEvent;
 import com.admtel.telephonyserver.events.DtmfEvent;
@@ -67,8 +68,7 @@ public abstract class Channel implements TimerNotifiable {
 	protected String acctSessionId = UUID.randomUUID().toString();
 	protected Integer h323DisconnectCause = 16;// normal call clearing
 
-	protected String baseDirectory = AdmTelephonyServer.getInstance()
-			.getDefinition().getBaseDirectory();
+	protected String baseDirectory = SystemConfig.getInstance().serverDefinition.getBaseDirectory();
 
 	protected Locale language;
 
@@ -414,7 +414,7 @@ public abstract class Channel implements TimerNotifiable {
 			sendInterimUpdate();
 			interimUpdateTimer = Timers.getInstance().startTimer(
 					this,
-					AdmTelephonyServer.getInstance().getDefinition()
+					SystemConfig.getInstance().serverDefinition
 							.getInterimUpdate() * 1000, false,
 					TimersDefs.InterimUpdateTimer);
 
@@ -525,5 +525,9 @@ public abstract class Channel implements TimerNotifiable {
 
 	private void sendInterimUpdate() {
 		RadiusServers.getInstance().accountingInterimUpdate(this);
+	}
+
+	public String getAccountCode() {
+		return getChannelData().getAccountCode();	
 	}
 }

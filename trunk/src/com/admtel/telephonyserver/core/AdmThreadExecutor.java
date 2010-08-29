@@ -3,12 +3,14 @@ package com.admtel.telephonyserver.core;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import com.admtel.telephonyserver.config.SystemConfig;
+
 public class AdmThreadExecutor {
 
 	public ThreadPoolExecutor executor;
 
 	private AdmThreadExecutor() {
-		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(AdmTelephonyServer.getInstance().getDefinition().getMaxThreads());
+		executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(SystemConfig.getInstance().serverDefinition.getMaxThreads());
 	}
 
 	private static class SingletonHolder {

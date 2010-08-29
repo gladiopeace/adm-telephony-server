@@ -78,4 +78,5 @@ public class ScriptManager implements DefinitionChangeListener {
 		definitionRemoved(oldDefinition);
 		definitionAdded(newDefinition);
 	}
+
 }

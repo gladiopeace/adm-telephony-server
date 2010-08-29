@@ -9,6 +9,8 @@
     <table>
     	<tr>
     	 <td>
+    	 	<a href="?action=index">Home</a>
+    	 	<a href="?action=channels">Channels</a>
     	 </td>
     	 <td>
     	     <#nested>

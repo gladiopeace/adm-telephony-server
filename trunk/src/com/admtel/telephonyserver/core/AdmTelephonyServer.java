@@ -13,7 +13,7 @@ import com.admtel.telephonyserver.httpserver.HttpServers;
 import com.admtel.telephonyserver.prompts.PromptBuilderFactory;
 import com.admtel.telephonyserver.radius.RadiusServers;
 
-public class AdmTelephonyServer implements DefinitionChangeListener {
+public class AdmTelephonyServer {
 
 	static Logger log = Logger.getLogger(AdmTelephonyServer.class);
 
@@ -49,8 +49,7 @@ public class AdmTelephonyServer implements DefinitionChangeListener {
 	}
 
 	private void start() {
-		SystemConfig.getInstance().addDefinitionChangeListener(this);
-		
+
 		SystemConfig sysConfig = SystemConfig.getInstance();
 		
 		//static listeners, order is important as conferencemanager might removed objects needed by RadiusServers
@@ -70,36 +69,7 @@ public class AdmTelephonyServer implements DefinitionChangeListener {
 		sysConfig.addDefinitionChangeListener(EventsManager.getInstance());
 		sysConfig.addDefinitionChangeListener(HttpServers.getInstance());
 		sysConfig.addDefinitionChangeListener(PromptBuilderFactory.getInstance());
-		sysConfig.addDefinitionChangeListener(BeansManager.getInstance());
+		//sysConfig.addDefinitionChangeListener(BeansManager.getInstance());
 		SystemConfig.getInstance().load();
 	}
-
-	@Override
-	public void definitionAdded(DefinitionInterface definition) {
-		log.debug("Definition : " + definition + ", added");
-		if (definition instanceof ServerDefinition){
-			this.definition = (ServerDefinition)definition;
-		}
-	}
-
-	@Override
-	public void definitionRemoved(DefinitionInterface definition) {
-		log.debug("Definition : " + definition + ", removed");
-		//TODO update server definition
-	}
-
-	@Override
-	public void defnitionChanged(DefinitionInterface oldDefinition,
-			DefinitionInterface newDefinition) {
-		log.debug("Definition : " + oldDefinition + " changed to "
-				+ newDefinition);
-		//TODO, update server definition
-	}
-	public ServerDefinition getDefinition() {
-		return definition;
-	}
-	public void setDefinition(ServerDefinition definition) {
-		this.definition = definition;
-	}
-
 }

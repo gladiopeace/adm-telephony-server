@@ -21,6 +21,7 @@ import org.tinyradius.util.RadiusException;
 import org.tinyradius.util.RadiusUtil;
 
 import com.admtel.telephonyserver.config.RadiusDefinition;
+import com.admtel.telephonyserver.config.SystemConfig;
 import com.admtel.telephonyserver.core.AdmTelephonyServer;
 import com.admtel.telephonyserver.core.Channel;
 import com.admtel.telephonyserver.core.Conference;
@@ -101,7 +102,7 @@ public class RadiusServer implements Authorizer{
 		AuthorizeResult result = new AuthorizeResult();
 		//ar.setAuthProtocol(AccessRequest.AUTH_PAP); // or AUTH_CHAP
 		ar.setDictionary(dictionary);
-		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
+		arDecorator.addAttribute("NAS-IP-Address", SystemConfig.getInstance().serverDefinition.getAddress());
 		arDecorator.addAttribute("Service-Type", serviceType);
 		arDecorator.addAttribute("Calling-Station-Id", callingStationId);
 		arDecorator.addAttribute("Called-Station-Id", calledStationId);
@@ -170,13 +171,13 @@ public class RadiusServer implements Authorizer{
 
 	@Override
 	public boolean accountingInterimUpdate(Channel channel) {
-		AccountingRequest acctRequest = new AccountingRequest(channel.getUserName(),
+		AccountingRequest acctRequest = new AccountingRequest((channel.getAccountCode()==null?channel.getUserName():channel.getAccountCode()),
 				AccountingRequest.ACCT_STATUS_TYPE_INTERIM_UPDATE);
 		
 		RadiusPacketDecorator arDecorator = new RadiusPacketDecorator(acctRequest);
 		
 		acctRequest.setDictionary(dictionary);
-		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
+		arDecorator.addAttribute("NAS-IP-Address", SystemConfig.getInstance().serverDefinition.getAddress());
 		arDecorator.addAttribute("Service-Type", "Login-User");
 		arDecorator.addAttribute("Calling-Station-Id", channel.getCallingStationId());
 		arDecorator.addAttribute("Called-Station-Id", channel.getCalledStationId());
@@ -209,13 +210,13 @@ public class RadiusServer implements Authorizer{
 	@Override
 	public boolean accountingStart(Channel channel) {
 		
-		AccountingRequest acctRequest = new AccountingRequest(channel.getUserName(),
+		AccountingRequest acctRequest = new AccountingRequest((channel.getAccountCode()==null?channel.getUserName():channel.getAccountCode()),
 				AccountingRequest.ACCT_STATUS_TYPE_START);
 		
 		RadiusPacketDecorator arDecorator = new RadiusPacketDecorator(acctRequest);
 		
 		acctRequest.setDictionary(dictionary);
-		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
+		arDecorator.addAttribute("NAS-IP-Address", SystemConfig.getInstance().serverDefinition.getAddress());
 		arDecorator.addAttribute("Service-Type", "Login-User");
 		arDecorator.addAttribute("Calling-Station-Id", channel.getCallingStationId());
 		arDecorator.addAttribute("Called-Station-Id", channel.getCalledStationId());
@@ -243,12 +244,12 @@ public class RadiusServer implements Authorizer{
 	@Override
 	public boolean accountingStop(Channel channel) {
 				
-		AccountingRequest acctRequest = new AccountingRequest(channel.getUserName(),
+		AccountingRequest acctRequest = new AccountingRequest((channel.getAccountCode()==null?channel.getUserName():channel.getAccountCode()),
 				AccountingRequest.ACCT_STATUS_TYPE_STOP);
 		RadiusPacketDecorator arDecorator = new RadiusPacketDecorator(acctRequest);
 
 		acctRequest.setDictionary(dictionary);
-		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
+		arDecorator.addAttribute("NAS-IP-Address", SystemConfig.getInstance().serverDefinition.getAddress());
 		arDecorator.addAttribute("Service-Type", "Login-User");
 		arDecorator.addAttribute("Calling-Station-Id", channel.getCallingStationId());
 		arDecorator.addAttribute("Called-Station-Id", channel.getCalledStationId());
@@ -293,7 +294,7 @@ public class RadiusServer implements Authorizer{
 		RadiusPacketDecorator arDecorator = new RadiusPacketDecorator(acctRequest);
 		
 		acctRequest.setDictionary(dictionary);
-		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
+		arDecorator.addAttribute("NAS-IP-Address", SystemConfig.getInstance().serverDefinition.getAddress());
 		arDecorator.addAttribute("Service-Type", "Conference");
 		arDecorator.addAttribute("Calling-Station-Id", channel.getCallingStationId());
 		arDecorator.addAttribute("Called-Station-Id", channel.getCalledStationId());
@@ -331,7 +332,7 @@ public class RadiusServer implements Authorizer{
 		RadiusPacketDecorator arDecorator = new RadiusPacketDecorator(acctRequest);
 		
 		acctRequest.setDictionary(dictionary);
-		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
+		arDecorator.addAttribute("NAS-IP-Address", SystemConfig.getInstance().serverDefinition.getAddress());
 		arDecorator.addAttribute("Service-Type", "Conference");
 		arDecorator.addAttribute("Calling-Station-Id", channel.getCallingStationId());
 		arDecorator.addAttribute("Called-Station-Id", channel.getCalledStationId());
@@ -367,7 +368,7 @@ public class RadiusServer implements Authorizer{
 		long sessionTime = new Period (participant.getJoinTime(), now).toStandardSeconds().getSeconds();
 
 		acctRequest.setDictionary(dictionary);
-		arDecorator.addAttribute("NAS-IP-Address", AdmTelephonyServer.getInstance().getDefinition().getAddress());
+		arDecorator.addAttribute("NAS-IP-Address", SystemConfig.getInstance().serverDefinition.getAddress());
 		arDecorator.addAttribute("Service-Type", "Conference");
 		arDecorator.addAttribute("Calling-Station-Id", channel.getCallingStationId());
 		arDecorator.addAttribute("Called-Station-Id", channel.getCalledStationId());

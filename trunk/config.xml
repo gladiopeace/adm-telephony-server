@@ -1,41 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
+
 <server>
 	<maxthreads>10</maxthreads>
 	<address>172.16.140.1</address>	
 	<base-directory>/usr/local/adm</base-directory>
-	<script-path>.;./scripts</script-path>
+	<script-path>.;./scripts;/Users/danny/AdmTel_Source/adm-telephony-scripts/src</script-path>
 	<radius-start-accounting>true</radius-start-accounting>
 	<radius-stop-accounting>true</radius-stop-accounting>
 	<radius-interim-update>10</radius-interim-update>
 </server>
+
 <registrar>
 		<enabled>true</enabled>
  		<class>com.admtel.telephonyserver.registrar.SimpleRegistrar</class>
 </registrar>
+
 <radius>
-<!--	<server>-->
-<!--		<id>first radius server</id>-->
-<!--		<address>172.16.140.129</address>-->
-<!--		<auth-port>1812</auth-port>-->
-<!--		<acct-port>1813</acct-port>-->
-<!--		<secret>meravoip</secret>-->
-<!--		<retry-count>5</retry-count>-->
-<!--		<socket-timeout>5000</socket-timeout>-->
-<!--	</server>-->
-	<!--
 	<server>
-	  	<id>Second radius server</id>
-	  	<address>172.16.140.130</address>
+		<id>first radius server</id>
+		<address>172.16.140.129</address>
 		<auth-port>1812</auth-port>
 		<acct-port>1813</acct-port>
-	  	<secret>meravoip</secret>
-	  	<retry-count>5</retry-count>
-	  	<socket-timeout>5000</socket-timeout>	  
+		<secret>meravoip</secret>
+		<retry-count>5</retry-count>
+		<socket-timeout>5000</socket-timeout>
 	</server>
---></radius>
+</radius>
 
-
+<!-- SWITCH LISTENERS START -->
 <switch-listeners>
  <switch-listener>
  	<address>
@@ -60,7 +53,9 @@
  	</type> 	
  </switch-listener> 
 </switch-listeners>
+<!-- SWITCH LISTENERS END -->
 
+<!-- CLI LISTENERS START -->
 <cli-listeners>
  <cli-listener>
   <address>172.16.140.1</address>
@@ -69,7 +64,9 @@
   <password>test</password>
  </cli-listener>
 </cli-listeners>
+<!-- CLI LISTENERS END -->
 
+<!-- HTTP LISTENERS START -->
 <http-servers>
  <http-server>
   <id>Freeswitch Configurator</id>
@@ -77,7 +74,7 @@
   <port>8057</port>
 	<adm-servlet>
 		<path>FSConfigurator</path> 
-		<class>scripts/WSFreeSwitchConfigurator.groovy</class>
+		<class>/Users/danny/AdmTel_Source/adm-telephony-scripts/src/WSFreeSwitchConfigurator.groovy</class>
 	</adm-servlet>
 	<adm-servlet>
 		<path>test</path> 
@@ -99,7 +96,9 @@
 <!--  <adm-servlet>scripts/HttpManager.groovy</adm-servlet>-->
 <!-- </http-server>-->
 </http-servers>
+<!-- HTTP LISTENERS START -->
 
+<!-- SWITCHES START -->
 <switches>
  <switch>
  	<id>MyFreeswitch</id>
@@ -121,7 +120,9 @@
  </switch>
 
 </switches>
+<!-- SWITCHES END -->
 
+<!-- SCRIPT FACTORIES START -->
 <scriptfactories>
 <!-- <scriptfactory>-->
 <!--  <class>scripts/AdmScriptFactory.groovy</class>-->
@@ -133,7 +134,9 @@
   <class>com.admtel.telephonyserver.scriptfactories.XMLScriptFactory</class>
  </scriptfactory>
 </scriptfactories>
+<!-- SCRIPT FACTORIES END -->
 
+<!--EVENT LISTENERS START -->
 <event-listeners>
 	<event-listener>
 	 <class>com.admtel.telephonyserver.eventlisteners.SimpleEventListener</class>
@@ -142,7 +145,9 @@
 	 <class>scripts/MyEventListener.groovy</class>
 	</event-listener>
 </event-listeners>
+<!--EVENT LISTENERS END -->
 
+<!--PROMPT BUILDERS START -->
 <prompt-builders>
  <prompt-builder>
 	<language>en</language>
@@ -157,10 +162,13 @@
  	<class>com.admtel.telephonyserver.prompts.FrenchPromptBuilder</class>
  </prompt-builder>
 </prompt-builders>
+<!--PROMPT BUILDERS END -->
+
 
 <beans>
 <!-- <bean>-->
 <!-- 	<class>scripts/AtsWS.groovy</class>-->
 <!-- </bean>-->
 </beans>
+
 </config>
