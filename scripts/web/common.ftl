@@ -9,8 +9,16 @@
     <table>
     	<tr>
     	 <td>
-    	 	<a href="?action=index">Home</a>
-    	 	<a href="?action=channels">Channels</a>
+    	 	<table>
+    	 		<tr>
+    	 			<td><a href="?action=index">Home</a></td>
+    	 		</tr>
+    	 		<tr>
+    	 			<td><a href="?action=channels">Channels</a></td>
+    	 		<tr>
+    	 			<td><a href="?action=conferences">Conferences</a></td>
+    	 		</tr>
+    	 	</table>
     	 </td>
     	 <td>
     	     <#nested>

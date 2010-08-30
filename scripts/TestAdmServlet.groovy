@@ -6,7 +6,7 @@ class TestAdmServlet implements AdmServlet {
 	public void process(HttpRequestMessage request, HttpResponseMessage response){		
 
 
-		response.appendBody("I am the test servlet")	
+		response.appendBody("Hello there")	
 
 	}
 }

@@ -60,7 +60,7 @@
  	</parameters>
  </script>
  <script name="ConferenceScript">
- 	<called>87654[0-9]</called>
+ 	<called>87654</called>
  	<class>scripts/ConferenceScript.groovy</class>
  	<parameters>
  		<parameter key="language" value="english"/>
