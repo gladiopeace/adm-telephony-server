@@ -107,8 +107,9 @@ public class RadiusServer implements Authorizer{
 		arDecorator.addAttribute("Calling-Station-Id", callingStationId);
 		arDecorator.addAttribute("Called-Station-Id", calledStationId);
 		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
-		arDecorator.addAttribute("Cisco-AVPair", "service-number="+channel.getServiceNumber());
-
+		if (channel.getServiceNumber() != null){
+			arDecorator.addAttribute("Cisco-AVPair", "service-number="+channel.getServiceNumber());
+		}
 		
 		String xpgkRequestType="";
 		if (routing) {
@@ -172,6 +173,10 @@ public class RadiusServer implements Authorizer{
 
 	@Override
 	public boolean accountingInterimUpdate(Channel channel) {
+		
+		String str = channel.getUserName();
+		str = channel.getAccountCode();
+		
 		AccountingRequest acctRequest = new AccountingRequest((channel.getAccountCode()==null?channel.getUserName():channel.getAccountCode()),
 				AccountingRequest.ACCT_STATUS_TYPE_INTERIM_UPDATE);
 		
@@ -189,7 +194,9 @@ public class RadiusServer implements Authorizer{
 		arDecorator.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
 		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
-		arDecorator.addAttribute("Cisco-AVPair", "service-number="+channel.getServiceNumber());
+		if (channel.getServiceNumber() != null){
+			arDecorator.addAttribute("Cisco-AVPair", "service-number="+channel.getServiceNumber());
+		}
 
 		if (channel.getAnswerTime()!=null){
 			arDecorator.addAttribute("h323-connect-time","h323-connect-time="+AdmUtils.dateToRadiusStr(channel.getAnswerTime()));
@@ -229,7 +236,9 @@ public class RadiusServer implements Authorizer{
 		arDecorator.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
 		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
-		arDecorator.addAttribute("Cisco-AVPair", "service-number="+channel.getServiceNumber());
+		if (channel.getServiceNumber() != null){
+			arDecorator.addAttribute("Cisco-AVPair", "service-number="+channel.getServiceNumber());
+		}
 		
 		log.trace("Sending Accounting-Start message : " + acctRequest);
 
@@ -268,7 +277,9 @@ public class RadiusServer implements Authorizer{
 		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
 		arDecorator.addAttribute("h323-remote-address", channel.getChannelData().getRemoteIP());
 		arDecorator.addAttribute("xpgk-dst-number-in", channel.getChannelData().getDestinationNumberIn());
-		arDecorator.addAttribute("Cisco-AVPair", "service-number="+channel.getServiceNumber());
+		if (channel.getServiceNumber() != null){
+			arDecorator.addAttribute("Cisco-AVPair", "service-number="+channel.getServiceNumber());
+		}
 
 
 		if (channel.getAnswerTime()!=null){
@@ -309,7 +320,9 @@ public class RadiusServer implements Authorizer{
 		arDecorator.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
 		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
-		arDecorator.addAttribute("Cisco-AVPair", "service-number="+channel.getServiceNumber());
+		if (channel.getServiceNumber() != null){
+			arDecorator.addAttribute("Cisco-AVPair", "service-number="+channel.getServiceNumber());
+		}
 
 		if (participant.getJoinTime()!=null){
 			arDecorator.addAttribute("h323-connect-time","h323-connect-time="+AdmUtils.dateToRadiusStr(participant.getJoinTime()));
@@ -348,7 +361,9 @@ public class RadiusServer implements Authorizer{
 		arDecorator.addAttribute("NAS-Port-Type","Async");//TODO, set proper value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel.getAcctUniqueSessionId());
 		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
-		arDecorator.addAttribute("Cisco-AVPair", "service-number="+channel.getServiceNumber());
+		if (channel.getServiceNumber() != null){
+			arDecorator.addAttribute("Cisco-AVPair", "service-number="+channel.getServiceNumber());
+		}
 
 		log.trace("Sending Accounting-Start message : " + acctRequest);
 
@@ -389,8 +404,9 @@ public class RadiusServer implements Authorizer{
 		arDecorator.addAttribute("Login-IP-Host",channel.getLoginIP());
 		arDecorator.addAttribute("h323-remote-address", channel.getChannelData().getRemoteIP());
 		arDecorator.addAttribute("xpgk-dst-number-in", channel.getChannelData().getDestinationNumberIn());
-		arDecorator.addAttribute("Cisco-AVPair", "service-number="+channel.getServiceNumber());
-
+		if (channel.getServiceNumber() != null){
+			arDecorator.addAttribute("Cisco-AVPair", "service-number="+channel.getServiceNumber());
+		}
 
 		if (channel.getAnswerTime()!=null){
 			arDecorator.addAttribute("h323-connect-time","h323-connect-time="+AdmUtils.dateToRadiusStr(participant.getJoinTime()));

@@ -137,6 +137,9 @@ public class FSChannel extends Channel {
 										.getCallerDestinationNumber()));
 
 				if (masterChannel != null) {
+					
+					log.debug(String.format("%s, ChannelOutgoing with master channel %s",FSChannel.this, masterChannel));
+					
 					FSChannel.this.setAcctUniqueSessionId(masterChannel
 							.getAcctUniqueSessionId());
 					FSChannel.this.setUserName(masterChannel.getUserName());
@@ -562,8 +565,8 @@ public class FSChannel extends Channel {
 			log
 					.debug(String
 							.format(
-									"START processing event (%s) state (%s), internalState(%s)",
-									fsEvent, state, currentState.getClass()
+									"%s, START processing event (%s) state (%s), internalState(%s)",
+									FSChannel.this, fsEvent, state, currentState.getClass()
 											.getSimpleName()));
 
 			switch (fsEvent.getEventType()) {
@@ -590,8 +593,8 @@ public class FSChannel extends Channel {
 				FSChannel.this._switch.removeChannel(FSChannel.this);
 			}
 			log.debug(String.format(
-					"END processing event (%s) state (%s), internalState(%s)",
-					fsEvent, state, currentState.getClass().getSimpleName()));
+					"%s, END processing event (%s) state (%s), internalState(%s)",
+					FSChannel.this, fsEvent, state, currentState.getClass().getSimpleName()));
 
 		}
 	};

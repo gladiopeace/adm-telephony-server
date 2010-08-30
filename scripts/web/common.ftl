@@ -18,6 +18,9 @@
     	 		<tr>
     	 			<td><a href="?action=conferences">Conferences</a></td>
     	 		</tr>
+				<tr>
+    	 			<td><a href="?action=scripts">Scripts</a></td>
+    	 		</tr>    	 		
     	 	</table>
     	 </td>
     	 <td>
