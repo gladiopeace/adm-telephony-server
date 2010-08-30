@@ -386,6 +386,7 @@ public abstract class Channel implements TimerNotifiable {
 		 * log.warn(String.format("Channel (%s), originate, invalid state(%s)",
 		 * this, state)); return Result.ChannelInvalidState; }
 		 */
+		log.trace(String.format("Channel(%s) dialing %s", this, address));
 		Result result = internalDial(address, timeout);
 		return result;
 	}
@@ -423,7 +424,6 @@ public abstract class Channel implements TimerNotifiable {
 			InboundAlertingEvent ie = (InboundAlertingEvent) e;
 			ie.setCalledIdNumber(getChannelData().getCalledNumber());
 			ie.setCallerIdNumber(getChannelData().getCallerIdNumber());
-			ie.setServiceNumber(getChannelData().getServiceNumber());
 			state = State.InboundAlerting;
 			callOrigin = CallOrigin.Inbound;
 			setupTime = new DateTime();

@@ -33,8 +33,6 @@ public class Conference implements TimerNotifiable{
 
 	public void onConferenceJoined(ConferenceJoinedEvent cje) {
 		
-		//TODO send radius start accounting
-		
 		Participant p = new Participant(cje.getParticipantId(), cje.isModerator(), cje.isMuted(), cje.isDeaf());
 		p.setJoinTime(new DateTime());
 		synchronizedParticipants.put(cje.getChannel(), p);
@@ -42,7 +40,6 @@ public class Conference implements TimerNotifiable{
 	}
 
 	public void onConferenceLeft(ConferenceLeftEvent cle) {
-		//TODO send radius stop accounting
 		synchronizedParticipants.remove(cle.getChannel());				
 	}
 	public long getParcitipantsCount(){

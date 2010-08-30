@@ -715,6 +715,7 @@ public class ASTChannel extends Channel{
 
 			ASTDialCommand dialCmd = new ASTDialCommand(ASTChannel.this,
 					address, timeout);
+			log.trace(String.format("Channel (%s) dialCmd %s", ASTChannel.this, dialCmd));
 			session.write(dialCmd);
 			result = Result.Ok;
 		}

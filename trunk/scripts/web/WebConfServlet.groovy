@@ -41,7 +41,10 @@ class WebConfServlet implements AdmServlet {
 		} 
 		[m:'']
 	}
-	
+	def conferences(request){
+		def c = ConferenceManager.getInstance().getAll()
+		['conferences':c]
+	}
 	def channels(request){
 		List<Channel> channels =  Switches.getInstance().getAllChannels();
 		def root =["channels":channels]
