@@ -51,7 +51,10 @@ class WebConfServlet implements AdmServlet {
 		println request.getParameter("action")
 		return root
 	}
-	
+	def scripts(request){
+		def s = Scripts.getInstance().getAll()
+		['scripts':s]
+	}
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
 		

@@ -479,8 +479,18 @@ public abstract class Channel implements TimerNotifiable {
 
 	@Override
 	public String toString() {
-		return "Channel [_switch=" + _switch + ", id=" + id + ", state="
-				+ state + "]";
+		return "Channel ["
+				+ (callOrigin != null ? "callOrigin=" + callOrigin + ", " : "")
+				+ (id != null ? "id=" + id + ", " : "")
+				+ (getAccountCode() != null ? "getAccountCode()="
+						+ getAccountCode() + ", " : "")
+				+ (getLanguage() != null ? "getLanguage()=" + getLanguage()
+						+ ", " : "")
+				+ (getServiceNumber() != null ? "getServiceNumber()="
+						+ getServiceNumber() + ", " : "")
+				+ (getState() != null ? "getState()=" + getState() + ", " : "")
+				+ (getUserName() != null ? "getUserName()=" + getUserName()
+						: "") + "]";
 	}
 
 	public Integer getH323DisconnectCause() {
