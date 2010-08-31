@@ -13,6 +13,7 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
 public class InitialState{
 	
 	SoftSwitch script
@@ -22,11 +23,12 @@ public class InitialState{
 	}
 	def onInboundAlerting (InboundAlertingEvent e){
 		
-		
-		script.log.trace (e.getChannel())
-		
 		AuthorizeResult result = Radius.authorize(e.getChannel(), e.getChannel().getAccountCode(),
 				"", e.getChannel().getLoginIP(), "Login-User", e.getCallerIdNumber(), e.getCalledIdNumber(), true, true)
+		
+		def channel = e.getChannel()
+		def routes = result.getRoutes();
+		
 		if (result?.getAuthorized()){
 			if (result.getRoutes().size()>0){
 				[script, e.getChannel(), result.getRoutes()] as DialState
@@ -38,6 +40,7 @@ public class InitialState{
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
 public class HangupState{
 	Script script
 	HangupState(script, channel, reason){
@@ -45,39 +48,35 @@ public class HangupState{
 	}
 }
 
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
 public class DialState{
 	
 	
-	Script script
-	def routes
-	int currentRoute = 0
+	SoftSwitch script
 	Channel b
 	Channel a
-	
+	def routes
 	DialState(script, channel, route){
 		this.script = script
-		this.routes = route
 		this.a=channel
 		this.b=null
-		channel.dial(routes[currentRoute], 10000)
-	}
-	DialState(Script, channel){
-		this.script = script
-		this.a=channel
-		b=null
-		channel.dial(routes[currentRoute], 10000)
+		this.routes = route
+		script.log.trace("********** $channel, dialing " + routes[0])
+		a.dial(routes[0], 10000)
 	}
 	def onDialStarted(DialStartedEvent e){
+		routes.remove 0
+		script.log.trace("*************** " + e.getChannel()+" (inbound) ---- "+e.getDialedChannel()+"(outbound)")
 		b = e.getDialedChannel()
 		this
 	}
 	def onHangup(HangupEvent e){
-		if (e.getChannel()==b){
-			a.hangup(DisconnectCode.Normal)
+		script.log.trace("*********************Hangup received for channel "+e.getChannel())
+		if (e.getChannel()==b && routes.size()>0){
+			return [script, e.getChannel(), routes] as DialState
 		}
 		else{
-			b.hangup(DisconnectCode.Normal)
+			return this
 		}
 	}
 	def onDialFailed(DialFailedEvent e){
@@ -88,3 +87,4 @@ public class DialState{
 		[script, e.getChannel()] as HangupState
 	}
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////

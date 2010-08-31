@@ -124,9 +124,6 @@
 
 <!-- SCRIPT FACTORIES START -->
 <scriptfactories>
-<!-- <scriptfactory>-->
-<!--  <class>scripts/AdmScriptFactory.groovy</class>-->
-<!-- </scriptfactory>-->
  <scriptfactory>
   <class>com.admtel.telephonyserver.scriptfactories.VariableScriptFactory</class>
  </scriptfactory>
