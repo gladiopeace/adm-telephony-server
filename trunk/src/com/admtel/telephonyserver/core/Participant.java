@@ -27,6 +27,8 @@ public class Participant {
 	boolean talking;
 	
 	String uniqueId;
+	private Conference conference;
+	private Channel channel;
 	
 	public boolean isMuted() {
 		return muted;
@@ -52,9 +54,11 @@ public class Participant {
 	public boolean isTalking(){
 		return this.talking;
 	}
-	public Participant(String memberId, boolean moderator, boolean muted, boolean deaf) {
+	public Participant(Channel channel, Conference conference, String memberId, boolean moderator, boolean muted, boolean deaf) {
 		super();		
 		this.memberId = memberId;
+		this.conference = conference;
+		this.channel = channel;
 		this.muted = muted;
 		this.moderator = moderator;
 		this.deaf = deaf;
@@ -70,5 +74,11 @@ public class Participant {
 	}
 	public String getUniqueId(){
 		return this.uniqueId;
+	}
+	public Channel getChannel() {
+		return channel;
+	}
+	public void setChannel(Channel channel) {
+		this.channel = channel;
 	}
 }

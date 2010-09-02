@@ -125,6 +125,9 @@
 <!-- SCRIPT FACTORIES START -->
 <scriptfactories>
  <scriptfactory>
+  <class>/Users/danny/AdmTel_Source/adm-telephony-scripts/src/WSScriptFactory.groovy</class>
+ </scriptfactory>
+ <scriptfactory>
   <class>com.admtel.telephonyserver.scriptfactories.VariableScriptFactory</class>
  </scriptfactory>
  <scriptfactory>

@@ -12,14 +12,15 @@ import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 
-public class Conference implements TimerNotifiable{
-	String id;	
+public class Conference implements TimerNotifiable {
+	String id;
 	DateTime createTime;
-	
+
 	Map<Channel, Participant> participants = new HashMap<Channel, Participant>();
-	Map<Channel, Participant> synchronizedParticipants = Collections.synchronizedMap(participants);
-	
-	public Conference(String id){
+	Map<Channel, Participant> synchronizedParticipants = Collections
+			.synchronizedMap(participants);
+
+	public Conference(String id) {
 		this.id = id;
 		createTime = new DateTime();
 		Timers.getInstance().startTimer(this, 10000, true, null);
@@ -32,17 +33,20 @@ public class Conference implements TimerNotifiable{
 	}
 
 	public void onConferenceJoined(ConferenceJoinedEvent cje) {
-		
-		Participant p = new Participant(cje.getParticipantId(), cje.isModerator(), cje.isMuted(), cje.isDeaf());
+
+		Participant p = new Participant(cje.getChannel(), this, cje
+				.getParticipantId(), cje.isModerator(), cje.isMuted(), cje
+				.isDeaf());
 		p.setJoinTime(new DateTime());
 		synchronizedParticipants.put(cje.getChannel(), p);
-		
+
 	}
 
 	public void onConferenceLeft(ConferenceLeftEvent cle) {
-		synchronizedParticipants.remove(cle.getChannel());				
+		synchronizedParticipants.remove(cle.getChannel());
 	}
-	public long getParcitipantsCount(){
+
+	public long getParcitipantsCount() {
 		return participants.size();
 	}
 
@@ -88,5 +92,5 @@ public class Conference implements TimerNotifiable{
 	public Participant getParticipant(Channel channel) {
 		return participants.get(channel);
 	}
-	
+
 }
