@@ -16,8 +16,8 @@ public class Conference implements TimerNotifiable {
 	String id;
 	DateTime createTime;
 
-	Map<Channel, Participant> participants = new HashMap<Channel, Participant>();
-	Map<Channel, Participant> synchronizedParticipants = Collections
+	Map<String, Participant> participants = new HashMap<String, Participant>();
+	Map<String, Participant> synchronizedParticipants = Collections
 			.synchronizedMap(participants);
 
 	public Conference(String id) {
@@ -38,12 +38,12 @@ public class Conference implements TimerNotifiable {
 				.getParticipantId(), cje.isModerator(), cje.isMuted(), cje
 				.isDeaf());
 		p.setJoinTime(new DateTime());
-		synchronizedParticipants.put(cje.getChannel(), p);
+		synchronizedParticipants.put(cje.getParticipantId(), p);
 
 	}
 
 	public void onConferenceLeft(ConferenceLeftEvent cle) {
-		synchronizedParticipants.remove(cle.getChannel());
+		synchronizedParticipants.remove(cle.getParticipantId());
 	}
 
 	public long getParcitipantsCount() {
@@ -89,8 +89,8 @@ public class Conference implements TimerNotifiable {
 		return builder.toString();
 	}
 
-	public Participant getParticipant(Channel channel) {
-		return participants.get(channel);
+	public Participant getParticipant(String participantId) {
+		return participants.get(participantId);
 	}
 
 }
