@@ -18,7 +18,7 @@ public class Event {
 		OutboundAlerting, 
 		DialFailed, 
 		Linked, 
-		DialStarted, ConferenceJoined, ConferenceLeft, ConferencedTalk, QueueJoined, QueueLeft, QueueJoinFailed,
+		DialStarted, ConferenceJoined, ConferenceLeft, ConferencedTalk, QueueJoined, QueueLeft, QueueJoinFailed, ConferenceMuted,
 	}
 	
 	protected EventType eventType;	

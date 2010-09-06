@@ -2,6 +2,6 @@ package com.admtel.telephonyserver.core;
 
 public enum Result {
 	Ok,
-	ChannelInvalidState, SessionInvalid, RequestError, ChannelInvalid, InvalidParameters,
+	ChannelInvalidState, SessionInvalid, RequestError, ChannelInvalid, InvalidParameters, InvalidConference, InvalidParticipant,
 	
 }

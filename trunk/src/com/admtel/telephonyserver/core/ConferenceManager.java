@@ -67,7 +67,7 @@ public class ConferenceManager implements TimerNotifiable, EventListener{
 			}
 			c.onConferenceJoined (cje);
 
-			RadiusServers.getInstance().accountingStart(cje.getChannel(), c, c.getParticipant(cje.getChannel()));
+			RadiusServers.getInstance().accountingStart(cje.getChannel(), c, c.getParticipant(cje.getParticipantId()));
 
 		}
 			break;
@@ -80,7 +80,7 @@ public class ConferenceManager implements TimerNotifiable, EventListener{
 			
 			
 			if (c != null){
-				RadiusServers.getInstance().accountingStop(cle.getChannel(), c, c.getParticipant(cle.getChannel()));
+				RadiusServers.getInstance().accountingStop(cle.getChannel(), c, c.getParticipant(cle.getParticipantId()));
 				c.onConferenceLeft(cle);
 				if (c.getParcitipantsCount() == 0){
 					synchronizedConferences.remove(c.getId());
@@ -90,5 +90,22 @@ public class ConferenceManager implements TimerNotifiable, EventListener{
 			break;
 		}
 		return false;
+	}
+	public Result disconnectParticipant(String conferenceId, String participantId){
+		Conference conference = conferences.get(conferenceId);
+		if (conference == null){
+			log.warn(String.format("Conferece not found %s", conferenceId));
+			return Result.InvalidConference;
+		}
+		Participant participant = conference.getParticipant(participantId);
+		if (participant == null){
+			log.warn(String.format("Participant %s , not found", participantId));
+			return Result.InvalidParticipant;
+		}
+		return participant.getChannel().hangup(DisconnectCode.Normal);
+	}
+	public Result muteParticipant(String conferenceId, String participantId){
+	
+		return Result.Ok;
 	}
 }
