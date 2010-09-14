@@ -53,25 +53,26 @@ public class GetConferenceNumber{
 	}
 	def onPlayAndGetDigitsEnded (PlayAndGetDigitsEndedEvent e){
 		
-//		AuthorizeResult result = Radius.authorize(e.getChannel(), e.getDigits(), 
-//			"", "", "Conference", e.getChannel().getCallingStationId(), 
-//			e.getChannel().getCalledStationId(), false, true)
-//		
-//		log.trace(result)
-//		
-//		if (!result.getAuthorized()){
-//			[script, e.getChannel()] as InvalidConference
-//		}
-//		else{
-//			[script, e.getChannel(), e.getDigits()] as JoinConference
-//		}
-		script.conferenceDTO = script.getConference(e.getDigits())
-		if (script.conferenceDTO == null){
+		 script.authorizeResult = Radius.authorize(e.getChannel(), e.getDigits(), 
+			"", "", "Conference", e.getChannel().getCallingStationId(), 
+			e.getChannel().getCalledStationId(), false, true)
+		
+		script.conferenceNumber = e.getDigits()
+		log.trace(script.authorizeResult)
+		println ("***************** " + script.authorizeResult)
+		if (!script.authorizeResult.getAuthorized()){
 			[script, e.getChannel()] as InvalidConference
 		}
 		else{
 			[script, e.getChannel()] as GetConferencePin
 		}
+//		script.conferenceDTO = script.getConference(e.getDigits())
+//		if (script.conferenceDTO == null){
+//			[script, e.getChannel()] as InvalidConference
+//		}
+//		else{
+//			[script, e.getChannel()] as GetConferencePin
+//		}
 		
 	}
 	def onPlayAndGetDigitsFailed(PlayAndGetDigitsFailedEvent e){
@@ -84,38 +85,25 @@ public class GetConferencePin{
 	static final Logger log = Logger.getLogger(GetConferencePin.class);
 	
 	ConferenceScript script
-	def conferenceDTO
 	
 	GetConferencePin(script, channel){
 		this.script = script
 		channel.playAndGetDigits(4,"conference/conf-getpin", 5000,"")
-		conferenceDTO = script.conferenceDTO
 	}
 	
 	def onPlayAndGetDigitsEnded(PlayAndGetDigitsEndedEvent e){
 		
 		log.trace ("GetConferencePin got ${e.getDigits()}")
 		
-		println "********** " + conferenceDTO.managed
-		if (e.getDigits() == conferenceDTO.getAdminPassword()){
+		if (e.getDigits() == script.authorizeResult.get("admin-pass")){
 			[script, e.getChannel()] as JoinConference
 		}
 		else
-		if (e.getDigits() == conferenceDTO.getUserPassword()){
-			if (conferenceDTO.managed){
-				[script, e.getChannel(), false] as JoinQueue
-			}
-			else{
-				[script, e.getChannel()] as JoinConference
-			}			
+		if (e.getDigits() == script.authorizeResult.get("manager-pass")){
+			[script, e.getChannel(), false] as JoinQueue
 		}
-		else if (e.getDigits() == conferenceDTO.getManagerPassword()){
-			if (conferenceDTO.managed){
-				[script, e.getChannel(), true] as JoinQueue
-			}
-			else{
+		else if (e.getDigits() == script.authorizeResult.get("user-pass")){
 				[script, e.getChannel()] as InvalidConferencePin
-			}
 		}
 		else{
 			[script, e.getChannel()] as InvalidConferencePin 
@@ -143,7 +131,7 @@ public class JoinQueue{
 	
 	JoinQueue(script, channel, isAgent){
 		this.script = script
-		channel.queue (script.conferenceDTO.getConferenceNumber(), isAgent)
+		channel.queue (script.conferenceNumber, isAgent)
 	}
 	def onQueueLeft (QueueLeftEvent e){
 		if (!e.isAgent()){
@@ -158,9 +146,10 @@ public class JoinConference{
 	static final Logger log = Logger.getLogger(JoinConference.class);
 	
 	ConferenceScript script
+	
 	JoinConference(script, channel){
 		this.script = script
-		channel.joinConference(script.conferenceDTO.getConferenceNumber(), false, false, false)
+		channel.joinConference(script.conferenceNumber, false, false, false)
 	}
 //	def onConferenceJoined(ConferenceJoinedEvent e){
 //		
