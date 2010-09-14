@@ -1,18 +1,22 @@
 package com.admtel.telephonyserver.radius;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class AuthorizeResult {
 	
 	String userName;
-	List<String> routes = new ArrayList<String>();
+	Boolean authorized = false;
+	Integer allowedTime = 0;
+
+	Map<String, Object> attributes = new HashMap<String, Object>();
 	
 	public List<String> getRoutes() {
-		return routes;
-	}
-	public void setRoutes(List<String> routes) {
-		this.routes = routes;
+		return (List<String>) attributes.get("routes");
 	}
 	public String getUserName() {
 		return userName;
@@ -20,8 +24,6 @@ public class AuthorizeResult {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
-	Boolean authorized = false;
-	Integer allowedTime = 0;
 	
 	
 	public Boolean getAuthorized() {
@@ -36,4 +38,39 @@ public class AuthorizeResult {
 	public void setAllowedTime(Integer allowedTime) {
 		this.allowedTime = allowedTime;
 	}
+	public Object get(String key){
+		return attributes.get(key);
+	}
+	public void put(String key, Object value){
+		attributes.put(key, value);
+	}
+	public void setRoutes(ArrayList arrayList) {
+		put("routes", arrayList);
+		
+	}
+	@Override
+	public String toString() {
+		final int maxLen = 20;
+		return "AuthorizeResult ["
+				+ (allowedTime != null ? "allowedTime=" + allowedTime + ", "
+						: "")
+				+ (attributes != null ? "attributes="
+						+ toString(attributes.entrySet(), maxLen) + ", " : "")
+				+ (authorized != null ? "authorized=" + authorized + ", " : "")
+				+ (userName != null ? "userName=" + userName : "") + "]";
+	}
+	private String toString(Collection<?> collection, int maxLen) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("[");
+		int i = 0;
+		for (Iterator<?> iterator = collection.iterator(); iterator.hasNext()
+				&& i < maxLen; i++) {
+			if (i > 0)
+				builder.append(", ");
+			builder.append(iterator.next());
+		}
+		builder.append("]");
+		return builder.toString();
+	}
+	
 }

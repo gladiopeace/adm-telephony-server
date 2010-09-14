@@ -13,23 +13,10 @@ public class ConferenceScript extends Script {
 
 	static ThreadLocal wsClients = new ThreadLocal()
 	static String TOKEN  = "1234"
-	
-	def conferenceDTO = null;
 
-	def getProxy(){
-		def proxy = wsClients.get()
-		if (proxy==null){
-			proxy = new WSClient("http://localhost:8080/adm-appserver/AppServerAPI?WSDL", this.class.classLoader)
-			proxy.initialize()
-			wsClients.set(proxy)
-		}
-		return proxy
-	}	
+	AuthorizeResult authorizeResult
+	String conferenceNumber;
 	
-	def getConference(conferenceNumber){
-		getProxy().getConferenceByNumber(TOKEN, conferenceNumber)
-	}
-				
 	@Override
 	public String getDisplayStr() {
 		// TODO Auto-generated method stub
