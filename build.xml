@@ -1,13 +1,49 @@
-<project>	
- <target name="clean" description="Clean the directories for building">
-			<delete file="dist/adm-telephony-server.jar"/>
+<project>
+	<target name="clean" description="Clean the directories for building">
+		<delete file="dist/adm-telephony-server.jar" />
+		<delete file="dist/ats-console"/>
 	</target>
-	
-  <target name="simple" depends="clean">  
-    <jar destfile="dist/adm-telephony-server.jar"
-         basedir="bin"
-         includes="**/*.class"
-    	 excludes="**/src/**,build.xml,**/*.xml,log4j.properties">
-    </jar>  	
-  </target>
+
+	<target name="simple" depends="clean">
+		<jar destfile="dist/adm-telephony-server.jar" basedir="bin" includes="**/*.class" excludes="**/src/**,build.xml,**/*.xml,log4j.properties">
+		</jar>
+	</target>
+
+	<target name="ats-console" depends="simple">
+
+		<delete dir="dist/temp" />
+
+		<unzip dest="dist/temp">
+			<fileset dir="lib">
+				<include name="mina-core-2.0.0-RC1.jar" />
+				<include name="jline-0.9.94.jar" />
+				<include name="slf4j-api-1.5.0.jar"/>
+				<include name="slf4j-log4j12-1.5.0.jar"/>
+				<include name="log4j-1.2.15.jar"/>
+			</fileset>
+		</unzip>
+
+		<!--  	
+	  	<copy todir="../../bin/temp">
+	  	 <fileset dir="./images"/>
+	  	</copy>
+	   -->
+
+		<jar destfile="dist/ats-console.jar" basedir="bin" includes="**/*ATSConsole.class,**/*.png" excludes="**/src/**,build.xml">
+		</jar>
+
+		<unzip src="dist/ats-console.jar" dest="dist/temp">
+		</unzip>
+		<delete file="dist/ats-console" />
+
+		<jar destfile="dist/ats-console.jar" basedir="dist/temp" includes="**/*">
+			<manifest>
+				<attribute name="Main-Class" value="com.admtel.telephonyserver.cli.ATSConsole" />
+			</manifest>
+		</jar>
+
+		<delete dir="dist/temp" />
+	</target>
+
+
 </project>
