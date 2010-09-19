@@ -1,15 +1,45 @@
 package com.admtel.telephonyserver.config;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 public class BeanDefinition implements DefinitionInterface {
 
 	String className;
+	Map<String, String>parameters = new HashMap<String, String>();
+	
+	private String toString(Collection<?> collection, int maxLen) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("[");
+		int i = 0;
+		for (Iterator<?> iterator = collection.iterator(); iterator.hasNext()
+				&& i < maxLen; i++) {
+			if (i > 0)
+				builder.append(", ");
+			builder.append(iterator.next());
+		}
+		builder.append("]");
+		return builder.toString();
+	}
+	public Map<String, String> getParameters() {
+		return parameters;
+	}
+	public void setParameters(Map<String, String> parameters) {
+		this.parameters = parameters;
+	}
 	@Override
 	public String getId() {
 		return className;
 	}
 	@Override
 	public String toString() {
-		return (className != null ? "className=" + className : "");
+		final int maxLen = 20;
+		return "BeanDefinition ["
+				+ (className != null ? "className=" + className + ", " : "")
+				+ (parameters != null ? "parameters="
+						+ toString(parameters.entrySet(), maxLen) : "") + "]";
 	}
 	public String getClassName() {
 		return className;

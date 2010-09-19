@@ -1,6 +1,7 @@
 package com.admtel.telephonyserver.events;
 
 import com.admtel.telephonyserver.core.Channel;
+import com.admtel.telephonyserver.remoteapi.Message;
 
 public class ConferenceLeftEvent extends ChannelEvent {
 
@@ -28,6 +29,12 @@ public class ConferenceLeftEvent extends ChannelEvent {
 
 	public void setConferenceId(String conferenceId) {
 		this.conferenceId = conferenceId;
+	}
+
+	@Override
+	public Message toMessage() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

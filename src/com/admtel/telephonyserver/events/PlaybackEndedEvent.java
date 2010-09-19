@@ -1,6 +1,7 @@
 package com.admtel.telephonyserver.events;
 
 import com.admtel.telephonyserver.core.Channel;
+import com.admtel.telephonyserver.remoteapi.Message;
 
 public class PlaybackEndedEvent extends ChannelEvent {
 
@@ -40,6 +41,12 @@ public class PlaybackEndedEvent extends ChannelEvent {
 
 	public void setInterruptedFile(String interruptedFile) {
 		this.interruptedFile = interruptedFile;
+	}
+
+	@Override
+	public Message toMessage() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	

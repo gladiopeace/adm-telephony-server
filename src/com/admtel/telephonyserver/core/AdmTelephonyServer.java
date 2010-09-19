@@ -69,7 +69,7 @@ public class AdmTelephonyServer {
 		sysConfig.addDefinitionChangeListener(EventsManager.getInstance());
 		sysConfig.addDefinitionChangeListener(HttpServers.getInstance());
 		sysConfig.addDefinitionChangeListener(PromptBuilderFactory.getInstance());
-		//sysConfig.addDefinitionChangeListener(BeansManager.getInstance());
+		sysConfig.addDefinitionChangeListener(BeansManager.getInstance());
 		SystemConfig.getInstance().load();
 	}
 }

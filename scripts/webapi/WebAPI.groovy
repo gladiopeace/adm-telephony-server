@@ -18,7 +18,6 @@ class WebAPI implements AdmServlet {
 		[index:"welcome"]
 	}
 	def originate(request){
-		log.trace("Originate ${request}")
 		Switch _switch = Switches.getInstance().getRandom();
 		if (_switch != null){
 			_switch.originate(request.getParameter("destination"), 10000, "", "", request.getParameter("script"), "")
@@ -26,7 +25,26 @@ class WebAPI implements AdmServlet {
 		}
 		"no switch found"
 	}
-		
+	def hangup(request){
+		String switchId = request.getParameter("switch");
+		Switch _switch = Switches.getInstance().getById(request.getParameter("switch"));
+		if (_switch == null){
+			"Switch ${switchId} not found"
+		}
+		else{
+			String channelId = request.getParameter("channel")
+			Channel c = _switch.getChannel(channelId);
+			if (c == null){
+				"Channel ${channelId} not found"
+			}
+			else{
+				c.hangup(DisconnectCode.Normal)				
+			}
+		}
+	}	
+	def hangup(request){
+
+	}
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
 		
@@ -37,6 +55,7 @@ class WebAPI implements AdmServlet {
 			action = 'index'
 		}
 		try{			
+			log.trace("WebAPI received {"+request+"}");
 			def model = "${action}"(request)
 			response.appendBody(model)	
 		}	

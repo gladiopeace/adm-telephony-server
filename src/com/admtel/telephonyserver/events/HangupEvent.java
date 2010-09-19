@@ -1,6 +1,7 @@
 package com.admtel.telephonyserver.events;
 
 import com.admtel.telephonyserver.core.Channel;
+import com.admtel.telephonyserver.remoteapi.Message;
 
 public class HangupEvent extends ChannelEvent {
 
@@ -32,6 +33,12 @@ public class HangupEvent extends ChannelEvent {
 
 	public void setHangCause(int hangCause) {
 		this.hangCause = hangCause;
+	}
+
+	@Override
+	public Message toMessage() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

@@ -51,7 +51,8 @@ public abstract class Channel implements TimerNotifiable {
 	protected String dtmfBuffer = "";
 	protected Switch _switch;
 
-	protected String uniqueId;
+	String switchId;
+	String uniqueId;
 
 	private ChannelData channelData = new ChannelData();
 
@@ -194,6 +195,7 @@ public abstract class Channel implements TimerNotifiable {
 	public Channel(Switch _switch, String id) {
 		this._switch = _switch;
 		this.id = id;
+		this.switchId = _switch.getSwitchId();
 		this.uniqueId = UUID.randomUUID().toString();
 		language = Locale.ENGLISH;
 	}

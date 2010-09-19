@@ -166,9 +166,32 @@
 
 
 <beans>
-<!-- <bean>-->
-<!-- 	<class>scripts/AtsWS.groovy</class>-->
-<!-- </bean>-->
+ <bean>
+ 	<class>com.admtel.telephonyserver.remoteapi.JSonSocketManagerBean</class>
+ 	<parameters>
+ 	 <parameter>
+ 	 	<name>address</name>
+ 	 	<value>172.16.140.1</value>
+ 	 </parameter>
+ 	 <parameter>
+ 	 	<name>port</name>
+ 	 	<value>1234</value>
+ 	 </parameter>
+ 	</parameters>
+ </bean>
+  <bean>
+ 	<class>scripts/ManagerBean.groovy</class>
+ 	<parameters>
+ 	 <parameter>
+ 	 	<name>address</name>
+ 	 	<value>172.16.140.1</value>
+ 	 </parameter>
+ 	 <parameter>
+ 	 	<name>port</name>
+ 	 	<value>1234</value>
+ 	 </parameter>
+ 	</parameters>
+ </bean>
 </beans>
 
 </config>

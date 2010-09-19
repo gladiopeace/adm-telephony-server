@@ -11,10 +11,6 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.log4j.Logger;
 
-import com.admtel.telephonyserver.core.SmartClassLoader;
-import com.admtel.telephonyserver.httpserver.AdmServlet;
-import com.admtel.telephonyserver.httpserver.DefaultAdmServlet;
-
 public class SystemConfig {
 
 	static Logger log = Logger.getLogger(SystemConfig.class);
@@ -284,6 +280,22 @@ public class SystemConfig {
 				if (subnode != null) {
 					BeanDefinition definition = new BeanDefinition();
 					definition.setClassName(subnode.getString("class"));
+					int parameterCounter = 0;
+					while (true){
+						try{
+							SubnodeConfiguration parametersSubnode = subnode.configurationAt(String.format("parameters.parameter(%d)", parameterCounter));
+							if (parametersSubnode != null){
+								
+								definition.getParameters().put(parametersSubnode.getString("name"), parametersSubnode.getString("value"));
+							}
+						}
+						catch (Exception e){
+							log.warn(e.getMessage());
+							break;
+						}
+						parameterCounter ++;
+					}
+
 					futureDefinitions.put(definition.getId(), definition);
 				} else {
 					return;

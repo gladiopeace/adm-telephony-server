@@ -1,6 +1,7 @@
 package com.admtel.telephonyserver.events;
 
 import com.admtel.telephonyserver.core.Channel;
+import com.admtel.telephonyserver.remoteapi.Message;
 
 public class DialFailedEvent extends ChannelEvent {
 
@@ -25,6 +26,11 @@ public class DialFailedEvent extends ChannelEvent {
 
 	public void setCause(Cause cause) {
 		this.cause = cause;
+	}
+	@Override
+	public Message toMessage() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
