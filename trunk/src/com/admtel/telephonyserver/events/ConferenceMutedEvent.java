@@ -1,6 +1,7 @@
 package com.admtel.telephonyserver.events;
 
 import com.admtel.telephonyserver.core.Channel;
+import com.admtel.telephonyserver.remoteapi.Message;
 
 public class ConferenceMutedEvent extends ChannelEvent {
 
@@ -26,6 +27,12 @@ public class ConferenceMutedEvent extends ChannelEvent {
 
 	public String getParticipantId() {
 		return participantId;
+	}
+
+	@Override
+	public Message toMessage() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

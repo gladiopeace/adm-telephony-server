@@ -18,5 +18,8 @@
 	<classpathentry kind="lib" path="lib/TinyRadius-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/groovyws-standalone-0.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/freemarker.jar"/>
+	<classpathentry kind="lib" path="lib/jline-0.9.94.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-core-asl-1.6.0.jar"/>
+	<classpathentry kind="lib" path="lib/jackson-mapper-asl-1.6.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,6 +1,7 @@
 package com.admtel.telephonyserver.events;
 
 import com.admtel.telephonyserver.core.Channel;
+import com.admtel.telephonyserver.remoteapi.Message;
 
 public class QueueJoinedEvent extends ChannelEvent {
 
@@ -20,6 +21,12 @@ public class QueueJoinedEvent extends ChannelEvent {
 
 	public Boolean isAgent() {
 		return isAgent;
+	}
+
+	@Override
+	public Message toMessage() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 

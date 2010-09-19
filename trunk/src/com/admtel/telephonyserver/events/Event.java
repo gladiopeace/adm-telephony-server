@@ -1,6 +1,8 @@
 package com.admtel.telephonyserver.events;
 
-public class Event {
+import com.admtel.telephonyserver.remoteapi.Message;
+
+public abstract class Event {
 	
 	
 	public enum EventType {		
@@ -25,4 +27,5 @@ public class Event {
 	public EventType getEventType(){
 		return eventType;
 	}
+	public abstract Message toMessage();
 }

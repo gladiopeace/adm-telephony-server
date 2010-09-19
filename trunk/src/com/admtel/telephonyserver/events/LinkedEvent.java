@@ -1,6 +1,7 @@
 package com.admtel.telephonyserver.events;
 
 import com.admtel.telephonyserver.core.Channel;
+import com.admtel.telephonyserver.remoteapi.Message;
 
 public class LinkedEvent extends ChannelEvent {
 	Channel peer = null;
@@ -11,6 +12,11 @@ public class LinkedEvent extends ChannelEvent {
 	}
 	public Channel getPeerChannel(){
 		return peer;
+	}
+	@Override
+	public Message toMessage() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

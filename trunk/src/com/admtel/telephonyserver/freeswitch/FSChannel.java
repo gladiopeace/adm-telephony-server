@@ -126,7 +126,7 @@ public class FSChannel extends Channel {
 				break;
 			case ChannelOutgoing: {
 				FSChannelOutgoingEvent coe = (FSChannelOutgoingEvent) fsEvent;
-				Channel masterChannel = FSChannel.this._switch.getChannel(coe
+				Channel masterChannel = FSChannel.this.getSwitch().getChannel(coe
 						.getDestinationChannel());
 				FSChannel.this.getChannelData().setLoginIP(
 						coe.getChannelAddress());
@@ -429,7 +429,7 @@ public class FSChannel extends Channel {
 				break;
 			case ChannelOriginate: {
 				FSChannelOriginateEvent coe = (FSChannelOriginateEvent) fsEvent;
-				FSChannel otherChannel = (FSChannel) FSChannel.this._switch
+				FSChannel otherChannel = (FSChannel) FSChannel.this.getSwitch()
 						.getChannel(coe.getChannelId());
 				FSChannel.this.onEvent(new DialStartedEvent(FSChannel.this,
 						otherChannel));
@@ -590,7 +590,7 @@ public class FSChannel extends Channel {
 
 			if (fsEvent.getEventType() == EventType.ChannelDestroy) {
 				getListeners().clear();
-				FSChannel.this._switch.removeChannel(FSChannel.this);
+				FSChannel.this.getSwitch().removeChannel(FSChannel.this);
 			}
 			log.debug(String.format(
 					"%s, END processing event (%s) state (%s), internalState(%s)",
@@ -630,7 +630,7 @@ public class FSChannel extends Channel {
 
 	@Override
 	public Result internalDial(String address, long timeout) {
-		String translatedAddress = _switch.getAddressTranslator().translate(
+		String translatedAddress = getSwitch().getAddressTranslator().translate(
 				address);
 		if (translatedAddress != null && translatedAddress.length() > 0) {
 			currentState = new DialingState(translatedAddress, timeout);

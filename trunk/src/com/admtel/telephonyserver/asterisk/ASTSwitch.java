@@ -42,20 +42,20 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 	// /////////////////////////////////////////////////////
 	// State classes
 	//	
-	static Logger log = Logger.getLogger(ASTSwitch.class);
+	private static Logger log = Logger.getLogger(ASTSwitch.class);
 
-	MessageHandler messageHandler;
-	IoSession session;
+	private MessageHandler messageHandler;
+	private IoSession session;
 
-	public static final int CONNECT_TIMEOUT = 1000;
-	public static final int RECONNECT_AFTER = 5000;
+	private static final int CONNECT_TIMEOUT = 1000;
+	private static final int RECONNECT_AFTER = 5000;
 
 	private SocketConnector connector;
 
-	protected String encodingDelimiter;
-	protected String decodingDelimiter;
+	private String encodingDelimiter;
+	private String decodingDelimiter;
 
-	Timer reconnectTimer = null;
+	private Timer reconnectTimer = null;
 
 	private class LoggingInState extends SimpleMessageHandler {
 
@@ -231,7 +231,7 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 					.getAddress(), getDefinition().getPort()));
 			return true;
 		} catch (Exception e) {
-			log.warn(AdmUtils.getStackTrace(e));
+			log.warn(e.getMessage(), e);
 		}
 		return false;
 	}

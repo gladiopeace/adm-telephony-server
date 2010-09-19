@@ -13,19 +13,20 @@ import com.admtel.telephonyserver.interfaces.AddressTranslator;
 
 public abstract class Switch {
 
-	static Logger log = Logger.getLogger(Switch.class);
+	private static Logger log = Logger.getLogger(Switch.class);
 
 	public enum SwitchStatus {
 		NotReady, Ready
 	};
 
-	SwitchDefinition definition;
+	private SwitchDefinition definition;
 	private SwitchStatus status;
 	private AddressTranslator addressTranslator;
 
 	private Map<String, Channel> channels = new HashMap<String, Channel>();
 	private Map<String, Channel> synchronizedChannels = Collections
 			.synchronizedMap(channels);
+	
 
 	public Switch(SwitchDefinition definition) {
 		this.definition = definition;

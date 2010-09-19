@@ -55,7 +55,7 @@ import com.admtel.telephonyserver.core.Timers;
 
 public class ASTChannel extends Channel{
 
-	static Logger log = Logger.getLogger(ASTChannel.class);
+	private static Logger log = Logger.getLogger(ASTChannel.class);
 
 	private class PlayingState extends State {
 
@@ -267,7 +267,7 @@ public class ASTChannel extends Channel{
 			switch (astEvent.getEventType()) {
 			case Dial: {
 				ASTDialEvent dialEvent = (ASTDialEvent) astEvent;
-				Channel masterChannel = ASTChannel.this._switch
+				Channel masterChannel = ASTChannel.this.getSwitch()
 						.getChannel(dialEvent.getChannelId());
 				if (masterChannel != null) {
 					ASTChannel.this.setAcctUniqueSessionId(masterChannel
@@ -736,7 +736,7 @@ public class ASTChannel extends Channel{
 							"DialedEvent form channel %s ---> %s", dialEvent
 									.getChannelId(), dialEvent
 									.getDestinationChannel()));
-					Channel dialedChannel = ASTChannel.this._switch
+					Channel dialedChannel = ASTChannel.this.getSwitch()
 							.getChannel(dialEvent.getDestinationChannel());
 					onEvent(new DialStartedEvent(ASTChannel.this, dialedChannel));
 				}
@@ -788,12 +788,12 @@ public class ASTChannel extends Channel{
 	// END STATES LOGIC
 	// ////////////////////////////////////////////////////////////////////////////////////////
 
-	State currentState = new NullState();
-	IoSession session;
+	protected State currentState = new NullState();
+	protected IoSession session;
 
-	ChannelProtocol channelProtocol = ChannelProtocol.Unknown;
+	protected ChannelProtocol channelProtocol = ChannelProtocol.Unknown;
 
-	MessageHandler messageHandler = new QueuedMessageHandler() {
+	private MessageHandler messageHandler = new QueuedMessageHandler() {
 
 		@Override
 		public void onMessage(Object message) {
@@ -836,7 +836,7 @@ public class ASTChannel extends Channel{
 
 			if (astEvent.getEventType() == EventType.Hangup) {
 				getListeners().clear();
-				ASTChannel.this._switch.removeChannel(ASTChannel.this);
+				ASTChannel.this.getSwitch().removeChannel(ASTChannel.this);
 			}
 			log.debug(String.format(
 					"END processing event (%s) state (%s), internalState(%s)",
@@ -901,7 +901,7 @@ public class ASTChannel extends Channel{
 
 	@Override
 	public Result internalDial(String address, long timeout) {
-		String translatedAddress = _switch.getAddressTranslator().translate(
+		String translatedAddress = getSwitch().getAddressTranslator().translate(
 				address);
 		if (translatedAddress != null && translatedAddress.length() > 0) {
 			currentState = new DialingState(translatedAddress, timeout);

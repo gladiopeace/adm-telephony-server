@@ -1,6 +1,7 @@
 package com.admtel.telephonyserver.events;
 
 import com.admtel.telephonyserver.core.Channel;
+import com.admtel.telephonyserver.remoteapi.Message;
 
 public class OutboundAlertingEvent extends ChannelEvent {
 
@@ -11,6 +12,11 @@ public class OutboundAlertingEvent extends ChannelEvent {
 		this.callerId = callerId;
 		this.calledNumber = calledNumber;
 		eventType = EventType.OutboundAlerting;
+	}
+	@Override
+	public Message toMessage() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
