@@ -51,8 +51,7 @@ public abstract class Channel implements TimerNotifiable {
 	protected String dtmfBuffer = "";
 	protected Switch _switch;
 
-	String switchId;
-	String uniqueId;
+	private String uniqueId;
 
 	private ChannelData channelData = new ChannelData();
 
@@ -195,7 +194,6 @@ public abstract class Channel implements TimerNotifiable {
 	public Channel(Switch _switch, String id) {
 		this._switch = _switch;
 		this.id = id;
-		this.switchId = _switch.getSwitchId();
 		this.uniqueId = UUID.randomUUID().toString();
 		language = Locale.ENGLISH;
 	}
@@ -206,6 +204,9 @@ public abstract class Channel implements TimerNotifiable {
 
 	public Switch getSwitch() {
 		return this._switch;
+	}
+	public void setSwitch(Switch _switch){
+		this._switch = _switch;
 	}
 
 	public void setDtmfBuffer(String dtmfBuffer) {
@@ -465,6 +466,14 @@ public abstract class Channel implements TimerNotifiable {
 		return false;
 	}
 
+	public Switch get_switch() {
+		return _switch;
+	}
+
+	public void set_switch(Switch switch1) {
+		_switch = switch1;
+	}
+	
 	private void stopTimers() {
 		Timers.getInstance().stopTimer(hangupTimer);
 		Timers.getInstance().stopTimer(interimUpdateTimer);

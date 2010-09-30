@@ -1,7 +1,6 @@
 package com.admtel.telephonyserver.events;
 
 import com.admtel.telephonyserver.core.Channel;
-import com.admtel.telephonyserver.remoteapi.Message;
 
 public abstract class ChannelEvent extends Event {
 	Channel channel;
@@ -18,8 +17,4 @@ public abstract class ChannelEvent extends Event {
 		super();
 		this.channel = channel;
 	}
-
-	@Override
-	public abstract Message toMessage();
-	
 }

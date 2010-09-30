@@ -17,15 +17,15 @@
 </registrar>
 
 <radius>
-	<server>
-		<id>first radius server</id>
-		<address>172.16.140.129</address>
-		<auth-port>1812</auth-port>
-		<acct-port>1813</acct-port>
-		<secret>meravoip</secret>
-		<retry-count>5</retry-count>
-		<socket-timeout>5000</socket-timeout>
-	</server>
+<!--	<server>-->
+<!--		<id>first radius server</id>-->
+<!--		<address>172.16.140.129</address>-->
+<!--		<auth-port>1812</auth-port>-->
+<!--		<acct-port>1813</acct-port>-->
+<!--		<secret>meravoip</secret>-->
+<!--		<retry-count>5</retry-count>-->
+<!--		<socket-timeout>5000</socket-timeout>-->
+<!--	</server>-->
 </radius>
 
 <!-- SWITCH LISTENERS START -->
@@ -124,9 +124,9 @@
 
 <!-- SCRIPT FACTORIES START -->
 <scriptfactories>
- <scriptfactory>
-  <class>/Users/danny/AdmTel_Source/adm-telephony-scripts/src/WSScriptFactory.groovy</class>
- </scriptfactory>
+<!-- <scriptfactory>-->
+<!--  <class>/Users/danny/AdmTel_Source/adm-telephony-scripts/src/WSScriptFactory.groovy</class>-->
+<!-- </scriptfactory>-->
  <scriptfactory>
   <class>com.admtel.telephonyserver.scriptfactories.VariableScriptFactory</class>
  </scriptfactory>
@@ -167,7 +167,7 @@
 
 <beans>
  <bean>
- 	<class>com.admtel.telephonyserver.remoteapi.JSonSocketManagerBean</class>
+ 	<class>com.admtel.telephonyserver.remote.JSonSocketManagerBean</class>
  	<parameters>
  	 <parameter>
  	 	<name>address</name>

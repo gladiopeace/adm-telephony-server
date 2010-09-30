@@ -1,8 +1,7 @@
 package com.admtel.telephonyserver.events;
 
+
 import com.admtel.telephonyserver.core.Channel;
-import com.admtel.telephonyserver.remoteapi.InboundAlertingMessage;
-import com.admtel.telephonyserver.remoteapi.Message;
 
 public class InboundAlertingEvent extends ChannelEvent {
 
@@ -53,17 +52,5 @@ public class InboundAlertingEvent extends ChannelEvent {
 		this.callerIdName = callerIdName;
 		this.calledIdNumber = calledIdNumber;
 	}
-
-	@Override
-	public Message toMessage() {
-		InboundAlertingMessage result = new InboundAlertingMessage();
-		result.setCalledIdNumber(calledIdNumber);
-		result.setCallerIdName(callerIdName);
-		result.setCallerIdNumber(callerIdNumber);
-		result.setChannelId(this.channel.getUniqueId());
-		result.setSwitchId(this.channel.getSwitch().getSwitchId());
-		return result;
-	}
-
 
 }

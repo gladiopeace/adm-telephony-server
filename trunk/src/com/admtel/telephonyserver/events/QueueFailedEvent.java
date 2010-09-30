@@ -1,7 +1,6 @@
 package com.admtel.telephonyserver.events;
 
 import com.admtel.telephonyserver.core.Channel;
-import com.admtel.telephonyserver.remoteapi.Message;
 
 public class QueueFailedEvent extends ChannelEvent {
 
@@ -13,12 +12,6 @@ public class QueueFailedEvent extends ChannelEvent {
 		eventType = EventType.QueueJoinFailed;
 		this.queueName = queueName;
 		this.reason = reason;
-	}
-
-	@Override
-	public Message toMessage() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }
