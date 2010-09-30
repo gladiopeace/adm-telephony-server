@@ -41,6 +41,9 @@ public abstract class Switch {
 		return definition.getId();
 	}
 
+	public void setSwitchId(String switchId){
+		
+	}
 	public void addChannel(Channel channel) {
 		if (channel != null) {
 			synchronizedChannels.put(channel.getId(), channel);

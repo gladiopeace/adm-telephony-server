@@ -21,5 +21,6 @@
 	<classpathentry kind="lib" path="lib/jline-0.9.94.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-core-asl-1.6.0.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-mapper-asl-1.6.0.jar"/>
+	<classpathentry kind="lib" path="lib/dp.lib-dto.GeDA-1.0.0-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

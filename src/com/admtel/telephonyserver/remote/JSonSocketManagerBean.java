@@ -1,4 +1,4 @@
-package com.admtel.telephonyserver.remoteapi;
+package com.admtel.telephonyserver.remote;
 
 import java.io.IOException;
 
@@ -70,9 +70,12 @@ public class JSonSocketManagerBean implements IoHandler, EventListener {
 	}
 
 	@Override
-	public void messageReceived(IoSession arg0, Object arg1) throws Exception {
-		// TODO Auto-generated method stub
-
+	public void messageReceived(IoSession session, Object message) throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.enableDefaultTyping(); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE
+		mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+		RequestDto requestDto = mapper.readValue(message.toString(), RequestDto.class);
+		log.trace(String.format("Received {%s} from {%s} - RequestDto = {%s}", message, session.getRemoteAddress(), requestDto));
 	}
 
 	@Override
@@ -112,13 +115,15 @@ public class JSonSocketManagerBean implements IoHandler, EventListener {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enableDefaultTyping(); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE
 		mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-		Message message = event.toMessage();
-		for (IoSession s:sessions){
-			try {
-				s.write(mapper.writeValueAsString(message));			
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			}
+		EventDto eventDto = EventDto.buildEventDto(event);
+		if (eventDto != null){
+			for (IoSession s:sessions){
+				try {
+					s.write(mapper.writeValueAsString(eventDto));			
+				} catch (Exception e) {
+					log.error(e.getMessage(), e);
+				}
+			}	
 		}
 		return false;
 	}

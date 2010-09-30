@@ -1,7 +1,6 @@
 package com.admtel.telephonyserver.events;
 
 import com.admtel.telephonyserver.core.Channel;
-import com.admtel.telephonyserver.remoteapi.Message;
 
 public class ConferenceJoinedEvent extends ChannelEvent {
 
@@ -84,11 +83,4 @@ public class ConferenceJoinedEvent extends ChannelEvent {
 	public void setDeaf(boolean deaf) {
 		this.deaf = deaf;
 	}
-
-	@Override
-	public Message toMessage() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

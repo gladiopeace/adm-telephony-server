@@ -1,11 +1,21 @@
-package com.admtel.telephonyserver.remoteapi;
+package com.admtel.telephonyserver.remote;
 
-public class InboundAlertingMessage extends Message {
+import dp.lib.dto.geda.annotations.Dto;
+import dp.lib.dto.geda.annotations.DtoField;
+
+@Dto
+public class InboundAlertingEventDto extends EventDto{
+	@DtoField("channel.switch.switchId")
 	String switchId;
+	@DtoField("channel.uniqueId")
 	String channelId;
+	@DtoField("calledIdNumber")
 	String calledIdNumber;
+	@DtoField("callerIdNumber")
 	String callerIdNumber;
+	@DtoField("callerIdName")
 	String callerIdName;
+	
 	public String getSwitchId() {
 		return switchId;
 	}
