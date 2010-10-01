@@ -1,5 +1,6 @@
 package com.admtel.telephonyserver.core;
 
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -12,7 +13,6 @@ import org.joda.time.Duration;
 
 import com.admtel.telephonyserver.config.SystemConfig;
 import com.admtel.telephonyserver.core.Timers.Timer;
-import com.admtel.telephonyserver.events.DialStartedEvent;
 import com.admtel.telephonyserver.events.DtmfEvent;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.HangupEvent;
@@ -22,6 +22,7 @@ import com.admtel.telephonyserver.interfaces.EventListener;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.radius.RadiusServers;
 import com.admtel.telephonyserver.registrar.UserLocation;
+import com.admtel.telephonyserver.requests.Request;
 import com.admtel.telephonyserver.utils.AdmUtils;
 import com.admtel.telephonyserver.utils.PromptsUtils;
 
@@ -71,6 +72,20 @@ public abstract class Channel implements TimerNotifiable {
 	protected String baseDirectory = SystemConfig.getInstance().serverDefinition.getBaseDirectory();
 
 	protected Locale language;
+	
+	private MessageHandler messageHandler = new QueuedMessageHandler() {
+
+		@Override
+		public void onMessage(Object message) {
+			if (message instanceof Request){
+				Channel.this.processRequest((Request)message);
+			}
+			else
+				Channel.this.processNativeEvent(message);
+			
+		}
+		
+	};
 
 	public Locale getLanguage() {
 		return language;
@@ -550,5 +565,14 @@ public abstract class Channel implements TimerNotifiable {
 
 	public String getAccountCode() {
 		return getChannelData().getAccountCode();	
+	}
+	
+	public void putMessage(Object message){
+		messageHandler.putMessage(message);
+	}
+	 abstract protected void processNativeEvent(Object event);
+	
+	 synchronized protected void processRequest(Request request){
+		
 	}
 }

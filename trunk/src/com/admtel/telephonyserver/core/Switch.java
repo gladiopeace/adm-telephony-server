@@ -10,6 +10,9 @@ import org.apache.log4j.Logger;
 import com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator;
 import com.admtel.telephonyserver.config.SwitchDefinition;
 import com.admtel.telephonyserver.interfaces.AddressTranslator;
+import com.admtel.telephonyserver.requests.ChannelRequest;
+import com.admtel.telephonyserver.requests.Request;
+import com.admtel.telephonyserver.requests.SwitchRequest;
 
 public abstract class Switch {
 
@@ -26,8 +29,23 @@ public abstract class Switch {
 	private Map<String, Channel> channels = new HashMap<String, Channel>();
 	private Map<String, Channel> synchronizedChannels = Collections
 			.synchronizedMap(channels);
-	
+	protected MessageHandler messageHandler = 
+		new QueuedMessageHandler(){
 
+			@Override
+			public void onMessage(Object message) {
+				if (message instanceof BasicIoMessage){
+					Switch.this.processBasicIoMessage((BasicIoMessage)message);
+				}
+				else
+				if (message instanceof Request){
+					Switch.this.processRequest((Request)message);
+				}
+				
+			}
+		
+		};
+	
 	public Switch(SwitchDefinition definition) {
 		this.definition = definition;
 		setStatus(SwitchStatus.NotReady);
@@ -129,5 +147,15 @@ public abstract class Switch {
 	public AddressTranslator getAddressTranslator() {
 		return addressTranslator;
 	}
-	
+
+	final public void processRequest(Request request)
+	{
+		//TODO process switch requests (like reload switch, stop switch ...)
+		if (request instanceof ChannelRequest){
+			ChannelRequest channelRequest = (ChannelRequest) request;
+			Channel channel = this.getChannel(channelRequest.getChannelId());
+			channel.putMessage(request);
+		}
+	}
+	abstract public void processBasicIoMessage(BasicIoMessage message);
 }

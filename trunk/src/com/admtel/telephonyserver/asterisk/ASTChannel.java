@@ -44,16 +44,13 @@ import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.core.Channel;
 import com.admtel.telephonyserver.core.ChannelProtocol;
 import com.admtel.telephonyserver.core.ConferenceManager;
-import com.admtel.telephonyserver.core.MessageHandler;
-import com.admtel.telephonyserver.core.Participant;
-import com.admtel.telephonyserver.core.QueuedMessageHandler;
 import com.admtel.telephonyserver.core.Result;
 import com.admtel.telephonyserver.core.Script;
 import com.admtel.telephonyserver.core.ScriptManager;
 import com.admtel.telephonyserver.core.Switch;
 import com.admtel.telephonyserver.core.Timers;
 
-public class ASTChannel extends Channel{
+public class ASTChannel extends Channel {
 
 	private static Logger log = Logger.getLogger(ASTChannel.class);
 
@@ -238,20 +235,21 @@ public class ASTChannel extends Channel{
 			case MeetmeJoin: {
 				ASTMeetmeJoinEvent je = (ASTMeetmeJoinEvent) astEvent;
 				ASTChannel.this.onEvent(new ConferenceJoinedEvent(
-						ASTChannel.this,je.getMeetme(), je.getUsernum(), moderator, muted,
-						deaf));
+						ASTChannel.this, je.getMeetme(), je.getUsernum(),
+						moderator, muted, deaf));
 			}
 				break;
 			case MeetmeLeave: {
 				ASTMeetmeLeaveEvent mle = (ASTMeetmeLeaveEvent) astEvent;
-				ASTChannel.this
-						.onEvent(new ConferenceLeftEvent(ASTChannel.this, mle.getMeetme(), mle.getUsernum()));
+				ASTChannel.this.onEvent(new ConferenceLeftEvent(
+						ASTChannel.this, mle.getMeetme(), mle.getUsernum()));
 			}
 				break;
 			case MeetmeTalking: {
 				ASTMeetmeTalkingEvent mte = (ASTMeetmeTalkingEvent) astEvent;
 				ASTChannel.this.onEvent(new ConferenceTalkEvent(
-						ASTChannel.this, mte.getMeetme(), mte.getUsernum(), mte.isOn()));
+						ASTChannel.this, mte.getMeetme(), mte.getUsernum(), mte
+								.isOn()));
 			}
 				break;
 			}
@@ -267,8 +265,8 @@ public class ASTChannel extends Channel{
 			switch (astEvent.getEventType()) {
 			case Dial: {
 				ASTDialEvent dialEvent = (ASTDialEvent) astEvent;
-				Channel masterChannel = ASTChannel.this.getSwitch()
-						.getChannel(dialEvent.getChannelId());
+				Channel masterChannel = ASTChannel.this.getSwitch().getChannel(
+						dialEvent.getChannelId());
 				if (masterChannel != null) {
 					ASTChannel.this.setAcctUniqueSessionId(masterChannel
 							.getAcctUniqueSessionId());
@@ -361,8 +359,11 @@ public class ASTChannel extends Channel{
 			}
 				break;
 
-			case Response: {				
-				if (variableFetcher != null && variableFetcher.processASTEvent(astEvent)) { // We got all
+			case Response: {
+				if (variableFetcher != null
+						&& variableFetcher.processASTEvent(astEvent)) { // We
+																		// got
+																		// all
 					// the
 					// needed
 					// variables
@@ -442,16 +443,16 @@ public class ASTChannel extends Channel{
 					getChannelData().setCalledNumber(dialedNumber);
 				}
 				if (ASTChannel.this.getAcctUniqueSessionId() == null) { // This
-																		// channel
-																		// is
-																		// not
-																		// related
-																		// to
-																		// another
-																		// channel
-																		// (the
-																		// first
-																		// leg)
+					// channel
+					// is
+					// not
+					// related
+					// to
+					// another
+					// channel
+					// (the
+					// first
+					// leg)
 					// Create script
 					ASTChannel.this.setAcctUniqueSessionId(UUID.randomUUID()
 							.toString());
@@ -470,10 +471,11 @@ public class ASTChannel extends Channel{
 				// only because the channel was
 				// answered
 
-/*				// TODO check the logic of this code
-				AnsweredEvent ae = new AnsweredEvent(ASTChannel.this);
-				ASTChannel.this.currentState = new IdleState();
-				ASTChannel.this.onEvent(ae);*/
+				/*
+				 * // TODO check the logic of this code AnsweredEvent ae = new
+				 * AnsweredEvent(ASTChannel.this); ASTChannel.this.currentState
+				 * = new IdleState(); ASTChannel.this.onEvent(ae);
+				 */
 
 			}
 		}
@@ -715,7 +717,8 @@ public class ASTChannel extends Channel{
 
 			ASTDialCommand dialCmd = new ASTDialCommand(ASTChannel.this,
 					address, timeout);
-			log.trace(String.format("Channel (%s) dialCmd %s", ASTChannel.this, dialCmd));
+			log.trace(String.format("Channel (%s) dialCmd %s", ASTChannel.this,
+					dialCmd));
 			session.write(dialCmd);
 			result = Result.Ok;
 		}
@@ -748,18 +751,20 @@ public class ASTChannel extends Channel{
 
 	}
 
-	private class QueueState extends State{
+	private class QueueState extends State {
 
 		private String queueName;
 		private boolean isAgent;
 
-		public QueueState(String queueName, boolean isAgent){
+		public QueueState(String queueName, boolean isAgent) {
 			this.queueName = queueName;
 			this.isAgent = isAgent;
-			ASTQueueCommand queueCmd = new ASTQueueCommand(ASTChannel.this, queueName);
+			ASTQueueCommand queueCmd = new ASTQueueCommand(ASTChannel.this,
+					queueName);
 			session.write(queueCmd);
 			result = Result.Ok;
 		}
+
 		@Override
 		public boolean onTimer(Object data) {
 			// TODO Auto-generated method stub
@@ -768,23 +773,25 @@ public class ASTChannel extends Channel{
 
 		@Override
 		public void processEvent(ASTEvent astEvent) {
-			switch (astEvent.getEventType()){
-			case Join:
-			{
+			switch (astEvent.getEventType()) {
+			case Join: {
 				ASTJoinEvent je = (ASTJoinEvent) astEvent;
-				ASTChannel.this.onEvent(new QueueJoinedEvent(ASTChannel.this, je.getQueue(), isAgent));
+				ASTChannel.this.onEvent(new QueueJoinedEvent(ASTChannel.this,
+						je.getQueue(), isAgent));
 			}
 				break;
-			case Leave:{
+			case Leave: {
 				ASTLeaveEvent le = (ASTLeaveEvent) astEvent;
-				ASTChannel.this.onEvent(new QueueLeftEvent(ASTChannel.this, le.getQueue(), isAgent, "Uknown"));
+				ASTChannel.this.onEvent(new QueueLeftEvent(ASTChannel.this, le
+						.getQueue(), isAgent, "Uknown"));
 			}
 				break;
 			}
-			
+
 		}
-		
+
 	}
+
 	// END STATES LOGIC
 	// ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -793,15 +800,9 @@ public class ASTChannel extends Channel{
 
 	protected ChannelProtocol channelProtocol = ChannelProtocol.Unknown;
 
-	private MessageHandler messageHandler = new QueuedMessageHandler() {
-
-		@Override
-		public void onMessage(Object message) {
-
-			if (message == null || !(message instanceof ASTEvent)) {
-				return;
-			}
-			ASTEvent astEvent = (ASTEvent) message;
+	synchronized protected void processNativeEvent(Object event) {
+		if (event instanceof ASTEvent) {
+			ASTEvent astEvent = (ASTEvent) event;
 			log
 					.debug(String
 							.format(
@@ -841,10 +842,8 @@ public class ASTChannel extends Channel{
 			log.debug(String.format(
 					"END processing event (%s) state (%s), internalState(%s)",
 					astEvent, state, currentState.getClass().getSimpleName()));
-
 		}
-
-	};
+	}
 
 	public ASTChannel(Switch _switch, String id, IoSession session) {
 		super(_switch, id);
@@ -901,8 +900,8 @@ public class ASTChannel extends Channel{
 
 	@Override
 	public Result internalDial(String address, long timeout) {
-		String translatedAddress = getSwitch().getAddressTranslator().translate(
-				address);
+		String translatedAddress = getSwitch().getAddressTranslator()
+				.translate(address);
 		if (translatedAddress != null && translatedAddress.length() > 0) {
 			currentState = new DialingState(translatedAddress, timeout);
 		} else {
@@ -943,17 +942,12 @@ public class ASTChannel extends Channel{
 		return Result.Ok;
 	}
 
-	public void processNativeEvent(ASTEvent astEvent) {
-		log.debug(astEvent + "(" + this + ")");
-		messageHandler.putMessage(astEvent);
-	}
-
 	@Override
 	synchronized public boolean onTimer(Object data) {
 		boolean result = super.onTimer(data);
 		log.debug("Got timer .... " + data);
 		if (data instanceof State) {
-			return ((State)data).onTimer(data);
+			return ((State) data).onTimer(data);
 		}
 		return result;
 	}

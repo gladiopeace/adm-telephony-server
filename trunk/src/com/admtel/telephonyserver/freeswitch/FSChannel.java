@@ -2,13 +2,11 @@ package com.admtel.telephonyserver.freeswitch;
 
 import java.util.UUID;
 
-
 import org.apache.log4j.Logger;
 import org.apache.mina.core.session.IoSession;
 
 import com.admtel.telephonyserver.config.SwitchType;
 import com.admtel.telephonyserver.core.Channel;
-import com.admtel.telephonyserver.core.MessageHandler;
 import com.admtel.telephonyserver.core.QueuedMessageHandler;
 import com.admtel.telephonyserver.core.Result;
 import com.admtel.telephonyserver.core.Script;
@@ -126,8 +124,8 @@ public class FSChannel extends Channel {
 				break;
 			case ChannelOutgoing: {
 				FSChannelOutgoingEvent coe = (FSChannelOutgoingEvent) fsEvent;
-				Channel masterChannel = FSChannel.this.getSwitch().getChannel(coe
-						.getDestinationChannel());
+				Channel masterChannel = FSChannel.this.getSwitch().getChannel(
+						coe.getDestinationChannel());
 				FSChannel.this.getChannelData().setLoginIP(
 						coe.getChannelAddress());
 
@@ -137,9 +135,11 @@ public class FSChannel extends Channel {
 										.getCallerDestinationNumber()));
 
 				if (masterChannel != null) {
-					
-					log.debug(String.format("%s, ChannelOutgoing with master channel %s",FSChannel.this, masterChannel));
-					
+
+					log.debug(String.format(
+							"%s, ChannelOutgoing with master channel %s",
+							FSChannel.this, masterChannel));
+
 					FSChannel.this.setAcctUniqueSessionId(masterChannel
 							.getAcctUniqueSessionId());
 					FSChannel.this.setUserName(masterChannel.getUserName());
@@ -362,20 +362,21 @@ public class FSChannel extends Channel {
 
 		@Override
 		public void processEvent(FSEvent event) {
-			
+
 			switch (event.getEventType()) {
 			case CommandReply: {
 				FSCommandReplyEvent cre = (FSCommandReplyEvent) event;
 				if (!cre.isSuccess()) {
-					FSChannel.this.onEvent(new PlaybackFailedEvent(FSChannel.this, cre
-							.getResultDescription()));
+					FSChannel.this.onEvent(new PlaybackFailedEvent(
+							FSChannel.this, cre.getResultDescription()));
 				}
 			}
 				break;
 			case ChannelExecute: { // TODO look for failure events
 				String application = event.getValue("Application");
 				if (application.equals("playback")) {
-					FSChannel.this.onEvent(new PlaybackStartedEvent(FSChannel.this));
+					FSChannel.this.onEvent(new PlaybackStartedEvent(
+							FSChannel.this));
 				}
 			}
 				break;
@@ -386,12 +387,18 @@ public class FSChannel extends Channel {
 							"variable_current_application_response", ""));
 					log.debug("Return code is " + returnCode);
 					if (returnCode.equals("FILE PLAYED")) {
-						FSChannel.this.onEvent(new PlaybackEndedEvent(FSChannel.this, event
-								.getValue("variable_playback_terminator_used",
-										""), ""));
+						FSChannel.this
+								.onEvent(new PlaybackEndedEvent(
+										FSChannel.this,
+										event
+												.getValue(
+														"variable_playback_terminator_used",
+														""), ""));
 					} else {
-						FSChannel.this.onEvent(new PlaybackFailedEvent(FSChannel.this,
-								returnCode)); // TODO return unified error codes
+						FSChannel.this.onEvent(new PlaybackFailedEvent(
+								FSChannel.this, returnCode)); // TODO return
+																// unified error
+																// codes
 					}
 				}
 			}
@@ -491,31 +498,31 @@ public class FSChannel extends Channel {
 								.getMemberId(), moderator, muted, deaf));
 			}
 				break;
-			case ConferenceRemoved:{
+			case ConferenceRemoved: {
 				FSConferenceRemovedEvent cre = (FSConferenceRemovedEvent) fsEvent;
-				FSChannel.this.onEvent(new ConferenceLeftEvent(
-						FSChannel.this, cre.getConferenceName(), cre
-								.getMemberId()));				
+				FSChannel.this.onEvent(new ConferenceLeftEvent(FSChannel.this,
+						cre.getConferenceName(), cre.getMemberId()));
 			}
-			break;
+				break;
 			}
 
 		}
 
 	}
-	
-	private class QueueState extends State{
 
-		
+	private class QueueState extends State {
+
 		private String queueName;
 		private Boolean isAgent;
 
-		public QueueState(String queueName, boolean agent){
+		public QueueState(String queueName, boolean agent) {
 			this.isAgent = agent;
 			this.queueName = queueName;
-			FSQueueCommand queueCmd = new FSQueueCommand(FSChannel.this, queueName, isAgent);
-			session.write(queueCmd);			
+			FSQueueCommand queueCmd = new FSQueueCommand(FSChannel.this,
+					queueName, isAgent);
+			session.write(queueCmd);
 		}
+
 		@Override
 		public boolean onTimer(Object data) {
 			// TODO Auto-generated method stub
@@ -528,77 +535,64 @@ public class FSChannel extends Channel {
 			case CommandReply: {
 				FSCommandReplyEvent cre = (FSCommandReplyEvent) event;
 				if (!cre.isSuccess()) {
-					FSChannel.this.onEvent(new QueueFailedEvent(
-							FSChannel.this, queueName, cre.getResultDescription()));
+					FSChannel.this.onEvent(new QueueFailedEvent(FSChannel.this,
+							queueName, cre.getResultDescription()));
 				}
 			}
 				break;
 			case Queue: {
 				FSQueueEvent queueEvent = (FSQueueEvent) event;
-				switch (queueEvent.getAction()){
+				switch (queueEvent.getAction()) {
 				case Push:
-					FSChannel.this.onEvent(new QueueJoinedEvent(FSChannel.this, queueEvent.getQueueName(), isAgent));
+					FSChannel.this.onEvent(new QueueJoinedEvent(FSChannel.this,
+							queueEvent.getQueueName(), isAgent));
 					break;
 				case Abort:
-					FSChannel.this.onEvent(new QueueLeftEvent(FSChannel.this, queueEvent.getQueueName(), isAgent, queueEvent.getStatus()));
+					FSChannel.this.onEvent(new QueueLeftEvent(FSChannel.this,
+							queueEvent.getQueueName(), isAgent, queueEvent
+									.getStatus()));
 					break;
-					//TODO leave
+				// TODO leave
 				}
 
 			}
 				break;
 			}
-			
+
 		}
-		 
+
 	}
 
-	private MessageHandler messageHandler = new QueuedMessageHandler() {
-
-		@Override
-		public void onMessage(Object message) {
-			if (message == null || !(message instanceof FSEvent)) {
-				return;
-			}
-			FSEvent fsEvent = (FSEvent) message;
-
-			log
-					.debug(String
-							.format(
-									"%s, START processing event (%s) state (%s), internalState(%s)",
-									FSChannel.this, fsEvent, state, currentState.getClass()
-											.getSimpleName()));
-
-			switch (fsEvent.getEventType()) {
-			case ChannelDestroy: {
-				FSChannelDestroyEvent cde = (FSChannelDestroyEvent) fsEvent;
-			}
-				break;
-			case ChannelHangup: {
-				FSChannel.this.onEvent(new HangupEvent(FSChannel.this));
-			}
-				break;
-			case ChannelAnswered: {
-				currentState = new IdleState();
-				FSChannel.this.onEvent(new AnsweredEvent(FSChannel.this));
-			}
-				break;
-			}
-			if (currentState != null) {
-				currentState.processEvent(fsEvent);
-			}
-
-			if (fsEvent.getEventType() == EventType.ChannelDestroy) {
-				getListeners().clear();
-				FSChannel.this.getSwitch().removeChannel(FSChannel.this);
-			}
-			log.debug(String.format(
-					"%s, END processing event (%s) state (%s), internalState(%s)",
-					FSChannel.this, fsEvent, state, currentState.getClass().getSimpleName()));
-
-		}
-	};
-
+	/*
+	 * private MessageHandler messageHandler = new QueuedMessageHandler() {
+	 * 
+	 * @Override public void onMessage(Object message) { if (message == null ||
+	 * !(message instanceof FSEvent)) { return; } FSEvent fsEvent = (FSEvent)
+	 * message;
+	 * 
+	 * log .debug(String .format(
+	 * "%s, START processing event (%s) state (%s), internalState(%s)",
+	 * FSChannel.this, fsEvent, state, currentState.getClass()
+	 * .getSimpleName()));
+	 * 
+	 * switch (fsEvent.getEventType()) { case ChannelDestroy: {
+	 * FSChannelDestroyEvent cde = (FSChannelDestroyEvent) fsEvent; } break;
+	 * case ChannelHangup: { FSChannel.this.onEvent(new
+	 * HangupEvent(FSChannel.this)); } break; case ChannelAnswered: {
+	 * currentState = new IdleState(); FSChannel.this.onEvent(new
+	 * AnsweredEvent(FSChannel.this)); } break; } if (currentState != null) {
+	 * currentState.processEvent(fsEvent); }
+	 * 
+	 * if (fsEvent.getEventType() == EventType.ChannelDestroy) {
+	 * getListeners().clear();
+	 * FSChannel.this.getSwitch().removeChannel(FSChannel.this); }
+	 * log.debug(String.format(
+	 * "%s, END processing event (%s) state (%s), internalState(%s)",
+	 * FSChannel.this, fsEvent, state,
+	 * currentState.getClass().getSimpleName()));
+	 * 
+	 * } };
+	 */
 	public FSChannel(Switch _switch, String id, IoSession session) {
 		super(_switch, id);
 		setIoSession(session);
@@ -630,8 +624,8 @@ public class FSChannel extends Channel {
 
 	@Override
 	public Result internalDial(String address, long timeout) {
-		String translatedAddress = getSwitch().getAddressTranslator().translate(
-				address);
+		String translatedAddress = getSwitch().getAddressTranslator()
+				.translate(address);
 		if (translatedAddress != null && translatedAddress.length() > 0) {
 			currentState = new DialingState(translatedAddress, timeout);
 		} else {
@@ -687,11 +681,6 @@ public class FSChannel extends Channel {
 		return currentState.getResult();
 	}
 
-	public void processNativeEvent(FSChannelEvent channelEvent) {
-		messageHandler.putMessage(channelEvent);
-
-	}
-
 	private String buildMessage(String uuid, String command, String app,
 			String arg) {
 		return String
@@ -710,6 +699,51 @@ public class FSChannel extends Channel {
 	public Result internalQueue(String queueName, boolean agent) {
 		currentState = new QueueState(queueName, agent);
 		return currentState.getResult();
+	}
+
+	@Override
+	synchronized protected void processNativeEvent(Object event) {
+		if (event instanceof FSEvent) {
+			FSEvent fsEvent = (FSEvent) event;
+			log
+					.debug(String
+							.format(
+									"%s, START processing event (%s) state (%s), internalState(%s)",
+									FSChannel.this, fsEvent, state,
+									currentState.getClass().getSimpleName()));
+
+			switch (fsEvent.getEventType()) {
+			case ChannelDestroy: {
+				FSChannelDestroyEvent cde = (FSChannelDestroyEvent) fsEvent;
+			}
+				break;
+			case ChannelHangup: {
+				FSChannel.this.onEvent(new HangupEvent(FSChannel.this));
+			}
+				break;
+			case ChannelAnswered: {
+				currentState = new IdleState();
+				FSChannel.this.onEvent(new AnsweredEvent(FSChannel.this));
+			}
+				break;
+			}
+			if (currentState != null) {
+				currentState.processEvent(fsEvent);
+			}
+
+			if (fsEvent.getEventType() == EventType.ChannelDestroy) {
+				getListeners().clear();
+				FSChannel.this.getSwitch().removeChannel(FSChannel.this);
+			}
+			log
+					.debug(String
+							.format(
+									"%s, END processing event (%s) state (%s), internalState(%s)",
+									FSChannel.this, fsEvent, state,
+									currentState.getClass().getSimpleName()));
+
+		}
+
 	}
 
 }
