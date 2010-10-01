@@ -12,6 +12,9 @@ import com.admtel.telephonyserver.config.SystemConfig;
 import com.admtel.telephonyserver.httpserver.HttpServers;
 import com.admtel.telephonyserver.prompts.PromptBuilderFactory;
 import com.admtel.telephonyserver.radius.RadiusServers;
+import com.admtel.telephonyserver.requests.HangupRequest;
+import com.admtel.telephonyserver.requests.Request;
+import com.admtel.telephonyserver.requests.SwitchRequest;
 
 public class AdmTelephonyServer {
 
@@ -48,6 +51,13 @@ public class AdmTelephonyServer {
 		}
 	}
 
+	public void processRequest (Request request){
+		log.trace(String.format("Received request %s", request));
+		if (request instanceof SwitchRequest){
+			Switches.getInstance().processRequest((SwitchRequest)request);
+		}
+	}
+	
 	private void start() {
 
 		SystemConfig sysConfig = SystemConfig.getInstance();

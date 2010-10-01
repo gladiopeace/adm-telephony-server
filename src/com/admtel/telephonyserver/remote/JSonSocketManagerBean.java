@@ -27,6 +27,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import com.admtel.telephonyserver.core.EventsManager;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.interfaces.EventListener;
+import com.admtel.telephonyserver.requests.Request;
 
 
 public class JSonSocketManagerBean implements IoHandler, EventListener {
@@ -74,8 +75,8 @@ public class JSonSocketManagerBean implements IoHandler, EventListener {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enableDefaultTyping(); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE
 		mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-		RequestDto requestDto = mapper.readValue(message.toString(), RequestDto.class);
-		log.trace(String.format("Received {%s} from {%s} - RequestDto = {%s}", message, session.getRemoteAddress(), requestDto));
+		Request request = mapper.readValue(message.toString(), Request.class);
+		log.trace(String.format("Received {%s} from {%s} - RequestDto = {%s}", message, session.getRemoteAddress(), request));
 	}
 
 	@Override

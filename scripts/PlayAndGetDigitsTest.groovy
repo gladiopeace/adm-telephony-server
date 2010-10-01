@@ -50,9 +50,9 @@ class PlayAndGetDigitsTest extends Script {
 		switch (event.getEventType()){
 			case Event.EventType.Answered:
 				AnsweredEvent ae = event
-			String[] prompts =["/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-sample_submenu",
-				"/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-account_number",
-				"/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-sample_submenu"]
+			String[] prompts =["ivr/8000/ivr-sample_submenu",
+				"ivr/ivr-account_number",
+				"ivr/ivr-sample_submenu"]
 				ae.getChannel().playAndGetDigits(10, prompts, 10000, "#")
 			break;
 		}

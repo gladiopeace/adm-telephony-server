@@ -14,6 +14,7 @@ import com.admtel.telephonyserver.config.DefinitionChangeListener;
 import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.SwitchDefinition;
 import com.admtel.telephonyserver.freeswitch.FSSwitch;
+import com.admtel.telephonyserver.requests.SwitchRequest;
 
 public class Switches implements DefinitionChangeListener {
 
@@ -95,7 +96,7 @@ public class Switches implements DefinitionChangeListener {
 				break;
 			case Freeswitch:
 			{
-				FSSwitch _switch = new FSSwitch(switchDefinition);
+				Switch _switch = new FSSwitch(switchDefinition);
 				put(_switch);
 				_switch.start();
 			}
@@ -128,5 +129,13 @@ public class Switches implements DefinitionChangeListener {
 			index --;
 		}
 		return null;
+	}
+
+	public void processRequest(SwitchRequest request) {
+		Switch _switch = getById(request.getSwitchId());
+		if (_switch  != null){
+			_switch.messageHandler.putMessage(request);
+		}
+		
 	}
 }
