@@ -17,6 +17,8 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import jline.ConsoleReader;
 import jline.History;
 import jline.SimpleCompletor;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 
 public class ATSConsole implements IoHandler{
 
@@ -50,11 +52,18 @@ public class ATSConsole implements IoHandler{
 		}
 		return true;
 	}
-	public ATSConsole(){
+	public ATSConsole(String[] args){
 		try {
 			String [] commands ={"show channel", "show jobs","exit"};
 			
-			if (!connect("172.16.140.1",1234,10000)){
+			 OptionParser parser = new OptionParser( "i:p::?." );
+			 OptionSet options = parser.parse(args);
+			 String address = (String) options.valueOf("i");
+			 String port = (String)options.valueOf("p");
+			 
+			 System.out.println("Connecting to "+ address+":"+port);
+			 
+			if (!connect(address,Integer.parseInt(port),10000)){
 				System.out.println("Failed to connect");
 				System.exit(0);
 			}
@@ -83,7 +92,7 @@ public class ATSConsole implements IoHandler{
 	}
 	
 	public static void main(String[] args) {
-		new ATSConsole();
+		new ATSConsole(args);
 	}
 
 	@Override

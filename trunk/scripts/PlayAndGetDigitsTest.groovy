@@ -54,8 +54,19 @@ class PlayAndGetDigitsTest extends Script {
 				"ivr/ivr-account_number",
 				"ivr/ivr-sample_submenu"]
 				ae.getChannel().playAndGetDigits(10, prompts, 10000, "#")
+				currentState = gettingDigits
 			break;
 		}
+	}
+	
+	def gettingDigits = {
+		Event event = it
+		switch (event.getEventType()){
+			case Event.EventType.PlayAndGetDigitsEnded:
+				PlayAndGetDigitsEndedEvent pde = event
+				println "********** Got digits " + pde.getDigits()
+			break;
+		}	
 	}
 	
 	def currentState = waitForCall
