@@ -33,8 +33,8 @@ import com.admtel.telephonyserver.requests.Request;
 public class JSonSocketManagerBean implements IoHandler, EventListener {
 
 	static Logger log = Logger.getLogger(JSonSocketManagerBean.class);
-	public String address;
-	public int port;
+	public String address = "localhost";
+	public int port = 12341;
 	protected SocketAcceptor acceptor;
 
 	public void init() {
