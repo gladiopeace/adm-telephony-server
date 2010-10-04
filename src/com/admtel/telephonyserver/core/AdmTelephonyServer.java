@@ -53,9 +53,8 @@ public class AdmTelephonyServer {
 
 	public void processRequest (Request request){
 		log.trace(String.format("Received request %s", request));
-		if (request instanceof SwitchRequest){
-			Switches.getInstance().processRequest((SwitchRequest)request);
-		}
+		//TODO better request processing
+		Switches.getInstance().processRequest(request);		
 	}
 	
 	private void start() {
@@ -66,6 +65,7 @@ public class AdmTelephonyServer {
 		
 		EventsManager.getInstance().addEventListener(RadiusServers.getInstance().toString(), RadiusServers.getInstance());
 		EventsManager.getInstance().addEventListener("ConferenceManager_Singleton", ConferenceManager.getInstance());
+		EventsManager.getInstance().addEventListener("Switches_Singleton", Switches.getInstance());
 		
 		sysConfig.addDefinitionChangeListener(
 				Switches.getInstance());

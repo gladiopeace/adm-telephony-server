@@ -1,6 +1,5 @@
 package com.admtel.telephonyserver.core;
 
-
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -22,6 +21,8 @@ import com.admtel.telephonyserver.interfaces.EventListener;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.radius.RadiusServers;
 import com.admtel.telephonyserver.registrar.UserLocation;
+import com.admtel.telephonyserver.requests.AnswerRequest;
+import com.admtel.telephonyserver.requests.HangupRequest;
 import com.admtel.telephonyserver.requests.Request;
 import com.admtel.telephonyserver.utils.AdmUtils;
 import com.admtel.telephonyserver.utils.PromptsUtils;
@@ -37,7 +38,7 @@ public abstract class Channel implements TimerNotifiable {
 	private enum TimersDefs {
 		HangupTimer, InterimUpdateTimer
 	}
-	
+
 	Timer hangupTimer;
 	Timer interimUpdateTimer;
 
@@ -69,22 +70,22 @@ public abstract class Channel implements TimerNotifiable {
 	protected String acctSessionId = UUID.randomUUID().toString();
 	protected Integer h323DisconnectCause = 16;// normal call clearing
 
-	protected String baseDirectory = SystemConfig.getInstance().serverDefinition.getBaseDirectory();
+	protected String baseDirectory = SystemConfig.getInstance().serverDefinition
+			.getBaseDirectory();
 
 	protected Locale language;
-	
+
 	private MessageHandler messageHandler = new QueuedMessageHandler() {
 
 		@Override
 		public void onMessage(Object message) {
-			if (message instanceof Request){
-				Channel.this.processRequest((Request)message);
-			}
-			else
+			if (message instanceof Request) {
+				Channel.this.processRequest((Request) message);
+			} else
 				Channel.this.processNativeEvent(message);
-			
+
 		}
-		
+
 	};
 
 	public Locale getLanguage() {
@@ -220,7 +221,8 @@ public abstract class Channel implements TimerNotifiable {
 	public Switch getSwitch() {
 		return this._switch;
 	}
-	public void setSwitch(Switch _switch){
+
+	public void setSwitch(Switch _switch) {
 		this._switch = _switch;
 	}
 
@@ -259,12 +261,14 @@ public abstract class Channel implements TimerNotifiable {
 			long timeout, String terminators, boolean interruptPlay);
 
 	public abstract Result internalDial(String address, long timeout);
-	
+
 	public abstract Result internalQueue(String queueName, boolean agent);
-	
-	final public Result queue(String queueName, boolean agent){ //TODO add more parameters
+
+	final public Result queue(String queueName, boolean agent) { // TODO add
+																	// more
+																	// parameters
 		Result result = internalQueue(queueName, agent);
-		
+
 		return result;
 	}
 
@@ -287,11 +291,9 @@ public abstract class Channel implements TimerNotifiable {
 	}
 
 	final public Result hangup(DisconnectCode disconnectCode) {
-		Result result = internalHangup(disconnectCode.toInteger());
-		if (result == Result.Ok) {
-			state = State.Clearing;
-		}
-		return result;
+		this.putMessage(new HangupRequest(
+				this.uniqueId, disconnectCode));
+		return Result.Ok;// TODO need better request/response/event model
 	}
 
 	final public Result playback(String[] prompt, String terminators) {
@@ -333,12 +335,8 @@ public abstract class Channel implements TimerNotifiable {
 					this, state));
 			return Result.ChannelInvalidState;
 		}
-		Result result = internalAnswer();
-		if (result == Result.Ok) {
-			state = State.Answering;
-		}
-		return result;
-
+		this.putMessage(new AnswerRequest(this.uniqueId));
+		return Result.Ok;// TODO need better request/response/event model
 	}
 
 	final public Result joinConference(String conferenceId, boolean moderator,
@@ -488,11 +486,11 @@ public abstract class Channel implements TimerNotifiable {
 	public void set_switch(Switch switch1) {
 		_switch = switch1;
 	}
-	
+
 	private void stopTimers() {
 		Timers.getInstance().stopTimer(hangupTimer);
 		Timers.getInstance().stopTimer(interimUpdateTimer);
-		
+
 	}
 
 	public DateTime getAnswerTime() {
@@ -564,15 +562,35 @@ public abstract class Channel implements TimerNotifiable {
 	}
 
 	public String getAccountCode() {
-		return getChannelData().getAccountCode();	
+		return getChannelData().getAccountCode();
 	}
-	
-	public void putMessage(Object message){
+
+	public void putMessage(Object message) {
 		messageHandler.putMessage(message);
 	}
-	 abstract protected void processNativeEvent(Object event);
-	
-	 synchronized protected void processRequest(Request request){
-		
+
+	abstract protected void processNativeEvent(Object event);
+
+	synchronized protected void processRequest(Request request) {
+		// TODO send response events
+
+		log.trace(String.format("processRequest{%s}", request));
+		switch (request.getType()) {
+		case HangupRequest: {
+			HangupRequest hr = (HangupRequest) request;
+			Result result = internalHangup(hr.getDisconnectCode().toInteger());
+			if (result == Result.Ok) {
+				state = State.Clearing;
+			}
+		}
+			break;
+		case AnswerRequest: {
+			Result result = internalAnswer();
+			if (result == Result.Ok) {
+				state = State.Answering;
+			}
+		}
+			break;
+		}
 	}
 }

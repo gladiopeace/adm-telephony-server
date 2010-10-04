@@ -53,7 +53,7 @@ class PlayAndGetDigitsTest extends Script {
 			String[] prompts =["ivr/8000/ivr-sample_submenu",
 				"ivr/ivr-account_number",
 				"ivr/ivr-sample_submenu"]
-				ae.getChannel().playAndGetDigits(10, prompts, 10000, "#")
+				ae.getChannel().playAndGetDigits(10, prompts, 30000, "#")
 				currentState = gettingDigits
 			break;
 		}

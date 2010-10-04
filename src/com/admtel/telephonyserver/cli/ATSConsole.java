@@ -1,9 +1,14 @@
 package com.admtel.telephonyserver.cli;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoHandler;
@@ -13,6 +18,13 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
+import org.codehaus.jackson.map.ObjectMapper;
+
+import com.admtel.telephonyserver.remote.EventDto;
+import com.admtel.telephonyserver.remote.HangupEventDto;
+import com.admtel.telephonyserver.remote.InboundAlertingEventDto;
+import com.admtel.telephonyserver.remote.OutboundAlertingEventDto;
+import com.admtel.telephonyserver.requests.Request;
 
 import jline.ConsoleReader;
 import jline.History;
@@ -25,8 +37,30 @@ public class ATSConsole implements IoHandler{
 	/**
 	 * @param args
 	 */
+	static Map<String, CLI_Command > COMMAND_MAP = new HashMap<String, CLI_Command>();
+	
+	static {
+		try{
+			COMMAND_MAP.put(CLI_HangupCommand.command, new CLI_HangupCommand());
+			COMMAND_MAP.put(CLI_ShowChannelsCommand.command, new CLI_ShowChannelsCommand());
+		}
+		catch (Exception e){
+			e.printStackTrace();
+		}
+	}
 	IoSession session;
 	private NioSocketConnector connector;
+	private List<String> channels = new ArrayList<String>();
+
+	CLI_Command getCLI_Command(String cmd){
+		for (String str:COMMAND_MAP.keySet()){
+			if (cmd.startsWith(str)){
+				return COMMAND_MAP.get(str);
+			}
+		}
+		return null;
+	}
+	
 	private boolean connect(String address, int port, int connectTimeout){
 		
 		System.out.println(String.format("ATSConsole trying to connected to %s:%d", address, port));
@@ -54,7 +88,7 @@ public class ATSConsole implements IoHandler{
 	}
 	public ATSConsole(String[] args){
 		try {
-			String [] commands ={"show channel", "show jobs","exit"};
+			String [] commands ={"show channel", "show jobs","hangup", "exit"};
 			
 			 OptionParser parser = new OptionParser( "i:p::?." );
 			 OptionSet options = parser.parse(args);
@@ -71,6 +105,7 @@ public class ATSConsole implements IoHandler{
 			SimpleCompletor sc = new SimpleCompletor(commands); 
 			
 			ConsoleReader reader = new ConsoleReader();
+		
 			reader.addCompletor(sc);
 			History history = new History();
 			reader.setHistory(history);
@@ -80,8 +115,29 @@ public class ATSConsole implements IoHandler{
 				String cmd = reader.readLine("ATS >");
 				
 				history.addToHistory(cmd);
+				
 				if (cmd.equals("exit")){
 					System.exit(0);
+				}
+				else{
+					CLI_Command cliCommand = getCLI_Command(cmd);
+					if (cliCommand != null){
+						try {
+							Request request = (Request) cliCommand.parse(cmd);
+							if (request != null){
+								System.out.println(String.format("Generated request {%s}", request));
+								ObjectMapper mapper = new ObjectMapper();
+								mapper.enableDefaultTyping(); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE
+								mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+								String requestStr = mapper.writeValueAsString(request); 
+								System.out.println("Sending command " + requestStr);
+								session.write(requestStr);
+								
+							}
+						} catch (Exception e) {							
+							e.printStackTrace();
+						} 
+					}
 				}
 			}
 		} catch (IOException e) {
@@ -98,13 +154,36 @@ public class ATSConsole implements IoHandler{
 	@Override
 	public void exceptionCaught(IoSession arg0, Throwable arg1)
 			throws Exception {
-		// TODO Auto-generated method stub
+		arg1.printStackTrace();
 		
 	}
 
 	@Override
 	public void messageReceived(IoSession session, Object message) throws Exception {
-		System.out.println(message);
+		//System.out.println(message);
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.enableDefaultTyping(); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE
+		mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+		try
+		{
+			EventDto event = mapper.readValue(message.toString(), EventDto.class);
+			if (event instanceof InboundAlertingEventDto){
+				InboundAlertingEventDto ia = (InboundAlertingEventDto) event;
+				channels.add(ia.getChannelId());
+			}
+			else if (event instanceof OutboundAlertingEventDto){
+				OutboundAlertingEventDto oa = (OutboundAlertingEventDto)event;
+				channels.add(oa.getChannelId());
+			}
+			else if (event instanceof HangupEventDto){
+				HangupEventDto he = (HangupEventDto) event;
+				channels.remove(he.getChannelId());
+			}
+		}
+		catch (Exception e){
+			e.printStackTrace();
+		}
+		
 		
 	}
 
@@ -116,7 +195,8 @@ public class ATSConsole implements IoHandler{
 
 	@Override
 	public void sessionClosed(IoSession arg0) throws Exception {
-		// TODO Auto-generated method stub
+		System.out.println("Disconnected");
+		System.exit(0);
 		
 	}
 
@@ -133,8 +213,8 @@ public class ATSConsole implements IoHandler{
 	}
 
 	@Override
-	public void sessionOpened(IoSession arg0) throws Exception {
-		// TODO Auto-generated method stub
+	public void sessionOpened(IoSession session) throws Exception {
+		this.session = session;
 		
 	}
 

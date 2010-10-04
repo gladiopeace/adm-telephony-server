@@ -21,6 +21,8 @@
 				<include name="slf4j-log4j12-1.5.0.jar"/>
 				<include name="log4j-1.2.15.jar"/>
 				<include name="jopt-simple-3.2.jar"/>
+				<include name="jackson-mapper-asl-1.6.0.jar"/>
+				<include name="jackson-core-asl-1.6.0.jar"/>
 			</fileset>
 		</unzip>
 
@@ -30,7 +32,9 @@
 	  	</copy>
 	   -->
 
-		<jar destfile="dist/ats-console.jar" basedir="bin" includes="**/*ATSConsole.class,**/*.png" excludes="**/src/**,build.xml">
+		<jar destfile="dist/ats-console.jar" basedir="bin" 
+			includes="**/*ATSConsole.class,**/*.png, **/*DisconnectCode.class, com/admtel/telephonyserver/requests/*.class com/admtel/telephonyserver/cli/*.class" 
+			excludes="**/src/**,build.xml">
 		</jar>
 
 		<unzip src="dist/ats-console.jar" dest="dist/temp">
