@@ -24,6 +24,7 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import com.admtel.telephonyserver.core.AdmTelephonyServer;
 import com.admtel.telephonyserver.core.EventsManager;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.interfaces.EventListener;
@@ -66,17 +67,29 @@ public class JSonSocketManagerBean implements IoHandler, EventListener {
 	@Override
 	public void exceptionCaught(IoSession arg0, Throwable arg1)
 			throws Exception {
-		// TODO Auto-generated method stub
+		log.error(arg1.getMessage(), arg1);
 
 	}
 
 	@Override
 	public void messageReceived(IoSession session, Object message) throws Exception {
+		
+		String messageStr = message.toString();
+		
+		log.trace("Received Message "+messageStr);
+		try{
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.enableDefaultTyping(); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE
-		mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-		Request request = mapper.readValue(message.toString(), Request.class);
-		log.trace(String.format("Received {%s} from {%s} - RequestDto = {%s}", message, session.getRemoteAddress(), request));
+		mapper.enableDefaultTyping(); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE				
+		Request request = mapper.readValue(messageStr, Request.class);
+		log.trace("Request is "+request);
+		if (request != null){
+			log.trace(String.format("Received {%s} from {%s} - RequestDto = {%s}", message, session.getRemoteAddress(), request));
+			AdmTelephonyServer.getInstance().processRequest(request);
+		}
+		}
+		catch (Exception e){
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	@Override
@@ -113,8 +126,9 @@ public class JSonSocketManagerBean implements IoHandler, EventListener {
 	public boolean onEvent(Event event) {
 		Collection<IoSession> sessions = this.acceptor.getManagedSessions()
 				.values();
+		try{
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.enableDefaultTyping(); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE
+		mapper.enableDefaultTyping(); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE		
 		mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
 		EventDto eventDto = EventDto.buildEventDto(event);
 		if (eventDto != null){
@@ -125,6 +139,10 @@ public class JSonSocketManagerBean implements IoHandler, EventListener {
 					log.error(e.getMessage(), e);
 				}
 			}	
+		}
+		}
+		catch (Exception e){
+			log.fatal(e.getMessage(), e);
 		}
 		return false;
 	}

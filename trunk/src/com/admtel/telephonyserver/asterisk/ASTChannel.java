@@ -837,7 +837,7 @@ public class ASTChannel extends Channel {
 
 			if (astEvent.getEventType() == EventType.Hangup) {
 				getListeners().clear();
-				ASTChannel.this.getSwitch().removeChannel(ASTChannel.this);
+				ASTChannel.this.getSwitch().removeChannel(ASTChannel.this);			
 			}
 			log.debug(String.format(
 					"END processing event (%s) state (%s), internalState(%s)",

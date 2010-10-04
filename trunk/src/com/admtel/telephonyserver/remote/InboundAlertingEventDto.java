@@ -5,8 +5,6 @@ import dp.lib.dto.geda.annotations.DtoField;
 
 @Dto
 public class InboundAlertingEventDto extends EventDto{
-	@DtoField("channel.switch.switchId")
-	String switchId;
 	@DtoField("channel.uniqueId")
 	String channelId;
 	@DtoField("calledIdNumber")
@@ -16,12 +14,6 @@ public class InboundAlertingEventDto extends EventDto{
 	@DtoField("callerIdName")
 	String callerIdName;
 	
-	public String getSwitchId() {
-		return switchId;
-	}
-	public void setSwitchId(String switchId) {
-		this.switchId = switchId;
-	}
 	public String getChannelId() {
 		return channelId;
 	}

@@ -29,6 +29,7 @@ public abstract class Switch {
 	private Map<String, Channel> channels = new HashMap<String, Channel>();
 	private Map<String, Channel> synchronizedChannels = Collections
 			.synchronizedMap(channels);
+	
 	protected MessageHandler messageHandler = 
 		new QueuedMessageHandler(){
 
@@ -150,12 +151,11 @@ public abstract class Switch {
 
 	final public void processRequest(Request request)
 	{
-		//TODO process switch requests (like reload switch, stop switch ...)
-		if (request instanceof ChannelRequest){
-			ChannelRequest channelRequest = (ChannelRequest) request;
-			Channel channel = this.getChannel(channelRequest.getChannelId());
-			channel.putMessage(request);
-		}
 	}
 	abstract public void processBasicIoMessage(BasicIoMessage message);
+
+	public void putMessage(SwitchRequest request) {
+		messageHandler.putMessage(request);
+		
+	}
 }
