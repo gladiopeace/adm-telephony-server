@@ -33,7 +33,9 @@
 	   -->
 
 		<jar destfile="dist/ats-console.jar" basedir="bin" 
-			includes="**/*ATSConsole.class,**/*.png, **/*DisconnectCode.class, com/admtel/telephonyserver/requests/*.class com/admtel/telephonyserver/cli/*.class" 
+			includes="**/*ATSConsole.class,**/*.png, **/*DisconnectCode.class, 
+			com/admtel/telephonyserver/requests/*.class, 
+			com/admtel/telephonyserver/cli/*.class, com/admtel/telephonyserver/remote/*Dto.class" 
 			excludes="**/src/**,build.xml">
 		</jar>
 

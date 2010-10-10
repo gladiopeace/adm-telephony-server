@@ -61,12 +61,7 @@ class AdmCompleteExample extends Script {
 			case EventType.InboundAlerting:
 				InboundAlertingEvent e = event
 				a = e.getChannel()
-				if (a != null){
-					println "********inbound alerting on channel " + a;
-					AuthorizeResult ar = Radius.authorize(a, "selzein", "1234", "", "", "9613820376", true, true)
-					if (ar != null){
-						println "*********"+ar.getAuthorized()+", " + ar.getAllowedTime()
-					}
+				if (a != null){					
 					a.answer()
 				}
 				state = "Answering"
@@ -96,10 +91,6 @@ class AdmCompleteExample extends Script {
 			println "*******" + prompts
 			
 			
-//			String[] prompts=	["/us/callie/ivr/8000/ivr-sample_submenu",
-//			"/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-account_number",
-//			"/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-sample_submenu"]
-//			a.playAndGetDigits(10, prompts, 10000, "#")
 			state = "Playing"
 			break
 		}

@@ -130,7 +130,7 @@ public class JSonSocketManagerBean implements IoHandler, EventListener {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enableDefaultTyping(); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE		
 		mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-		EventDto eventDto = EventDto.buildEventDto(event);
+		EventDto eventDto = EventDtoBuilder.getInstance().buildEventDto(event);
 		if (eventDto != null){
 			for (IoSession s:sessions){
 				try {

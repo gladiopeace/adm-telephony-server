@@ -5,10 +5,9 @@ import com.admtel.telephonyserver.requests.HangupRequest;
 import com.admtel.telephonyserver.requests.Request;
 
 public class CLI_HangupCommand extends CLI_Command {
-	static{
-		command = "hangup";
-		minimumArgs = 2;
-	}
+	static String command = "hangup";
+	static int miniumArgs = 2;
+
 	@Override
 	Request onParse() {
 		HangupRequest result = null;

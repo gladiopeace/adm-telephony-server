@@ -6,12 +6,12 @@ public class HangupEvent extends ChannelEvent {
 
 	@Override
 	public String toString() {
-		return "HangupEvent [hangCause=" + hangCause + ", hangupCauseStr="
+		return "HangupEvent [hangCause=" + hangupCause + ", hangupCauseStr="
 				+ hangupCauseStr + "]";
 	}
 
 	String hangupCauseStr;
-	int hangCause;
+	int hangupCause;
 	
 	public HangupEvent(Channel channel) {
 		super(channel);
@@ -26,11 +26,11 @@ public class HangupEvent extends ChannelEvent {
 		this.hangupCauseStr = hangupCauseStr;
 	}
 
-	public int getHangCause() {
-		return hangCause;
+	public int getHangupCause() {
+		return hangupCause;
 	}
 
-	public void setHangCause(int hangCause) {
-		this.hangCause = hangCause;
+	public void setHangupCause(int hangupCause) {
+		this.hangupCause = hangupCause;
 	}
 }
