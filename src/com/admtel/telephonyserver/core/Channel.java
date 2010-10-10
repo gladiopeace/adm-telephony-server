@@ -449,7 +449,7 @@ public abstract class Channel implements TimerNotifiable {
 		case Hangup: {
 			HangupEvent he = (HangupEvent) e;
 			hangupTime = new DateTime();
-			h323DisconnectCause = he.getHangCause();
+			h323DisconnectCause = he.getHangupCause();
 			stopTimers();
 		}
 			break;

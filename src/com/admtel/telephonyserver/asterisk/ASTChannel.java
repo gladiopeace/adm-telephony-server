@@ -816,9 +816,9 @@ public class ASTChannel extends Channel {
 				HangupEvent he = new HangupEvent(ASTChannel.this);
 				he.setHangupCauseStr(asthe.getCauseTxt());
 				try {
-					he.setHangCause(Integer.parseInt(asthe.getCause()));
+					he.setHangupCause(Integer.parseInt(asthe.getCause()));
 				} catch (Exception e) {
-					he.setHangCause(16);
+					he.setHangupCause(16);
 				}
 				ASTChannel.this.onEvent(he);
 			}

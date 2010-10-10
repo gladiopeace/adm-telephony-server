@@ -2,7 +2,7 @@
 <config>
 
 <server>
-	<maxthreads>10</maxthreads>
+	<maxthreads>15</maxthreads>
 	<address>172.16.140.1</address>	
 	<base-directory>/usr/local/adm</base-directory>
 	<script-path>.;./scripts;/Users/danny/AdmTel_Source/adm-telephony-scripts/src</script-path>
@@ -87,6 +87,10 @@
 	<adm-servlet>
 		<path>webapi</path>
 		<class>scripts/webapi/WebAPI.groovy</class>
+	</adm-servlet>
+	<adm-servlet>
+	 <path>asterisk-curl</path>
+	 <class>scripts/AsteriskCurlExample.groovy</class>
 	</adm-servlet>
  </http-server>
 <!-- <http-server>-->

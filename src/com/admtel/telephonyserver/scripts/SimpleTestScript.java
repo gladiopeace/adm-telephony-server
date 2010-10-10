@@ -3,6 +3,7 @@ package com.admtel.telephonyserver.scripts;
 import org.apache.log4j.Logger;
 
 import com.admtel.telephonyserver.core.Channel;
+import com.admtel.telephonyserver.core.DisconnectCode;
 import com.admtel.telephonyserver.core.Script;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.InboundAlertingEvent;
@@ -53,6 +54,7 @@ public class SimpleTestScript extends Script {
 				PlayAndGetDigitsEndedEvent e = (PlayAndGetDigitsEndedEvent) event;
 				displayStr = "Got digits " + e.getDigits();
 				log.debug("Got digits " + e.getDigits());
+				e.getChannel().hangup(DisconnectCode.Normal);
 			}
 				break;
 		}
@@ -77,18 +79,12 @@ public class SimpleTestScript extends Script {
 	}
 
 	private void processAnsweringState(Event event) {
-		/*
-		 * a.playback(
-		 * "/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-sample_submenu.wav"
-		 * , "*");
-		 */
 		
 		switch (event.getEventType()){
 		case Answered:
 		{
 			
-			String[] prompts={"/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-sample_submenu",
-					"/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-account_number"};
+			String[] prompts={"ivr/ivr-welcome_to_freeswitch"};
 			log.debug("PlayAndGetDigits ....");
 			a
 			.playAndGetDigits(
@@ -114,19 +110,13 @@ public class SimpleTestScript extends Script {
 		case PlaybackEnded: {
 			PlaybackEndedEvent event = (PlaybackEndedEvent) e;
 			log.debug("Playback ended interrupted By " + event.getInterruptingDigit());
-			// originate(a.getId(), "sofia/internal/1000%", 1000);
-			// if (!a.getDigits(0, 4,
-			// "/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-sample_submenu.wav",
-			// 10000, "#")){
-			// log.error("Could not play and get digits");
-			// }
 		}
 		break;
 		case PlayAndGetDigitsEnded:{
 			PlayAndGetDigitsEndedEvent event = (PlayAndGetDigitsEndedEvent) e;
 			log.debug("Got digits " + event.getDigits());
-			String[] prompts={"/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-sample_submenu",
-			"/usr/local/freeswitch/sounds/en/us/callie/ivr/8000/ivr-account_number"};
+			String[] prompts={"ivr/ivr-sample_submenu",
+			"ivr/ivr-account_number"};
 	a
 	.playAndGetDigits(
 			4,

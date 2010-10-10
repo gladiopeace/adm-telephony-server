@@ -4,10 +4,9 @@ import com.admtel.telephonyserver.requests.Request;
 import com.admtel.telephonyserver.requests.ShowChannelsRequest;
 
 public class CLI_ShowChannelsCommand extends CLI_Command {
-	static{
-		command = "show channels";
-		minimumArgs = 2;
-	}
+	static String command = "show channels";
+	static int miniumArgs = 2;
+
 	@Override
 	Request onParse() {
 		ShowChannelsRequest result = null;

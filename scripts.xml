@@ -19,7 +19,7 @@
  
   <script name="voicemail2">
   <called>801123</called>
-  <class>com.admtel.telephony.scripts.SimpleTestScript</class>
+  <class>com.admtel.telephonyserver.scripts.SimpleTestScript</class>
   <parameters>
    <parameter key="language" value="english"/>
   </parameters>

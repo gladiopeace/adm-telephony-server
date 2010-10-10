@@ -24,13 +24,14 @@ import com.admtel.telephonyserver.interfaces.EventListener;
 public class RadiusServers implements DefinitionChangeListener, Authorizer,
 		EventListener {
 
-	//TODO, check when radius services are enabled. Throw an exception for scripts that try to use radius services when they're not available
+	//TODO, check when radius services are enabled. 
+	//Throw an exception for scripts that try to use radius services when they're not available
 	
 	static Logger log = Logger.getLogger(RadiusServers.class);
 
 	Map<String, RadiusServer> idMap = new HashMap<String, RadiusServer>();
 	Random rnd = new Random(System.currentTimeMillis());
-
+	
 	private RadiusServers() {
 	}
 

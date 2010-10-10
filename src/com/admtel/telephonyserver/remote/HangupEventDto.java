@@ -1,7 +1,9 @@
 package com.admtel.telephonyserver.remote;
 
+import dp.lib.dto.geda.annotations.Dto;
 import dp.lib.dto.geda.annotations.DtoField;
 
+@Dto
 public class HangupEventDto extends EventDto {
 	@DtoField("channel.uniqueId")
 	String channelId;
@@ -22,17 +24,17 @@ public class HangupEventDto extends EventDto {
 		this.hangupCauseStr = hangupCauseStr;
 	}
 
-	public int getHangCause() {
-		return hangCause;
+	public int getHangupCause() {
+		return hangupCause;
 	}
 
-	public void setHangCause(int hangCause) {
-		this.hangCause = hangCause;
+	public void setHangupCause(int hangupCause) {
+		this.hangupCause = hangupCause;
 	}
 
 	@DtoField("hangupCauseStr")
 	String hangupCauseStr;
 	
 	@DtoField("hangupCause")
-	int hangCause;
+	int hangupCause;
 }

@@ -43,6 +43,9 @@ public class ATSConsole implements IoHandler{
 		try{
 			COMMAND_MAP.put(CLI_HangupCommand.command, new CLI_HangupCommand());
 			COMMAND_MAP.put(CLI_ShowChannelsCommand.command, new CLI_ShowChannelsCommand());
+			for (String str:COMMAND_MAP.keySet()){
+				System.out.println("Command --- " + str);
+			}
 		}
 		catch (Exception e){
 			e.printStackTrace();
@@ -54,7 +57,7 @@ public class ATSConsole implements IoHandler{
 
 	CLI_Command getCLI_Command(String cmd){
 		for (String str:COMMAND_MAP.keySet()){
-			if (cmd.startsWith(str)){
+			if (cmd.startsWith(str)){				
 				return COMMAND_MAP.get(str);
 			}
 		}
@@ -88,7 +91,7 @@ public class ATSConsole implements IoHandler{
 	}
 	public ATSConsole(String[] args){
 		try {
-			String [] commands ={"show channel", "show jobs","hangup", "exit"};
+			String [] commands ={"show channels","hangup", "exit"};
 			
 			 OptionParser parser = new OptionParser( "i:p::?." );
 			 OptionSet options = parser.parse(args);
@@ -160,7 +163,7 @@ public class ATSConsole implements IoHandler{
 
 	@Override
 	public void messageReceived(IoSession session, Object message) throws Exception {
-		//System.out.println(message);
+		System.out.println(message);
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enableDefaultTyping(); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE
 		mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
