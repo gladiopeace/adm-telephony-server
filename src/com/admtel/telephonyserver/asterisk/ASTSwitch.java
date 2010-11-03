@@ -47,7 +47,7 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 	private IoSession session;
 
 	private static final int CONNECT_TIMEOUT = 1000;
-	private static final int RECONNECT_AFTER = 5000;
+	private static final int RECONNECT_AFTER = 500;
 
 	private SocketConnector connector;
 
@@ -67,6 +67,15 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 		super(definition);
 		this.encodingDelimiter = "\r\n\r\n";
 		this.decodingDelimiter = "\r\n\r\n";
+		connector = new NioSocketConnector();
+		connector.getFilterChain().addLast("logger", new LoggingFilter());
+		TextLineCodecFactory textLineCodecFactory = new TextLineCodecFactory(
+				Charset.forName("UTF-8"), encodingDelimiter, decodingDelimiter);
+		textLineCodecFactory.setDecoderMaxLineLength(8192);
+		textLineCodecFactory.setEncoderMaxLineLength(8192);
+		connector.getFilterChain().addLast("codec",
+				new ProtocolCodecFilter(textLineCodecFactory));
+		connector.setHandler(this);
 	}
 
 	@Override
@@ -92,12 +101,13 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 	@Override
 	public void sessionClosed(IoSession session) throws Exception {
 		log.warn("Disconnected from switch " + getDefinition().getId());
+		setStatus (SwitchStatus.Disconnected);
 		start();
 	}
 
 	@Override
 	public void sessionCreated(IoSession session) throws Exception {
-		// TODO Auto-generated method stub
+		setStatus(SwitchStatus.Ready);
 
 	}
 
@@ -128,16 +138,7 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 	private boolean connect() {
 		log.debug(String.format("Trying to connect to %s:%d", getDefinition()
 				.getAddress(), getDefinition().getPort()));
-		connector = new NioSocketConnector();
-		connector.getFilterChain().addLast("logger", new LoggingFilter());
-		TextLineCodecFactory textLineCodecFactory = new TextLineCodecFactory(
-				Charset.forName("UTF-8"), encodingDelimiter, decodingDelimiter);
-		textLineCodecFactory.setDecoderMaxLineLength(8192);
-		textLineCodecFactory.setEncoderMaxLineLength(8192);
-		connector.getFilterChain().addLast("codec",
-				new ProtocolCodecFilter(textLineCodecFactory));
-		connector.setHandler(this);
-
+		setStatus(SwitchStatus.Connecting);
 		try {
 			ConnectFuture connectFuture = connector
 					.connect(new InetSocketAddress(
@@ -150,6 +151,8 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 			return true;
 		} catch (Exception e) {
 			log.warn(e.getMessage(), e);
+			if (session != null) session.close(true);
+			setStatus(SwitchStatus.Disconnected);
 		}
 		return false;
 	}
@@ -158,7 +161,10 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 	public boolean onTimer(Object data) {
 		if (isConnected())
 			return true;// stop the timer
-		return connect();
+		if (getStatus() == SwitchStatus.NotReady || getStatus() == SwitchStatus.Disconnected){
+			return connect();
+		}
+		return false;
 	}
 
 	private boolean isConnected() {
