@@ -24,6 +24,7 @@ import com.admtel.telephonyserver.core.Result;
 import com.admtel.telephonyserver.core.SimpleMessageHandler;
 import com.admtel.telephonyserver.core.Switch;
 import com.admtel.telephonyserver.core.Timers;
+import com.admtel.telephonyserver.core.Switch.SwitchStatus;
 import com.admtel.telephonyserver.core.Timers.Timer;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelCreateEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelDataEvent;
@@ -60,6 +61,15 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 		super(definition);
 		this.encodingDelimiter = "\n\n";
 		this.decodingDelimiter = "\n\n";
+		connector = new NioSocketConnector();
+		connector.getFilterChain().addLast("logger", new LoggingFilter());
+		TextLineCodecFactory textLineCodecFactory = new TextLineCodecFactory(
+				Charset.forName("UTF-8"), encodingDelimiter, decodingDelimiter);
+		textLineCodecFactory.setDecoderMaxLineLength(8192);
+		textLineCodecFactory.setEncoderMaxLineLength(8192);
+		connector.getFilterChain().addLast("codec",
+				new ProtocolCodecFilter(textLineCodecFactory));
+		connector.setHandler(this);		
 	}
 
 	@Override
@@ -100,13 +110,14 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 	@Override
 	public void sessionClosed(IoSession session) throws Exception {
 		log.warn("Disconnected from switch "+this.getSwitchId());
+		setStatus (SwitchStatus.Disconnected);
 		this.start();
 
 	}
 
 	@Override
 	public void sessionCreated(IoSession session) throws Exception {
-		// TODO Auto-generated method stub
+		setStatus(SwitchStatus.Ready);
 
 	}
 
@@ -130,6 +141,9 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 	public boolean onTimer(Object data) {
 		if (isConnected())
 			return true;// stop the timer
+		if (getStatus() == SwitchStatus.NotReady || getStatus() == SwitchStatus.Disconnected){
+			return connect();
+		}		
 		return connect();
 	}
 
@@ -140,16 +154,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 	private boolean connect() {
 		log.debug(String.format("Trying to connect to %s:%d", getDefinition()
 				.getAddress(), getDefinition().getPort()));
-		connector = new NioSocketConnector();
-		connector.getFilterChain().addLast("logger", new LoggingFilter());
-		TextLineCodecFactory textLineCodecFactory = new TextLineCodecFactory(
-				Charset.forName("UTF-8"), encodingDelimiter, decodingDelimiter);
-		textLineCodecFactory.setDecoderMaxLineLength(8192);
-		textLineCodecFactory.setEncoderMaxLineLength(8192);
-		connector.getFilterChain().addLast("codec",
-				new ProtocolCodecFilter(textLineCodecFactory));
-		connector.setHandler(this);
-
+		setStatus(SwitchStatus.Connecting);
 		try {
 			ConnectFuture connectFuture = connector
 					.connect(new InetSocketAddress(getDefinition().getAddress(),
@@ -161,6 +166,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 			return true;
 		} catch (Exception e) {
 			log.warn(AdmUtils.getStackTrace(e));
+			setStatus(SwitchStatus.Disconnected);
 		}
 		return false;
 	}

@@ -19,7 +19,7 @@ public abstract class Switch {
 	private static Logger log = Logger.getLogger(Switch.class);
 
 	public enum SwitchStatus {
-		NotReady, Ready
+		NotReady, Ready, Disconnecting, Disconnected, Connecting
 	};
 
 	private SwitchDefinition definition;
