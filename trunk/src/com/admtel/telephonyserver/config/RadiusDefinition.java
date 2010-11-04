@@ -7,8 +7,17 @@ public class RadiusDefinition implements DefinitionInterface {
 	int acctPort;
 	int retryCount;
 	int socketTimeout;
+	boolean log;
 	
 	
+	public boolean isLog() {
+		return log;
+	}
+
+	public void setLog(boolean log) {
+		this.log = log;
+	}
+
 	public int getRetryCount() {
 		return retryCount;
 	}
@@ -41,6 +50,7 @@ public class RadiusDefinition implements DefinitionInterface {
 		result = prime * result + ((address == null) ? 0 : address.hashCode());
 		result = prime * result + authPort;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + (log ? 1231 : 1237);
 		result = prime * result + retryCount;
 		result = prime * result + ((secret == null) ? 0 : secret.hashCode());
 		result = prime * result + socketTimeout;
@@ -69,6 +79,8 @@ public class RadiusDefinition implements DefinitionInterface {
 			if (other.id != null)
 				return false;
 		} else if (!id.equals(other.id))
+			return false;
+		if (log != other.log)
 			return false;
 		if (retryCount != other.retryCount)
 			return false;
@@ -123,6 +135,12 @@ public class RadiusDefinition implements DefinitionInterface {
 	@Override
 	public String getId() {
 		return id;
+	}
+
+	@Override
+	public boolean isCoreChange(DefinitionInterface definition) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

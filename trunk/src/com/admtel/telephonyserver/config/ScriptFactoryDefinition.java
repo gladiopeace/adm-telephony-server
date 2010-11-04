@@ -50,4 +50,10 @@ public class ScriptFactoryDefinition implements DefinitionInterface{
 		return super.toString()+":"+this.className;
 	}
 
+	@Override
+	public boolean isCoreChange(DefinitionInterface definition) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

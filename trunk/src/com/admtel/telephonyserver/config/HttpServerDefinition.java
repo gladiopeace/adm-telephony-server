@@ -86,4 +86,10 @@ public class HttpServerDefinition implements DefinitionInterface {
 		this.port = port;
 	}
 
+	@Override
+	public boolean isCoreChange(DefinitionInterface definition) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

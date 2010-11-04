@@ -1,11 +1,14 @@
 <project>
 	<target name="clean" description="Clean the directories for building">
 		<delete file="dist/adm-telephony-server.jar" />
-		<delete file="dist/ats-console"/>
+		<delete file="dist/ats-console" />
 	</target>
 
 	<target name="simple" depends="clean">
-		<jar destfile="dist/adm-telephony-server.jar" basedir="bin" includes="**/*.class" excludes="**/src/**,build.xml,**/*.xml,log4j.properties">
+		<jar destfile="dist/adm-telephony-server.jar" basedir="bin" 
+			includes="**/*.class,com/admtel/telephonyserver/radius/adm_dictionary" 
+			excludes="**/src/**,build.xml,**/*.xml,log4j.properties">
+
 		</jar>
 	</target>
 
@@ -17,12 +20,12 @@
 			<fileset dir="lib">
 				<include name="mina-core-2.0.0-RC1.jar" />
 				<include name="jline-0.9.94.jar" />
-				<include name="slf4j-api-1.5.0.jar"/>
-				<include name="slf4j-log4j12-1.5.0.jar"/>
-				<include name="log4j-1.2.15.jar"/>
-				<include name="jopt-simple-3.2.jar"/>
-				<include name="jackson-mapper-asl-1.6.0.jar"/>
-				<include name="jackson-core-asl-1.6.0.jar"/>
+				<include name="slf4j-api-1.5.0.jar" />
+				<include name="slf4j-log4j12-1.5.0.jar" />
+				<include name="log4j-1.2.15.jar" />
+				<include name="jopt-simple-3.2.jar" />
+				<include name="jackson-mapper-asl-1.6.0.jar" />
+				<include name="jackson-core-asl-1.6.0.jar" />
 			</fileset>
 		</unzip>
 
@@ -32,11 +35,9 @@
 	  	</copy>
 	   -->
 
-		<jar destfile="dist/ats-console.jar" basedir="bin" 
-			includes="**/*ATSConsole.class,**/*.png, **/*DisconnectCode.class, 
+		<jar destfile="dist/ats-console.jar" basedir="bin" includes="**/*ATSConsole.class,**/*.png, **/*DisconnectCode.class, 
 			com/admtel/telephonyserver/requests/*.class, 
-			com/admtel/telephonyserver/cli/*.class, com/admtel/telephonyserver/remote/*Dto.class" 
-			excludes="**/src/**,build.xml">
+			com/admtel/telephonyserver/cli/*.class, com/admtel/telephonyserver/remote/*Dto.class" excludes="**/src/**,build.xml">
 		</jar>
 
 		<unzip src="dist/ats-console.jar" dest="dist/temp">

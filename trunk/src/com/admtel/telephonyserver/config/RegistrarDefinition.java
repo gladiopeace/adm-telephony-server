@@ -55,5 +55,10 @@ public class RegistrarDefinition implements DefinitionInterface {
 	public String getId() {
 		return className;
 	}
+	@Override
+	public boolean isCoreChange(DefinitionInterface definition) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 }

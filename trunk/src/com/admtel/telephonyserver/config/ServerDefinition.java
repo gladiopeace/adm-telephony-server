@@ -132,4 +132,9 @@ public class ServerDefinition implements DefinitionInterface {
 				+ (stopAccounting != null ? "stopAccounting=" + stopAccounting
 						: "") + "]";
 	}
+	@Override
+	public boolean isCoreChange(DefinitionInterface definition) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

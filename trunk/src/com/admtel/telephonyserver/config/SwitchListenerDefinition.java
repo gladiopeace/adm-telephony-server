@@ -70,6 +70,11 @@ public class SwitchListenerDefinition implements DefinitionInterface{
 	public String toString(){
 		return super.toString()+":"+this.address+":"+this.port+":"+this.switchType;
 	}
+	@Override
+	public boolean isCoreChange(DefinitionInterface definition) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 	
 }

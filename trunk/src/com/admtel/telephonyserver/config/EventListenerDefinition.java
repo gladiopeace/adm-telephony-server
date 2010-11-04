@@ -41,5 +41,10 @@ public class EventListenerDefinition implements DefinitionInterface {
 	public void setClassName(String className) {
 		this.className = className;
 	}
+	@Override
+	public boolean isCoreChange(DefinitionInterface definition) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 }

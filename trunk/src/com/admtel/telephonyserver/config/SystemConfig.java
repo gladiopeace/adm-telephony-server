@@ -112,7 +112,7 @@ public class SystemConfig {
 						"switches.switch(%d)", counter));
 				if (subnode != null) {
 					SwitchDefinition definition = new SwitchDefinition();
-					definition.setId(subnode.getString("id"));
+					definition.setName(subnode.getString("name"));
 					definition.setAddress(subnode.getString("address"));
 					definition.setPort(subnode.getInt("port"));
 					definition.setUsername(subnode.getString("username"));
@@ -121,6 +121,7 @@ public class SystemConfig {
 							.getString("type")));
 					definition.setAddressTranslatorClass(subnode
 							.getString("addresstranslator"));
+					definition.setEnabled(subnode.getBoolean("enabled", true));
 					futureDefinitions.put(definition.getId(), definition);
 				} else {
 					return;
@@ -151,6 +152,7 @@ public class SystemConfig {
 					definition.setRetryCount(subnode.getInt("retry-count", 5));
 					definition.setSocketTimeout(subnode.getInt(
 							"socket-timeout", 5000));
+					definition.setLog(subnode.getBoolean("log", false));
 					futureDefinitions.put(definition.getId(), definition);
 				}
 			} catch (Exception e) {

@@ -30,6 +30,8 @@ public class Switches implements DefinitionChangeListener, EventListener {
 
 	Map<String, Switch> idMap = new HashMap<String, Switch>();
 	Map<String, Switch> addressMap = new HashMap<String, Switch>();
+	
+	Map<String, Switch> stoppedSwitches = new HashMap<String,Switch>();
 
 	private Map<String, Channel> channels = new HashMap<String, Channel>();
 	private Map<String, Channel> synchronizedChannels = Collections
@@ -55,6 +57,29 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			synchronized (this) {
 				idMap.put(_switch.getDefinition().getId(), _switch);
 				addressMap.put(_switch.getDefinition().getAddress(), _switch);
+			}
+		}
+	}
+	private void remove(Switch _switch){
+		if (_switch != null){
+			synchronized (this){
+				idMap.remove(_switch.getDefinition().getId());
+				addressMap.remove(_switch.getDefinition().getAddress());
+			}
+		}
+	}
+	
+	private void addToStopped(Switch _switch){
+		if (_switch != null){
+			synchronized(this){
+				stoppedSwitches.put(_switch.getDefinition().getId(), _switch);
+			}
+		}
+	}
+	private void removeFromStopped(Switch _switch){
+		if (_switch != null){
+			synchronized (this){
+				stoppedSwitches.remove(_switch.getDefinition().getId());
 			}
 		}
 	}
@@ -121,15 +146,30 @@ public class Switches implements DefinitionChangeListener, EventListener {
 	@Override
 	public void definitionRemoved(DefinitionInterface definition) {
 		if (definition instanceof SwitchDefinition) {
-			// TODO
+			Switch _switch = this.getById(definition.getId());
+			log.trace("Definition removed - " + definition);
+			if (_switch != null){				
+				_switch.stop();
+				remove(_switch);
+				addToStopped(_switch);
+			}
 		}
 	}
 
 	@Override
 	public void defnitionChanged(DefinitionInterface oldDefinition,
 			DefinitionInterface newDefinition) {
-		if (newDefinition instanceof SwitchDefinition) {
-			// TODO
+		log.trace(String.format("Definition changed from {%s} to {%s}", oldDefinition, newDefinition));
+		if (newDefinition.isCoreChange(oldDefinition)){
+			definitionRemoved(oldDefinition);
+			definitionAdded(newDefinition);
+		}
+		else{
+			SwitchDefinition def = (SwitchDefinition) newDefinition;
+			Switch _switch = this.getById(def.getId());
+			if (_switch != null){
+				_switch.setDefinition(def);
+			}
 		}
 
 	}
@@ -202,3 +242,4 @@ public class Switches implements DefinitionChangeListener, EventListener {
 		return false;
 	}
 }
+ 

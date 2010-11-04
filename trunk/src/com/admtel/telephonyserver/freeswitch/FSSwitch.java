@@ -53,9 +53,9 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 	protected String decodingDelimiter;
 
 	Timer reconnectTimer = null;
-	private enum State {LoggingIn, LoggedIn};
+	private enum State {Connecting, LoggingIn, LoggedIn, Disconnecting, Disconnected};
 	
-	State state = State.LoggingIn;
+	State state = State.Disconnected;
 	
 	public FSSwitch(SwitchDefinition definition) {
 		super(definition);
@@ -78,7 +78,12 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 		reconnectTimer = Timers.getInstance().startTimer(this, RECONNECT_AFTER,
 				false, null);
 	}
-
+	
+	@Override
+	public void stop() {
+		super.stop();
+	}
+	
 	@Override
 	public Result originate(String destination, long timeout, String callerId,
 			String calledId, String script, String data) {
@@ -110,15 +115,13 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 	@Override
 	public void sessionClosed(IoSession session) throws Exception {
 		log.warn("Disconnected from switch "+this.getSwitchId());
-		setStatus (SwitchStatus.Disconnected);
+		state = State.Disconnected;		
 		this.start();
 
 	}
 
 	@Override
 	public void sessionCreated(IoSession session) throws Exception {
-		setStatus(SwitchStatus.Ready);
-
 	}
 
 	@Override
@@ -134,6 +137,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 		String username = FSSwitch.this.getDefinition().getUsername();
 		String password = FSSwitch.this.getDefinition().getPassword();
 		session.write("auth " + password);
+		state = State.LoggingIn;
 
 	}
 
@@ -141,10 +145,10 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 	public boolean onTimer(Object data) {
 		if (isConnected())
 			return true;// stop the timer
-		if (getStatus() == SwitchStatus.NotReady || getStatus() == SwitchStatus.Disconnected){
+		if (getDefinition().isEnabled() && state == State.Disconnected) {
 			return connect();
 		}		
-		return connect();
+		return true;
 	}
 
 	private boolean isConnected() {
@@ -153,8 +157,8 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	private boolean connect() {
 		log.debug(String.format("Trying to connect to %s:%d", getDefinition()
-				.getAddress(), getDefinition().getPort()));
-		setStatus(SwitchStatus.Connecting);
+				.getAddress(), getDefinition().getPort()));		
+		state = State.Connecting;
 		try {
 			ConnectFuture connectFuture = connector
 					.connect(new InetSocketAddress(getDefinition().getAddress(),
@@ -166,7 +170,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 			return true;
 		} catch (Exception e) {
 			log.warn(AdmUtils.getStackTrace(e));
-			setStatus(SwitchStatus.Disconnected);
+			state = State.Disconnected;			
 		}
 		return false;
 	}
@@ -188,6 +192,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 						// check for return of event
 						// filter
 						state = State.LoggedIn;
+						setStatus(SwitchStatus.Ready);
 					} else {
 						log.warn("Session failed to connect "
 								+ session.getRemoteAddress());

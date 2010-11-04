@@ -43,6 +43,8 @@ public class ATSConsole implements IoHandler{
 		try{
 			COMMAND_MAP.put(CLI_HangupCommand.command, new CLI_HangupCommand());
 			COMMAND_MAP.put(CLI_ShowChannelsCommand.command, new CLI_ShowChannelsCommand());
+			COMMAND_MAP.put(CLI_ReloadCommand.command, new CLI_ReloadCommand());
+			COMMAND_MAP.put(CLI_ShowStatusCommand.command, new CLI_ShowStatusCommand());
 			for (String str:COMMAND_MAP.keySet()){
 				System.out.println("Command --- " + str);
 			}
@@ -51,6 +53,18 @@ public class ATSConsole implements IoHandler{
 			e.printStackTrace();
 		}
 	}
+	
+	static String[] commandsToArray(){
+		String[] result = new String[COMMAND_MAP.size()];
+		int i =0;
+		for (String str:COMMAND_MAP.keySet()){
+			result[i] = str;
+			i++;
+		}
+		
+		return result;
+	}
+	
 	IoSession session;
 	private NioSocketConnector connector;
 	private List<String> channels = new ArrayList<String>();
@@ -91,7 +105,7 @@ public class ATSConsole implements IoHandler{
 	}
 	public ATSConsole(String[] args){
 		try {
-			String [] commands ={"show channels","hangup", "exit"};
+			//String [] commands ={"show channels","hangup", "exit"};
 			
 			 OptionParser parser = new OptionParser( "i:p::?." );
 			 OptionSet options = parser.parse(args);
@@ -105,7 +119,7 @@ public class ATSConsole implements IoHandler{
 				System.exit(0);
 			}
 			 
-			SimpleCompletor sc = new SimpleCompletor(commands); 
+			SimpleCompletor sc = new SimpleCompletor(commandsToArray()); 
 			
 			ConsoleReader reader = new ConsoleReader();
 		

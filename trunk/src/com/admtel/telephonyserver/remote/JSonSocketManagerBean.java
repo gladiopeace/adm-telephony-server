@@ -30,7 +30,6 @@ import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.interfaces.EventListener;
 import com.admtel.telephonyserver.requests.Request;
 
-
 public class JSonSocketManagerBean implements IoHandler, EventListener {
 
 	static Logger log = Logger.getLogger(JSonSocketManagerBean.class);
@@ -72,22 +71,29 @@ public class JSonSocketManagerBean implements IoHandler, EventListener {
 	}
 
 	@Override
-	public void messageReceived(IoSession session, Object message) throws Exception {
-		
+	public void messageReceived(IoSession session, Object message)
+			throws Exception {
+
 		String messageStr = message.toString();
-		
-		log.trace("Received Message "+messageStr);
-		try{
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.enableDefaultTyping(); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE				
-		Request request = mapper.readValue(messageStr, Request.class);
-		log.trace("Request is "+request);
-		if (request != null){
-			log.trace(String.format("Received {%s} from {%s} - RequestDto = {%s}", message, session.getRemoteAddress(), request));
-			AdmTelephonyServer.getInstance().processRequest(request);
-		}
-		}
-		catch (Exception e){
+
+		log.trace("Received Message " + messageStr);
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			mapper.enableDefaultTyping(); // default to using
+											// DefaultTyping.OBJECT_AND_NON_CONCRETE
+			Request request = mapper.readValue(messageStr, Request.class);
+			log.trace("Request is " + request);
+			if (request != null) {
+				log.trace(String.format(
+						"Received {%s} from {%s} - RequestDto = {%s}", message,
+						session.getRemoteAddress(), request));
+				EventDto event = AdmTelephonyServer.getInstance()
+						.processRequest(request);
+				if (event != null) {
+					sendEventAsJson(event);
+				}
+			}
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 	}
@@ -122,26 +128,32 @@ public class JSonSocketManagerBean implements IoHandler, EventListener {
 
 	}
 
-	@Override
-	public boolean onEvent(Event event) {
+	void sendEventAsJson(EventDto eventDto) {
+		if (eventDto == null)
+			return;
 		Collection<IoSession> sessions = this.acceptor.getManagedSessions()
 				.values();
-		try{
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.enableDefaultTyping(); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE		
+		mapper.enableDefaultTyping(); // default to using
+										// DefaultTyping.OBJECT_AND_NON_CONCRETE
 		mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-		EventDto eventDto = EventDtoBuilder.getInstance().buildEventDto(event);
-		if (eventDto != null){
-			for (IoSession s:sessions){
-				try {
-					s.write(mapper.writeValueAsString(eventDto));			
-				} catch (Exception e) {
-					log.error(e.getMessage(), e);
-				}
-			}	
+		for (IoSession s : sessions) {
+			try {
+				s.write(mapper.writeValueAsString(eventDto));
+			} catch (Exception e) {
+				log.error(e.getMessage(), e);
+			}
 		}
-		}
-		catch (Exception e){
+
+	}
+
+	@Override
+	public boolean onEvent(Event event) {
+		try {
+			EventDto eventDto = EventDtoBuilder.getInstance().buildEventDto(
+					event);
+			sendEventAsJson(eventDto);
+		} catch (Exception e) {
 			log.fatal(e.getMessage(), e);
 		}
 		return false;
