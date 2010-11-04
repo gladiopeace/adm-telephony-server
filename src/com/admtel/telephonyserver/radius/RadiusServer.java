@@ -1,5 +1,9 @@
 package com.admtel.telephonyserver.radius;
 
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
@@ -45,7 +49,11 @@ public class RadiusServer implements Authorizer {
 	public RadiusDefinition definition;
 
 	Dictionary dictionary;
-	
+
+	FileOutputStream fos = null;
+	BufferedOutputStream bos = null;
+	DataOutputStream dos = null;
+
 	final static String CONFERENCE_SERVICE_TYPE = "Conference";
 
 	public RadiusServer(RadiusDefinition definition) {
@@ -59,6 +67,15 @@ public class RadiusServer implements Authorizer {
 			dictionary = DictionaryParser.parseDictionary(s);
 		} catch (IOException e) {
 			log.fatal("Failed to instanciate RadiusServer", e);
+		}
+		if (definition.isLog()) {
+			try {
+				fos = new FileOutputStream(new File("radius.log"));
+				bos = new BufferedOutputStream(fos);
+				dos = new DataOutputStream(bos);
+			} catch (IOException e) {
+				log.fatal(e.getMessage());
+			}
 		}
 	}
 
@@ -151,11 +168,11 @@ public class RadiusServer implements Authorizer {
 						// log.debug(attribute2.getAttributeTypeObject().getName()+"====="+RadiusUtil.getStringFromUtf8(attribute2.getAttributeData()));
 						if (attribute2.getAttributeTypeObject().getName()
 								.equals("Cisco-Command-Code")) {
-							if (result.getRoutes() == null){
+							if (result.getRoutes() == null) {
 								result.setRoutes(new ArrayList());
 							}
-							result.getRoutes().add(RadiusUtil
-									.getStringFromUtf8(attribute2
+							result.getRoutes().add(
+									RadiusUtil.getStringFromUtf8(attribute2
 											.getAttributeData()));
 						} else if (attribute2.getAttributeTypeObject()
 								.getName().equals("h323-credit-time")) {
@@ -175,19 +192,17 @@ public class RadiusServer implements Authorizer {
 							if (key_value.length == 2) {
 								Object o = result.get(key_value[0]);
 								if (o != null) {
-									if (o instanceof List){
-									List l = (List) o;
-									l.add(key_value[1]);
-									}
-									else{
+									if (o instanceof List) {
+										List l = (List) o;
+										l.add(key_value[1]);
+									} else {
 										List l = new ArrayList();
 										l.add(o);
 										l.add(key_value[1]);
 										result.put(key_value[0], l);
 									}
-								}
-								else{
-									result.put(key_value[0],key_value[1]);
+								} else {
+									result.put(key_value[0], key_value[1]);
 								}
 							}
 						}
@@ -207,6 +222,16 @@ public class RadiusServer implements Authorizer {
 			log.error(e.getMessage(), e);
 		} catch (RadiusException e) {
 			log.error(e.getMessage(), e);
+		}
+		
+		//write to log file
+		if (dos != null){
+			try {
+				dos.writeUTF(ar.toString());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				log.warn(e.getMessage());
+			}
 		}
 		log.trace(result);
 		return result;
@@ -242,7 +267,7 @@ public class RadiusServer implements Authorizer {
 				+ AdmUtils.dateToRadiusStr(channel.getSetupTime()));
 		arDecorator.addAttribute("Acct-Delay-Time", "0");
 		arDecorator.addAttribute("NAS-Port-Type", "Async");// TODO, set proper
-															// value
+		// value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel
 				.getAcctUniqueSessionId());
 		arDecorator.addAttribute("Login-IP-Host", channel.getLoginIP());
@@ -295,7 +320,7 @@ public class RadiusServer implements Authorizer {
 				+ AdmUtils.dateToRadiusStr(channel.getSetupTime()));
 		arDecorator.addAttribute("Acct-Delay-Time", "0");
 		arDecorator.addAttribute("NAS-Port-Type", "Async");// TODO, set proper
-															// value
+		// value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel
 				.getAcctUniqueSessionId());
 		arDecorator.addAttribute("Login-IP-Host", channel.getLoginIP());
@@ -344,7 +369,7 @@ public class RadiusServer implements Authorizer {
 		arDecorator.addAttribute("Acct-Session-Time", Long.toString(channel
 				.getSessionTime()));
 		arDecorator.addAttribute("NAS-Port-Type", "Async");// TODO, set proper
-															// value
+		// value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel
 				.getAcctUniqueSessionId());
 		arDecorator.addAttribute("h323-disconnect-cause",
@@ -407,7 +432,7 @@ public class RadiusServer implements Authorizer {
 				+ AdmUtils.dateToRadiusStr(channel.getSetupTime()));
 		arDecorator.addAttribute("Acct-Delay-Time", "0");
 		arDecorator.addAttribute("NAS-Port-Type", "Async");// TODO, set proper
-															// value
+		// value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel
 				.getAcctUniqueSessionId());
 		arDecorator.addAttribute("Login-IP-Host", channel.getLoginIP());
@@ -459,7 +484,7 @@ public class RadiusServer implements Authorizer {
 				+ AdmUtils.dateToRadiusStr(channel.getSetupTime()));
 		arDecorator.addAttribute("Acct-Delay-Time", "0");
 		arDecorator.addAttribute("NAS-Port-Type", "Async");// TODO, set proper
-															// value
+		// value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel
 				.getAcctUniqueSessionId());
 		arDecorator.addAttribute("Login-IP-Host", channel.getLoginIP());
@@ -511,7 +536,7 @@ public class RadiusServer implements Authorizer {
 		arDecorator.addAttribute("Acct-Session-Time", Long
 				.toString(sessionTime));
 		arDecorator.addAttribute("NAS-Port-Type", "Async");// TODO, set proper
-															// value
+		// value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel
 				.getAcctUniqueSessionId());
 		arDecorator.addAttribute("h323-disconnect-cause",

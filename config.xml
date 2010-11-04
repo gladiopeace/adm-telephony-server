@@ -9,6 +9,7 @@
 	<radius-start-accounting>true</radius-start-accounting>
 	<radius-stop-accounting>true</radius-stop-accounting>
 	<radius-interim-update>10</radius-interim-update>
+	<log>true</log>
 </server>
 
 <registrar>
@@ -41,17 +42,17 @@
  		freeswitch
  	</type> 	
  </switch-listener>
-  <switch-listener>
- 	<address>
- 		172.16.34.1
- 	</address>
- 	<port>
- 		4573
- 	</port>
- 	<type>
- 		asterisk
- 	</type> 	
- </switch-listener> 
+<!--  <switch-listener>-->
+<!-- 	<address>-->
+<!-- 		172.16.34.1-->
+<!-- 	</address>-->
+<!-- 	<port>-->
+<!-- 		4573-->
+<!-- 	</port>-->
+<!-- 	<type>-->
+<!-- 		asterisk-->
+<!-- 	</type> 	-->
+<!-- </switch-listener> -->
 </switch-listeners>
 <!-- SWITCH LISTENERS END -->
 
@@ -105,22 +106,24 @@
 <!-- SWITCHES START -->
 <switches>
  <switch>
- 	<id>MyFreeswitch</id>
+ 	<name>MyFreeswitch</name>
     <address>172.16.140.129</address>
   	<port>8021</port>
   	<username>admin</username>
   	<password>admin</password>
   	<type>freeswitch</type>  
   	<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultFSAddressTranslator</addresstranslator> 	
+  	<enabled>false</enabled>
  </switch>
  <switch>
-  <id>MyAsterisk</id>
+  <name>Asterisk_VMWARE</name>
   <address>172.16.34.134</address>
   <port>5038</port>
   <username>admin</username>
   <password>voicelynx1201</password>
   <type>asterisk</type>
   <addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator</addresstranslator>
+  <enabled>true</enabled>
  </switch>
 
 </switches>

@@ -51,6 +51,11 @@ public class PromptBuilderDefinition implements DefinitionInterface {
 			return false;
 		return true;
 	}
+	@Override
+	public boolean isCoreChange(DefinitionInterface definition) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 
 }

@@ -8,6 +8,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator;
+import com.admtel.telephonyserver.config.DefinitionChangeListener;
+import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.SwitchDefinition;
 import com.admtel.telephonyserver.interfaces.AddressTranslator;
 import com.admtel.telephonyserver.requests.ChannelRequest;
@@ -19,7 +21,7 @@ public abstract class Switch {
 	private static Logger log = Logger.getLogger(Switch.class);
 
 	public enum SwitchStatus {
-		NotReady, Ready, Disconnecting, Disconnected, Connecting
+		NotReady, Blocked, Ready, Starting, Stopping
 	};
 
 	private SwitchDefinition definition;
@@ -29,40 +31,42 @@ public abstract class Switch {
 	private Map<String, Channel> channels = new HashMap<String, Channel>();
 	private Map<String, Channel> synchronizedChannels = Collections
 			.synchronizedMap(channels);
-	
-	protected MessageHandler messageHandler = 
-		new QueuedMessageHandler(){
 
-			@Override
-			public void onMessage(Object message) {
-				if (message instanceof BasicIoMessage){
-					Switch.this.processBasicIoMessage((BasicIoMessage)message);
-				}
-				else
-				if (message instanceof Request){
-					Switch.this.processRequest((Request)message);
-				}
-				
+	protected MessageHandler messageHandler = new QueuedMessageHandler() {
+
+		@Override
+		public void onMessage(Object message) {
+			if (message instanceof BasicIoMessage) {
+				Switch.this.processBasicIoMessage((BasicIoMessage) message);
+			} else if (message instanceof Request) {
+				Switch.this.processRequest((Request) message);
 			}
-		
-		};
-	
+		}
+	};
+
 	public Switch(SwitchDefinition definition) {
 		this.definition = definition;
 		setStatus(SwitchStatus.NotReady);
-		
+		setAddressTranslator(SmartClassLoader
+				.createInstance(AddressTranslator.class,
+						definition.getAddressTranslatorClass()));
+		if (getAddressTranslator() == null) {
+			setAddressTranslator(new DefaultASTAddressTranslator());
+		}
 	}
 
 	public SwitchDefinition getDefinition() {
 		return definition;
 	}
+
 	public String getSwitchId() {
 		return definition.getId();
 	}
 
-	public void setSwitchId(String switchId){
-		
+	public void setSwitchId(String switchId) {
+
 	}
+
 	public void addChannel(Channel channel) {
 		if (channel != null) {
 			synchronizedChannels.put(channel.getId(), channel);
@@ -87,15 +91,15 @@ public abstract class Switch {
 		return channels.values();
 	}
 
-	public void start(){
-		//TODO reload addressTranslator to pick up modifications
-		setAddressTranslator(SmartClassLoader
-				.createInstance(AddressTranslator.class, definition
-						.getAddressTranslatorClass()));
-		if (getAddressTranslator() == null) {
-			setAddressTranslator(new DefaultASTAddressTranslator());
-		}
+	public void start() {
+		status = SwitchStatus.Starting;
+	}
 
+	public void stop() {
+		for (Channel channel: channels.values()){
+			channel.hangup(DisconnectCode.Normal);
+		}
+		status = SwitchStatus.Stopping;
 	}
 
 	public SwitchStatus getStatus() {
@@ -103,8 +107,7 @@ public abstract class Switch {
 	}
 
 	abstract public Result originate(String destination, long timeout,
-			String callerId, String calledId, String script,
-			String data);
+			String callerId, String calledId, String script, String data);
 
 	@Override
 	public int hashCode() {
@@ -141,21 +144,40 @@ public abstract class Switch {
 		this.status = status;
 	}
 
-	public void setAddressTranslator(AddressTranslator addressTranslator) {
+	synchronized public void setAddressTranslator(
+			AddressTranslator addressTranslator) {
 		this.addressTranslator = addressTranslator;
 	}
 
-	public AddressTranslator getAddressTranslator() {
+	synchronized public AddressTranslator getAddressTranslator() {
 		return addressTranslator;
 	}
 
-	final public void processRequest(Request request)
-	{
+	final public void processRequest(Request request) {
 	}
+
 	abstract public void processBasicIoMessage(BasicIoMessage message);
 
 	public void putMessage(SwitchRequest request) {
 		messageHandler.putMessage(request);
-		
+
+	}
+
+	public boolean isAcceptingCalls() {
+		return definition.isEnabled() && status == SwitchStatus.Ready;
+	}
+
+	public void setDefinition(SwitchDefinition def) {
+		if (!def.getAddressTranslatorClass().equals(
+				definition.getAddressTranslatorClass())) {
+
+			setAddressTranslator(SmartClassLoader.createInstance(
+					AddressTranslator.class, def.getAddressTranslatorClass()));
+			if (getAddressTranslator() == null) {
+				setAddressTranslator(new DefaultASTAddressTranslator());
+			}
+		}
+		definition = def;
+
 	}
 }

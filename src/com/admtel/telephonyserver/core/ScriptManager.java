@@ -36,6 +36,7 @@ public class ScriptManager implements DefinitionChangeListener {
 			script = sf.createScript(channelData);
 			if (script != null) {
 				Scripts.getInstance().add(script);
+				log.trace(String.format("Script (%s) created for ChannelData (%s)", script, channelData));
 				return script;
 			}
 		}

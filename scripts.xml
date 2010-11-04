@@ -75,6 +75,13 @@
  	</parameters>
  </script>
  
+ <script name="CallingCard">
+ 	<called>801555</called>
+ 	<class>scripts/CallingCard.groovy</class>
+ 	<parameters>
+ 	 <parameter key="language" value="english"></parameter>
+ 	</parameters>
+ </script>
  
  <script name="SoftSwitch">
   <called>[0-9]*</called>

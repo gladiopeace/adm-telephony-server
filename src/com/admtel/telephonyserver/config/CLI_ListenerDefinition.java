@@ -103,4 +103,10 @@ public class CLI_ListenerDefinition implements DefinitionInterface{
 				+ (username != null ? "username=" + username : "");
 	}
 
+	@Override
+	public boolean isCoreChange(DefinitionInterface definition) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

@@ -12,6 +12,8 @@ import com.admtel.telephonyserver.config.SystemConfig;
 import com.admtel.telephonyserver.httpserver.HttpServers;
 import com.admtel.telephonyserver.prompts.PromptBuilderFactory;
 import com.admtel.telephonyserver.radius.RadiusServers;
+import com.admtel.telephonyserver.remote.EventDto;
+import com.admtel.telephonyserver.remote.SimpleMessageDto;
 import com.admtel.telephonyserver.requests.HangupRequest;
 import com.admtel.telephonyserver.requests.Request;
 import com.admtel.telephonyserver.requests.SwitchRequest;
@@ -51,10 +53,25 @@ public class AdmTelephonyServer {
 		}
 	}
 
-	public void processRequest (Request request){
+	public EventDto processRequest (Request request){
 		log.trace(String.format("Received request %s", request));
+		EventDto result = null;
+		switch (request.getType()){
+		case Reload:
+			log.trace("Reloading configuration ...");
+			SystemConfig.getInstance().load();
+			break;
+		case ShowStatus:
+			result = new SimpleMessageDto(showStatus());
+			break;
+		}
 		//TODO better request processing
 		Switches.getInstance().processRequest(request);		
+		return result;
+	}
+	
+	String showStatus(){
+		return AdmThreadExecutor.getInstance().getStatus();
 	}
 	
 	private void start() {

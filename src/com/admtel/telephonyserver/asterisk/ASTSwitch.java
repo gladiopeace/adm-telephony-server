@@ -22,6 +22,7 @@ import com.admtel.telephonyserver.asterisk.events.ASTNewChannelEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTPeerStatusEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTResponseEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTEvent.EventType;
+import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.SwitchDefinition;
 import com.admtel.telephonyserver.core.BasicIoMessage;
 import com.admtel.telephonyserver.core.QueuedMessageHandler;
@@ -41,13 +42,13 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	// /////////////////////////////////////////////////////
 	// State classes
-	//	
+	//
 	private static Logger log = Logger.getLogger(ASTSwitch.class);
 
 	private IoSession session;
 
 	private static final int CONNECT_TIMEOUT = 1000;
-	private static final int RECONNECT_AFTER = 500;
+	private static final int RECONNECT_AFTER = 5000;
 
 	private SocketConnector connector;
 
@@ -57,10 +58,10 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 	private Timer reconnectTimer = null;
 
 	private enum State {
-		LoggingIn, LoggedIn
+		Connecting, LoggingIn, LoggedIn, Disconnecting, Disconnected,
 	};
 
-	private State state = State.LoggingIn;
+	private State state = State.Disconnected;
 
 	// /////////////////////////////////////////////////////
 	public ASTSwitch(SwitchDefinition definition) {
@@ -101,14 +102,12 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 	@Override
 	public void sessionClosed(IoSession session) throws Exception {
 		log.warn("Disconnected from switch " + getDefinition().getId());
-		setStatus (SwitchStatus.Disconnected);
+		state = State.Disconnected;
 		start();
 	}
 
 	@Override
 	public void sessionCreated(IoSession session) throws Exception {
-		setStatus(SwitchStatus.Ready);
-
 	}
 
 	@Override
@@ -135,10 +134,16 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 				false, null);
 	}
 
+	@Override
+	public void stop() {
+		super.stop();		
+	}
+
 	private boolean connect() {
 		log.debug(String.format("Trying to connect to %s:%d", getDefinition()
 				.getAddress(), getDefinition().getPort()));
-		setStatus(SwitchStatus.Connecting);
+
+		state = State.Connecting;
 		try {
 			ConnectFuture connectFuture = connector
 					.connect(new InetSocketAddress(
@@ -151,8 +156,9 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 			return true;
 		} catch (Exception e) {
 			log.warn(e.getMessage(), e);
-			if (session != null) session.close(true);
-			setStatus(SwitchStatus.Disconnected);
+			if (session != null)
+				session.close(true);
+			state = State.Disconnected;
 		}
 		return false;
 	}
@@ -161,10 +167,11 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 	public boolean onTimer(Object data) {
 		if (isConnected())
 			return true;// stop the timer
-		if (getStatus() == SwitchStatus.NotReady || getStatus() == SwitchStatus.Disconnected){
+	
+		if (getDefinition().isEnabled() && state == State.Disconnected) {
 			return connect();
 		}
-		return false;
+		return true;
 	}
 
 	private boolean isConnected() {
@@ -181,12 +188,10 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 		String translatedDestination = getAddressTranslator().translate(
 				destination);
-		session
-				.write(String
-						.format(
-								"Action: Originate\nChannel: %s\nTimeout: %d\nApplication: AGI\nVariable: adm_args=%s\nData: agi:async\nAsync: 1\nActionId: %s",
-								translatedDestination, timeout, admArgs, uuid
-										+ "___Originate"));
+		session.write(String
+				.format("Action: Originate\nChannel: %s\nTimeout: %d\nApplication: AGI\nVariable: adm_args=%s\nData: agi:async\nAsync: 1\nActionId: %s",
+						translatedDestination, timeout, admArgs, uuid
+								+ "___Originate"));
 		return Result.Ok;
 	}
 
@@ -195,14 +200,15 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 		switch (state) {
 		case LoggingIn: {
 			if (message != null) {
-				ASTEvent event = ASTEvent.buildEvent(ASTSwitch.this
-						.getSwitchId(), message.getMessage());
+				ASTEvent event = ASTEvent.buildEvent(
+						ASTSwitch.this.getSwitchId(), message.getMessage());
 				if (event != null && event.getEventType() == EventType.Response) {
 					ASTResponseEvent response = (ASTResponseEvent) event;
 					if (response.isSuccess()) {
 						log.debug(response.getMessage());
 						ASTSwitch.this.setStatus(SwitchStatus.Ready);
 						state = State.LoggedIn;
+						setStatus(SwitchStatus.Ready);
 					}
 				}
 			}
@@ -211,11 +217,11 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 		case LoggedIn: {
 			if (message != null) {
 
-				log.debug(String.format("Switch (%s) : \n%s", ASTSwitch.this
-						.getSwitchId(), message.getMessage()));
+				log.debug(String.format("Switch (%s) : \n%s",
+						ASTSwitch.this.getSwitchId(), message.getMessage()));
 
-				ASTEvent event = ASTEvent.buildEvent(ASTSwitch.this
-						.getSwitchId(), message.getMessage());
+				ASTEvent event = ASTEvent.buildEvent(
+						ASTSwitch.this.getSwitchId(), message.getMessage());
 				if (event == null) {
 					log.debug("Didn't create Event for message ...");
 					return;
@@ -228,8 +234,8 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 				switch (event.getEventType()) {
 				case NewChannel: {
 					ASTNewChannelEvent nce = (ASTNewChannelEvent) event;
-					ASTChannel channel = new ASTChannel(ASTSwitch.this, nce
-							.getChannelId(), message.getSession());
+					ASTChannel channel = new ASTChannel(ASTSwitch.this,
+							nce.getChannelId(), message.getSession());
 					ASTSwitch.this.addChannel(channel);
 				}
 					break;
@@ -270,4 +276,5 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 			break;
 		}
 	}
+
 }
