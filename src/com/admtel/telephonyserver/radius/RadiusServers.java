@@ -104,22 +104,20 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 	}
 
 	@Override
-	public AuthorizeResult authorize(Channel channel, String username,
+	public AuthorizeResult authorize(String username,
 			String password, String address, String serviceType,
-			String calledStationId, boolean routing, boolean number) {
+			String calledStationId, String callingStationId, String loginIp, String serviceNumber, boolean routing, boolean number) {
 
-		if (channel == null) {
-			log.warn("authorize channel is null");
-			return new AuthorizeResult();
-		}
+		
 		if (idMap.isEmpty()){
 			return new AuthorizeResult();
 		}
 		AuthorizeResult authorizeResult = getAvailableServer().authorize(
-				channel, username, password, address, serviceType,
-				calledStationId, routing, number);
+				 username, password, address, serviceType,
+				calledStationId, callingStationId, loginIp, serviceNumber, routing, number);
 		if (authorizeResult.getAuthorized()) {
-			channel.setUserName(authorizeResult.getUserName());
+			//channel.setUserName(authorizeResult.getUserName());
+			//
 			// TODO set hangup time
 		}
 
@@ -156,7 +154,6 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 		accountingStop(event.getChannel());
 	}
 
-	@Override
 	public boolean accountingInterimUpdate(Channel channel) {
 		if (!isEnabled()) return false;
 		RadiusServer radiusServer = getAvailableServer();
@@ -166,7 +163,6 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 		return true;
 	}
 
-	@Override
 	public boolean accountingStart(Channel channel) {
 		if (!isEnabled()) return false;
 		RadiusServer radiusServer = getAvailableServer();
@@ -176,7 +172,6 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 		return true;
 	}
 
-	@Override
 	public boolean accountingStop(Channel channel) {
 		if (!isEnabled()) return false;
 		RadiusServer radiusServer = getAvailableServer();
@@ -186,7 +181,6 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 		return true;
 	}
 
-	@Override
 	public boolean accountingInterimUpdate(Channel channel,
 			Conference conference, Participant participant) {
 		if (!isEnabled()) return false;
@@ -197,7 +191,6 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 		return true;
 	}
 
-	@Override
 	public boolean accountingStart(Channel channel, Conference conference,
 			Participant participant) {
 		if (!isEnabled()) return false;
@@ -208,7 +201,6 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 		return true;
 	}
 
-	@Override
 	public boolean accountingStop(Channel channel, Conference conference,
 			Participant participant) {
 		if (!isEnabled()) return false;

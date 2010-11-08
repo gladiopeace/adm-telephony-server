@@ -2,7 +2,10 @@ package com.admtel.telephonyserver.core;
 
 import java.util.ArrayList;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -32,6 +35,20 @@ public abstract class Script implements EventListener{
 
 	List<Channel> channels = new ArrayList<Channel>();
 
+	Map<String, String> parameters;
+	
+	public Map<String, String> getParameters(){
+		return parameters;
+	}
+	public String getParameter(String key){
+		if (parameters != null){
+			return parameters.get(key);
+		}
+		return null;
+	}
+	public void setParameters (Map<String, String> parameters){
+		this.parameters = parameters;
+	}
 	public ScriptState getState() {
 		return scriptState;
 	}
@@ -40,6 +57,31 @@ public abstract class Script implements EventListener{
 		id = UUID.randomUUID().toString();
 	}
 
+	@Override
+	public String toString() {
+		final int maxLen = 20;
+		return "Script ["
+				+ (id != null ? "id=" + id + ", " : "")
+				+ (scriptState != null ? "scriptState=" + scriptState + ", "
+						: "")
+				+ (channels != null ? "channels=" + toString(channels, maxLen)
+						+ ", " : "")
+				+ (parameters != null ? "parameters="
+						+ toString(parameters.entrySet(), maxLen) : "") + "]";
+	}
+	private String toString(Collection<?> collection, int maxLen) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("[");
+		int i = 0;
+		for (Iterator<?> iterator = collection.iterator(); iterator.hasNext()
+				&& i < maxLen; i++) {
+			if (i > 0)
+				builder.append(", ");
+			builder.append(iterator.next());
+		}
+		builder.append("]");
+		return builder.toString();
+	}
 	public String getId(){
 		return id;
 	}
@@ -127,7 +169,4 @@ public abstract class Script implements EventListener{
 	protected abstract void onTimer();
 
 	protected abstract void onStop();
-	
-	protected abstract void onStart(Object data);
-
 }

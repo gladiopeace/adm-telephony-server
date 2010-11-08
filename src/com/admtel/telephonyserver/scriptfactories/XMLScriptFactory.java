@@ -6,9 +6,12 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.log4j.Logger;
 
 import com.admtel.telephonyserver.core.ChannelData;
@@ -23,7 +26,7 @@ public class XMLScriptFactory implements ScriptFactory, Loadable {
 
 	private XMLConfiguration config;
 
-	private List<ScriptData> scripts = new ArrayList<ScriptData>();
+	private List<ScriptData> scripts = new CopyOnWriteArrayList<ScriptData>();
 
 	static class ScriptData {
 		public String name;
@@ -59,6 +62,7 @@ public class XMLScriptFactory implements ScriptFactory, Loadable {
 
 	public XMLScriptFactory() throws ConfigurationException {
 		config = new XMLConfiguration("scripts.xml");
+		config.setReloadingStrategy(new FileChangedReloadingStrategy());
 	}
 
 	@Override
@@ -75,6 +79,7 @@ public class XMLScriptFactory implements ScriptFactory, Loadable {
 							log.debug(String.format(
 									"Created script for (%s) - script (%s)",
 									channelData.toString(), script));
+							script.setParameters(scriptData.parameters);
 						}
 						return script;
 					} catch (Exception e) {
@@ -110,8 +115,8 @@ public class XMLScriptFactory implements ScriptFactory, Loadable {
 
 	@Override
 	public void load() {
-		// TODO, reload logic
-
+		log.trace("Loading configuration ... ");
+		scripts.clear();
 		int counter = 0;
 		try {
 			while (config.configurationAt(String.format("script(%d)", counter)) != null) {
@@ -122,10 +127,16 @@ public class XMLScriptFactory implements ScriptFactory, Loadable {
 						"script(%d).called", counter));
 				String className = config.getString(String.format(
 						"script(%d).class", counter));
+				Map<String, String> parameters = new HashMap<String, String>();
+				try{
 				HierarchicalConfiguration parametersConfig = config
 						.configurationAt(String.format("script(%d).parameters",
 								counter));
-				Map<String, String> parameters = loadParameters(parametersConfig);
+				 parameters = loadParameters(parametersConfig);
+				}
+				catch (Exception e){
+					log.warn(e.getMessage());
+				}
 				ScriptData sd = new ScriptData(name, called, className,
 						parameters);
 				scripts.add(sd);

@@ -60,20 +60,20 @@ public class AdmTelephonyServer {
 		case Reload:
 			log.trace("Reloading configuration ...");
 			SystemConfig.getInstance().load();
+			ScriptManager.getInstance().reload();
 			break;
 		case ShowStatus:
-			result = new SimpleMessageDto(showStatus());
+			result = new SimpleMessageDto(AdmThreadExecutor.getInstance().getStatus());
+			break;
+		case ShowSwitch:
+			result = new SimpleMessageDto(Switches.getInstance().toReadableString());
 			break;
 		}
 		//TODO better request processing
 		Switches.getInstance().processRequest(request);		
 		return result;
 	}
-	
-	String showStatus(){
-		return AdmThreadExecutor.getInstance().getStatus();
-	}
-	
+		
 	private void start() {
 
 		SystemConfig sysConfig = SystemConfig.getInstance();

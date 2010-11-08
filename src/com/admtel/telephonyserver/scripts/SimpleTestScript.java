@@ -147,10 +147,4 @@ public class SimpleTestScript extends Script {
 	public String getDisplayStr() {
 		return displayStr;
 	}
-
-	@Override
-	protected void onStart(Object data) {
-		// TODO Auto-generated method stub
-		
-	}
 }

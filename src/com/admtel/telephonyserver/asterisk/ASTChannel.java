@@ -77,6 +77,10 @@ public class ASTChannel extends Channel {
 
 		private Result execute() {
 			playedPromptCount = 0;
+			if (terminators == null ||terminators.trim().isEmpty()){
+				terminators = "X";
+			}
+			
 			String actionId = getId() + "___StreamFile";
 			ASTChannel.this.session
 					.write(String

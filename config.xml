@@ -5,7 +5,7 @@
 	<maxthreads>15</maxthreads>
 	<address>172.16.140.1</address>	
 	<base-directory>/usr/local/adm</base-directory>
-	<script-path>.;./scripts;/Users/danny/AdmTel_Source/adm-telephony-scripts/src</script-path>
+	<script-path>.;./scripts</script-path>
 	<radius-start-accounting>true</radius-start-accounting>
 	<radius-stop-accounting>true</radius-stop-accounting>
 	<radius-interim-update>10</radius-interim-update>
@@ -134,9 +134,9 @@
 <!-- <scriptfactory>-->
 <!--  <class>/Users/danny/AdmTel_Source/adm-telephony-scripts/src/WSScriptFactory.groovy</class>-->
 <!-- </scriptfactory>-->
- <scriptfactory>
-  <class>com.admtel.telephonyserver.scriptfactories.VariableScriptFactory</class>
- </scriptfactory>
+<!-- <scriptfactory>-->
+<!--  <class>com.admtel.telephonyserver.scriptfactories.VariableScriptFactory</class>-->
+<!-- </scriptfactory>-->
  <scriptfactory>
   <class>com.admtel.telephonyserver.scriptfactories.XMLScriptFactory</class>
  </scriptfactory>
