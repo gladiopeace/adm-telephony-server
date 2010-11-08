@@ -45,9 +45,7 @@ public class ATSConsole implements IoHandler{
 			COMMAND_MAP.put(CLI_ShowChannelsCommand.command, new CLI_ShowChannelsCommand());
 			COMMAND_MAP.put(CLI_ReloadCommand.command, new CLI_ReloadCommand());
 			COMMAND_MAP.put(CLI_ShowStatusCommand.command, new CLI_ShowStatusCommand());
-			for (String str:COMMAND_MAP.keySet()){
-				System.out.println("Command --- " + str);
-			}
+			COMMAND_MAP.put(CLI_ShowSwitchCommand.command, new CLI_ShowSwitchCommand());			
 		}
 		catch (Exception e){
 			e.printStackTrace();

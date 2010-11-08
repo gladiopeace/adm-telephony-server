@@ -79,10 +79,17 @@
  	<called>801555</called>
  	<class>scripts/CallingCard.groovy</class>
  	<parameters>
- 	 <parameter key="language" value="english"></parameter>
+<!-- 		<parameter key="language" value="english"/>-->
+ 		<parameter key="authenticator" value="default"/>
+ 	</parameters> 	
+ </script>
+ <script name="cc">
+ 	<called>801666</called>
+ 	<class>scripts/cc/CallingCardScript.groovy</class>
+ 	<parameters>
+ 		<parameter key="authorizer" value="com.admtel.telephonyserver.misc.SimpleAuthorizer"/>
  	</parameters>
  </script>
- 
  <script name="SoftSwitch">
   <called>[0-9]*</called>
   <class>scripts/SoftSwitch.groovy</class>

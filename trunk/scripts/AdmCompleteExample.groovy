@@ -52,10 +52,6 @@ class AdmCompleteExample extends Script {
 			break
 		}
 	}
-	@Override
-	public void onStart (data){
-		
-	}
 	void processWaitingForCall_State(Event event){
 		switch (event.getEventType()){
 			case EventType.InboundAlerting:

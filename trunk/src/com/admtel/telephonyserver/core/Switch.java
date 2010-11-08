@@ -180,4 +180,7 @@ public abstract class Switch {
 		definition = def;
 
 	}
+	public String toReadableString(){
+		return String.format("%s|%s:%d|%s|%d\n", definition.getName(), definition.getAddress(), definition.getPort(), getStatus(), channels.size());
+	}
 }

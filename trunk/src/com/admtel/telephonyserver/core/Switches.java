@@ -241,5 +241,13 @@ public class Switches implements DefinitionChangeListener, EventListener {
 
 		return false;
 	}
+
+	public String toReadableString() {
+		String result ="";
+		for (Switch _switch:idMap.values()){
+			result += _switch.toReadableString();
+		}
+		return result;
+	}
 }
  

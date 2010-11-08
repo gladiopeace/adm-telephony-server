@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
+import java.math.BigDecimal;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,14 +96,9 @@ public class RadiusServer implements Authorizer {
 	}
 
 	@Override
-	public AuthorizeResult authorize(Channel channel, String username,
+	public AuthorizeResult authorize(String username,
 			String password, String address, String serviceType,
-			String calledStationId, boolean routing, boolean number) {
-
-		if (channel == null) {
-			log.warn("channel is null");
-			return new AuthorizeResult();
-		}
+			String calledStationId, String callingStationId, String loginIp, String serviceNumber, boolean routing, boolean number) {		
 
 		log.trace(String.format("authorize :%s:%s:%s:%s:%s", username, address,
 				calledStationId, routing, number));
@@ -111,13 +107,15 @@ public class RadiusServer implements Authorizer {
 		}
 		if (password == null || password.isEmpty()) {
 			password = "0000";
-		}
-		String callingStationId = channel.getCallingStationId();
+		}		
 		if (callingStationId == null || callingStationId.isEmpty()) {
 			callingStationId = "0000";
 		}
 		if (calledStationId == null || calledStationId.isEmpty()) {
 			calledStationId = "0000";
+		}
+		if (loginIp == null || loginIp.isEmpty()){
+			loginIp = "x.x.x.x";
 		}
 
 		AccessRequest ar = new AccessRequest(username, password);
@@ -130,10 +128,10 @@ public class RadiusServer implements Authorizer {
 		arDecorator.addAttribute("Service-Type", serviceType);
 		arDecorator.addAttribute("Calling-Station-Id", callingStationId);
 		arDecorator.addAttribute("Called-Station-Id", calledStationId);
-		arDecorator.addAttribute("Login-IP-Host", channel.getLoginIP());
-		if (channel.getServiceNumber() != null) {
+		arDecorator.addAttribute("Login-IP-Host", loginIp);
+		if (serviceNumber != null) {
 			arDecorator.addAttribute("Cisco-AVPair", "service-number="
-					+ channel.getServiceNumber());
+					+ serviceNumber);
 		}
 
 		String xpgkRequestType = "";
@@ -182,6 +180,15 @@ public class RadiusServer implements Authorizer {
 												.getAttributeData()));
 							} catch (Exception e) {
 								result.allowedTime = 0;
+							}
+						} else if (attribute2.getAttributeTypeObject()
+								.getName().equals("h323-credit-amount")) {
+							try {
+								result.credit = new BigDecimal(RadiusUtil
+										.getStringFromUtf8(attribute2
+												.getAttributeData()));
+							} catch (Exception e) {
+								result.credit = BigDecimal.ZERO;
 							}
 						} else if (attribute2.getAttributeTypeObject()
 								.getName().equals("Cisco-AVPair")) {
@@ -237,7 +244,6 @@ public class RadiusServer implements Authorizer {
 		return result;
 	}
 
-	@Override
 	public boolean accountingInterimUpdate(Channel channel) {
 
 		String str = channel.getUserName();
@@ -294,7 +300,6 @@ public class RadiusServer implements Authorizer {
 		return true;
 	}
 
-	@Override
 	public boolean accountingStart(Channel channel) {
 
 		AccountingRequest acctRequest = new AccountingRequest((channel
@@ -342,7 +347,6 @@ public class RadiusServer implements Authorizer {
 		return true;
 	}
 
-	@Override
 	public boolean accountingStop(Channel channel) {
 
 		AccountingRequest acctRequest = new AccountingRequest((channel
@@ -407,7 +411,6 @@ public class RadiusServer implements Authorizer {
 		return true;
 	}
 
-	@Override
 	public boolean accountingInterimUpdate(Channel channel,
 			Conference conference, Participant participant) {
 		AccountingRequest acctRequest = new AccountingRequest(conference
@@ -459,7 +462,6 @@ public class RadiusServer implements Authorizer {
 		return true;
 	}
 
-	@Override
 	public boolean accountingStart(Channel channel, Conference conference,
 			Participant participant) {
 		AccountingRequest acctRequest = new AccountingRequest(conference
@@ -506,7 +508,6 @@ public class RadiusServer implements Authorizer {
 		return true;
 	}
 
-	@Override
 	public boolean accountingStop(Channel channel, Conference conference,
 			Participant participant) {
 		AccountingRequest acctRequest = new AccountingRequest(conference

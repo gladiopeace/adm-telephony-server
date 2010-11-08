@@ -11,7 +11,6 @@
 	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry kind="lib" path="lib/groovy-all-1.7.1.jar"/>
 	<classpathentry kind="lib" path="lib/joda-time-1.6.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="lib/mina-core-2.0.0-RC1.jar" sourcepath="/Users/danny/adm/apps/mina-2.0.0-RC1/src"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.5.0.jar"/>
@@ -23,5 +22,6 @@
 	<classpathentry kind="lib" path="lib/jackson-mapper-asl-1.6.0.jar"/>
 	<classpathentry kind="lib" path="lib/dp.lib-dto.GeDA-1.0.0-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/jopt-simple-3.2.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.14.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

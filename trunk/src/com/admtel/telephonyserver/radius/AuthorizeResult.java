@@ -1,5 +1,6 @@
 package com.admtel.telephonyserver.radius;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -12,7 +13,20 @@ public class AuthorizeResult {
 	String userName;
 	Boolean authorized = false;
 	Integer allowedTime = 0;
+	BigDecimal credit = BigDecimal.ZERO;
 
+	public BigDecimal getCredit() {
+		return credit;
+	}
+	public void setCredit(BigDecimal credit) {
+		this.credit = credit;
+	}
+	public Map<String, Object> getAttributes() {
+		return attributes;
+	}
+	public void setAttributes(Map<String, Object> attributes) {
+		this.attributes = attributes;
+	}
 	Map<String, Object> attributes = new HashMap<String, Object>();
 	
 	public List<String> getRoutes() {

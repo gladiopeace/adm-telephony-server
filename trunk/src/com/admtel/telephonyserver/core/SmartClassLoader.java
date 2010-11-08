@@ -1,29 +1,20 @@
 package com.admtel.telephonyserver.core;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.codehaus.groovy.control.CompilerConfiguration;
-
 import com.admtel.telephonyserver.config.SystemConfig;
-import com.admtel.telephonyserver.utils.AdmUtils;
-
-
-import groovy.lang.GroovyClassLoader;
 import groovy.util.GroovyScriptEngine;
 
 public class SmartClassLoader {
 	
 	static Logger log = Logger.getLogger(SmartClassLoader.class);
 	
-	GroovyClassLoader groovyClassLoader;
 	GroovyScriptEngine groovyScriptEngine;
 	ClassLoader classLoader;
 	
 	private SmartClassLoader(){
 		classLoader = SmartClassLoader.class.getClassLoader(); 
-		groovyClassLoader = new GroovyClassLoader(classLoader);
 		try {
 
 			String[] roots = SystemConfig.getInstance().serverDefinition.getScriptPath().split(";");
@@ -88,6 +79,7 @@ public class SmartClassLoader {
 	
 	
 	static public <T> T createInstance(Class<T> classType, String className){
+		log.trace("Creating instance of class " + className);
 		return SmartClassLoader.getInstance().createInstanceI(classType, className);
 	}
 	
