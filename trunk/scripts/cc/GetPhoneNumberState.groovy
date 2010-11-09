@@ -6,7 +6,7 @@ import com.admtel.telephonyserver.events.PlayAndGetDigitsFailedEvent;
 import com.admtel.telephonyserver.radius.AuthorizeResult;
 
 class GetPhoneNumberState extends GState {
-
+	
 	int counter = 0;
 	
 	
@@ -14,18 +14,18 @@ class GetPhoneNumberState extends GState {
 	public void onEnter() {
 		
 		script.channel.playAndGetDigits(10, "callingcard/phonenum", 10000, "#")
-	
 	}
-
+	
 	@Override
 	public void onExit() {
 		// TODO Auto-generated method stub
-
+		
 	}
 	def onPlayAndGetDigitsEnded (PlayAndGetDigitsEndedEvent e){
 		counter ++
-		AuthorizeResult aResult = script.session.authorizer.authorize(e.getDigits(), "", "", "login-user", "", "", "", "", false, false);
+		AuthorizeResult aResult = script.session.authorizer.authorize(e.getDigits(), "", "", "Login-User", e.getDigits(), script.channel.getCallingStationId(), "", "", false, false);
 		if (aResult.getAuthorized() && aResult.getRoutes()?.size() > 0){
+			script.session.routes = aResult.getRoutes()
 			return "Dial"
 		}
 		if (counter < 3){

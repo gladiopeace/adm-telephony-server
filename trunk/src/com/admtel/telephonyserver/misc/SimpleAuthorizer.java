@@ -16,7 +16,8 @@ public class SimpleAuthorizer implements Authorizer{
 		AuthorizeResult result = new AuthorizeResult();
 		
 		ArrayList<String> routes = new ArrayList<String>();
-		routes.add("sip/1000");
+		routes.add("sip:"+calledStationId);
+		routes.add("sip:"+calledStationId+"0");
 		
 		result.setUserName(username);
 		result.setAuthorized(true);

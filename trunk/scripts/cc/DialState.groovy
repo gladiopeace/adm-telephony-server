@@ -5,9 +5,10 @@ import com.admtel.telephonyserver.events.*;
 
 class DialState extends GState {
 
+	int count = 0;
 	@Override
-	public void onEnter() {
-		script.channel.dial("sip:6000", 10000)
+	public void onEnter() {		
+		script.channel.dial(script.session.routes[count], 10000)
 	}
 
 	@Override
@@ -16,10 +17,16 @@ class DialState extends GState {
 
 	}	
 	def onDialStarted(DialStartedEvent event){
-		script.log.trace("Dial started ")
+		script.log.trace("Dial started ***********************")
 	}
 	def onDialFailed(DialFailedEvent event){
-		script.log.trace("Dial failed *************************")
+		count ++;
+		if (script.session.routes.size()+1 > count){
+			script.channel.dial(script.session.routes[count],10000)
+			return null;
+		}
+		script.session.dialFailedCause = event.getCause()
+		return "PlayDialFailed"
 	}
 	def onHangup(HangupEvent e){
 		if (e.getChannel() != script.channel){			

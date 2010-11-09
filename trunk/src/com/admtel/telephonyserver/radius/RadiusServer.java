@@ -115,7 +115,7 @@ public class RadiusServer implements Authorizer {
 			calledStationId = "0000";
 		}
 		if (loginIp == null || loginIp.isEmpty()){
-			loginIp = "x.x.x.x";
+			loginIp = "127.0.0.1";
 		}
 
 		AccessRequest ar = new AccessRequest(username, password);
