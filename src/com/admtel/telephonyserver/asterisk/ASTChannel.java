@@ -30,7 +30,9 @@ import com.admtel.telephonyserver.events.AnsweredEvent;
 import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
 import com.admtel.telephonyserver.events.ConferenceTalkEvent;
+import com.admtel.telephonyserver.events.DialFailedEvent;
 import com.admtel.telephonyserver.events.DialStartedEvent;
+import com.admtel.telephonyserver.events.DialStatus;
 import com.admtel.telephonyserver.events.HangupEvent;
 import com.admtel.telephonyserver.events.InboundAlertingEvent;
 import com.admtel.telephonyserver.events.OutboundAlertingEvent;
@@ -747,6 +749,12 @@ public class ASTChannel extends Channel {
 							.getChannel(dialEvent.getDestinationChannel());
 					onEvent(new DialStartedEvent(ASTChannel.this, dialedChannel));
 				}
+				else{
+					if (dialEvent.getDialStatus() != DialStatus.Answer){
+						onEvent(new DialFailedEvent(ASTChannel.this, dialEvent.getDialStatus()));						
+					}
+				}
+				
 			}
 				break;
 			}

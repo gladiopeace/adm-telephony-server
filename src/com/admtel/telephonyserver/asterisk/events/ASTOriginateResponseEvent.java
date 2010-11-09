@@ -3,7 +3,7 @@ package com.admtel.telephonyserver.asterisk.events;
 import java.util.Map;
 
 import com.admtel.telephonyserver.events.DialFailedEvent;
-import com.admtel.telephonyserver.events.DialFailedEvent.Cause;
+import com.admtel.telephonyserver.events.DialStatus;
 
 public class ASTOriginateResponseEvent extends ASTChannelEvent {
 	
@@ -36,31 +36,31 @@ public class ASTOriginateResponseEvent extends ASTChannelEvent {
 		return values.get("Channel");
 	}
 
-	public DialFailedEvent.Cause getReason(){
+	public DialStatus getReason(){
 		//return values.get("Reason");
 		String reason = values.get("Reason");
-		Cause result = Cause.Unknown;
+		DialStatus result = DialStatus.Unknown;
 		try{
 			int iCause = Integer.valueOf(reason);
 			switch (iCause){
 			case 0:
-					result = Cause.InvalidNumber;
+					result = DialStatus.InvalidNumber;
 				break;
 			case 1:
-				result =Cause.NoAnswer;
+				result = DialStatus.NoAnswer;
 				break;
 			case 4:
-				result = Cause.Answer;
+				result = DialStatus.Answer;
 				break;
 			case 8:
-					result = Cause.Congested;
+					result = DialStatus.Congested;
 				break;
 			}
 		}
 		catch (Exception e){
 			
 		}
-		return DialFailedEvent.Cause.Unknown;
+		return DialStatus.Unknown;
 	}
 
 }

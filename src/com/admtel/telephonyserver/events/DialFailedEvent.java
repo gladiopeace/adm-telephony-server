@@ -4,26 +4,21 @@ import com.admtel.telephonyserver.core.Channel;
 
 public class DialFailedEvent extends ChannelEvent {
 
-	public enum Cause{Unknown, InvalidNumber, NoAnswer, Congested, Answer}
-	
-	Cause cause = Cause.Unknown;
+	DialStatus dialStatus = DialStatus.Unknown;
 	
 	public DialFailedEvent(Channel channel) {
 		super(channel);
 		eventType = EventType.DialFailed;
 	}
-	public DialFailedEvent (Channel channel, Cause cause){
+	public DialFailedEvent (Channel channel, DialStatus dialStatus){
 		super(channel);
 		eventType = EventType.DialFailed;
-		this.cause = cause;
+		this.dialStatus = dialStatus;
 	}
-
-	public Cause getCause() {
-		return cause;
+	public DialStatus getDialStatus() {
+		return dialStatus;
 	}
-
-
-	public void setCause(Cause cause) {
-		this.cause = cause;
+	public void setDialStatus(DialStatus dialStatus) {
+		this.dialStatus = dialStatus;
 	}
 }

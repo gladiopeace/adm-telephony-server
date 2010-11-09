@@ -217,8 +217,8 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 		case LoggedIn: {
 			if (message != null) {
 
-//				log.debug(String.format("Switch (%s) : \n%s",
-//						ASTSwitch.this.getSwitchId(), message.getMessage()));
+				log.debug(String.format("Switch (%s) : \n%s",
+						ASTSwitch.this.getSwitchId(), message.getMessage()));
 
 				ASTEvent event = ASTEvent.buildEvent(
 						ASTSwitch.this.getSwitchId(), message.getMessage());

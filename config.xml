@@ -18,15 +18,15 @@
 </registrar>
 
 <radius>
-<!--	<server>-->
-<!--		<id>first radius server</id>-->
-<!--		<address>172.16.140.129</address>-->
-<!--		<auth-port>1812</auth-port>-->
-<!--		<acct-port>1813</acct-port>-->
-<!--		<secret>meravoip</secret>-->
-<!--		<retry-count>5</retry-count>-->
-<!--		<socket-timeout>5000</socket-timeout>-->
-<!--	</server>-->
+	<server>
+		<id>first radius server</id>
+		<address>172.16.140.129</address>
+		<auth-port>1812</auth-port>
+		<acct-port>1813</acct-port>
+		<secret>meravoip</secret>
+		<retry-count>5</retry-count>
+		<socket-timeout>5000</socket-timeout>
+	</server>
 </radius>
 
 <!-- SWITCH LISTENERS START -->

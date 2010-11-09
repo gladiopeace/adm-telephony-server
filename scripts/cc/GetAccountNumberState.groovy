@@ -4,7 +4,7 @@ import com.admtel.telephonyserver.interfaces.Authorizer;
 import com.admtel.telephonyserver.events.PlayAndGetDigitsEndedEvent;
 import com.admtel.telephonyserver.events.PlayAndGetDigitsFailedEvent;
 import com.admtel.telephonyserver.radius.AuthorizeResult;
-import com.admtel.telephonyserver.core.SmartClassLoader;
+import com.admtel.telephonyserver.core.*;
 
 class WaitForCallState extends GState {
 
@@ -25,7 +25,8 @@ class WaitForCallState extends GState {
 	}
 	def onPlayAndGetDigitsEnded (PlayAndGetDigitsEndedEvent e){
 		counter ++
-		AuthorizeResult aResult = authorizer.authorize(e.getDigits(), "", "", "login-user", "", "", "", "", false, false);
+		//authorizer.authorize(username, password, address, serviceType, calledStationId, callingStationId, loginIp, serviceNumber, routing, number)
+		AuthorizeResult aResult = authorizer.authorize(e.getDigits(), "", "", "Login-User", script.channel.getChannelData(), "", "", "", false, false);
 		
 		if (aResult.getAuthorized()){
 			script.session.accountNumber = aResult.getUserName()
