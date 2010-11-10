@@ -146,6 +146,8 @@ public class RadiusServer implements Authorizer {
 					+ xpgkRequestType);
 		}
 
+		log.trace("Sending Radius Authorize message : " + ar);
+		
 		RadiusPacket response;
 		try {
 			RadiusClient radiusClient = getRadiusClient();
