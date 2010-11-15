@@ -154,7 +154,7 @@ public class RadiusServer implements Authorizer {
 			response = radiusClient.authenticate(ar);
 			response.setDictionary(dictionary);
 
-			// log.debug(response);
+			log.trace(response);
 			switch (response.getPacketType()) {
 			case RadiusPacket.ACCESS_ACCEPT: {
 				result.authorized = true;

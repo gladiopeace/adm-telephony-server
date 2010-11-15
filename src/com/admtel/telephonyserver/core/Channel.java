@@ -115,6 +115,9 @@ public abstract class Channel implements TimerNotifiable {
 		return getChannelData().getServiceNumber();
 	}
 
+	public void setServiceNumber(String serviceNumber){
+		getChannelData().setServiceNumber(serviceNumber);
+	}
 	public CallOrigin getCallOrigin() {
 		return callOrigin;
 	}
