@@ -5,8 +5,12 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EnglishPromptBuilder extends GenericPromptBuilder  {
+import org.apache.log4j.Logger;
 
+public class EnglishPromptBuilder extends GenericPromptBuilder  {
+	
+	static Logger log = Logger.getLogger(EnglishPromptBuilder.class);
+	
 	@Override
 	public List<String> numberToPrompt(Long number) {
 		
@@ -57,6 +61,11 @@ public class EnglishPromptBuilder extends GenericPromptBuilder  {
 				currentNumber = remainder;				
 			}
 		}
+		String number_result="";
+		for (String str : result){
+			number_result +=", " + str;
+		}
+		log.trace("Building number for "+number+", result = "+ number_result);
 		return result;
 	}
 

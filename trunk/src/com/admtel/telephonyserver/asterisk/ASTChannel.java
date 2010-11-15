@@ -279,6 +279,7 @@ public class ASTChannel extends Channel {
 					ASTChannel.this.acctUniqueSessionId = masterChannel
 							.getAcctUniqueSessionId();
 					ASTChannel.this.setUserName(masterChannel.getUserName());
+					ASTChannel.this.setServiceNumber(masterChannel.getServiceNumber());
 					ASTChannel.this.getChannelData().setDestinationNumberIn(
 							masterChannel.getChannelData().getCalledNumber());
 					ASTChannel.this.getChannelData().setRemoteIP(

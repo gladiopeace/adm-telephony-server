@@ -12,4 +12,16 @@ public class OutboundAlertingEvent extends ChannelEvent {
 		this.calledNumber = calledNumber;
 		eventType = EventType.OutboundAlerting;
 	}
+	public String getCalledNumber() {
+		return calledNumber;
+	}
+	public void setCalledNumber(String calledNumber) {
+		this.calledNumber = calledNumber;
+	}
+	public String getCallerId() {
+		return callerId;
+	}
+	public void setCallerId(String callerId) {
+		this.callerId = callerId;
+	}
 }

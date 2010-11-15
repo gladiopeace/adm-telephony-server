@@ -10,6 +10,9 @@ VENDORATTR	9	h323-disconnect-time	29	string
 VENDORATTR	9	h323-disconnect-cause	30	string
 VENDORATTR	9	h323-remote-address	23	string
 VENDORATTR	9	Cisco-Command-Code	252	string
+VENDORATTR	9	h323-credit-amount	101	string
+VENDORATTR	9	h323-preferred-lang	107	string
+VENDORATTR	9	h323-currency	110	string
 
 VENDOR	11344	FreeRADIUS
 
