@@ -42,17 +42,17 @@
  		freeswitch
  	</type> 	
  </switch-listener>
-<!--  <switch-listener>-->
-<!-- 	<address>-->
-<!-- 		172.16.34.1-->
-<!-- 	</address>-->
-<!-- 	<port>-->
-<!-- 		4573-->
-<!-- 	</port>-->
-<!-- 	<type>-->
-<!-- 		asterisk-->
-<!-- 	</type> 	-->
-<!-- </switch-listener> -->
+  <switch-listener>
+ 	<address>
+ 		172.16.34.1
+ 	</address>
+ 	<port>
+ 		4573
+ 	</port>
+ 	<type>
+ 		asterisk
+ 	</type> 	
+ </switch-listener> 
 </switch-listeners>
 <!-- SWITCH LISTENERS END -->
 
