@@ -2,7 +2,7 @@
 <scripts>
  <script name="voicemail">
   <called>1234</called>
-  <class>com.admtel.telephony.scripts.SimpleTestScript</class>
+  <class>com.admtel.telephonyserver.scripts.SimpleTestScript</class>
   <parameters>
    <parameter key="language" value="arabic"/>
   </parameters>
@@ -19,13 +19,6 @@
   <script name="PlayAndGetDigitsTest">
  	<called>801888</called>
  	<class>scripts/PlayAndGetDigitsTest.groovy</class>
- 	<parameters>
- 	<parameter key="language" value="english"/>
- 	</parameters>
- </script>
-  <script name="AnswerTestScript">
- 	<called>801222</called>
- 	<class>scripts/AnswerTestScript.groovy</class>
  	<parameters>
  	<parameter key="language" value="english"/>
  	</parameters>

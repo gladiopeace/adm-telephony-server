@@ -75,7 +75,7 @@
   <port>8057</port>
 	<adm-servlet>
 		<path>FSConfigurator</path> 
-		<class>/Users/danny/AdmTel_Source/adm-telephony-scripts/src/WSFreeSwitchConfigurator.groovy</class>
+		<class>/Users/danny/workspace/adm-telephony-scripts/src/WSFreeSwitchConfigurator.groovy</class>
 	</adm-servlet>
 	<adm-servlet>
 		<path>test</path> 
@@ -113,7 +113,7 @@
   	<password>admin</password>
   	<type>freeswitch</type>  
   	<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultFSAddressTranslator</addresstranslator> 	
-  	<enabled>false</enabled>
+  	<enabled>true</enabled>
  </switch>
  <switch>
   <name>Asterisk_VMWARE</name>
@@ -123,7 +123,7 @@
   <password>voicelynx1201</password>
   <type>asterisk</type>
   <addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator</addresstranslator>
-  <enabled>true</enabled>
+  <enabled>false</enabled>
  </switch>
 
 </switches>
