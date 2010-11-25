@@ -51,12 +51,13 @@
 		<delete dir="dist/temp" />
 	</target>
 
-	<target name="zip" depends="ats-console">
-		<zip destfile="adm-telephony-server.zip">
+	<target name="release" depends="ats-console">
+		<zip destfile="dist/adm-telephony-server_snapshot.zip">
 			<zipfileset dir="lib" prefix="lib" />
 			<zipfileset dir="dist" prefix="" />
 			<zipfileset dir="." includes="config.xml, scripts.xml, run.sh"/>
 			<zipfileset dir="src" prefix="" includes="log4j.properties"/>
+			<zipfileset dir="scripts" prefix="scripts"/>
 		</zip>
 	</target>
 
