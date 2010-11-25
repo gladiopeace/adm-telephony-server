@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scripts>
-
- <script name="SoftSwitch">
-  <called>1[0-9]{3}</called>
-  <class>scripts/SoftSwitch.groovy</class>
-    <parameters>
-   <parameter key="language" value="arabic"/>
-  </parameters>
- </script>
- 
  <script name="voicemail">
   <called>1234</called>
   <class>com.admtel.telephony.scripts.SimpleTestScript</class>
@@ -53,24 +44,7 @@
  	<parameter key="language" value="english"/>
  	</parameters>
  </script>
-
  
-  <script name="ContactCenterScript">
- 	<called>801333</called>
- 	<class>scripts/ContactCenterScript.groovy</class>
- 	<parameters>
- 		<parameter key="language" value="english"/>
- 	</parameters>
- </script>
- 
- <script name="CallingCard">
- 	<called>801555</called>
- 	<class>scripts/CallingCard.groovy</class>
- 	<parameters>
-<!-- 		<parameter key="language" value="english"/>-->
- 		<parameter key="authenticator" value="default"/>
- 	</parameters> 	
- </script>
  <script name="cc">
  	<called>801666</called>
  	<class>/Users/danny/workspace/adm-telephony-scripts/src/callingcard/CallingCardScript.groovy</class>
@@ -89,9 +63,9 @@
  	</parameters>
  </script>
  
- <script name="SoftSwitch">
+ <script name="TransitSwitch">
   <called>[0-9]*</called>
-  <class>scripts/SoftSwitch.groovy</class>
+  <class>scripts/TransitSwitch.groovy</class>
   <parameters>
    <parameter key="language" value="english"/>
   </parameters>
