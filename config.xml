@@ -23,7 +23,7 @@
 		<address>172.16.140.129</address>
 		<auth-port>1812</auth-port>
 		<acct-port>1813</acct-port>
-		<secret>meravoip</secret>
+		<secret>test</secret>
 		<retry-count>5</retry-count>
 		<socket-timeout>5000</socket-timeout>
 	</server>
@@ -90,10 +90,35 @@
 		<class>scripts/webapi/WebAPI.groovy</class>
 	</adm-servlet>
 	<adm-servlet>
-	 <path>asterisk-curl</path>
+	 <path>asterisk-curl/single</path>
 	 <class>scripts/AsteriskCurlExample.groovy</class>
 	</adm-servlet>
  </http-server>
+ <http-server>
+  <id>dot34</id>
+  <address>172.16.34.1</address>
+  <port>8057</port>
+	<adm-servlet>
+		<path>FSConfigurator</path> 
+		<class>/Users/danny/workspace/adm-telephony-scripts/src/WSFreeSwitchConfigurator.groovy</class>
+	</adm-servlet>
+	<adm-servlet>
+		<path>test</path> 
+		<class>scripts/TestAdmServlet.groovy</class>
+	</adm-servlet>	
+	<adm-servlet>
+		<path>webconf</path>
+		<class>scripts/web/WebConfServlet.groovy</class>
+	</adm-servlet>
+	<adm-servlet>
+		<path>webapi</path>
+		<class>scripts/webapi/WebAPI.groovy</class>
+	</adm-servlet>
+	<adm-servlet>
+	 <path>asterisk-curl/single</path>
+	 <class>scripts/AsteriskCurlExample.groovy</class>
+	</adm-servlet>
+ </http-server> 
 <!-- <http-server>-->
 <!--  <id>Manager</id>-->
 <!--  <address>172.16.140.1</address>-->
@@ -123,7 +148,7 @@
   <password>voicelynx1201</password>
   <type>asterisk</type>
   <addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator</addresstranslator>
-  <enabled>false</enabled>
+  <enabled>true</enabled>
  </switch>
 
 </switches>
