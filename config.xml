@@ -145,7 +145,7 @@
   <address>172.16.34.134</address>
   <port>5038</port>
   <username>admin</username>
-  <password>voicelynx1201</password>
+  <password>password</password>
   <type>asterisk</type>
   <addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator</addresstranslator>
   <enabled>true</enabled>
