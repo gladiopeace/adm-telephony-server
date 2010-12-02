@@ -13,4 +13,8 @@ public class AnsweredEventDto extends EventDto {
 	public void setChannelId(String channelId) {
 		this.channelId = channelId;
 	}
+	@Override
+	public String toDisplayString() {
+		return String.format("Channel(%s) answered", channelId);
+	}
 }

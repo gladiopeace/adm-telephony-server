@@ -37,4 +37,9 @@ public class HangupEventDto extends EventDto {
 	
 	@DtoField("hangupCause")
 	int hangupCause;
+
+	@Override
+	public String toDisplayString() {
+		return String.format("Channel(%s) hangup, cause (%s)", channelId, hangupCauseStr);
+	}
 }

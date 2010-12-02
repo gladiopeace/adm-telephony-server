@@ -66,8 +66,7 @@ public abstract class Channel implements TimerNotifiable {
 
 	protected String h323CallOrigin;
 
-	protected String acctUniqueSessionId;
-	protected String acctSessionId = UUID.randomUUID().toString();
+	protected String acctUniqueSessionId;	
 	protected Integer h323DisconnectCause = 16;// normal call clearing
 
 	protected String baseDirectory = SystemConfig.getInstance().serverDefinition
@@ -179,11 +178,7 @@ public abstract class Channel implements TimerNotifiable {
 	}
 
 	public String getAcctSessionId() {
-		return acctSessionId;
-	}
-
-	public void setAcctSessionId(String acctSessionId) {
-		this.acctSessionId = acctSessionId;
+		return uniqueId;
 	}
 
 	public void setUniqueId(String uniqueId) {

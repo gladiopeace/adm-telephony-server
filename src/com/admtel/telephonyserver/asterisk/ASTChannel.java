@@ -21,6 +21,7 @@ import com.admtel.telephonyserver.asterisk.events.ASTJoinEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTLeaveEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTMeetmeJoinEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTMeetmeLeaveEvent;
+import com.admtel.telephonyserver.asterisk.events.ASTMeetmeMuteEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTMeetmeTalkingEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTNewChannelEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTNewStateEvent;
@@ -29,6 +30,7 @@ import com.admtel.telephonyserver.core.Timers.Timer;
 import com.admtel.telephonyserver.events.AnsweredEvent;
 import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
+import com.admtel.telephonyserver.events.ConferenceMutedEvent;
 import com.admtel.telephonyserver.events.ConferenceTalkEvent;
 import com.admtel.telephonyserver.events.DialFailedEvent;
 import com.admtel.telephonyserver.events.DialStartedEvent;
@@ -258,6 +260,11 @@ public class ASTChannel extends Channel {
 								.isOn()));
 			}
 				break;
+			case MeetmeMute:{
+				ASTMeetmeMuteEvent mme = (ASTMeetmeMuteEvent) astEvent;
+				ASTChannel.this.onEvent(new ConferenceMutedEvent(ASTChannel.this, mme.getMeetme(), mme.getUsernum(), mme.isMuted()));
+			}
+			break;
 			}
 
 		}

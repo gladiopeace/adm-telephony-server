@@ -1,15 +1,19 @@
 package com.admtel.telephonyserver.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.joda.time.DateTime;
 
 import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
+import com.admtel.telephonyserver.events.ConferenceMutedEvent;
+import com.admtel.telephonyserver.events.ConferenceTalkEvent;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 
 public class Conference implements TimerNotifiable {
@@ -26,6 +30,11 @@ public class Conference implements TimerNotifiable {
 		Timers.getInstance().startTimer(this, 10000, true, null);
 	}
 
+	public List<Participant> getParticipants(){
+		List<Participant> result = new ArrayList<Participant>();
+		result.addAll(synchronizedParticipants.values());
+		return result;
+	}
 	@Override
 	public boolean onTimer(Object data) {
 		// TODO Auto-generated method stub
@@ -91,6 +100,22 @@ public class Conference implements TimerNotifiable {
 
 	public Participant getParticipant(String participantId) {
 		return participants.get(participantId);
+	}
+
+	public void onConferenceTalk(ConferenceTalkEvent cte) {
+		Participant p = participants.get(cte.getParticipantId());
+		if (p!=null){
+			p.setTalking(cte.isTalking());
+		}
+		
+	}
+
+	public void onConferenceMuted(ConferenceMutedEvent cme) {
+		Participant p = participants.get(cme.getParticipantId());
+		if (p != null){
+			p.setMuted(cme.isMuted());
+		}
+		
 	}
 
 }

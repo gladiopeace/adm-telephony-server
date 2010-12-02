@@ -16,5 +16,5 @@ import dp.lib.dto.geda.assembler.DTOAssembler;
 
 @Dto
 public abstract class EventDto {
-
+	public abstract String toDisplayString();
 }

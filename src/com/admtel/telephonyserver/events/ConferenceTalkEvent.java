@@ -10,7 +10,7 @@ public class ConferenceTalkEvent extends ChannelEvent {
 	
 	public ConferenceTalkEvent(Channel channel, String conferenceId, String participantId, boolean talking) {
 		super(channel);
-		eventType = EventType.ConferencedTalk;
+		eventType = EventType.ConferenceTalk;
 		this.talking = talking;
 		this.conferenceId = conferenceId;
 		this.participantId = participantId;
@@ -30,7 +30,7 @@ public class ConferenceTalkEvent extends ChannelEvent {
 	public void setTalking(boolean talking) {
 		this.talking = talking;
 	}
-	boolean isTalking(){
+	public boolean isTalking(){
 		return this.talking;
 	}
 }

@@ -175,13 +175,14 @@ public class ATSConsole implements IoHandler{
 
 	@Override
 	public void messageReceived(IoSession session, Object message) throws Exception {
-		System.out.println(message);
+		
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.enableDefaultTyping(); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE
 		mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
 		try
 		{
 			EventDto event = mapper.readValue(message.toString(), EventDto.class);
+			System.out.println(event.toDisplayString());
 			if (event instanceof InboundAlertingEventDto){
 				InboundAlertingEventDto ia = (InboundAlertingEventDto) event;
 				channels.add(ia.getChannelId());
