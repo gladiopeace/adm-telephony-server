@@ -14,4 +14,9 @@ public class SimpleMessageDto extends EventDto {
 		this.message = message;
 	}
 	String message;
+	@Override
+	public String toDisplayString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

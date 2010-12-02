@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 
 import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
+import com.admtel.telephonyserver.events.ConferenceMutedEvent;
+import com.admtel.telephonyserver.events.ConferenceTalkEvent;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.Event.EventType;
 import com.admtel.telephonyserver.interfaces.EventListener;
@@ -85,6 +87,25 @@ public class ConferenceManager implements TimerNotifiable, EventListener{
 				if (c.getParcitipantsCount() == 0){
 					synchronizedConferences.remove(c.getId());
 				}
+			}
+		}
+			break;
+			
+		case ConferenceTalk:
+		{
+			ConferenceTalkEvent cte = (ConferenceTalkEvent)event;
+			Conference c = conferences.get(cte.getConferenceId());
+			if (c != null){
+				c.onConferenceTalk(cte);
+			}
+		}
+			break;
+		case ConferenceMuted:
+		{
+			ConferenceMutedEvent cme = (ConferenceMutedEvent) event;
+			Conference c = conferences.get(cme.getConferenceId());
+			if (c != null){
+				c.onConferenceMuted(cme);
 			}
 		}
 			break;

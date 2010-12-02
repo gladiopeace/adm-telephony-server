@@ -1,0 +1,11 @@
+REQUEST FORMAT
+--------------
+
+http://<address>:port//<destination>?action=<action>[<key>=<value>]*
+
+ACTIONS
+-------
+action: hangup
+parameters : channel=<channelId>
+example
+http://localhost:8057/webapi?action=hangup&channel=4028819f2c838455012c83847f480001

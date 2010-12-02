@@ -38,4 +38,8 @@ public class InboundAlertingEventDto extends EventDto{
 	public void setCallerIdName(String callerIdName) {
 		this.callerIdName = callerIdName;
 	}
+	@Override
+	public String toDisplayString() {
+		return String.format("Incoming call : channel(%s), calledId(%s), callerId(%s), callerName(%s)", channelId, calledIdNumber, callerIdNumber, callerIdName);
+	}
 }

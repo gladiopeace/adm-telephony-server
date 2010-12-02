@@ -30,5 +30,10 @@ public class OutboundAlertingEventDto extends EventDto{
 	public void setCallerId(String callerId) {
 		this.callerId = callerId;
 	}
+	@Override
+	public String toDisplayString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

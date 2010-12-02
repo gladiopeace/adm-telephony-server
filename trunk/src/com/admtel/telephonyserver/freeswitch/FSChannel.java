@@ -15,6 +15,8 @@ import com.admtel.telephonyserver.core.Switch;
 import com.admtel.telephonyserver.events.AnsweredEvent;
 import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
+import com.admtel.telephonyserver.events.ConferenceMutedEvent;
+import com.admtel.telephonyserver.events.ConferenceTalkEvent;
 import com.admtel.telephonyserver.events.DialFailedEvent;
 import com.admtel.telephonyserver.events.DialStartedEvent;
 import com.admtel.telephonyserver.events.Event;
@@ -38,7 +40,9 @@ import com.admtel.telephonyserver.freeswitch.events.FSChannelOriginateEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelOutgoingEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSCommandReplyEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSConferenceJoinedEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSConferenceMuteEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSConferenceRemovedEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSConferenceTalkingEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSDtmfEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSQueueEvent;
@@ -504,6 +508,16 @@ public class FSChannel extends Channel {
 						cre.getConferenceName(), cre.getMemberId()));
 			}
 				break;
+			case ConferenceTalking:{
+				FSConferenceTalkingEvent cte = (FSConferenceTalkingEvent) fsEvent;
+				FSChannel.this.onEvent(new ConferenceTalkEvent(FSChannel.this, cte.getConferenceName(), cte.getMemberId(), cte.isOn()));
+			}
+			break;
+			case ConferenceMute:{
+				FSConferenceMuteEvent cme = (FSConferenceMuteEvent) fsEvent;
+				FSChannel.this.onEvent(new ConferenceMutedEvent(FSChannel.this, cme.getConferenceName(), cme.getMemberId(), cme.isMuted()));
+			}
+			break;
 			}
 
 		}

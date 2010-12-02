@@ -1,17 +1,14 @@
 <project>
-	<target name="clean" description="Clean the directories for building">
-		<delete file="dist/adm-telephony-server.jar" />
-		<delete file="dist/ats-console" />
-	</target>
 
-	<target name="simple" depends="clean">
+	<target name="simple">
+		<delete file="dist/adm-telephony-server.jar" />
 		<jar destfile="dist/adm-telephony-server.jar" basedir="bin" includes="**/*.class,com/admtel/telephonyserver/radius/adm_dictionary" excludes="**/src/**,build.xml,**/*.xml,log4j.properties">
 
 		</jar>
 	</target>
 
-	<target name="ats-console" depends="simple">
-
+	<target name="ats-console">
+		<delete file="dist/ats-console" />
 		<delete dir="dist/temp" />
 
 		<unzip dest="dist/temp">
@@ -20,7 +17,7 @@
 				<include name="jline-0.9.94.jar" />
 				<include name="slf4j-api-1.5.0.jar" />
 				<include name="slf4j-log4j12-1.5.0.jar" />
-				<include name="log4j-1.2.15.jar" />
+				<include name="log4j-1.2.14.jar" />
 				<include name="jopt-simple-3.2.jar" />
 				<include name="jackson-mapper-asl-1.6.0.jar" />
 				<include name="jackson-core-asl-1.6.0.jar" />
@@ -51,7 +48,8 @@
 		<delete dir="dist/temp" />
 	</target>
 
-	<target name="release" depends="ats-console">
+	<target name="release" depends="ats-console, simple">
+		<delete file="dist/adm-telephony-server_snapshot.zip"/>
 		<zip destfile="dist/adm-telephony-server_snapshot.zip">
 			<zipfileset dir="lib" prefix="lib" />
 			<zipfileset dir="dist" prefix="" />
