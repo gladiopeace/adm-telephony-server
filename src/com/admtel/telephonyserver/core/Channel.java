@@ -12,6 +12,8 @@ import org.joda.time.Duration;
 
 import com.admtel.telephonyserver.config.SystemConfig;
 import com.admtel.telephonyserver.core.Timers.Timer;
+import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
+import com.admtel.telephonyserver.events.ConferenceLeftEvent;
 import com.admtel.telephonyserver.events.DtmfEvent;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.HangupEvent;
@@ -23,6 +25,7 @@ import com.admtel.telephonyserver.radius.RadiusServers;
 import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.requests.AnswerRequest;
 import com.admtel.telephonyserver.requests.HangupRequest;
+import com.admtel.telephonyserver.requests.ParticipantMuteRequest;
 import com.admtel.telephonyserver.requests.Request;
 import com.admtel.telephonyserver.utils.AdmUtils;
 import com.admtel.telephonyserver.utils.PromptsUtils;
@@ -66,13 +69,16 @@ public abstract class Channel implements TimerNotifiable {
 
 	protected String h323CallOrigin;
 
-	protected String acctUniqueSessionId;	
+	protected String acctUniqueSessionId;
 	protected Integer h323DisconnectCause = 16;// normal call clearing
 
 	protected String baseDirectory = SystemConfig.getInstance().serverDefinition
 			.getBaseDirectory();
 
 	protected Locale language;
+
+	private String conferenceId;
+	private String memberId;
 
 	private MessageHandler messageHandler = new QueuedMessageHandler() {
 
@@ -114,9 +120,10 @@ public abstract class Channel implements TimerNotifiable {
 		return getChannelData().getServiceNumber();
 	}
 
-	public void setServiceNumber(String serviceNumber){
+	public void setServiceNumber(String serviceNumber) {
 		getChannelData().setServiceNumber(serviceNumber);
 	}
+
 	public CallOrigin getCallOrigin() {
 		return callOrigin;
 	}
@@ -289,9 +296,11 @@ public abstract class Channel implements TimerNotifiable {
 	}
 
 	final public Result hangup(DisconnectCode disconnectCode) {
-		this.putMessage(new HangupRequest(
-				this.uniqueId, disconnectCode));
-		return Result.Ok;// TODO need better request/response/event model
+		Result result = internalHangup(disconnectCode.ordinal());
+		if (result == Result.Ok){
+			state = State.Clearing;
+		}
+		return result;// TODO need better request/response/event model
 	}
 
 	final public Result playback(String[] prompt, String terminators) {
@@ -333,8 +342,12 @@ public abstract class Channel implements TimerNotifiable {
 					this, state));
 			return Result.ChannelInvalidState;
 		}
-		this.putMessage(new AnswerRequest(this.uniqueId));
-		return Result.Ok;// TODO need better request/response/event model
+		
+		Result result = internalAnswer();
+		if (result == Result.Ok){
+			state = State.Answering;
+		}
+		return result;// TODO need better request/response/event model
 	}
 
 	final public Result joinConference(String conferenceId, boolean moderator,
@@ -345,7 +358,7 @@ public abstract class Channel implements TimerNotifiable {
 					state));
 			return Result.ChannelInvalidState;
 		}
-		state = State.Conferenced;
+		
 		Result result = internalJoinConference(conferenceId, moderator,
 				startMuted, startDeaf);
 		if (result != Result.Ok) {
@@ -375,6 +388,16 @@ public abstract class Channel implements TimerNotifiable {
 		}
 		return result;
 
+	}
+
+	public abstract Result internalConferenceMute(String conferenceId, String memberId, boolean mute);
+	
+	final public Result conferenceMute(boolean mute){
+		if (state != State.Conferenced){
+			log.warn(String.format("Channel (%s), conferenceMute(%b), invalid state (%s)", this, mute, state));
+			return Result.ChannelInvalidState;
+		}
+		return internalConferenceMute(conferenceId, memberId, mute);
 	}
 
 	final public Result dial(UserLocation userLocation, long timeout) {
@@ -460,7 +483,19 @@ public abstract class Channel implements TimerNotifiable {
 		case QueueJoined:
 			state = State.Queued;
 			break;
-
+		case ConferenceJoined: {
+			ConferenceJoinedEvent cje = (ConferenceJoinedEvent) e;
+			this.conferenceId = cje.getConferenceId();
+			this.memberId = cje.getParticipantId();
+			state = State.Conferenced;
+		}
+			break;
+		case ConferenceLeft: {
+			this.conferenceId = null;
+			this.memberId = null;
+			state = State.Idle;
+		}
+			break;
 		}
 
 		try {
@@ -576,19 +611,19 @@ public abstract class Channel implements TimerNotifiable {
 		switch (request.getType()) {
 		case HangupRequest: {
 			HangupRequest hr = (HangupRequest) request;
-			Result result = internalHangup(hr.getDisconnectCode().toInteger());
-			if (result == Result.Ok) {
-				state = State.Clearing;
-			}
+			Result result = hangup(hr.getDisconnectCode());			
 		}
 			break;
 		case AnswerRequest: {
-			Result result = internalAnswer();
-			if (result == Result.Ok) {
-				state = State.Answering;
-			}
+			answer();
 		}
 			break;
+		case ParticipantMuteRequest:
+		{
+			ParticipantMuteRequest pmr = (ParticipantMuteRequest) request;
+			conferenceMute(pmr.isMute());			
+		}
+		break;
 		}
 	}
 }

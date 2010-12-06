@@ -8,7 +8,7 @@
 	<script-path>.;./scripts;/Users/danny/workspace/adm-telephony-scripts/src</script-path>
 	<radius-start-accounting>true</radius-start-accounting>
 	<radius-stop-accounting>true</radius-stop-accounting>
-	<radius-interim-update>10</radius-interim-update>
+	<radius-interim-update>30</radius-interim-update>
 	<log>true</log>
 </server>
 

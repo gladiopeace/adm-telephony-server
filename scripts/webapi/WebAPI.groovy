@@ -20,30 +20,56 @@ class WebAPI implements AdmServlet {
 		println "*********** index"
 		"Welcome"
 	}
-	def hangup(request){
-		
+	def hangup(request){		
 		HangupRequest hangupRequest = new HangupRequest(request.getParameter('channel'), DisconnectCode.Normal) 
 		Switches.getInstance().processRequest(hangupRequest)
 		"Channel hangup request " + request.getParameters('channel')
 	}	
 
 	def participant_disconnect(request){
-
+		Conference c = ConferenceManager.getInstance().getConferenceById(request.getParameter('conference'))
+		if (c == null){
+			return "conference not found"
+		}
+		Participant p = c.getParticipant(request.getParameter('participant'))
+		if (p == null){
+			return "Participant not found"
+		}
+		HangupRequest hangupRequest = new HangupRequest(p.getChannel().getId(), DisconnectCode.Normal)
+		Switches.getInstance().processRequest(hangupRequest)
+		"Participant " + request.getParameter('participant') + " on channel " + p.getChannel().getUniqueId()+", disconnected"
+	}
+	def participant_mute(request){
+		Conference c = ConferenceManager.getInstance().getConferenceById(request.getParameter('conference'))
+		if (c == null){
+			return "conference not found"
+		}
+		Participant p = c.getParticipant(request.getParameter('participant'))
+		if (p==null) return "Participant not found"
+		String mutedStr = request.getParameter('mute')
+		
+		boolean muted = false
+		if (mutedStr != null){
+			muted = Boolean.parseBoolean(mutedStr)
+		}
+		
+		ParticipantMuteRequest pmr = new ParticipantMuteRequest(p.getChannel().getUniqueId(), muted )
+		Switches.getInstance().processRequest(pmr)
+		"Participant ${p.getChannel().getUniqueId()} mute = ${muted}"
 	}
 	def conference_details(request){
 		Conference c = ConferenceManager.getInstance().getConferenceById(request.getParameter('conference'))
 		def writer = new StringWriter()
 		if (c != null){
-			List<Participant> p = c.getParticipants()
-			
-			
+			List<Participant> p = c.getParticipants()						
 			def xml = new MarkupBuilder(writer)
 			
 			xml.'document'(type: "conference/xml") {
-				conference(id:c.){
+				conference(id:c.id){
 					participants(){
 						p.each{
-							participant(it.uniqueId)
+							Channel channel = it.getChannel()
+							participant(id:uniqueId, time:it.joinTime, caller:channel?.getCallingStationId(), memberId:it.memberId, talking:it.isTalking(), deaf:it.isDeaf(), moderator:it.isModerator(), muted:it.isMuted())
 						}
 					}
 				}
@@ -53,6 +79,8 @@ class WebAPI implements AdmServlet {
 	}
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
+		//TODO check token
+		
 		def action = request.getParameter("action")
 		if (!(action?.length()>0)){
 			action = 'index'
