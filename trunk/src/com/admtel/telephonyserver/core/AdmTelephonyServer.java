@@ -57,15 +57,15 @@ public class AdmTelephonyServer {
 		log.trace(String.format("Received request %s", request));
 		EventDto result = null;
 		switch (request.getType()){
-		case Reload:
+		case ReloadRequest:
 			log.trace("Reloading configuration ...");
 			SystemConfig.getInstance().load();
 			ScriptManager.getInstance().reload();
 			break;
-		case ShowStatus:
+		case ShowStatusRequest:
 			result = new SimpleMessageDto(AdmThreadExecutor.getInstance().getStatus());
 			break;
-		case ShowSwitch:
+		case ShowSwitchRequest:
 			result = new SimpleMessageDto(Switches.getInstance().toReadableString());
 			break;
 		}

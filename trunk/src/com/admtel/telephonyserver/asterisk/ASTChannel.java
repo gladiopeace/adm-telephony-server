@@ -8,7 +8,10 @@ import org.apache.log4j.Logger;
 import org.apache.mina.core.session.IoSession;
 import org.joda.time.DateTime;
 
+import com.admtel.telephonyserver.asterisk.commands.ASTCommand;
 import com.admtel.telephonyserver.asterisk.commands.ASTDialCommand;
+import com.admtel.telephonyserver.asterisk.commands.ASTMeetmeMuteCommand;
+import com.admtel.telephonyserver.asterisk.commands.ASTMeetmeUnmuteCommand;
 import com.admtel.telephonyserver.asterisk.commands.ASTQueueCommand;
 import com.admtel.telephonyserver.asterisk.events.ASTAgiExecEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTAsyncAgiEvent;
@@ -987,6 +990,19 @@ public class ASTChannel extends Channel {
 	@Override
 	public Result internalQueue(String queueName, boolean isAgent) {
 		currentState = new QueueState(queueName, isAgent);
+		return Result.Ok;
+	}
+
+	@Override
+	public Result internalConferenceMute(String conferenceId, String memberId, boolean mute) {
+		ASTCommand cmd = null;
+		if (mute){
+			cmd = new ASTMeetmeMuteCommand(this, conferenceId, memberId);
+		}
+		else{
+			cmd = new ASTMeetmeUnmuteCommand(this, conferenceId, memberId);
+		}
+		session.write(cmd);
 		return Result.Ok;
 	}
 }

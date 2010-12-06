@@ -31,6 +31,7 @@ import com.admtel.telephonyserver.events.PlaybackFailedEvent;
 import com.admtel.telephonyserver.events.PlaybackStartedEvent;
 import com.admtel.telephonyserver.events.QueueFailedEvent;
 import com.admtel.telephonyserver.events.QueueJoinedEvent;
+import com.admtel.telephonyserver.freeswitch.commands.FSMemberMuteCommand;
 import com.admtel.telephonyserver.freeswitch.commands.FSQueueCommand;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelCreateEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelDataEvent;
@@ -758,6 +759,15 @@ public class FSChannel extends Channel {
 
 		}
 
+	}
+
+	@Override
+	public Result internalConferenceMute(String conferenceId, String memberId,
+			boolean mute) {
+		FSMemberMuteCommand cmd = new FSMemberMuteCommand(this, conferenceId, memberId, mute);
+		log.trace(String.format("%s, on channel %s", cmd, this));
+		session.write(cmd);
+		return Result.Ok;
 	}
 
 }
