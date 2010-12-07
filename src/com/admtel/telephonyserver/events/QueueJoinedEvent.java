@@ -4,6 +4,14 @@ import com.admtel.telephonyserver.core.Channel;
 
 public class QueueJoinedEvent extends ChannelEvent {
 
+	@Override
+	public String toString() {
+		return "QueueJoinedEvent ["
+				+ (queueName != null ? "queueName=" + queueName + ", " : "")
+				+ (isAgent != null ? "isAgent=" + isAgent + ", " : "")
+				+ (channel != null ? "channel=" + channel : "") + "]";
+	}
+
 	private String queueName;
 	private Boolean isAgent;	
 

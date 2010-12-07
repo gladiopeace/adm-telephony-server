@@ -26,6 +26,7 @@ import com.admtel.telephonyserver.core.Switch;
 import com.admtel.telephonyserver.core.Timers;
 import com.admtel.telephonyserver.core.Switch.SwitchStatus;
 import com.admtel.telephonyserver.core.Timers.Timer;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelBridgeEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelCreateEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelDataEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelEvent;
@@ -252,6 +253,14 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 							}
 						}
 							break;
+						case ChannelBridge:{
+							FSChannelBridgeEvent cbe = (FSChannelBridgeEvent) event;
+							FSChannel otherChannel = (FSChannel) FSSwitch.this.getChannel(cbe.getPeerChannelId());
+							if (otherChannel != null){
+								otherChannel.putMessage(channelEvent);
+							}
+						}
+						break;
 						}
 						channel.putMessage(channelEvent);
 					}

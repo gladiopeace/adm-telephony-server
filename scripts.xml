@@ -56,6 +56,11 @@
  	</parameters>
  </script>
  
+ <script name = "contactcenter">
+ 	<called>801999</called>
+ 	<class>/Users/danny/workspace/adm-telephony-scripts/src/ContactCenter/ContactCenterScript.groovy</class>
+ </script>
+ 
  <script name="TransitSwitch">
   <called>[0-9]*</called>
   <class>scripts/TransitSwitch.groovy</class>
