@@ -22,6 +22,7 @@ import com.admtel.telephonyserver.events.DialStartedEvent;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.HangupEvent;
 import com.admtel.telephonyserver.events.InboundAlertingEvent;
+import com.admtel.telephonyserver.events.LinkedEvent;
 import com.admtel.telephonyserver.events.OutboundAlertingEvent;
 import com.admtel.telephonyserver.events.PlayAndGetDigitsEndedEvent;
 import com.admtel.telephonyserver.events.PlayAndGetDigitsFailedEvent;
@@ -33,6 +34,7 @@ import com.admtel.telephonyserver.events.QueueFailedEvent;
 import com.admtel.telephonyserver.events.QueueJoinedEvent;
 import com.admtel.telephonyserver.freeswitch.commands.FSMemberMuteCommand;
 import com.admtel.telephonyserver.freeswitch.commands.FSQueueCommand;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelBridgeEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelCreateEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelDataEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelDestroyEvent;
@@ -306,7 +308,7 @@ public class FSChannel extends Channel {
 						.getValue("variable_current_application");
 				if (application.equals("read")) {
 					String readResult = event.getValue("variable_read_result");
-					if (readResult != null && readResult.equals("failure")) {
+					if (readResult == null || !readResult.equals("success")) {
 						FSChannel.this.onEvent(new PlayAndGetDigitsFailedEvent(
 								FSChannel.this, readResult));
 					} else {
@@ -741,6 +743,16 @@ public class FSChannel extends Channel {
 				FSChannel.this.onEvent(new AnsweredEvent(FSChannel.this));
 			}
 				break;
+			case ChannelBridge:{
+				FSChannelBridgeEvent cbe = (FSChannelBridgeEvent) fsEvent;
+				String otherChannelId= cbe.getPeerChannelId();
+				if (!cbe.getChannelId().equals(getId())){
+					otherChannelId = cbe.getChannelId();
+				}
+				Channel otherChannel = _switch.getChannel(otherChannelId);
+				FSChannel.this.onEvent(new LinkedEvent(this, otherChannel));
+			}
+			break;
 			}
 			if (currentState != null) {
 				currentState.processEvent(fsEvent);
