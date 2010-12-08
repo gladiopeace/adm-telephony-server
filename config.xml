@@ -224,6 +224,27 @@
  	 </parameter>
  	</parameters>
  </bean>
+ <bean>
+ 	<class>/Users/danny/workspace/adm-telephony-scripts/src/conference/DBConferenceHelperBean.groovy</class>
+ 	<parameters>
+ 		<parameter>
+ 		 <name>dbUrl</name>
+ 		 <value>jdbc:postgresql://localhost:5432/adm_appserver</value>
+ 		</parameter>
+ 		<parameter>
+ 			<name>dbUser</name>
+ 			<value>tester</value>
+ 		</parameter>
+ 		<parameter>
+ 			<name>dbPassword</name>
+ 			<value>tester1234</value>
+ 		</parameter>
+ 		<parameter>
+ 			<name>dbDriver</name>
+ 			<value>org.postgresql.Driver</value>
+ 		</parameter>
+ 	</parameters>
+ </bean>
 </beans>
 
 </config>
