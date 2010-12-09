@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
@@ -181,7 +182,21 @@ public class SystemConfig {
 							SubnodeConfiguration servletSubnode = subnode.configurationAt(String.format("adm-servlet(%d)", servletCounter));
 							if (servletSubnode != null){
 
-								definition.getAdmServlets().put(servletSubnode.getString("path"), servletSubnode.getString("class"));
+								AdmServletDefinition servletDefinition = new AdmServletDefinition();
+								servletDefinition.setClassName(servletSubnode.getString("class"));
+								servletDefinition.setPath(servletSubnode.getString("path"));
+								definition.putServletDefinition(servletDefinition.getPath(), servletDefinition);
+								try{
+									HierarchicalConfiguration parametersConfig = subnode
+											.configurationAt(String.format("adm-servlet(%d).parameters",
+													servletCounter));
+									 Map<String, String>parameters = ConfigUtils.loadParameters(parametersConfig);
+									 servletDefinition.setParameters(parameters);
+									 
+									}
+									catch (Exception e){
+										log.warn(e.getMessage());
+									}
 							}
 						}
 						catch (Exception e){
@@ -282,21 +297,18 @@ public class SystemConfig {
 				if (subnode != null) {
 					BeanDefinition definition = new BeanDefinition();
 					definition.setClassName(subnode.getString("class"));
-					int parameterCounter = 0;
-					while (true){
-						try{
-							SubnodeConfiguration parametersSubnode = subnode.configurationAt(String.format("parameters.parameter(%d)", parameterCounter));
-							if (parametersSubnode != null){
-								
-								definition.getParameters().put(parametersSubnode.getString("name"), parametersSubnode.getString("value"));
-							}
+					definition.setId(subnode.getString("id"));
+					
+					try{
+						HierarchicalConfiguration parametersConfig = config
+								.configurationAt(String.format("beans.bean(%d).parameters",
+										counter));
+						 Map<String,String>parameters = ConfigUtils.loadParameters(parametersConfig);
+						 definition.setParameters(parameters);
 						}
 						catch (Exception e){
 							log.warn(e.getMessage());
-							break;
 						}
-						parameterCounter ++;
-					}
 
 					futureDefinitions.put(definition.getId(), definition);
 				} else {

@@ -1,250 +1,250 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 
-<server>
-	<maxthreads>15</maxthreads>
-	<address>172.16.140.1</address>	
-	<base-directory>/usr/local/adm</base-directory>
-	<script-path>.;./scripts;/Users/danny/workspace/adm-telephony-scripts/src</script-path>
-	<radius-start-accounting>true</radius-start-accounting>
-	<radius-stop-accounting>true</radius-stop-accounting>
-	<radius-interim-update>30</radius-interim-update>
-	<log>true</log>
-</server>
-
-<registrar>
-		<enabled>true</enabled>
- 		<class>com.admtel.telephonyserver.registrar.SimpleRegistrar</class>
-</registrar>
-
-<radius>
 	<server>
-		<id>first radius server</id>
-		<address>172.16.140.129</address>
-		<auth-port>1812</auth-port>
-		<acct-port>1813</acct-port>
-		<secret>test</secret>
-		<retry-count>5</retry-count>
-		<socket-timeout>5000</socket-timeout>
+		<maxthreads>15</maxthreads>
+		<address>172.16.140.1</address>
+		<base-directory>/usr/local/adm</base-directory>
+		<script-path>.;./scripts;/Users/danny/workspace/adm-telephony-scripts/src
+		</script-path>
+		<radius-start-accounting>true</radius-start-accounting>
+		<radius-stop-accounting>true</radius-stop-accounting>
+		<radius-interim-update>30</radius-interim-update>
+		<log>true</log>
 	</server>
-</radius>
 
-<!-- SWITCH LISTENERS START -->
-<switch-listeners>
- <switch-listener>
- 	<address>
- 		172.16.140.1
+	<registrar>
+		<enabled>true</enabled>
+		<class>com.admtel.telephonyserver.registrar.SimpleRegistrar</class>
+	</registrar>
+
+	<radius>
+		<server>
+			<id>first radius server</id>
+			<address>172.16.140.129</address>
+			<auth-port>1812</auth-port>
+			<acct-port>1813</acct-port>
+			<secret>test</secret>
+			<retry-count>5</retry-count>
+			<socket-timeout>5000</socket-timeout>
+		</server>
+	</radius>
+
+	<!-- SWITCH LISTENERS START -->
+	<switch-listeners>
+		<switch-listener>
+			<address>
+				172.16.140.1
  	</address>
- 	<port>
- 		8084
+			<port>
+				8084
  	</port>
- 	<type>
- 		freeswitch
- 	</type> 	
- </switch-listener>
-  <switch-listener>
- 	<address>
- 		172.16.34.1
+			<type>
+				freeswitch
+ 	</type>
+		</switch-listener>
+		<switch-listener>
+			<address>
+				172.16.34.1
  	</address>
- 	<port>
- 		4573
+			<port>
+				4573
  	</port>
- 	<type>
- 		asterisk
- 	</type> 	
- </switch-listener> 
-</switch-listeners>
-<!-- SWITCH LISTENERS END -->
+			<type>
+				asterisk
+ 	</type>
+		</switch-listener>
+	</switch-listeners>
+	<!-- SWITCH LISTENERS END -->
 
-<!-- CLI LISTENERS START -->
-<cli-listeners>
- <cli-listener>
-  <address>172.16.140.1</address>
-  <port>8055</port>
-  <username>test</username>
-  <password>test</password>
- </cli-listener>
-</cli-listeners>
-<!-- CLI LISTENERS END -->
+	<!-- CLI LISTENERS START -->
+	<cli-listeners>
+		<cli-listener>
+			<address>172.16.140.1</address>
+			<port>8055</port>
+			<username>test</username>
+			<password>test</password>
+		</cli-listener>
+	</cli-listeners>
+	<!-- CLI LISTENERS END -->
 
-<!-- HTTP LISTENERS START -->
-<http-servers>
- <http-server>
-  <id>Freeswitch Configurator</id>
-  <address>172.16.140.1</address>
-  <port>8057</port>
-	<adm-servlet>
-		<path>FSConfigurator</path> 
-		<class>/Users/danny/workspace/adm-telephony-scripts/src/WSFreeSwitchConfigurator.groovy</class>
-	</adm-servlet>
-	<adm-servlet>
-		<path>test</path> 
-		<class>scripts/TestAdmServlet.groovy</class>
-	</adm-servlet>	
-	<adm-servlet>
-		<path>webconf</path>
-		<class>scripts/web/WebConfServlet.groovy</class>
-	</adm-servlet>
-	<adm-servlet>
-		<path>webapi</path>
-		<class>scripts/webapi/WebAPI.groovy</class>
-	</adm-servlet>
-	<adm-servlet>
-	 <path>asterisk-curl/single</path>
-	 <class>scripts/AsteriskCurlExample.groovy</class>
-	</adm-servlet>
- </http-server>
- <http-server>
-  <id>dot34</id>
-  <address>172.16.34.1</address>
-  <port>8057</port>
-	<adm-servlet>
-		<path>FSConfigurator</path> 
-		<class>/Users/danny/workspace/adm-telephony-scripts/src/WSFreeSwitchConfigurator.groovy</class>
-	</adm-servlet>
-	<adm-servlet>
-		<path>test</path> 
-		<class>scripts/TestAdmServlet.groovy</class>
-	</adm-servlet>	
-	<adm-servlet>
-		<path>webconf</path>
-		<class>scripts/web/WebConfServlet.groovy</class>
-	</adm-servlet>
-	<adm-servlet>
-		<path>webapi</path>
-		<class>scripts/webapi/WebAPI.groovy</class>
-	</adm-servlet>
-	<adm-servlet>
-	 <path>asterisk-curl/single</path>
-	 <class>scripts/AsteriskCurlExample.groovy</class>
-	</adm-servlet>
- </http-server> 
-<!-- <http-server>-->
-<!--  <id>Manager</id>-->
-<!--  <address>172.16.140.1</address>-->
-<!--  <port>8058</port>-->
-<!--  <adm-servlet>scripts/HttpManager.groovy</adm-servlet>-->
-<!-- </http-server>-->
-</http-servers>
-<!-- HTTP LISTENERS START -->
+	<!-- HTTP LISTENERS START -->
+	<http-servers>
+		<http-server>
+			<id>Freeswitch Configurator</id>
+			<address>172.16.140.1</address>
+			<port>8057</port>
+			<adm-servlet>
+				<path>FSConfigurator</path>
+				<class>/Users/danny/workspace/adm-telephony-scripts/src/WSFreeSwitchConfigurator.groovy
+				</class>
+			</adm-servlet>
+			<adm-servlet>
+				<path>test</path>
+				<class>scripts/TestAdmServlet.groovy</class>
+			</adm-servlet>
+			<adm-servlet>
+				<path>webconf</path>
+				<class>scripts/web/WebConfServlet.groovy</class>
+			</adm-servlet>
+			<adm-servlet>
+				<path>webapi</path>
+				<class>scripts/webapi/WebAPI.groovy</class>
+				<parameters>
+					<parameter name="SecurityProvider" value="simple-security-provider"/>
+				</parameters>
+			</adm-servlet>
+			<adm-servlet>
+				<path>asterisk-curl/single</path>
+				<class>scripts/AsteriskCurlExample.groovy</class>
+			</adm-servlet>
+		</http-server>
+		<http-server>
+			<id>dot34</id>
+			<address>172.16.34.1</address>
+			<port>8057</port>
+			<adm-servlet>
+				<path>FSConfigurator</path>
+				<class>/Users/danny/workspace/adm-telephony-scripts/src/WSFreeSwitchConfigurator.groovy
+				</class>
+			</adm-servlet>
+			<adm-servlet>
+				<path>test</path>
+				<class>scripts/TestAdmServlet.groovy</class>
+			</adm-servlet>
+			<adm-servlet>
+				<path>webconf</path>
+				<class>scripts/web/WebConfServlet.groovy</class>
+			</adm-servlet>
+			<adm-servlet>
+				<path>webapi</path>
+				<class>scripts/webapi/WebAPI.groovy</class>
+				<parameters>
+					<parameter name="SecurityProvider" value="simple-security-provider"/>
+				</parameters>
+			</adm-servlet>
+			<adm-servlet>
+				<path>asterisk-curl/single</path>
+				<class>scripts/AsteriskCurlExample.groovy</class>
+			</adm-servlet>
+		</http-server>
+		<!-- <http-server> -->
+		<!-- <id>Manager</id> -->
+		<!-- <address>172.16.140.1</address> -->
+		<!-- <port>8058</port> -->
+		<!-- <adm-servlet>scripts/HttpManager.groovy</adm-servlet> -->
+		<!-- </http-server> -->
+	</http-servers>
+	<!-- HTTP LISTENERS START -->
 
-<!-- SWITCHES START -->
-<switches>
- <switch>
- 	<name>MyFreeswitch</name>
-    <address>172.16.140.129</address>
-  	<port>8021</port>
-  	<username>admin</username>
-  	<password>admin</password>
-  	<type>freeswitch</type>  
-  	<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultFSAddressTranslator</addresstranslator> 	
-  	<enabled>true</enabled>
- </switch>
- <switch>
-  <name>Asterisk_VMWARE</name>
-  <address>172.16.34.134</address>
-  <port>5038</port>
-  <username>admin</username>
-  <password>password</password>
-  <type>asterisk</type>
-  <addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator</addresstranslator>
-  <enabled>false</enabled>
- </switch>
+	<!-- SWITCHES START -->
+	<switches>
+		<switch>
+			<name>MyFreeswitch</name>
+			<address>172.16.140.129</address>
+			<port>8021</port>
+			<username>admin</username>
+			<password>admin</password>
+			<type>freeswitch</type>
+			<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultFSAddressTranslator
+			</addresstranslator>
+			<enabled>true</enabled>
+		</switch>
+		<switch>
+			<name>Asterisk_VMWARE</name>
+			<address>172.16.34.134</address>
+			<port>5038</port>
+			<username>admin</username>
+			<password>password</password>
+			<type>asterisk</type>
+			<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator
+			</addresstranslator>
+			<enabled>false</enabled>
+		</switch>
 
-</switches>
-<!-- SWITCHES END -->
+	</switches>
+	<!-- SWITCHES END -->
 
-<!-- SCRIPT FACTORIES START -->
-<scriptfactories>
-<!-- <scriptfactory>-->
-<!--  <class>/Users/danny/AdmTel_Source/adm-telephony-scripts/src/WSScriptFactory.groovy</class>-->
-<!-- </scriptfactory>-->
-<!-- <scriptfactory>-->
-<!--  <class>com.admtel.telephonyserver.scriptfactories.VariableScriptFactory</class>-->
-<!-- </scriptfactory>-->
- <scriptfactory>
-  <class>com.admtel.telephonyserver.scriptfactories.XMLScriptFactory</class>
- </scriptfactory>
-</scriptfactories>
-<!-- SCRIPT FACTORIES END -->
+	<!-- SCRIPT FACTORIES START -->
+	<scriptfactories>
+		<!-- <scriptfactory> -->
+		<!-- <class>/Users/danny/AdmTel_Source/adm-telephony-scripts/src/WSScriptFactory.groovy</class> -->
+		<!-- </scriptfactory> -->
+		<!-- <scriptfactory> -->
+		<!-- <class>com.admtel.telephonyserver.scriptfactories.VariableScriptFactory</class> -->
+		<!-- </scriptfactory> -->
+		<scriptfactory>
+			<class>com.admtel.telephonyserver.scriptfactories.XMLScriptFactory
+			</class>
+		</scriptfactory>
+	</scriptfactories>
+	<!-- SCRIPT FACTORIES END -->
 
-<!--EVENT LISTENERS START -->
-<event-listeners>
-	<event-listener>
-	 <class>com.admtel.telephonyserver.eventlisteners.SimpleEventListener</class>
-	</event-listener>
-	<event-listener>
-	 <class>scripts/MyEventListener.groovy</class>
-	</event-listener>
-</event-listeners>
-<!--EVENT LISTENERS END -->
+	<!--EVENT LISTENERS START -->
+	<event-listeners>
+		<event-listener>
+			<class>com.admtel.telephonyserver.eventlisteners.SimpleEventListener
+			</class>
+		</event-listener>
+		<event-listener>
+			<class>scripts/MyEventListener.groovy</class>
+		</event-listener>
+	</event-listeners>
+	<!--EVENT LISTENERS END -->
 
-<!--PROMPT BUILDERS START -->
-<prompt-builders>
- <prompt-builder>
-	<language>en</language>
- 	<class>com.admtel.telephonyserver.prompts.EnglishPromptBuilder</class>
- </prompt-builder>
- <prompt-builder>
- 	<language>ar</language>
- 	<class>com.admtel.telephonyserver.prompts.ArabicPromptBuilder</class>
- </prompt-builder>
- <prompt-builder>
- 	<language>fr</language>
- 	<class>com.admtel.telephonyserver.prompts.FrenchPromptBuilder</class>
- </prompt-builder>
-</prompt-builders>
-<!--PROMPT BUILDERS END -->
+	<!--PROMPT BUILDERS START -->
+	<prompt-builders>
+		<prompt-builder>
+			<language>en</language>
+			<class>com.admtel.telephonyserver.prompts.EnglishPromptBuilder
+			</class>
+		</prompt-builder>
+		<prompt-builder>
+			<language>ar</language>
+			<class>com.admtel.telephonyserver.prompts.ArabicPromptBuilder</class>
+		</prompt-builder>
+		<prompt-builder>
+			<language>fr</language>
+			<class>com.admtel.telephonyserver.prompts.FrenchPromptBuilder</class>
+		</prompt-builder>
+	</prompt-builders>
+	<!--PROMPT BUILDERS END -->
 
 
-<beans>
- <bean>
- 	<class>com.admtel.telephonyserver.remote.JSonSocketManagerBean</class>
- 	<parameters>
- 	 <parameter>
- 	 	<name>address</name>
- 	 	<value>172.16.140.1</value>
- 	 </parameter>
- 	 <parameter>
- 	 	<name>port</name>
- 	 	<value>12341</value>
- 	 </parameter>
- 	</parameters>
- </bean>
-  <bean>
- 	<class>scripts/ManagerBean.groovy</class>
- 	<parameters>
- 	 <parameter>
- 	 	<name>address</name>
- 	 	<value>172.16.140.1</value>
- 	 </parameter>
- 	 <parameter>
- 	 	<name>port</name>
- 	 	<value>1234</value>
- 	 </parameter>
- 	</parameters>
- </bean>
- <bean>
- 	<class>/Users/danny/workspace/adm-telephony-scripts/src/conference/DBConferenceHelperBean.groovy</class>
- 	<parameters>
- 		<parameter>
- 		 <name>dbUrl</name>
- 		 <value>jdbc:postgresql://localhost:5432/adm_appserver</value>
- 		</parameter>
- 		<parameter>
- 			<name>dbUser</name>
- 			<value>tester</value>
- 		</parameter>
- 		<parameter>
- 			<name>dbPassword</name>
- 			<value>tester1234</value>
- 		</parameter>
- 		<parameter>
- 			<name>dbDriver</name>
- 			<value>org.postgresql.Driver</value>
- 		</parameter>
- 	</parameters>
- </bean>
-</beans>
+	<beans>
+		<bean>
+			<class>com.admtel.telephonyserver.remote.JSonSocketManagerBean
+			</class>
+			<id>json_api</id>
+			<parameters>
+				<parameter name="address" value="172.16.140.1"/>
+				<parameter name="port" value="12341"/>
+			</parameters>
+		</bean>
+		<bean>
+			<class>scripts/ManagerBean.groovy</class>
+			<id>manager</id>
+			<parameters>
+				<parameter name="address" value="172.16.140.1"/>
+				<parameter name="port" value="1234"/>
+			</parameters>
+		</bean>
+		<bean>
+			<class>/Users/danny/workspace/adm-telephony-scripts/src/conference/DBConferenceHelperBean.groovy
+			</class>
+			<id>conferencer-helper</id>
+			<parameters>
+				<parameter name="dbUrl" value="jdbc:postgresql://localhost:5432/adm_appserver"/>
+				<parameter name="dbUser" value="tester"/>
+				<parameter name="dbPassword" value="tester1234"/>
+				<parameter name="dbDriver" value="org.postgresql.Driver"/>
+			</parameters>
+		</bean>
+
+		<bean>
+			<id>simple-security-provider</id>
+			<class>com.admtel.telephonyserver.misc.SimpleSecurityProvider</class>
+		</bean>
+	</beans>
 
 </config>

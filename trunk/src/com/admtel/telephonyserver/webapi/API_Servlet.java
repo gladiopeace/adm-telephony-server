@@ -4,7 +4,7 @@ import com.admtel.telephonyserver.httpserver.AdmServlet;
 import com.admtel.telephonyserver.httpserver.HttpRequestMessage;
 import com.admtel.telephonyserver.httpserver.HttpResponseMessage;
 
-public class API_Servlet implements AdmServlet {
+public class API_Servlet extends AdmServlet {
 
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response) {

@@ -28,6 +28,10 @@ public class BeansManager implements DefinitionChangeListener {
 		return SingletonHolder.instance;
 	}
 
+	public Object getBean(String id){
+		Object result = beans.get(id);
+		return result;
+	}
 	@Override
 	public void definitionAdded(DefinitionInterface definition) {
 		if (definition != null && definition instanceof BeanDefinition) {
@@ -70,7 +74,7 @@ public class BeansManager implements DefinitionChangeListener {
 						}
 						
 					} catch (Exception e) {
-						log.error(e.getMessage(),e);
+						log.warn(e.getMessage(),e);
 					} 
 
 				}
