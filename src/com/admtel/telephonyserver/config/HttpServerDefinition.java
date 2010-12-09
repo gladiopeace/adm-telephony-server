@@ -9,17 +9,16 @@ public class HttpServerDefinition implements DefinitionInterface {
 	String id;
 	String address;
 	int port;
+
 	
-	Map<String, String> admServlets = new HashMap<String, String>();	
+	Map<String, AdmServletDefinition> admServlets = new HashMap<String, AdmServletDefinition>();	
 
-	public Map<String, String> getAdmServlets() {
-		return admServlets;
+	public AdmServletDefinition getServletDefinition(String path){
+		return admServlets.get(path);
 	}
-
-	public void setAdmServlets(Map<String, String> admServlets) {
-		this.admServlets = admServlets;
+	public void putServletDefinition(String path, AdmServletDefinition servletDefinition){
+		admServlets.put(path, servletDefinition);
 	}
-
 	@Override
 	public String getId() {
 		return id;

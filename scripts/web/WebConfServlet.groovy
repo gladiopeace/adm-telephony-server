@@ -11,7 +11,7 @@ import com.admtel.telephonyserver.httpserver.AdmServlet;
 
 import freemarker.template.*;
 
-class WebConfServlet implements AdmServlet {
+class WebConfServlet extends AdmServlet {
 	
 	
 	static Configuration config = null;

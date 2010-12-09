@@ -3,7 +3,7 @@ package com.admtel.telephonyserver.httpserver;
 import java.util.Iterator;
 import java.util.Map;
 
-public class DefaultAdmServlet implements AdmServlet {
+public class DefaultAdmServlet extends AdmServlet {
 
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response) {

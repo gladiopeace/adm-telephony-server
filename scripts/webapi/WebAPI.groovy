@@ -10,14 +10,17 @@ import com.admtel.telephonyserver.httpserver.HttpRequestMessage;
 import com.admtel.telephonyserver.httpserver.HttpResponseMessage;
 import groovy.xml.MarkupBuilder;
 import com.admtel.telephonyserver.httpserver.AdmServlet;
+import com.admtel.telephonyserver.interfaces.TokenSecurityProvider;
 
-class WebAPI implements AdmServlet {
+class WebAPI extends AdmServlet {
 	
 	static Logger log = Logger.getLogger(WebAPI.class)
 	
 	
+	TokenSecurityProvider securityProvider;
+
 	def index(request){
-		println "*********** index"
+		println "*********** index ${securityProvider}"
 		"Welcome"
 	}
 	def hangup(request){		
@@ -80,6 +83,9 @@ class WebAPI implements AdmServlet {
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
 		//TODO check token
+		this.securityProvider = BeansManager.getInstance().getBean(getParameter('SecurityProvider'))
+		if (securityProvider.getSecurityLevel(request.getParameter('token')) > 0){
+			
 		
 		def action = request.getParameter("action")
 		if (!(action?.length()>0)){
@@ -89,13 +95,18 @@ class WebAPI implements AdmServlet {
 			log.trace("WebAPI received {"+request+"}");
 			def model = "${action}"(request)
 			println "model = ${model}"
-			response.appendBody(model)	
+			response.appendBody(model)
+			response.setResponseCode(HttpStatus.ORDINAL_200_OK)			
 		}	
 		catch (Exception e){
 			println e
 			log.fatal(e.getMessage(), e)
 			response.setResponseCode(HttpStatus.Not_Implemented)
 		}
-		response.setResponseCode(HttpStatus.ORDINAL_200_OK)
+		}
+		else{
+			response.appendBody("Unauthorized")
+			response.setResponseCode(HttpStatus.ORDINAL_401_Unauthorized);
+		}
 	}
 }

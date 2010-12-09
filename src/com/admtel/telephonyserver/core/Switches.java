@@ -185,6 +185,9 @@ public class Switches implements DefinitionChangeListener, EventListener {
 		return null;
 	}
 
+	public Channel getChannelById(String id){
+		return channels.get(id);
+	}
 	public void processRequest(Request request) {
 		if (request instanceof ChannelRequest) {
 			ChannelRequest channelRequest = (ChannelRequest) request;

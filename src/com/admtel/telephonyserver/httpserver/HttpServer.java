@@ -15,6 +15,7 @@ import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
+import com.admtel.telephonyserver.config.AdmServletDefinition;
 import com.admtel.telephonyserver.config.HttpServerDefinition;
 import com.admtel.telephonyserver.core.AdmThreadExecutor;
 import com.admtel.telephonyserver.core.SmartClassLoader;
@@ -34,7 +35,7 @@ public class HttpServer implements IoHandler {
 	private HttpServerDefinition definition;
 
 	static Logger log = Logger.getLogger(HttpServer.class);
-
+	
 	public HttpServer(HttpServerDefinition definition) {
 		this.definition = definition;
 
@@ -61,7 +62,14 @@ public class HttpServer implements IoHandler {
 
 
 		try {
-			AdmServlet servlet = SmartClassLoader.createInstance(AdmServlet.class, definition.getAdmServlets().get(request.getContext()));
+			//TODO make it a bean object ??
+			AdmServletDefinition servletDefinition = definition.getServletDefinition(request.getContext());
+			AdmServlet servlet = null;
+			if (servletDefinition != null){
+				servlet = SmartClassLoader.createInstance(AdmServlet.class, servletDefinition.getClassName());
+				servlet.setParameters(servletDefinition.getParameters());
+			}
+			
 			if (servlet == null){
 				servlet = admServlet;
 			}

@@ -14,6 +14,7 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.log4j.Logger;
 
+import com.admtel.telephonyserver.config.ConfigUtils;
 import com.admtel.telephonyserver.core.ChannelData;
 import com.admtel.telephonyserver.core.Script;
 import com.admtel.telephonyserver.core.SmartClassLoader;
@@ -91,27 +92,6 @@ public class XMLScriptFactory implements ScriptFactory, Loadable {
 		return null;
 	}
 
-	public Map<String, String> loadParameters(HierarchicalConfiguration section) {
-		int coutner = 0;
-		Map<String, String> result = new Hashtable<String, String>();
-
-		try {
-			int counter = 0;
-			while (section.configurationAt(String.format("parameter(%d)",
-					counter)) != null) {
-				String key = section.getString(String.format(
-						"parameter(%d)[@key]", counter));
-				String value = section.getString(String.format(
-						"parameter(%d)[@value]", counter));
-				result.put(key, value);
-				counter++;
-			}
-		} catch (Exception e) {
-
-		}
-		return result;
-
-	}
 
 	@Override
 	public void load() {
@@ -132,7 +112,7 @@ public class XMLScriptFactory implements ScriptFactory, Loadable {
 				HierarchicalConfiguration parametersConfig = config
 						.configurationAt(String.format("script(%d).parameters",
 								counter));
-				 parameters = loadParameters(parametersConfig);
+				 parameters = ConfigUtils.loadParameters(parametersConfig);
 				}
 				catch (Exception e){
 					log.warn(e.getMessage());

@@ -8,6 +8,8 @@ import java.util.Map;
 public class BeanDefinition implements DefinitionInterface {
 
 	String className;
+	String id;
+
 	Map<String, String>parameters = new HashMap<String, String>();
 	
 	private String toString(Collection<?> collection, int maxLen) {
@@ -31,13 +33,17 @@ public class BeanDefinition implements DefinitionInterface {
 	}
 	@Override
 	public String getId() {
-		return className;
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
 	}
 	@Override
 	public String toString() {
 		final int maxLen = 20;
 		return "BeanDefinition ["
 				+ (className != null ? "className=" + className + ", " : "")
+				+ (id != null ? "id=" + id + ", " : "")
 				+ (parameters != null ? "parameters="
 						+ toString(parameters.entrySet(), maxLen) : "") + "]";
 	}
