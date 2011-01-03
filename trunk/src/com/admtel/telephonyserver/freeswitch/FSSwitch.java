@@ -38,6 +38,7 @@ import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.requests.Request;
 import com.admtel.telephonyserver.utils.AdmUtils;
+import com.admtel.telephonyserver.utils.CodecsUtils;
 
 public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 
@@ -216,7 +217,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 				case ChannelCreate: {
 					FSChannelCreateEvent cce = (FSChannelCreateEvent) event;
 					FSChannel channel = new FSChannel(FSSwitch.this, cce
-							.getChannelId(), message.getSession());
+							.getChannelId(), message.getSession());					
 					FSSwitch.this.addChannel(channel);
 				}
 					break;
@@ -242,6 +243,9 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 						case ChannelData:
 							// Replace the iosession, with the session from the
 							// incoming connection
+							String sipReqParams = channelEvent.getValue("variable_sip_req_params");
+							channel.getChannelData().addDelimitedVars(CodecsUtils.urlDecode(sipReqParams), ";");
+
 							channel.setIoSession(message.getSession());
 							break;
 						case ChannelOriginate: {

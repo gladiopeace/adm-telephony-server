@@ -1,14 +1,3 @@
-import com.admtel.telephonyserver.core.DisconnectCode;
-
-import org.apache.commons.logging.Log;
-import org.apache.log4j.Logger;
-
-import com.admtel.telephonyserver.events.Event.EventType;
-
-import com.admtel.telephonyserver.core.Script;
-import com.admtel.telephonyserver.core.Channel;
-import com.admtel.telephonyserver.events.*;
-import com.admtel.telephonyserver.radius.*;
 
 
 class TransitSwitch extends Script {
@@ -41,6 +30,11 @@ class TransitSwitch extends Script {
 	protected void onTimer() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	protected void onCreate(){
+	
 	}
 	
 	@Override
