@@ -1,9 +1,3 @@
-import com.admtel.telephonyserver.prompts.PromptBuilder
-import com.admtel.telephonyserver.core.*
-import com.admtel.telephonyserver.events.*
-import com.admtel.telephonyserver.radius.*;
-import com.admtel.telephonyserver.events.Event.EventType;
-import com.admtel.telephonyserver.prompts.*;
 
 class AdmCompleteExample extends Script {
 	
@@ -90,6 +84,11 @@ class AdmCompleteExample extends Script {
 			state = "Playing"
 			break
 		}
+	}
+	
+	@Override
+	protected void onCreate(){
+	
 	}
 
 }

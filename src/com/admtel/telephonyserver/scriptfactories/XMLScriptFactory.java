@@ -50,7 +50,7 @@ public class XMLScriptFactory implements ScriptFactory, Loadable {
 		public String toString() {
 			String result = name + ":" + called + ":" + className;
 			for (String key : parameters.keySet()) {
-				result += "\t" + parameters.get(key);
+				result += "\t" + key+"="+ parameters.get(key);
 			}
 			return result;
 		}
@@ -79,7 +79,7 @@ public class XMLScriptFactory implements ScriptFactory, Loadable {
 						if (script != null) {
 							log.debug(String.format(
 									"Created script for (%s) - script (%s)",
-									channelData.toString(), script));
+									channelData.toString(), scriptData));
 							script.setParameters(scriptData.parameters);
 						}
 						return script;

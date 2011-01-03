@@ -147,4 +147,10 @@ public class SimpleTestScript extends Script {
 	public String getDisplayStr() {
 		return displayStr;
 	}
+
+	@Override
+	protected void onCreate() {
+		// TODO Auto-generated method stub
+		
+	}
 }

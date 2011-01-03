@@ -1,9 +1,3 @@
-import com.admtel.telephonyserver.events.Event.EventType;
-
-import com.admtel.telephonyserver.core.Script;
-import com.admtel.telephonyserver.events.Event;
-import com.admtel.telephonyserver.core.Channel;
-import com.admtel.telephonyserver.events.*;
 
 class DialoutScript extends Script {
 	
@@ -93,5 +87,9 @@ class DialoutScript extends Script {
 	}
 	protected void processConnected_State(Event event){
 		
+	}
+	@Override
+	protected void onCreate(){
+	
 	}
 }

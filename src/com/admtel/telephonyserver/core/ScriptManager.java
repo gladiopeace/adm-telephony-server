@@ -38,10 +38,11 @@ public class ScriptManager implements DefinitionChangeListener, Loadable{
 			if (script != null) {
 				Scripts.getInstance().add(script);
 				log.trace(String.format("Script (%s) created for ChannelData (%s)", script, channelData));
+				script.onCreate();
 				return script;
 			}
 		}
-		return script;
+		return null;
 	}
 
 	@Override

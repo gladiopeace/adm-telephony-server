@@ -169,4 +169,6 @@ public abstract class Script implements EventListener{
 	protected abstract void onTimer();
 
 	protected abstract void onStop();
+	
+	protected abstract void onCreate();
 }

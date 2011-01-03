@@ -1,6 +1,3 @@
-import com.admtel.telephonyserver.core.Script;
-import com.admtel.telephonyserver.events.*;
-import com.admtel.telephonyserver.core.Channel;
 
 
 class PlayAndGetDigitsTest extends Script {
@@ -35,6 +32,11 @@ class PlayAndGetDigitsTest extends Script {
 
 	}
 
+	@Override
+	protected void onCreate(){
+	
+	}
+	
 	def waitForCall={
 			Event event = it
 			switch (event.getEventType()){
