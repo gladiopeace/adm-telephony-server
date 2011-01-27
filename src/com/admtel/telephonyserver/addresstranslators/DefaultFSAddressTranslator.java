@@ -12,7 +12,7 @@ public class DefaultFSAddressTranslator implements AddressTranslator {
 				return String.format("sofia/default/%s@%s", addressItems[0], addressItems[1]);
 			}
 			else if (addressItems.length==1){
-				return String.format("SIP/%s", addressItems[0]+"%");
+				return String.format("sofia/internal/%s", addressItems[0]+"%");
 			}
 		}
 		else if (address.startsWith("iax2:")){

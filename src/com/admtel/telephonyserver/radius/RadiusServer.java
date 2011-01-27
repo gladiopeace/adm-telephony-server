@@ -251,9 +251,11 @@ public class RadiusServer implements Authorizer {
 		String str = channel.getUserName();
 		str = channel.getAccountCode();
 
-		AccountingRequest acctRequest = new AccountingRequest((channel
+		String username = (channel
 				.getAccountCode() == null ? channel.getUserName() : channel
-				.getAccountCode()),
+				.getAccountCode());
+		if (username == null) return false;
+		AccountingRequest acctRequest = new AccountingRequest(username,
 				AccountingRequest.ACCT_STATUS_TYPE_INTERIM_UPDATE);
 
 		RadiusPacketDecorator arDecorator = new RadiusPacketDecorator(
@@ -303,10 +305,12 @@ public class RadiusServer implements Authorizer {
 	}
 
 	public boolean accountingStart(Channel channel) {
-
-		AccountingRequest acctRequest = new AccountingRequest((channel
+		String username = (channel
 				.getAccountCode() == null ? channel.getUserName() : channel
-				.getAccountCode()), AccountingRequest.ACCT_STATUS_TYPE_START);
+				.getAccountCode());
+		if (username == null) return false;
+		
+		AccountingRequest acctRequest = new AccountingRequest(username, AccountingRequest.ACCT_STATUS_TYPE_START);
 
 		RadiusPacketDecorator arDecorator = new RadiusPacketDecorator(
 				acctRequest);
@@ -351,9 +355,12 @@ public class RadiusServer implements Authorizer {
 
 	public boolean accountingStop(Channel channel) {
 
-		AccountingRequest acctRequest = new AccountingRequest((channel
+		String username = (channel
 				.getAccountCode() == null ? channel.getUserName() : channel
-				.getAccountCode()), AccountingRequest.ACCT_STATUS_TYPE_STOP);
+				.getAccountCode());
+		if (username == null) return false;
+		
+		AccountingRequest acctRequest = new AccountingRequest(username, AccountingRequest.ACCT_STATUS_TYPE_STOP);
 		RadiusPacketDecorator arDecorator = new RadiusPacketDecorator(
 				acctRequest);
 

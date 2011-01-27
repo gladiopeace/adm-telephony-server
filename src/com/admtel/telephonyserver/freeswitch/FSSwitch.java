@@ -24,6 +24,7 @@ import com.admtel.telephonyserver.core.Result;
 import com.admtel.telephonyserver.core.SimpleMessageHandler;
 import com.admtel.telephonyserver.core.Switch;
 import com.admtel.telephonyserver.core.Timers;
+import com.admtel.telephonyserver.core.Channel.CallOrigin;
 import com.admtel.telephonyserver.core.Switch.SwitchStatus;
 import com.admtel.telephonyserver.core.Timers.Timer;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelBridgeEvent;
@@ -34,6 +35,7 @@ import com.admtel.telephonyserver.freeswitch.events.FSChannelOriginateEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSCommandReplyEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSRegisterEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelCreateEvent.CallDirection;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.requests.Request;
@@ -214,13 +216,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 					return;
 				}
 				switch (event.getEventType()) {
-				case ChannelCreate: {
-					FSChannelCreateEvent cce = (FSChannelCreateEvent) event;
-					FSChannel channel = new FSChannel(FSSwitch.this, cce
-							.getChannelId(), message.getSession());					
-					FSSwitch.this.addChannel(channel);
-				}
-					break;
+				
 				case FsRegister: {
 					FSRegisterEvent registerEvent = (FSRegisterEvent) event;
 					if (registerEvent.getRegistered()) {
@@ -233,19 +229,38 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 					}
 				}
 					break;
+				case ChannelCreate:
+				{
+					FSChannelCreateEvent cce = (FSChannelCreateEvent) event;
+					FSChannel channel = new FSChannel(FSSwitch.this, cce
+							.getChannelId(), message.getSession());
+					switch (cce.getDirection()){
+					case Inbound:
+						channel.setCallOrigin(CallOrigin.Inbound);
+						break;
+					case Outbound:
+						channel.setCallOrigin(CallOrigin.Outbound);
+						break;
+					}
+					
+					FSSwitch.this.addChannel(channel);
+
+				}
+					break;
 				}
 				if (event instanceof FSChannelEvent) {
 					FSChannelEvent channelEvent = (FSChannelEvent) event;
 					FSChannel channel = (FSChannel) FSSwitch.this
 							.getChannel(channelEvent.getChannelId());
-					if (channel != null) {
+					if (channel == null){
+						return;
+					}
+					
 						switch (event.getEventType()) {
 						case ChannelData:
 							// Replace the iosession, with the session from the
 							// incoming connection
-							String sipReqParams = channelEvent.getValue("variable_sip_req_params");
-							channel.getChannelData().addDelimitedVars(CodecsUtils.urlDecode(sipReqParams), ";");
-
+							
 							channel.setIoSession(message.getSession());
 							break;
 						case ChannelOriginate: {
@@ -267,7 +282,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 						break;
 						}
 						channel.putMessage(channelEvent);
-					}
+					
 				}
 			}			
 			break;

@@ -10,19 +10,12 @@ public abstract class FSChannelEvent extends FSEvent {
 	}
 	public abstract String getChannelId();
 	
-	public String getAnswerState(){
-		return values.get("Answer-State"); //TODO convert to proper answer state
-	}
 	public boolean isOutbound(){
 		String callDirection = values.get("Call-Direction");
 		if (callDirection == null){
 			return false;
 		}
 		return callDirection.equals("outbound");		
-	}
-	public FSChannelState getChannelState(){
-		String answerState = values.get("Answer-State");
-		return FSChannelState.fromString(answerState);
 	}
 	public String getCallerIdNum(){
 		return values.get("Channel-Caller-ID-Number");

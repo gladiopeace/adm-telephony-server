@@ -79,6 +79,19 @@ public abstract class Channel implements TimerNotifiable {
 
 	private String conferenceId;
 	private String memberId;
+	
+	public Script script;
+
+	public Script getScript() {
+		return script;
+	}
+
+	public void setScript(Script script) {		
+		if (this.script != null){
+			this.script.onStop();
+		}
+		this.script = script;
+	}
 
 	private MessageHandler messageHandler = new QueuedMessageHandler() {
 
@@ -389,7 +402,7 @@ public abstract class Channel implements TimerNotifiable {
 		return result;
 
 	}
-
+	
 	public abstract Result internalConferenceMute(String conferenceId, String memberId, boolean mute);
 	
 	final public Result conferenceMute(boolean mute){
@@ -463,22 +476,20 @@ public abstract class Channel implements TimerNotifiable {
 			ie.setCallerIdNumber(getChannelData().getCallerIdNumber());
 			state = State.InboundAlerting;
 			callOrigin = CallOrigin.Inbound;
-			setupTime = new DateTime();
-			this.addEventListener(EventsManager.getInstance());
+			setupTime = new DateTime();			
 		}
 			break;
 		case Hangup: {
 			HangupEvent he = (HangupEvent) e;
 			hangupTime = new DateTime();
 			h323DisconnectCause = he.getHangupCause();
-			stopTimers();
+			stopTimers();			
 		}
 			break;
 		case OutboundAlerting:
 			state = State.OutboundAlerting;
 			callOrigin = CallOrigin.Outbound;
-			setupTime = new DateTime();
-			this.addEventListener(EventsManager.getInstance());
+			setupTime = new DateTime();			
 			break;
 		case QueueJoined:
 			state = State.Queued;
@@ -498,6 +509,12 @@ public abstract class Channel implements TimerNotifiable {
 			break;
 		}
 
+		EventsManager.getInstance().onEvent(e);
+		
+		if (script != null){			
+			script.onEvent(e);
+		}
+		
 		try {
 			Iterator<EventListener> it = getListeners().iterator();
 			while (it.hasNext()) {
@@ -508,6 +525,8 @@ public abstract class Channel implements TimerNotifiable {
 		}
 		if (e.getEventType() == EventType.Hangup) {
 			removeAllEventListeners();
+			setScript(null);
+			_switch.removeChannel(this);
 		}
 		return false;
 	}

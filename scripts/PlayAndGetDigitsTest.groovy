@@ -1,4 +1,5 @@
-
+import com.admtel.telephonyserver.core.*;
+import com.admtel.telephonyserver.events.*;
 
 class PlayAndGetDigitsTest extends Script {
 

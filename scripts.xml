@@ -37,7 +37,10 @@
  	<parameter name="language" value="english"/>
  	</parameters>
  </script>
- 
+ <script name="Dialout">
+ 	<called>11111111</called>
+ 	<class>scripts/DialoutScript.groovy</class>
+ </script>
  <script name="cc">
  	<called>801666</called>
  	<class>/Users/danny/workspace/adm-telephony-scripts/src/callingcard/CallingCardScript.groovy</class>
@@ -63,7 +66,7 @@
  
  <script name="TransitSwitch">
   <called>[0-9]*</called>
-  <class>scripts/TransitSwitch.groovy</class>
+  <class>/Users/danny/workspace/adm-telephony-scripts/src/transitswitch/TransitSwitchScript.groovy</class>
   <parameters>
    <parameter name="language" value="english"/>
   </parameters>
