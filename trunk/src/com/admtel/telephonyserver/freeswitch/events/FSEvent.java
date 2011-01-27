@@ -41,6 +41,7 @@ public class FSEvent {
 			EVENTS_MAP.put("CHANNEL_ORIGINATE", FSChannelOriginateEvent.class
 					.getConstructor(String.class, Map.class));
 			EVENTS_MAP.put("CHANNEL_BRIDGE", FSChannelBridgeEvent.class.getConstructor(String.class, Map.class));
+			EVENTS_MAP.put("CHANNEL_STATE", FSChannelStateEvent.class.getConstructor(String.class, Map.class));
 
 		} catch (Exception e) {
 			log.fatal(e.getMessage());

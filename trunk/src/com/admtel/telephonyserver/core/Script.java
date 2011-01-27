@@ -33,8 +33,6 @@ public abstract class Script implements EventListener{
 	
 	ScriptState scriptState = ScriptState.Running;
 
-	List<Channel> channels = new ArrayList<Channel>();
-
 	Map<String, String> parameters;
 	
 	public Map<String, String> getParameters(){
@@ -57,18 +55,6 @@ public abstract class Script implements EventListener{
 		id = UUID.randomUUID().toString();
 	}
 
-	@Override
-	public String toString() {
-		final int maxLen = 20;
-		return "Script ["
-				+ (id != null ? "id=" + id + ", " : "")
-				+ (scriptState != null ? "scriptState=" + scriptState + ", "
-						: "")
-				+ (channels != null ? "channels=" + toString(channels, maxLen)
-						+ ", " : "")
-				+ (parameters != null ? "parameters="
-						+ toString(parameters.entrySet(), maxLen) : "") + "]";
-	}
 	private String toString(Collection<?> collection, int maxLen) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("[");
@@ -95,42 +81,34 @@ public abstract class Script implements EventListener{
 		return result;
 	}
 
-	public List<Channel> getChannels() {
-		return channels;
-	}
 
 	final public boolean onEvent(Event event) {
 		
 		try{
-		log.trace("Script " + this + ", got event " + event);
-
+		log.trace(this + ", got event " + event);		
 		switch (event.getEventType()) {
 		case InboundAlerting: {
 			InboundAlertingEvent ie = (InboundAlertingEvent) event;
-			channels.add(ie.getChannel());
 		}
 			break;
 		case OutboundAlerting:{
 			OutboundAlertingEvent oa = (OutboundAlertingEvent)event;
-			channels.add(oa.getChannel());
 		}
 		break;
 		case Hangup: {
 			HangupEvent he = (HangupEvent) event;
-			channels.remove(he.getChannel());
-			log.debug("Script " + this + ", got hangup, cleared channel");
+			log.debug(this + ", got hangup, cleared channel");
 		}
 			break;
 		case DialStarted: {
 			DialStartedEvent dse = (DialStartedEvent) event;
 			// Add the dialed channel to the list of channels, and add us to the
 			// listeners
-			log.debug("Dial Started ....");
+			log.debug(this+", Dial Started ....");
 			if (dse.getDialedChannel() != null) {
-				log.debug(String.format("DialStarted : %s--->%s", dse
+				log.debug(String.format("%s, DialStarted : %s--->%s", this, dse
 						.getChannel().getId(), dse.getDialedChannel().getId()));
 				dse.getDialedChannel().addEventListener(this);
-				channels.add(dse.getDialedChannel());
 			}
 		}
 			break;
@@ -140,23 +118,10 @@ public abstract class Script implements EventListener{
 
 		}
 		catch (Exception e){
-			log.fatal(e.getMessage(), e);
-		}
-		finally{
-			internalStop();
+			log.fatal(this+", " + e.getMessage(), e);
 		}
 		return true;
 	}
-	private void internalStop(){
-		if (channels.size() == 0) {
-			log.debug(" *********** Script " + this
-					+ ", no more channels, stopping ...");
-			scriptState = ScriptState.Stopped;
-			onStop();
-			Scripts.getInstance().remove(this);
-		}		
-	}
-	
 	//Registrar functions
 	public UserLocation find(String user){
 		return Registrar.getInstance().find(user);

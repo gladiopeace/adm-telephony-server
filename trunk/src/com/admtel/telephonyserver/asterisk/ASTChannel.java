@@ -398,12 +398,9 @@ public class ASTChannel extends Channel {
 					log.trace(getChannelData());
 
 					// Create script
-					Script script = ScriptManager.getInstance().createScript(
+					script = ScriptManager.getInstance().createScript(
 							getChannelData());
-					if (script != null) {
-						log.debug("Created script " + script);
-						getListeners().add(script);
-					}
+					
 					// Send inbound alerting event
 					if (ASTChannel.this.getAcctUniqueSessionId() == null) {
 						ASTChannel.this.setAcctUniqueSessionId(UUID
@@ -473,11 +470,9 @@ public class ASTChannel extends Channel {
 					// Create script
 					ASTChannel.this.setAcctUniqueSessionId(UUID.randomUUID()
 							.toString());
-					Script script = ScriptManager.getInstance().createScript(
+					script = ScriptManager.getInstance().createScript(
 							getChannelData());
-					if (script != null) {
-						getListeners().add(script);
-					}
+					
 				} // Send outbound alerting event
 				OutboundAlertingEvent oa = new OutboundAlertingEvent(
 						ASTChannel.this, ASTChannel.this.getCallingStationId(),
@@ -858,10 +853,7 @@ public class ASTChannel extends Channel {
 				currentState.processEvent(astEvent);
 			}
 
-			if (astEvent.getEventType() == EventType.Hangup) {
-				getListeners().clear();
-				ASTChannel.this.getSwitch().removeChannel(ASTChannel.this);			
-			}
+			
 			log.debug(String.format(
 					"END processing event (%s) state (%s), internalState(%s)",
 					astEvent, state, currentState.getClass().getSimpleName()));

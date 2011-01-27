@@ -1,3 +1,6 @@
+import com.admtel.telephonyserver.core.*;
+import com.admtel.telephonyserver.events.*;
+import com.admtel.telephonyserver.events.Event.EventType;
 
 class DialoutScript extends Script {
 	
@@ -61,7 +64,7 @@ class DialoutScript extends Script {
 	protected void processAnswering_State(Event event){
 		switch (event.getEventType()){
 			case EventType.Answered:
-			 a.dial("sip:1000", 10000)
+			 a.dial("sip:1008", 10000)
 			state = "Dialing"
 			displayStr = "Dialed sip:hassan"
 			break

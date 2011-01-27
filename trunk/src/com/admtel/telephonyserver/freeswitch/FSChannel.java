@@ -39,8 +39,12 @@ import com.admtel.telephonyserver.freeswitch.events.FSChannelCreateEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelDataEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelDestroyEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelExecuteCompleteEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelExecuteEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelOriginateEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelOutgoingEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelStateEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelStateEvent.CallState;
 import com.admtel.telephonyserver.freeswitch.events.FSCommandReplyEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSConferenceJoinedEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSConferenceMuteEvent;
@@ -49,6 +53,7 @@ import com.admtel.telephonyserver.freeswitch.events.FSConferenceTalkingEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSDtmfEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSQueueEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelStateEvent.ChannelState;
 import com.admtel.telephonyserver.freeswitch.events.FSEvent.EventType;
 import com.admtel.telephonyserver.utils.AdmUtils;
 import com.admtel.telephonyserver.utils.CodecsUtils;
@@ -60,7 +65,7 @@ public class FSChannel extends Channel {
 	private IoSession session;
 	private State currentState = new NullState();
 
-	static Logger log = Logger.getLogger(FSChannel.class);
+	static Logger fsChannelLog = Logger.getLogger(FSChannel.class);
 
 	private abstract class State {
 		public abstract void processEvent(FSEvent fsEvent);
@@ -79,6 +84,11 @@ public class FSChannel extends Channel {
 	}
 
 	private class IdleState extends State {
+
+		public IdleState() {
+			session.write(buildMessage(getId(), "execute", "set",
+					"hangup_after_bridge=false"));
+		}
 
 		@Override
 		public boolean onTimer(Object data) {
@@ -105,30 +115,7 @@ public class FSChannel extends Channel {
 		@Override
 		public void processEvent(FSEvent fsEvent) {
 			switch (fsEvent.getEventType()) {
-			case ChannelData: {
-				FSChannelDataEvent cde = (FSChannelDataEvent) fsEvent;
-				String admArgs = cde.getValue("variable_adm_args");
-				getChannelData().addDelimitedVars(admArgs, "&");
-				getChannelData().setCalledNumber(cde.getCalledIdNum());
-				getChannelData().setCallerIdNumber(cde.getCallerIdNum());
-				getChannelData().setCallerIdName(cde.getCallerIdNum());
-				getChannelData().setUserName(cde.getUserName());
-				getChannelData().setLoginIP(cde.getChannelAddress());
-				getChannelData().setServiceNumber(cde.getCalledIdNum());
 
-				// Create script
-				Script script = ScriptManager.getInstance().createScript(
-						getChannelData());
-				if (script != null) {
-					getListeners().add(script);
-				}
-				// Send outbound alerting event
-				OutboundAlertingEvent ie = new OutboundAlertingEvent(
-						FSChannel.this, FSChannel.this.getCallingStationId(),
-						FSChannel.this.getCalledStationId());
-				FSChannel.this.onEvent(ie);
-			}
-				break;
 			case ChannelOutgoing: {
 				FSChannelOutgoingEvent coe = (FSChannelOutgoingEvent) fsEvent;
 				Channel masterChannel = FSChannel.this.getSwitch().getChannel(
@@ -143,7 +130,7 @@ public class FSChannel extends Channel {
 
 				if (masterChannel != null) {
 
-					log.debug(String.format(
+					fsChannelLog.debug(String.format(
 							"%s, ChannelOutgoing with master channel %s",
 							FSChannel.this, masterChannel));
 
@@ -155,14 +142,22 @@ public class FSChannel extends Channel {
 					FSChannel.this.getChannelData().setRemoteIP(
 							masterChannel.getChannelData().getLoginIP());
 				}
-				// Send outbound alerting event
-				OutboundAlertingEvent ie = new OutboundAlertingEvent(
-						FSChannel.this, FSChannel.this.getCallingStationId(),
-						FSChannel.this.getCalledStationId());
-				FSChannel.this.onEvent(ie);
+				
 
 			}
 				break;
+			case ChannelState:{
+				FSChannelStateEvent cse = (FSChannelStateEvent) fsEvent;
+				if (cse.getChannelState() == ChannelState.CS_REPORTING && cse.getCallState() == CallState.RINGING){
+					// Send outbound alerting event
+					OutboundAlertingEvent ie = new OutboundAlertingEvent(
+							FSChannel.this, FSChannel.this.getCallingStationId(),
+							FSChannel.this.getCalledStationId());
+					FSChannel.this.onEvent(ie);
+				}
+			}
+			break;
+				
 			}
 
 		}
@@ -184,6 +179,9 @@ public class FSChannel extends Channel {
 				FSChannelDataEvent cde = (FSChannelDataEvent) fsEvent;
 				String admArgs = cde.getValue("variable_adm_args");
 				getChannelData().addDelimitedVars(admArgs, "&");
+				String sipReqParams = cde.getValue("variable_sip_req_params");
+				getChannelData().addDelimitedVars(
+						CodecsUtils.urlDecode(sipReqParams), ";");
 				getChannelData().setCalledNumber(cde.getCalledIdNum());
 				getChannelData().setCallerIdNumber(cde.getCallerIdNum());
 				getChannelData().setCallerIdName(cde.getCallerIdNum());
@@ -193,19 +191,9 @@ public class FSChannel extends Channel {
 				getChannelData().setServiceNumber(cde.getCalledIdNum());
 
 				// Create script
-				Script script = ScriptManager.getInstance().createScript(
-						getChannelData());
-				if (script != null) {
-					getListeners().add(script);
-				}
-				if (FSChannel.this.getAcctUniqueSessionId() == null) {
-					FSChannel.this.setAcctUniqueSessionId(UUID.randomUUID()
-							.toString());
-				}
-				// Send inbound alerting event
-				InboundAlertingEvent ie = new InboundAlertingEvent(
-						FSChannel.this);
-				FSChannel.this.onEvent(ie);
+				FSChannel.this.setScript(ScriptManager.getInstance().createScript(
+						getChannelData()));				
+				FSChannel.this.onEvent(new InboundAlertingEvent(FSChannel.this));
 			}
 				break;
 			}
@@ -217,30 +205,26 @@ public class FSChannel extends Channel {
 	private class NullState extends State {
 
 		@Override
-		public void processEvent(FSEvent event) {
+		public void processEvent(FSEvent fsEvent) {
 
 			Event result = null;
 
-			switch (event.getEventType()) {
-			case ChannelCreate: {
-				FSChannelCreateEvent cce = (FSChannelCreateEvent) event;
-
-				if (cce.isOutbound()) {
-					switch (cce.getChannelState()) {
-					case Ringing:
-						currentState = new OutboundAlertingState();
-						break;
-					}
-				} else {
-					switch (cce.getChannelState()) {
-					case Ringing:
-						currentState = new InboundAlertingState();
-						break;
-					}
+			switch (fsEvent.getEventType()) {
+			case ChannelCreate:{
+				FSChannelCreateEvent cce = (FSChannelCreateEvent) fsEvent;
+				if (FSChannel.this.getAcctUniqueSessionId() == null) {
+					FSChannel.this.setAcctUniqueSessionId(UUID.randomUUID()
+							.toString());
 				}
+				if (cce.isOutbound()) {
+					currentState = new OutboundAlertingState();
+				} else {
+					currentState = new InboundAlertingState();					
+				}				
 			}
-				break;
+			break;
 			}
+
 		}
 
 		@Override
@@ -392,15 +376,14 @@ public class FSChannel extends Channel {
 				if (application.equals("playback")) {
 					String returnCode = CodecsUtils.urlDecode(event.getValue(
 							"variable_current_application_response", ""));
-					log.debug("Return code is " + returnCode);
+					fsChannelLog.debug("Return code is " + returnCode);
 					if (returnCode.equals("FILE PLAYED")) {
 						FSChannel.this
 								.onEvent(new PlaybackEndedEvent(
 										FSChannel.this,
-										event
-												.getValue(
-														"variable_playback_terminator_used",
-														""), ""));
+										event.getValue(
+												"variable_playback_terminator_used",
+												""), ""));
 					} else {
 						FSChannel.this.onEvent(new PlaybackFailedEvent(
 								FSChannel.this, returnCode)); // TODO return
@@ -421,7 +404,11 @@ public class FSChannel extends Channel {
 	}
 
 	private class DialingState extends State {
+		
+		final Logger log = Logger.getLogger(DialingState.class);
+		
 		public DialingState(String address, long timeout) {
+			log.trace("Dialing "+address);
 			session.write(buildMessage(getId(), "execute", "bridge", address));
 		}
 
@@ -455,6 +442,7 @@ public class FSChannel extends Channel {
 		}
 
 	}
+
 
 	private class JoinConferenceState extends State {
 		String conferenceId;
@@ -511,16 +499,21 @@ public class FSChannel extends Channel {
 						cre.getConferenceName(), cre.getMemberId()));
 			}
 				break;
-			case ConferenceTalking:{
+			case ConferenceTalking: {
 				FSConferenceTalkingEvent cte = (FSConferenceTalkingEvent) fsEvent;
-				FSChannel.this.onEvent(new ConferenceTalkEvent(FSChannel.this, cte.getConferenceName(), cte.getMemberId(), cte.isOn()));
+				FSChannel.this
+						.onEvent(new ConferenceTalkEvent(FSChannel.this, cte
+								.getConferenceName(), cte.getMemberId(), cte
+								.isOn()));
 			}
-			break;
-			case ConferenceMute:{
+				break;
+			case ConferenceMute: {
 				FSConferenceMuteEvent cme = (FSConferenceMuteEvent) fsEvent;
-				FSChannel.this.onEvent(new ConferenceMutedEvent(FSChannel.this, cme.getConferenceName(), cme.getMemberId(), cme.isMuted()));
+				FSChannel.this.onEvent(new ConferenceMutedEvent(FSChannel.this,
+						cme.getConferenceName(), cme.getMemberId(), cme
+								.isMuted()));
 			}
-			break;
+				break;
 			}
 
 		}
@@ -535,6 +528,9 @@ public class FSChannel extends Channel {
 		public QueueState(String queueName, boolean agent) {
 			this.isAgent = agent;
 			this.queueName = queueName;
+
+			session.write(buildMessage(getId(), "execute", "set",
+					"hangup_after_bridge=false"));
 			FSQueueCommand queueCmd = new FSQueueCommand(FSChannel.this,
 					queueName, isAgent);
 			session.write(queueCmd);
@@ -624,8 +620,10 @@ public class FSChannel extends Channel {
 		if (callerDestinationNumber == null)
 			return null;
 
-		return callerDestinationNumber.substring(0, callerDestinationNumber
-				.indexOf("@"));
+		if (callerDestinationNumber.indexOf("@") == -1)
+			return null;
+		return callerDestinationNumber.substring(0,
+				callerDestinationNumber.indexOf("@"));
 	}
 
 	public void setIoSession(IoSession session) {
@@ -646,7 +644,7 @@ public class FSChannel extends Channel {
 		if (translatedAddress != null && translatedAddress.length() > 0) {
 			currentState = new DialingState(translatedAddress, timeout);
 		} else {
-			log.warn(String.format("%s, invalid dial string %s", this.getId(),
+			fsChannelLog.warn(String.format("%s, invalid dial string %s", this.getId(),
 					address));
 			return Result.InvalidParameters;
 		}
@@ -701,8 +699,7 @@ public class FSChannel extends Channel {
 	private String buildMessage(String uuid, String command, String app,
 			String arg) {
 		return String
-				.format(
-						"SendMsg %s\ncall-command: %s\nexecute-app-name: %s\nexecute-app-arg: %s\n",
+				.format("SendMsg %s\ncall-command: %s\nexecute-app-name: %s\nexecute-app-arg: %s\n",
 						uuid, command, app, arg);
 	}
 
@@ -722,12 +719,12 @@ public class FSChannel extends Channel {
 	synchronized protected void processNativeEvent(Object event) {
 		if (event instanceof FSEvent) {
 			FSEvent fsEvent = (FSEvent) event;
-			log
-					.debug(String
-							.format(
-									"%s, START processing event (%s) state (%s), internalState(%s)",
-									FSChannel.this, fsEvent, state,
-									currentState.getClass().getSimpleName()));
+			if (!(event instanceof FSChannelExecuteEvent || event instanceof FSChannelExecuteCompleteEvent)){									
+			fsChannelLog.debug(String
+					.format("%s, START processing event (%s) state (%s), internalState(%s)",
+							FSChannel.this, fsEvent, state, currentState
+									.getClass().getSimpleName()));
+			}
 
 			switch (fsEvent.getEventType()) {
 			case ChannelDestroy: {
@@ -743,31 +740,34 @@ public class FSChannel extends Channel {
 				FSChannel.this.onEvent(new AnsweredEvent(FSChannel.this));
 			}
 				break;
-			case ChannelBridge:{
+			case ChannelBridge: {
 				FSChannelBridgeEvent cbe = (FSChannelBridgeEvent) fsEvent;
-				String otherChannelId= cbe.getPeerChannelId();
-				if (!cbe.getChannelId().equals(getId())){
+				String otherChannelId = cbe.getPeerChannelId();
+				if (!cbe.getChannelId().equals(getId())) {
 					otherChannelId = cbe.getChannelId();
 				}
 				Channel otherChannel = _switch.getChannel(otherChannelId);
 				FSChannel.this.onEvent(new LinkedEvent(this, otherChannel));
 			}
-			break;
+				break;
+			case ChannelState: {
+				FSChannelStateEvent cse = (FSChannelStateEvent) fsEvent;
+				if (cse.getChannelState() == ChannelState.CS_REPORTING
+						&& cse.getCallState() == CallState.HANGUP) {
+					FSChannel.this.onEvent(new HangupEvent(FSChannel.this));
+				}
+			}
+				break;
 			}
 			if (currentState != null) {
 				currentState.processEvent(fsEvent);
 			}
-
-			if (fsEvent.getEventType() == EventType.ChannelDestroy) {
-				getListeners().clear();
-				FSChannel.this.getSwitch().removeChannel(FSChannel.this);
+			if (!(event instanceof FSChannelExecuteEvent || event instanceof FSChannelExecuteCompleteEvent)){
+			fsChannelLog.debug(String
+					.format("%s, END processing event (%s) state (%s), internalState(%s)",
+							FSChannel.this, fsEvent, state, currentState
+									.getClass().getSimpleName()));
 			}
-			log
-					.debug(String
-							.format(
-									"%s, END processing event (%s) state (%s), internalState(%s)",
-									FSChannel.this, fsEvent, state,
-									currentState.getClass().getSimpleName()));
 
 		}
 
@@ -776,10 +776,10 @@ public class FSChannel extends Channel {
 	@Override
 	public Result internalConferenceMute(String conferenceId, String memberId,
 			boolean mute) {
-		FSMemberMuteCommand cmd = new FSMemberMuteCommand(this, conferenceId, memberId, mute);
-		log.trace(String.format("%s, on channel %s", cmd, this));
+		FSMemberMuteCommand cmd = new FSMemberMuteCommand(this, conferenceId,
+				memberId, mute);
+		fsChannelLog.trace(String.format("%s, on channel %s", cmd, this));
 		session.write(cmd);
 		return Result.Ok;
 	}
-
 }

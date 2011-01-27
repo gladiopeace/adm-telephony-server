@@ -24,7 +24,6 @@ import com.admtel.telephonyserver.core.Conference;
 import com.admtel.telephonyserver.core.ConferenceManager;
 import com.admtel.telephonyserver.core.Registrar;
 import com.admtel.telephonyserver.core.Script;
-import com.admtel.telephonyserver.core.Scripts;
 import com.admtel.telephonyserver.core.Switch;
 import com.admtel.telephonyserver.core.SwitchListener;
 import com.admtel.telephonyserver.core.SwitchListeners;
@@ -250,21 +249,6 @@ public class CLI_Connection extends IoHandlerAdapter {
 	}
 
 	private void showScripts(IoSession session) {
-		Iterator<Script> scriptIterator = Scripts.getInstance().getAll()
-				.iterator();
-		session.write("Scripts\n");
-		while (scriptIterator.hasNext()) {
-			Script script = scriptIterator.next();
-			session.write(String
-					.format("\t%s\t%s\t%s\n",
-							script.getClass().getSimpleName(), script
-									.getState(), script.getDisplayStr()));
-			Iterator<Channel> channelIt = script.getChannels().iterator();
-			while (channelIt.hasNext()) {
-				Channel c = channelIt.next();
-				session.write(String.format("\t\t%s\t%s\t%s\n", c.getSwitch()
-						.getDefinition().getId(), c.getId(), c.getState()));
-			}
-		}
+		
 	}
 }
