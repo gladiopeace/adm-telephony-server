@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 
 import com.admtel.telephonyserver.httpserver.HttpRequestMessage;
 import com.admtel.telephonyserver.httpserver.HttpResponseMessage;
-
+import com.admtel.telephonyserver.requests.*;
 import com.admtel.telephonyserver.httpserver.AdmServlet;
 
 import freemarker.template.*;
@@ -32,13 +32,8 @@ class WebConfServlet extends AdmServlet {
 	}
 	
 	def hangup(request){
-		Switch _switch = Switches.getInstance().getById(request.getParameter("switch"))
-		if (_switch != null){
-			Channel channel = _switch.getChannel(request.getParameter("channel"))
-			if (channel != null){
-				channel.hangup(DisconnectCode.Normal)
-			}
-		} 
+		HangupRequest hangupRequest = new HangupRequest(request.getParameter('channel'), DisconnectCode.Normal) 
+		Switches.getInstance().processRequest(hangupRequest)
 		[m:'']
 	}
 	def conferences(request){
@@ -55,10 +50,18 @@ class WebConfServlet extends AdmServlet {
 		def s = Scripts.getInstance().getAll()
 		['scripts':s]
 	}
+	def dial(request){
+		String destination = URLDecoder.decode(request.getParameter('destination'))
+		String channel = request.getParameter('channel')
+		int timeout = Integer.valueOf(request.getParameter('timeout'))
+		DialRequest dialRequest = new DialRequest( channel, destination, timeout)
+		Switches.getInstance().processRequest(dialRequest)
+		return [m:"Dial ${request.getParameter('destination')}"]
+	}
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
 		
-
+		log.trace("WebConfServlet received {"+request+"}");
 		
 		def action = request.getParameter("action")
 		if (!(action?.length()>0)){

@@ -9,10 +9,10 @@ public class DefaultFSAddressTranslator implements AddressTranslator {
 		if (address.startsWith("sip:")){
 			String[] addressItems = address.substring(4).split("@");
 			if (addressItems.length == 2){
-				return String.format("sofia/default/%s@%s", addressItems[0], addressItems[1]);
+				return String.format("sofia/internal/%s@%s", addressItems[0], addressItems[1]);
 			}
 			else if (addressItems.length==1){
-				return String.format("sofia/internal/%s", addressItems[0]+"%");
+				return String.format("sofia/internal/%s", addressItems[0]);
 			}
 		}
 		else if (address.startsWith("iax2:")){
@@ -23,6 +23,10 @@ public class DefaultFSAddressTranslator implements AddressTranslator {
 			else if (addressItems.length==1){
 				return String.format("IAX2/%s", addressItems[0]);
 			}
+		}
+		else if (address.startsWith("loop:")){
+			String addressItems = address.substring(5);
+			return "loopback/"+addressItems;
 		}
 		return "";
 	}

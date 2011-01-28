@@ -1,16 +1,4 @@
-import org.mortbay.jetty.HttpStatus;
-
-import com.admtel.telephonyserver.core.*;
-
-import java.io.StringWriter;
-
-import org.apache.log4j.Logger;
-import com.admtel.telephonyserver.requests.*;
-import com.admtel.telephonyserver.httpserver.HttpRequestMessage;
-import com.admtel.telephonyserver.httpserver.HttpResponseMessage;
-import groovy.xml.MarkupBuilder;
-import com.admtel.telephonyserver.httpserver.AdmServlet;
-import com.admtel.telephonyserver.interfaces.TokenSecurityProvider;
+import java.net.URLDecoder;
 
 class WebAPI extends AdmServlet {
 	
@@ -79,6 +67,14 @@ class WebAPI extends AdmServlet {
 			}
 		}
 		writer.toString()			
+	}
+	def dial(request){
+		String destination = URLDecoder.decode(request.getParameter('destination'))
+		String channel = request.getParameter('channel')
+		int timeout = Integer.valueOf(request.getParameter('timeout'))
+		DialRequest dialRequest = new DialRequest( channel, destination, timeout)
+		Switches.getInstance().processRequest(dialRequest)
+		"${channel} -> Dialed -> ${destination}"
 	}
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
