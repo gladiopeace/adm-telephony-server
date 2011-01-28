@@ -24,6 +24,7 @@ import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.radius.RadiusServers;
 import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.requests.AnswerRequest;
+import com.admtel.telephonyserver.requests.DialRequest;
 import com.admtel.telephonyserver.requests.HangupRequest;
 import com.admtel.telephonyserver.requests.ParticipantMuteRequest;
 import com.admtel.telephonyserver.requests.Request;
@@ -643,6 +644,12 @@ public abstract class Channel implements TimerNotifiable {
 			conferenceMute(pmr.isMute());			
 		}
 		break;
+		case DialRequest:
+		{
+			DialRequest dialRequest = (DialRequest) request;
+			dial(dialRequest.getDestination(), dialRequest.getTimeout());
+		}
+			break;
 		}
 	}
 }
