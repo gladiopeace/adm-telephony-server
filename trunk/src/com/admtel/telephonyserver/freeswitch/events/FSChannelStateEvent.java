@@ -47,5 +47,16 @@ public class FSChannelStateEvent extends FSChannelEvent {
 	public String getChannelId() {
 		return values.get("Unique-ID");
 	}
-
+	public String getCallerIdNum(){
+		return values.get("Caller-Caller-ID-Number");
+	}
+	public String getCalledIdNum(){
+		return values.get("Caller-Destination-Number");
+	}
+	public String getUserName(){
+		return values.get("Caller-Username");
+	}
+	public String getChannelAddress(){
+		return values.get("Caller-Network-Addr");
+	}
 }

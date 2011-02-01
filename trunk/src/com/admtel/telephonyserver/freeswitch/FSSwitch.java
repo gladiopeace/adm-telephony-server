@@ -1,5 +1,6 @@
 package com.admtel.telephonyserver.freeswitch;
 
+
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 
@@ -24,7 +25,7 @@ import com.admtel.telephonyserver.core.Result;
 import com.admtel.telephonyserver.core.SimpleMessageHandler;
 import com.admtel.telephonyserver.core.Switch;
 import com.admtel.telephonyserver.core.Timers;
-import com.admtel.telephonyserver.core.Channel.CallOrigin;
+import com.admtel.telephonyserver.core.CallOrigin;
 import com.admtel.telephonyserver.core.Switch.SwitchStatus;
 import com.admtel.telephonyserver.core.Timers.Timer;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelBridgeEvent;
@@ -35,7 +36,6 @@ import com.admtel.telephonyserver.freeswitch.events.FSChannelOriginateEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSCommandReplyEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSRegisterEvent;
-import com.admtel.telephonyserver.freeswitch.events.FSChannelCreateEvent.CallDirection;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.requests.Request;

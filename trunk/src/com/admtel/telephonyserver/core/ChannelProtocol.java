@@ -1,7 +1,7 @@
 package com.admtel.telephonyserver.core;
 
 public enum ChannelProtocol {
-	Unknown, ISDN, SIP, H323, IAX2;
+	Unknown, ISDN, SIP, H323, IAX2, Local;
 	
 	public static ChannelProtocol fromString (String protocolStr){
 		if (protocolStr == null) return Unknown;
@@ -13,6 +13,9 @@ public enum ChannelProtocol {
 		}
 		else if (protocolStr.equalsIgnoreCase("iax2")){
 			return IAX2;
+		}
+		else if (protocolStr.equals("local")){
+			return Local;
 		}
 		return Unknown;
 	}

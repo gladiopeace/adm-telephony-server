@@ -13,8 +13,7 @@ import org.apache.log4j.Logger;
 import com.admtel.telephonyserver.events.DialStartedEvent;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.HangupEvent;
-import com.admtel.telephonyserver.events.InboundAlertingEvent;
-import com.admtel.telephonyserver.events.OutboundAlertingEvent;
+import com.admtel.telephonyserver.events.AlertingEvent;
 import com.admtel.telephonyserver.interfaces.EventListener;
 
 import com.admtel.telephonyserver.interfaces.Authorizer;
@@ -35,6 +34,8 @@ public abstract class Script implements EventListener{
 
 	Map<String, String> parameters;
 	
+	List<Channel> channels = new ArrayList<Channel>();
+	
 	public Map<String, String> getParameters(){
 		return parameters;
 	}
@@ -44,6 +45,7 @@ public abstract class Script implements EventListener{
 		}
 		return null;
 	}
+
 	public void setParameters (Map<String, String> parameters){
 		this.parameters = parameters;
 	}
@@ -87,19 +89,11 @@ public abstract class Script implements EventListener{
 		try{
 		log.trace(this + ", got event " + event);		
 		switch (event.getEventType()) {
-		case InboundAlerting: {
-			InboundAlertingEvent ie = (InboundAlertingEvent) event;
+		case Alerting: {
+			AlertingEvent ie = (AlertingEvent) event;
 		}
 			break;
-		case OutboundAlerting:{
-			OutboundAlertingEvent oa = (OutboundAlertingEvent)event;
-		}
-		break;
-		case Hangup: {
-			HangupEvent he = (HangupEvent) event;
-			log.debug(this + ", got hangup, cleared channel");
-		}
-			break;
+		
 		case DialStarted: {
 			DialStartedEvent dse = (DialStartedEvent) event;
 			// Add the dialed channel to the list of channels, and add us to the
@@ -109,13 +103,22 @@ public abstract class Script implements EventListener{
 				log.debug(String.format("%s, DialStarted : %s--->%s", this, dse
 						.getChannel().getId(), dse.getDialedChannel().getId()));
 				dse.getDialedChannel().addEventListener(this);
+				addChannel(dse.getDialedChannel());
 			}
 		}
 			break;
 		}
 
 		processEvent(event);
-
+		
+		if (event.getEventType() == Event.EventType.Hangup){
+			HangupEvent he = (HangupEvent) event;
+			removeChannel(he.getChannel());
+		}
+		if (channels.size() == 0){
+			onStop();
+			ScriptManager.getInstance().deleteScript(this);
+		}
 		}
 		catch (Exception e){
 			log.fatal(this+", " + e.getMessage(), e);
@@ -135,5 +138,42 @@ public abstract class Script implements EventListener{
 
 	protected abstract void onStop();
 	
-	protected abstract void onCreate();
+	public abstract void onStart();
+	public void addChannel(Channel channel) {
+		if (channel == null) return;
+		channels.add(channel);
+		channel.addEventListener(this);
+	}
+	public void removeChannel(Channel channel){
+		if (channel == null) return;
+		channel.removeEventListener(this);
+		channels.remove(channel);
+	}
+	public Channel getIncomingChannel(){
+		return getChannel(CallOrigin.Inbound);
+	}
+	
+	public Channel getChannel(CallOrigin callOrigin){
+		for (Channel c: channels){
+			if (c.getCallOrigin() == callOrigin){
+				return c;
+			}
+		}
+		return null;
+		
+	}
+	
+	public Channel getChannel(CallOrigin callOrigin, Channel.State state){
+		for (Channel c:channels){
+			if (c.getCallOrigin() == callOrigin && c.getState() == state){
+				return c;
+			}
+		}
+		
+		return null;
+	}
+	
+	public List<Channel> getChannels() {
+		return channels;
+	}
 }

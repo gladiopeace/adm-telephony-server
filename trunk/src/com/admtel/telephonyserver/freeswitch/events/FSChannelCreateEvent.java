@@ -2,9 +2,9 @@ package com.admtel.telephonyserver.freeswitch.events;
 
 import java.util.Map;
 
-public class FSChannelCreateEvent extends FSChannelEvent {
+import com.admtel.telephonyserver.core.CallOrigin;
 
-	public enum CallDirection {Inbound, Outbound};
+public class FSChannelCreateEvent extends FSChannelEvent {
 	
 	public FSChannelCreateEvent(String switchId, Map values) {
 		super(switchId, values);
@@ -15,13 +15,4 @@ public class FSChannelCreateEvent extends FSChannelEvent {
 	public String getChannelId() {		
 		return values.get("Unique-ID");
 	}
-	
-	public CallDirection getDirection(){
-		String direction = values.get("Call-Direction");
-		if (direction.equals("inbound")){
-			return CallDirection.Inbound;
-		}
-		return CallDirection.Outbound;
-	}
-
 }

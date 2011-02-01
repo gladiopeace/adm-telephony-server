@@ -47,7 +47,7 @@ class WebConfServlet extends AdmServlet {
 		return root
 	}
 	def scripts(request){
-		def s = Scripts.getInstance().getAll()
+		def s = ScriptManager.getInstance().getScripts();
 		['scripts':s]
 	}
 	def dial(request){
@@ -60,8 +60,6 @@ class WebConfServlet extends AdmServlet {
 	}
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
-		
-		log.trace("WebConfServlet received {"+request+"}");
 		
 		def action = request.getParameter("action")
 		if (!(action?.length()>0)){

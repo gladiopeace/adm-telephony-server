@@ -22,7 +22,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import com.admtel.telephonyserver.remote.EventDto;
 import com.admtel.telephonyserver.remote.HangupEventDto;
-import com.admtel.telephonyserver.remote.InboundAlertingEventDto;
+import com.admtel.telephonyserver.remote.AlertingEventDto;
 import com.admtel.telephonyserver.remote.OutboundAlertingEventDto;
 import com.admtel.telephonyserver.requests.Request;
 
@@ -183,8 +183,8 @@ public class ATSConsole implements IoHandler{
 		{
 			EventDto event = mapper.readValue(message.toString(), EventDto.class);
 			System.out.println(event.toDisplayString());
-			if (event instanceof InboundAlertingEventDto){
-				InboundAlertingEventDto ia = (InboundAlertingEventDto) event;
+			if (event instanceof AlertingEventDto){
+				AlertingEventDto ia = (AlertingEventDto) event;
 				channels.add(ia.getChannelId());
 			}
 			else if (event instanceof OutboundAlertingEventDto){

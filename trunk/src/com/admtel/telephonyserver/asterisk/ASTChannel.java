@@ -39,8 +39,7 @@ import com.admtel.telephonyserver.events.DialFailedEvent;
 import com.admtel.telephonyserver.events.DialStartedEvent;
 import com.admtel.telephonyserver.events.DialStatus;
 import com.admtel.telephonyserver.events.HangupEvent;
-import com.admtel.telephonyserver.events.InboundAlertingEvent;
-import com.admtel.telephonyserver.events.OutboundAlertingEvent;
+import com.admtel.telephonyserver.events.AlertingEvent;
 import com.admtel.telephonyserver.events.PlayAndGetDigitsEndedEvent;
 import com.admtel.telephonyserver.events.PlayAndGetDigitsStartedEvent;
 import com.admtel.telephonyserver.events.PlaybackEndedEvent;
@@ -398,15 +397,15 @@ public class ASTChannel extends Channel {
 					log.trace(getChannelData());
 
 					// Create script
-					script = ScriptManager.getInstance().createScript(
-							getChannelData());
+					ScriptManager.getInstance().createScript(
+							ASTChannel.this);
 					
 					// Send inbound alerting event
 					if (ASTChannel.this.getAcctUniqueSessionId() == null) {
 						ASTChannel.this.setAcctUniqueSessionId(UUID
 								.randomUUID().toString());
 					}
-					InboundAlertingEvent ie = new InboundAlertingEvent(
+					AlertingEvent ie = new AlertingEvent(
 							ASTChannel.this);
 					ASTChannel.this.onEvent(ie);
 					variableFetcher = null;
@@ -470,13 +469,11 @@ public class ASTChannel extends Channel {
 					// Create script
 					ASTChannel.this.setAcctUniqueSessionId(UUID.randomUUID()
 							.toString());
-					script = ScriptManager.getInstance().createScript(
-							getChannelData());
+					ScriptManager.getInstance().createScript(ASTChannel.this);
 					
 				} // Send outbound alerting event
-				OutboundAlertingEvent oa = new OutboundAlertingEvent(
-						ASTChannel.this, ASTChannel.this.getCallingStationId(),
-						ASTChannel.this.getCalledStationId());
+				AlertingEvent oa = new AlertingEvent(
+						ASTChannel.this);
 				ASTChannel.this.onEvent(oa);
 
 				// In the case of asterisk, we know that we're here
@@ -915,10 +912,8 @@ public class ASTChannel extends Channel {
 
 	@Override
 	public Result internalDial(String address, long timeout) {
-		String translatedAddress = getSwitch().getAddressTranslator()
-				.translate(address);
-		if (translatedAddress != null && translatedAddress.length() > 0) {
-			currentState = new DialingState(translatedAddress, timeout);
+		if (address != null && address.length() > 0) {
+			currentState = new DialingState(address, timeout);
 		} else {
 			log.warn(String.format("%s, invalid dial string %s", this.getId(),
 					address));
