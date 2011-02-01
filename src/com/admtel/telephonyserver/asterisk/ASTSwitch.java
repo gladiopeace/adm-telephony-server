@@ -186,11 +186,9 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 		String admArgs = "script=" + script + "&data=" + data;
 
-		String translatedDestination = getAddressTranslator().translate(
-				destination);
 		session.write(String
 				.format("Action: Originate\nChannel: %s\nTimeout: %d\nApplication: AGI\nVariable: adm_args=%s\nData: agi:async\nAsync: 1\nActionId: %s",
-						translatedDestination, timeout, admArgs, uuid
+						destination, timeout, admArgs, uuid
 								+ "___Originate"));
 		return Result.Ok;
 	}

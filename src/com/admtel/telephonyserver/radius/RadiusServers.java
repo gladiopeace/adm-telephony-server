@@ -15,8 +15,7 @@ import com.admtel.telephonyserver.core.EventsManager;
 import com.admtel.telephonyserver.core.Participant;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.HangupEvent;
-import com.admtel.telephonyserver.events.InboundAlertingEvent;
-import com.admtel.telephonyserver.events.OutboundAlertingEvent;
+import com.admtel.telephonyserver.events.AlertingEvent;
 import com.admtel.telephonyserver.events.Event.EventType;
 import com.admtel.telephonyserver.interfaces.Authorizer;
 import com.admtel.telephonyserver.interfaces.EventListener;
@@ -127,24 +126,21 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 	@Override
 	public boolean onEvent(Event event) {
 		switch (event.getEventType()) {
-		case InboundAlerting:
-			onIncomingEvent((InboundAlertingEvent) event);
+		case Alerting:
+			onAlerting((AlertingEvent) event);
 			break;
 		case Hangup:
 			onHangupEvent((HangupEvent) event);
-			break;
-		case OutboundAlerting:
-			onOutboundAlertingEvent((OutboundAlertingEvent) event);
 			break;
 		}
 		return false;
 	}
 
-	private void onOutboundAlertingEvent(OutboundAlertingEvent event) {
+	private void onAlerting(AlertingEvent event) {
 		accountingStart(event.getChannel());
 	}
 
-	private void onIncomingEvent(InboundAlertingEvent event) {
+	private void onIncomingEvent(AlertingEvent event) {
 		log.trace(event);
 		accountingStart(event.getChannel());
 	}

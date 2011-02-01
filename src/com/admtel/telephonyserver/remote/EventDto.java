@@ -8,9 +8,7 @@ import org.apache.log4j.Logger;
 import com.admtel.telephonyserver.events.AnsweredEvent;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.HangupEvent;
-import com.admtel.telephonyserver.events.InboundAlertingEvent;
-import com.admtel.telephonyserver.events.OutboundAlertingEvent;
-
+import com.admtel.telephonyserver.events.AlertingEvent;
 import dp.lib.dto.geda.annotations.Dto;
 import dp.lib.dto.geda.assembler.DTOAssembler;
 

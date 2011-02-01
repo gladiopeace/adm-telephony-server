@@ -234,8 +234,7 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			removeChannel(he.getChannel());
 		}
 			break;
-		case InboundAlerting:
-		case OutboundAlerting:
+		case Alerting:
 			ChannelEvent ce = (ChannelEvent) event;
 			addChannel(ce.getChannel());
 

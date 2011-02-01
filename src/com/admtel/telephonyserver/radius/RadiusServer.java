@@ -32,7 +32,7 @@ import com.admtel.telephonyserver.core.AdmTelephonyServer;
 import com.admtel.telephonyserver.core.Channel;
 import com.admtel.telephonyserver.core.Conference;
 import com.admtel.telephonyserver.core.Participant;
-import com.admtel.telephonyserver.core.Channel.CallOrigin;
+import com.admtel.telephonyserver.core.CallOrigin;
 import com.admtel.telephonyserver.interfaces.Authorizer;
 import com.admtel.telephonyserver.utils.AdmUtils;
 
@@ -146,7 +146,7 @@ public class RadiusServer implements Authorizer {
 					+ xpgkRequestType);
 		}
 
-		log.trace("Sending Radius Authorize message : " + ar);
+		log.trace("Sending Radius Authorize message : " + ar+"\n\n");
 		
 		RadiusPacket response;
 		try {
@@ -242,7 +242,7 @@ public class RadiusServer implements Authorizer {
 				log.warn(e.getMessage());
 			}
 		}
-		log.trace(result);
+		log.trace(result+"\n\n");
 		return result;
 	}
 
@@ -254,7 +254,9 @@ public class RadiusServer implements Authorizer {
 		String username = (channel
 				.getAccountCode() == null ? channel.getUserName() : channel
 				.getAccountCode());
-		if (username == null) return false;
+		if (username == null){
+			username = "XXXXXXXX"; //TODO parameterize 
+		}
 		AccountingRequest acctRequest = new AccountingRequest(username,
 				AccountingRequest.ACCT_STATUS_TYPE_INTERIM_UPDATE);
 
@@ -291,7 +293,7 @@ public class RadiusServer implements Authorizer {
 					+ AdmUtils.dateToRadiusStr(channel.getAnswerTime()));
 		}
 
-		log.trace("Sending Accounting-Start message : " + acctRequest);
+		log.trace("Sending Accounting-Start message : " + acctRequest+"\n\n");
 
 		try {
 			getRadiusClient().account(acctRequest);
@@ -308,7 +310,9 @@ public class RadiusServer implements Authorizer {
 		String username = (channel
 				.getAccountCode() == null ? channel.getUserName() : channel
 				.getAccountCode());
-		if (username == null) return false;
+		if (username == null){
+			username = "XXXXXXXX"; //TODO parameterize 
+		}
 		
 		AccountingRequest acctRequest = new AccountingRequest(username, AccountingRequest.ACCT_STATUS_TYPE_START);
 
@@ -340,7 +344,7 @@ public class RadiusServer implements Authorizer {
 					+ channel.getServiceNumber());
 		}
 
-		log.trace("Sending Accounting-Start message : " + acctRequest);
+		log.trace("Sending Accounting-Start message : " + acctRequest+"\n\n");
 
 		try {
 			getRadiusClient().account(acctRequest);
@@ -358,7 +362,9 @@ public class RadiusServer implements Authorizer {
 		String username = (channel
 				.getAccountCode() == null ? channel.getUserName() : channel
 				.getAccountCode());
-		if (username == null) return false;
+		if (username == null){
+			username = "XXXXXXXX"; //TODO parameterize 
+		}
 		
 		AccountingRequest acctRequest = new AccountingRequest(username, AccountingRequest.ACCT_STATUS_TYPE_STOP);
 		RadiusPacketDecorator arDecorator = new RadiusPacketDecorator(
@@ -408,7 +414,7 @@ public class RadiusServer implements Authorizer {
 									+ AdmUtils.dateToRadiusStr(channel
 											.getHangupTime()));
 		}
-		log.trace("Sending Accounting-Stop message : " + acctRequest);
+		log.trace("Sending Accounting-Stop message : " + acctRequest+"\n\n");
 
 		try {
 			getRadiusClient().account(acctRequest);

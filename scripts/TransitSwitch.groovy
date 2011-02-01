@@ -13,13 +13,7 @@ class TransitSwitch extends Script {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	@Override
-	protected void onStart(Object data) {
-		// TODO Auto-generated method stub
 		
-	}
-	
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
@@ -33,7 +27,7 @@ class TransitSwitch extends Script {
 	}
 	
 	@Override
-	protected void onCreate(){
+	protected void onStart(){
 	
 	}
 	

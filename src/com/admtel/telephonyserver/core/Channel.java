@@ -17,7 +17,7 @@ import com.admtel.telephonyserver.events.ConferenceLeftEvent;
 import com.admtel.telephonyserver.events.DtmfEvent;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.HangupEvent;
-import com.admtel.telephonyserver.events.InboundAlertingEvent;
+import com.admtel.telephonyserver.events.AlertingEvent;
 import com.admtel.telephonyserver.events.Event.EventType;
 import com.admtel.telephonyserver.interfaces.EventListener;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
@@ -36,7 +36,7 @@ public abstract class Channel implements TimerNotifiable {
 	static Logger log = Logger.getLogger(Channel.class);
 
 	public enum State {
-		Null, InboundAlerting, Idle, Clearing, Answering, OutboundAlerting, MediaBusy, Busy, Conferenced, Queued,
+		Null, Idle, Clearing, Answering, Alering, MediaBusy, Busy, Conferenced, Queued,
 	}
 
 	private enum TimersDefs {
@@ -45,10 +45,6 @@ public abstract class Channel implements TimerNotifiable {
 
 	Timer hangupTimer;
 	Timer interimUpdateTimer;
-
-	public enum CallOrigin {
-		Inbound, Outbound
-	};
 
 	private List<EventListener> listeners = new CopyOnWriteArrayList<EventListener>();
 
@@ -80,19 +76,6 @@ public abstract class Channel implements TimerNotifiable {
 
 	private String conferenceId;
 	private String memberId;
-	
-	public Script script;
-
-	public Script getScript() {
-		return script;
-	}
-
-	public void setScript(Script script) {		
-		if (this.script != null){
-			this.script.onStop();
-		}
-		this.script = script;
-	}
 
 	private MessageHandler messageHandler = new QueuedMessageHandler() {
 
@@ -351,12 +334,6 @@ public abstract class Channel implements TimerNotifiable {
 	}
 
 	final public Result answer() {
-		if (state != State.InboundAlerting) {
-			log.warn(String.format("Channel (%s), answer, invalid state(%s)",
-					this, state));
-			return Result.ChannelInvalidState;
-		}
-		
 		Result result = internalAnswer();
 		if (result == Result.Ok){
 			state = State.Answering;
@@ -471,12 +448,9 @@ public abstract class Channel implements TimerNotifiable {
 					TimersDefs.InterimUpdateTimer);
 
 			break;
-		case InboundAlerting: {
-			InboundAlertingEvent ie = (InboundAlertingEvent) e;
-			ie.setCalledIdNumber(getChannelData().getCalledNumber());
-			ie.setCallerIdNumber(getChannelData().getCallerIdNumber());
-			state = State.InboundAlerting;
-			callOrigin = CallOrigin.Inbound;
+		case Alerting: {
+			AlertingEvent ie = (AlertingEvent) e;
+			state = State.Alering;
 			setupTime = new DateTime();			
 		}
 			break;
@@ -486,11 +460,6 @@ public abstract class Channel implements TimerNotifiable {
 			h323DisconnectCause = he.getHangupCause();
 			stopTimers();			
 		}
-			break;
-		case OutboundAlerting:
-			state = State.OutboundAlerting;
-			callOrigin = CallOrigin.Outbound;
-			setupTime = new DateTime();			
 			break;
 		case QueueJoined:
 			state = State.Queued;
@@ -511,11 +480,7 @@ public abstract class Channel implements TimerNotifiable {
 		}
 
 		EventsManager.getInstance().onEvent(e);
-		
-		if (script != null){			
-			script.onEvent(e);
-		}
-		
+
 		try {
 			Iterator<EventListener> it = getListeners().iterator();
 			while (it.hasNext()) {
@@ -525,8 +490,7 @@ public abstract class Channel implements TimerNotifiable {
 			log.fatal(AdmUtils.getStackTrace(ex));
 		}
 		if (e.getEventType() == EventType.Hangup) {
-			removeAllEventListeners();
-			setScript(null);
+			removeAllEventListeners();			
 			_switch.removeChannel(this);
 		}
 		return false;

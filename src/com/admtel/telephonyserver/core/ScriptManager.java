@@ -1,5 +1,6 @@
 package com.admtel.telephonyserver.core;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,6 +18,7 @@ public class ScriptManager implements DefinitionChangeListener, Loadable{
 	Logger log = Logger.getLogger(ScriptManager.class);
 
 	private Map<String, ScriptFactory> scriptFactories = new ConcurrentHashMap<String, ScriptFactory>();
+	private Map<String, Script> scripts = new ConcurrentHashMap<String, Script>();
 
 	private ScriptManager() {
 
@@ -30,18 +32,25 @@ public class ScriptManager implements DefinitionChangeListener, Loadable{
 		return SingletonHolder.instance;
 	}
 
-	public Script createScript(ChannelData channelData) {
-		log.debug("Creating script for channelData "+channelData);
+	public Script createScript(Channel channel) {
+		log.debug("Creating script for channel "+channel);
 		Script script = null;
 		for (ScriptFactory sf : scriptFactories.values()) {
-			script = sf.createScript(channelData);
+			script = sf.createScript(channel.getChannelData());
 			if (script != null) {				
-				log.trace(String.format("Script (%s) created for ChannelData (%s)", script, channelData));
-				script.onCreate();
+				log.trace(String.format("Script (%s) created for Channel (%s)", script, channel));
+				scripts.put(script.id, script);
+				script.addChannel(channel);
+				script.onStart();
 				return script;
 			}
 		}
 		return null;
+	}
+	
+	public void deleteScript(Script script){
+		if (script == null) return;
+		scripts.remove(script.id);
 	}
 
 	@Override
@@ -103,4 +112,7 @@ public class ScriptManager implements DefinitionChangeListener, Loadable{
 		
 	}
 
+	Collection<Script> getScripts(){
+		return scripts.values();
+	}
 }

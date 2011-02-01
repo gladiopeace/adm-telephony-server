@@ -8,9 +8,7 @@ import org.apache.log4j.Logger;
 import com.admtel.telephonyserver.events.AnsweredEvent;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.HangupEvent;
-import com.admtel.telephonyserver.events.InboundAlertingEvent;
-import com.admtel.telephonyserver.events.OutboundAlertingEvent;
-
+import com.admtel.telephonyserver.events.AlertingEvent;
 import dp.lib.dto.geda.assembler.DTOAssembler;
 
 public class EventDtoBuilder {
@@ -49,11 +47,10 @@ public class EventDtoBuilder {
 	
 	private EventDtoBuilder(){
 		try{			
-		BUILDER_MAP.put(InboundAlertingEvent.class,
-				InboundAlertingEventDto.class);
+		BUILDER_MAP.put(AlertingEvent.class,
+				AlertingEventDto.class);
 		BUILDER_MAP.put(AnsweredEvent.class, AnsweredEventDto.class);
-		BUILDER_MAP.put(HangupEvent.class, HangupEventDto.class);
-		BUILDER_MAP.put(OutboundAlertingEvent.class, OutboundAlertingEventDto.class);
+		BUILDER_MAP.put(HangupEvent.class, HangupEventDto.class);		
 		}
 		catch (Exception e){
 			log.fatal(e.getMessage(), e);

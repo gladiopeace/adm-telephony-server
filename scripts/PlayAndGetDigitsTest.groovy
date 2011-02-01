@@ -10,7 +10,7 @@ class PlayAndGetDigitsTest extends Script {
 	}
 
 	@Override
-	protected void onStart(Object data) {
+	protected void onStart() {
 		// TODO Auto-generated method stub
 
 	}

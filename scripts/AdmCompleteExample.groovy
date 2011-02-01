@@ -87,7 +87,7 @@ class AdmCompleteExample extends Script {
 	}
 	
 	@Override
-	protected void onCreate(){
+	protected void onStart(){
 	
 	}
 

@@ -10,15 +10,14 @@ public abstract class Event {
 		PlaybackEnded,
 		PlayAndGetDigitsStarted,
 		PlayAndGetDigitsEnded,
-		InboundAlerting, 		
+		Alerting, 		
 		DTMF, AnswerFailed, 
 		PlayAndGetDigitsFailed, 
 		PlaybackFailed, 
-		HangupFailed, 
-		OutboundAlerting, 
+		HangupFailed, 		 
 		DialFailed, 
 		Linked, 
-		DialStarted, ConferenceJoined, ConferenceLeft, ConferenceTalk, QueueJoined, QueueLeft, QueueJoinFailed, ConferenceMuted, ChannelListed,
+		DialStarted, ConferenceJoined, ConferenceLeft, ConferenceTalk, QueueJoined, QueueLeft, QueueJoinFailed, ConferenceMuted, ChannelListed, QueueBridged,
 	}
 	
 	protected EventType eventType;	
