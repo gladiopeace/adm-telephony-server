@@ -807,6 +807,21 @@ public class ASTChannel extends Channel {
 
 	}
 
+	private class AcdQueueState extends State{
+
+		@Override
+		public void processEvent(ASTEvent astEvent) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public boolean onTimer(Object data) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		
+	}
 	// END STATES LOGIC
 	// ////////////////////////////////////////////////////////////////////////////////////////
 
@@ -991,5 +1006,11 @@ public class ASTChannel extends Channel {
 		}
 		session.write(cmd);
 		return Result.Ok;
+	}
+
+	@Override
+	public Result internalAcdQueue(String queueName) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

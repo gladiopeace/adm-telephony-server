@@ -273,6 +273,12 @@ public abstract class Channel implements TimerNotifiable {
 
 		return result;
 	}
+	final public Result acdQueue(String queueName){ // TODO add more parameters
+		Result result = internalAcdQueue(queueName);
+		return result;
+	}
+	
+	public abstract Result internalAcdQueue(String queueName);
 
 	final public Result playAndGetDigits(int max, String prompt, long timeout,
 			String terminators) {
