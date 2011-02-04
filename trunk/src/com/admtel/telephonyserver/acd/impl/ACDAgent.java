@@ -1,6 +1,6 @@
-package com.admtel.telephonyserver.acd;
+package com.admtel.telephonyserver.acd.impl;
 
-public class ACD_Agent {
+public class AcdAgent {
 	public enum Status{Ready, Busy};
 	String name;
 	String address;

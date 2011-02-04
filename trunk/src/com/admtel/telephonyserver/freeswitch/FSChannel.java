@@ -808,4 +808,10 @@ public class FSChannel extends Channel {
 		session.write(cmd);
 		return Result.Ok;
 	}
+
+	@Override
+	public Result internalAcdQueue(String queueName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
