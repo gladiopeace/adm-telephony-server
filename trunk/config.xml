@@ -221,6 +221,29 @@
 				<parameter name="port" value="12341"/>
 			</parameters>
 		</bean>
+		
+		<bean>
+			<class>com.admtel.telephonyserver.acd.impl.AcdDataProviderImpl</class>
+			<id>simpleAcdDataProvider</id>
+		</bean>
+		
+		<bean>
+		 <class>com.admtel.telephonyserver.acd.impl.AcdServiceImpl</class>
+		 <id>acdService</id>
+		 <parameters>
+		 	<parameter name="acdDataProvider" value="simpleAcdDataProvider"/>
+		 </parameters>
+		</bean>
+		
+		<bean>
+			<class>com.admtel.telephonyserver.acd.AcdManager</class>
+			<id>AcdManager</id>
+			<parameters>
+				<parameter name="acdService" value="acdService"/>
+				<parameter name="timeout" value="5000"/>
+			</parameters>
+		</bean>
+		
 		<bean>
 			<class>scripts/ManagerBean.groovy</class>
 			<id>manager</id>

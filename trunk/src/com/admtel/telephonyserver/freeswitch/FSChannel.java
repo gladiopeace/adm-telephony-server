@@ -106,70 +106,6 @@ public class FSChannel extends Channel {
 
 	}
 
-	private class OutboundAlertingState extends State {
-
-		@Override
-		public boolean onTimer(Object data) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public void processEvent(FSEvent fsEvent) {
-			switch (fsEvent.getEventType()) {
-
-			case ChannelOutgoing: {
-				FSChannelOutgoingEvent coe = (FSChannelOutgoingEvent) fsEvent;
-				Channel masterChannel = FSChannel.this.getSwitch().getChannel(
-						coe.getDestinationChannel());
-				FSChannel.this.getChannelData().setLoginIP(
-						coe.getChannelAddress());
-
-				FSChannel.this.getChannelData().setCalledNumber(
-						FSChannel.this
-								.getCalledNumberFromCallerDestinationNumber(coe
-										.getCallerDestinationNumber()));
-
-				if (masterChannel != null) {
-
-					fsChannelLog.debug(String.format(
-							"%s, ChannelOutgoing with master channel %s",
-							FSChannel.this, masterChannel));
-
-					FSChannel.this.setAcctUniqueSessionId(masterChannel
-							.getAcctUniqueSessionId());
-					FSChannel.this.setUserName(masterChannel.getUserName());
-					FSChannel.this.getChannelData().setDestinationNumberIn(
-							masterChannel.getChannelData().getCalledNumber());
-					FSChannel.this.getChannelData().setRemoteIP(
-							masterChannel.getChannelData().getLoginIP());
-				}
-
-			}
-				break;
-			case ChannelOriginate: {
-				FSChannelOriginateEvent coe = (FSChannelOriginateEvent) fsEvent;
-				String fifoInboundChannel = coe
-						.getValue("variable_fifo_bridge_uuid");
-
-			}
-				break;
-			case ChannelState: {
-				FSChannelStateEvent cse = (FSChannelStateEvent) fsEvent;
-				if (cse.getChannelState() == ChannelState.CS_REPORTING
-						&& cse.getCallState() == CallState.RINGING) {
-					// Send outbound alerting event
-
-				}
-			}
-				break;
-
-			}
-
-		}
-
-	}
-
 	private class AlertingState extends State {
 
 		@Override
@@ -600,6 +536,26 @@ public class FSChannel extends Channel {
 		}
 
 	}
+	
+	private class AcdQueueState extends State{
+
+		String queueName;
+		public AcdQueueState(String queueName){
+			this.queueName = queueName;
+		}
+		@Override
+		public void processEvent(FSEvent fsEvent) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public boolean onTimer(Object data) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		
+	}
 
 	/*
 	 * private MessageHandler messageHandler = new QueuedMessageHandler() {
@@ -634,21 +590,6 @@ public class FSChannel extends Channel {
 	public FSChannel(Switch _switch, String id, IoSession session) {
 		super(_switch, id);
 		setIoSession(session);
-	}
-
-	public String getCalledNumberFromCallerDestinationNumber(
-			String callerDestinationNumber) {
-
-		// TODO complete for diffrerence format
-
-		// Take the string up to @
-		if (callerDestinationNumber == null)
-			return null;
-
-		if (callerDestinationNumber.indexOf("@") == -1)
-			return null;
-		return callerDestinationNumber.substring(0,
-				callerDestinationNumber.indexOf("@"));
 	}
 
 	public void setIoSession(IoSession session) {
