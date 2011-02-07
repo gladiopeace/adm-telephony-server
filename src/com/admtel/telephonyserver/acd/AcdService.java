@@ -1,12 +1,13 @@
 package com.admtel.telephonyserver.acd;
 
-import java.util.List;
+import java.util.Date;
 
+import java.util.List;
 import com.admtel.telephonyserver.requests.DialRequest;
 
 public interface AcdService {
-	public void addChannel(String queueName, String channelId);
-	public void removeChannel(String channelId);
+	public boolean queueChannel(String queueName, String channelId, Date setupDate, int priority);
+	public void unqueueChannel(String channelId);
 	public List<DialRequest> getNextDial();
-	
+	public boolean containsChannel(String uniqueId);
 }

@@ -98,5 +98,7 @@ public class AdmTelephonyServer {
 		sysConfig.addDefinitionChangeListener(PromptBuilderFactory.getInstance());
 		sysConfig.addDefinitionChangeListener(BeansManager.getInstance());
 		SystemConfig.getInstance().load();
+		
+		BeansManager.getInstance().init();
 	}
 }

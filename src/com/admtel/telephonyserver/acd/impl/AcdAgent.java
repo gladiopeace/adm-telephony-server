@@ -4,7 +4,11 @@ public class AcdAgent {
 	public enum Status{Ready, Busy};
 	String name;
 	String address;
-	Status status;
+	Status status = Status.Ready;
+	public AcdAgent(String name, String address) {
+		this.name = name;
+		this.address = address;
+	}
 	public String getName() {
 		return name;
 	}

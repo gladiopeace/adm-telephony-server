@@ -5,10 +5,13 @@ import java.util.Date;
 public class AcdChannel implements Comparable<AcdChannel> {
 	String channelId;
 	Integer priority;
-	AcdQueue queue;
+	AcdQueue acdQueue;
 	Date setupTime;
+	
+	AcdAgent agent;
 
-	public AcdChannel(String channelId, Date setupTime, Integer priority) {
+	public AcdChannel(AcdQueue acdQueue, String channelId, Date setupTime, Integer priority) {
+		this.acdQueue = acdQueue;
 		this.channelId = channelId;
 		this.priority = priority;
 		this.setupTime = setupTime;
