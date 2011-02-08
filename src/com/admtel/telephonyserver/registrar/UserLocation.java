@@ -1,11 +1,14 @@
 package com.admtel.telephonyserver.registrar;
 
+import com.admtel.telephonyserver.core.SigProtocol;
+import com.admtel.telephonyserver.core.Switch;
+
 public class UserLocation {
 	String user;
-	String protocol;
+	SigProtocol protocol;
 	String switchId;
 	
-	public UserLocation(String switchId, String protocol, String user) {
+	public UserLocation(String switchId, SigProtocol protocol, String user) {
 		super();
 		this.user = user;
 		this.protocol = protocol;
@@ -22,10 +25,11 @@ public class UserLocation {
 	public void setUser(String user) {
 		this.user = user;
 	}
-	public String getProtocol() {
+
+	public SigProtocol getProtocol() {
 		return protocol;
 	}
-	public void setProtocol(String protocol) {
+	public void setProtocol(SigProtocol protocol) {
 		this.protocol = protocol;
 	}
 	public String getSwitchId() {
@@ -33,6 +37,14 @@ public class UserLocation {
 	}
 	public void setSwitchId(String switchId) {
 		this.switchId = switchId;
+	}
+	public String getAddress(Switch _switch) {
+		if (_switch.getSwitchId().equals(switchId)){
+			return String.format("%s:%s", protocol, user);
+		}
+		else{
+			return String.format("%s:%s@%s", protocol, user, _switch.getDefinition().getAddress());
+		}
 	}
 	
 }

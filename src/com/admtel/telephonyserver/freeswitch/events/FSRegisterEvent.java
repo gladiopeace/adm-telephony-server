@@ -2,13 +2,24 @@ package com.admtel.telephonyserver.freeswitch.events;
 
 import java.util.Map;
 
+import com.admtel.telephonyserver.core.SigProtocol;
+
 public class FSRegisterEvent extends FSEvent {
 
 	Boolean registered = true;
-	public FSRegisterEvent(String switchId, Map values, Boolean registered) {
+	SigProtocol protocol;
+	
+	public FSRegisterEvent(String switchId, SigProtocol protocol, Map values, Boolean registered) {
 		super(switchId, values);
 		eventType = EventType.FsRegister;
 		this.registered = registered;
+		this.protocol = protocol;
+	}
+	public SigProtocol getProtocol() {
+		return protocol;
+	}
+	public void setProtocol(SigProtocol protocol) {
+		this.protocol = protocol;
 	}
 	public Boolean getRegistered() {
 		return registered;

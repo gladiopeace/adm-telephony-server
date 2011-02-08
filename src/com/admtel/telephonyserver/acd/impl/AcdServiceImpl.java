@@ -45,7 +45,7 @@ public class AcdServiceImpl implements AcdService {
 
 	@Override
 	synchronized public boolean queueChannel(String queueName, String channelId, Date setupTime, int priority) {
-		log.trace(String.format("Queueing channel (%s) in queue(%s)"));
+		log.trace(String.format("Queueing channel (%s) in queue(%s)", queueName, channelId));
 		AcdQueue acdQueue = acdQueues.get(queueName);
 		if (acdQueue == null){
 			log.warn(String.format("Queue %s doesn't exist", queueName));
@@ -78,12 +78,14 @@ public class AcdServiceImpl implements AcdService {
 		for (AcdQueue acdQueue: acdQueues.values()){
 			if (acdQueue.waitingChannels.size() > 0){
 				AcdChannel channel = acdQueue.waitingChannels.peek();
+				log.trace(String.format("Waiting channel(%s) - queue(%s) looking for a free agent", channel.channelId, channel.acdQueue.name));
 				if (channel != null){
 					AcdAgent agent = acdQueue.getFreeAgent();
 					if (agent != null){
 						channel = acdQueue.waitingChannels.poll();
 						channel.agent = agent;
 						agent.setStatus(Status.Busy);
+						log.trace(String.format("Waiting channel(%s) - queue(%s) found agent (%s)", channel.channelId, channel.acdQueue.name, agent.name));
 						requests.add(new DialRequest(channel.channelId, agent.address, acdQueue.timeout));
 					}
 				}
@@ -95,5 +97,20 @@ public class AcdServiceImpl implements AcdService {
 	@Override
 	public boolean containsChannel(String uniqueId) {		
 		return channels.containsKey(uniqueId);
+	}
+
+	@Override
+	synchronized public boolean requeueChannel(String channelId) {
+		log.trace(String.format("Requeuing channel (%s)", channelId));
+		AcdChannel channel = channels.get(channelId);
+		if (channel != null){
+			if (channel.agent != null){
+				channel.agent.setStatus(Status.Ready);
+				channel.agent = null;
+			}
+			channel.acdQueue.waitingChannels.add(channel);			
+			return true;
+		}
+		return false;
 	}
 }

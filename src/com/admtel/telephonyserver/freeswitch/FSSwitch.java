@@ -210,7 +210,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 			if (message != null) {
 				FSEvent event = FSEvent.buildEvent(FSSwitch.this.getSwitchId(),
 						message.getMessage());
-				//log.debug(String.format("%s\n\n", message.getMessage()));
+				log.debug(String.format("%s\n\n", message.getMessage()));
 				if (event == null) {
 					/* log.debug("Didn't create Event for message ..."); */
 					return;
@@ -222,7 +222,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 					if (registerEvent.getRegistered()) {
 						Registrar.getInstance().register(
 								new UserLocation(registerEvent.getSwitchId(),
-										"UU", registerEvent.getUser()));
+										registerEvent.getProtocol(), registerEvent.getUser()));
 					} else {
 						Registrar.getInstance().unregister(
 								registerEvent.getUser());

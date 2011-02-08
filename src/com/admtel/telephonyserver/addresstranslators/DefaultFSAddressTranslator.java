@@ -15,7 +15,7 @@ public class DefaultFSAddressTranslator implements AddressTranslator {
 					result = String.format("sofia/internal/%s@%s", address.getDestination(), address.getGateway());
 				}
 				else{
-					result = String.format("sofia/internal/%s", address.getDestination());
+					result = String.format("sofia/internal/%s", address.getDestination()+"%");
 				}
 				break;
 			case IAX2:
