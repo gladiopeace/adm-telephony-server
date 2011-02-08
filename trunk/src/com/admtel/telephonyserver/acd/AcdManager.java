@@ -15,6 +15,7 @@ import com.admtel.telephonyserver.core.Switches;
 import com.admtel.telephonyserver.core.Timers;
 import com.admtel.telephonyserver.events.AcdQueueBridgeFailedEvent;
 import com.admtel.telephonyserver.events.AcdQueueFailedEvent;
+import com.admtel.telephonyserver.events.DialFailedEvent;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.HangupEvent;
 import com.admtel.telephonyserver.interfaces.EventListener;
@@ -61,11 +62,14 @@ public class AcdManager implements EventListener, TimerNotifiable {
 
 		}
 			break;
-		case AcdQueueBridgeFailed:{
-			AcdQueueBridgeFailedEvent qfe = (AcdQueueBridgeFailedEvent) event;
-			acdService.requeueChannel(qfe.getChannel().getUniqueId());
+		case DialFailed:
+		{
+			DialFailedEvent dfe = (DialFailedEvent) event;
+			if (acdService.containsChannel(dfe.getChannel().getUniqueId())){
+				acdService.requeueChannel(dfe.getChannel().getUniqueId());
+			}
 		}
-		break;
+			break;
 		}
 		return false;
 	}
