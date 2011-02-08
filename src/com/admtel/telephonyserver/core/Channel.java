@@ -438,14 +438,6 @@ public abstract class Channel implements TimerNotifiable {
 		case QueueLeft:
 			state = State.Idle;
 			break;
-		case DialFailed: {
-			switch (state) {
-			case AcdQueued:
-				onEvent(new AcdQueueBridgeFailedEvent(this));
-				break;
-			}
-		}
-		break;
 		case Answered:
 			state = State.Idle;
 			setAnswerTime(new DateTime());
