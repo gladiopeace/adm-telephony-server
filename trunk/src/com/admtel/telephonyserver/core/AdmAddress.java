@@ -2,7 +2,7 @@ package com.admtel.telephonyserver.core;
 
 
 public class AdmAddress {
-	ChannelProtocol protocol;
+	SigProtocol protocol;
 	String destination = null;
 	String gateway = null;
 	
@@ -10,7 +10,7 @@ public class AdmAddress {
 	public AdmAddress(String address){
 		if (address.startsWith("sip:")){
 			String[] addressItems = address.substring(4).split("@");
-			protocol = ChannelProtocol.SIP;
+			protocol = SigProtocol.SIP;
 			if (addressItems.length == 2){				
 				destination = addressItems[0];
 				gateway = addressItems[1];				
@@ -20,7 +20,7 @@ public class AdmAddress {
 			}
 		}
 		else if (address.startsWith("iax2:")){
-			protocol = ChannelProtocol.IAX2;
+			protocol = SigProtocol.IAX2;
 			String[] addressItems = address.substring(5).split("@");
 			if (addressItems.length == 2){
 				destination = addressItems[0];
@@ -31,16 +31,16 @@ public class AdmAddress {
 			}
 		}
 		else if (address.startsWith("local:")){
-			protocol = ChannelProtocol.Local;
+			protocol = SigProtocol.Local;
 			String addressItems = address.substring(5);
 			destination = addressItems;
 		}
 	}
 	
-	public ChannelProtocol getProtocol() {
+	public SigProtocol getProtocol() {
 		return protocol;
 	}
-	public void setProtocol(ChannelProtocol protocol) {
+	public void setProtocol(SigProtocol protocol) {
 		this.protocol = protocol;
 	}
 	public String getDestination() {

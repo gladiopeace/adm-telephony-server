@@ -10,4 +10,5 @@ public interface AcdService {
 	public void unqueueChannel(String channelId);
 	public List<DialRequest> getNextDial();
 	public boolean containsChannel(String uniqueId);
+	public boolean requeueChannel(String channelId);
 }

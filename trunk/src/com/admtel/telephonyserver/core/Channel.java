@@ -10,8 +10,10 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
+import com.admtel.telephonyserver.acd.AcdManager;
 import com.admtel.telephonyserver.config.SystemConfig;
 import com.admtel.telephonyserver.core.Timers.Timer;
+import com.admtel.telephonyserver.events.AcdQueueBridgeFailedEvent;
 import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
 import com.admtel.telephonyserver.events.DtmfEvent;
@@ -19,6 +21,7 @@ import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.HangupEvent;
 import com.admtel.telephonyserver.events.AlertingEvent;
 import com.admtel.telephonyserver.events.Event.EventType;
+import com.admtel.telephonyserver.freeswitch.FSChannel;
 import com.admtel.telephonyserver.interfaces.EventListener;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.radius.RadiusServers;
@@ -36,7 +39,7 @@ public abstract class Channel implements TimerNotifiable {
 	static Logger log = Logger.getLogger(Channel.class);
 
 	public enum State {
-		Null, Idle, Clearing, Answering, Alering, MediaBusy, Busy, Conferenced, Queued,
+		Null, Idle, Clearing, Answering, Alering, MediaBusy, Busy, Conferenced, Queued, AcdQueued,
 	}
 
 	private enum TimersDefs {
@@ -70,7 +73,7 @@ public abstract class Channel implements TimerNotifiable {
 	protected Integer h323DisconnectCause = 16;// normal call clearing
 
 	protected String baseDirectory = SystemConfig.getInstance().serverDefinition
-			.getBaseDirectory();
+	.getBaseDirectory();
 
 	protected Locale language;
 
@@ -267,17 +270,18 @@ public abstract class Channel implements TimerNotifiable {
 	public abstract Result internalQueue(String queueName, boolean agent);
 
 	final public Result queue(String queueName, boolean agent) { // TODO add
-																	// more
-																	// parameters
+		// more
+		// parameters
 		Result result = internalQueue(queueName, agent);
 
 		return result;
 	}
-	final public Result acdQueue(String queueName){ // TODO add more parameters
+
+	final public Result acdQueue(String queueName) { // TODO add more parameters
 		Result result = internalAcdQueue(queueName);
 		return result;
 	}
-	
+
 	public abstract Result internalAcdQueue(String queueName);
 
 	final public Result playAndGetDigits(int max, String prompt, long timeout,
@@ -300,7 +304,7 @@ public abstract class Channel implements TimerNotifiable {
 
 	final public Result hangup(DisconnectCode disconnectCode) {
 		Result result = internalHangup(disconnectCode.ordinal());
-		if (result == Result.Ok){
+		if (result == Result.Ok) {
 			state = State.Clearing;
 		}
 		return result;// TODO need better request/response/event model
@@ -341,7 +345,7 @@ public abstract class Channel implements TimerNotifiable {
 
 	final public Result answer() {
 		Result result = internalAnswer();
-		if (result == Result.Ok){
+		if (result == Result.Ok) {
 			state = State.Answering;
 		}
 		return result;// TODO need better request/response/event model
@@ -355,7 +359,7 @@ public abstract class Channel implements TimerNotifiable {
 					state));
 			return Result.ChannelInvalidState;
 		}
-		
+
 		Result result = internalJoinConference(conferenceId, moderator,
 				startMuted, startDeaf);
 		if (result != Result.Ok) {
@@ -386,42 +390,33 @@ public abstract class Channel implements TimerNotifiable {
 		return result;
 
 	}
-	
-	public abstract Result internalConferenceMute(String conferenceId, String memberId, boolean mute);
-	
-	final public Result conferenceMute(boolean mute){
-		if (state != State.Conferenced){
-			log.warn(String.format("Channel (%s), conferenceMute(%b), invalid state (%s)", this, mute, state));
+
+	public abstract Result internalConferenceMute(String conferenceId,
+			String memberId, boolean mute);
+
+	final public Result conferenceMute(boolean mute) {
+		if (state != State.Conferenced) {
+			log.warn(String.format(
+					"Channel (%s), conferenceMute(%b), invalid state (%s)",
+					this, mute, state));
 			return Result.ChannelInvalidState;
 		}
 		return internalConferenceMute(conferenceId, memberId, mute);
 	}
 
-	final public Result dial(UserLocation userLocation, long timeout) {
-		Result result = Result.Ok;
-		if (userLocation.getSwitchId().equals(
-				this.getSwitch().getDefinition().getId())) {
-
-			// TODO have more dynamic protocols to dial out
-
-			result = internalDial("sip:" + userLocation.getUser(), timeout);
-		} else {
-			result = internalDial(String.format("sip:%s@%s", userLocation
-					.getUser(), getSwitch().getDefinition().getAddress()),
-					timeout);
-		}
-
-		return result;
-	}
-
 	final public Result dial(String address, long timeout) {
-		/*
-		 * if (state != State.Idle){
-		 * log.warn(String.format("Channel (%s), originate, invalid state(%s)",
-		 * this, state)); return Result.ChannelInvalidState; }
-		 */
+
 		log.trace(String.format("Channel(%s) dialing %s", this, address));
-		Result result = internalDial(address, timeout);
+		String tAddress = address;
+		if (address.startsWith("user:")){
+			tAddress = address.substring(5);			
+			UserLocation location = Registrar.getInstance().find(tAddress);
+			if (location == null){
+				return Result.UserNotFound;
+			}
+			tAddress = location.getAddress(_switch);
+		}
+		Result result = internalDial(tAddress, timeout);
 		return result;
 	}
 
@@ -434,7 +429,7 @@ public abstract class Channel implements TimerNotifiable {
 			DtmfEvent event = (DtmfEvent) e;
 			dtmfBuffer += event.getDigit();
 		}
-			break;
+		break;
 		case PlaybackEnded:
 		case PlayAndGetDigitsEnded:
 		case AnswerFailed:
@@ -443,6 +438,14 @@ public abstract class Channel implements TimerNotifiable {
 		case QueueLeft:
 			state = State.Idle;
 			break;
+		case DialFailed: {
+			switch (state) {
+			case AcdQueued:
+				onEvent(new AcdQueueBridgeFailedEvent(this));
+				break;
+			}
+		}
+		break;
 		case Answered:
 			state = State.Idle;
 			setAnswerTime(new DateTime());
@@ -450,23 +453,26 @@ public abstract class Channel implements TimerNotifiable {
 			interimUpdateTimer = Timers.getInstance().startTimer(
 					this,
 					SystemConfig.getInstance().serverDefinition
-							.getInterimUpdate() * 1000, false,
+					.getInterimUpdate() * 1000, false,
 					TimersDefs.InterimUpdateTimer);
 
+			break;
+		case AcdQueueJoined:
+			state = State.AcdQueued;
 			break;
 		case Alerting: {
 			AlertingEvent ie = (AlertingEvent) e;
 			state = State.Alering;
-			setupTime = new DateTime();			
+			setupTime = new DateTime();
 		}
-			break;
+		break;
 		case Hangup: {
 			HangupEvent he = (HangupEvent) e;
 			hangupTime = new DateTime();
 			h323DisconnectCause = he.getHangupCause();
-			stopTimers();			
+			stopTimers();
 		}
-			break;
+		break;
 		case QueueJoined:
 			state = State.Queued;
 			break;
@@ -476,13 +482,13 @@ public abstract class Channel implements TimerNotifiable {
 			this.memberId = cje.getParticipantId();
 			state = State.Conferenced;
 		}
-			break;
+		break;
 		case ConferenceLeft: {
 			this.conferenceId = null;
 			this.memberId = null;
 			state = State.Idle;
 		}
-			break;
+		break;
 		}
 
 		EventsManager.getInstance().onEvent(e);
@@ -496,7 +502,7 @@ public abstract class Channel implements TimerNotifiable {
 			log.fatal(AdmUtils.getStackTrace(ex));
 		}
 		if (e.getEventType() == EventType.Hangup) {
-			removeAllEventListeners();			
+			removeAllEventListeners();
 			_switch.removeChannel(this);
 		}
 		return false;
@@ -527,17 +533,17 @@ public abstract class Channel implements TimerNotifiable {
 	@Override
 	public String toString() {
 		return "Channel ["
-				+ (callOrigin != null ? "callOrigin=" + callOrigin + ", " : "")
-				+ (id != null ? "id=" + id + ", " : "")
-				+ (getAccountCode() != null ? "getAccountCode()="
-						+ getAccountCode() + ", " : "")
+		+ (callOrigin != null ? "callOrigin=" + callOrigin + ", " : "")
+		+ (id != null ? "id=" + id + ", " : "")
+		+ (getAccountCode() != null ? "getAccountCode()="
+				+ getAccountCode() + ", " : "")
 				+ (getLanguage() != null ? "getLanguage()=" + getLanguage()
 						+ ", " : "")
-				+ (getServiceNumber() != null ? "getServiceNumber()="
-						+ getServiceNumber() + ", " : "")
-				+ (getState() != null ? "getState()=" + getState() + ", " : "")
-				+ (getUserName() != null ? "getUserName()=" + getUserName()
-						: "") + "]";
+						+ (getServiceNumber() != null ? "getServiceNumber()="
+								+ getServiceNumber() + ", " : "")
+								+ (getState() != null ? "getState()=" + getState() + ", " : "")
+								+ (getUserName() != null ? "getUserName()=" + getUserName()
+										: "") + "]";
 	}
 
 	public Integer getH323DisconnectCause() {
@@ -601,25 +607,23 @@ public abstract class Channel implements TimerNotifiable {
 		switch (request.getType()) {
 		case HangupRequest: {
 			HangupRequest hr = (HangupRequest) request;
-			Result result = hangup(hr.getDisconnectCode());			
+			Result result = hangup(hr.getDisconnectCode());
 		}
-			break;
+		break;
 		case AnswerRequest: {
 			answer();
 		}
-			break;
-		case ParticipantMuteRequest:
-		{
+		break;
+		case ParticipantMuteRequest: {
 			ParticipantMuteRequest pmr = (ParticipantMuteRequest) request;
-			conferenceMute(pmr.isMute());			
+			conferenceMute(pmr.isMute());
 		}
 		break;
-		case DialRequest:
-		{
+		case DialRequest: {
 			DialRequest dialRequest = (DialRequest) request;
 			dial(dialRequest.getDestination(), dialRequest.getTimeout());
 		}
-			break;
+		break;
 		}
 	}
 }

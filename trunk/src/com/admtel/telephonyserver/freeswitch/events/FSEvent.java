@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.admtel.telephonyserver.core.SigProtocol;
 import com.admtel.telephonyserver.utils.CodecsUtils;
 
 public class FSEvent {
@@ -65,10 +66,10 @@ public class FSEvent {
 				String eventSubclass = CodecsUtils.urlDecode(map.get("Event-Subclass"));
 				if (eventSubclass != null){
 					if (eventSubclass.equals("sofia::register")){
-						return new FSRegisterEvent (switchId, map, true);
+						return new FSRegisterEvent (switchId, SigProtocol.SIP, map, true);
 					}
 					else if (eventSubclass.equals("sofia::unregister")){
-						return new FSRegisterEvent(switchId, map, false);
+						return new FSRegisterEvent(switchId, SigProtocol.SIP, map, false);
 					}
 					else if (eventSubclass.equalsIgnoreCase("conference::maintenance")){
 						String action = map.get("Action");

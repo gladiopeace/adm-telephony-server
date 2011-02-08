@@ -240,7 +240,7 @@
 			<id>AcdManager</id>
 			<parameters>
 				<parameter name="acdService" value="acdService"/>
-				<parameter name="timeout" value="5000"/>
+				<parameter name="timeout" value="15000"/>
 			</parameters>
 		</bean>
 		

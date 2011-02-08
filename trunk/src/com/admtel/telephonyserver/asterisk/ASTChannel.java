@@ -48,7 +48,7 @@ import com.admtel.telephonyserver.events.QueueJoinedEvent;
 import com.admtel.telephonyserver.events.QueueLeftEvent;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.core.Channel;
-import com.admtel.telephonyserver.core.ChannelProtocol;
+import com.admtel.telephonyserver.core.SigProtocol;
 import com.admtel.telephonyserver.core.ConferenceManager;
 import com.admtel.telephonyserver.core.Result;
 import com.admtel.telephonyserver.core.Script;
@@ -828,7 +828,7 @@ public class ASTChannel extends Channel {
 	protected State currentState = new NullState();
 	protected IoSession session;
 
-	protected ChannelProtocol channelProtocol = ChannelProtocol.Unknown;
+	protected SigProtocol channelProtocol = SigProtocol.Unknown;
 
 	synchronized protected void processNativeEvent(Object event) {
 		if (event instanceof ASTEvent) {
@@ -877,9 +877,9 @@ public class ASTChannel extends Channel {
 		this.session = session;
 
 		if (id.toLowerCase().startsWith("sip")) {
-			channelProtocol = ChannelProtocol.SIP;
+			channelProtocol = SigProtocol.SIP;
 		} else if (id.toLowerCase().startsWith("iax2")) {
-			channelProtocol = ChannelProtocol.IAX2;
+			channelProtocol = SigProtocol.IAX2;
 		}
 	}
 

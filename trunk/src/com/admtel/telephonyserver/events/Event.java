@@ -17,7 +17,7 @@ public abstract class Event {
 		HangupFailed, 		 
 		DialFailed, 
 		Linked, 
-		DialStarted, ConferenceJoined, ConferenceLeft, ConferenceTalk, QueueJoined, QueueLeft, QueueJoinFailed, ConferenceMuted, ChannelListed, QueueBridged,
+		DialStarted, ConferenceJoined, ConferenceLeft, ConferenceTalk, QueueJoined, QueueLeft, QueueJoinFailed, ConferenceMuted, ChannelListed, QueueBridged, AcdQueueBridged, AcdQueueFailed, AcdQueueJoined, AcdQueueLeft, AcdQueueBridgeFailed,
 	}
 	
 	protected EventType eventType;	
