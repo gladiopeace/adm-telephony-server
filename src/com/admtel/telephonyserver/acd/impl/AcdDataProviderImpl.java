@@ -16,14 +16,15 @@ public class AcdDataProviderImpl implements AcdDataProvider {
 		agents.put("agent_4", new AcdAgent("agent_4", "user:1003"));
 		AcdQueue queue = new AcdQueue("queue_1");
 		queues.put("queue_1", queue);
-		queue.agents.put("agent_1", agents.get("agent_1"));
-		queue.agents.put("agent_2", agents.get("agent_2"));
-		queue.agents.put("agent_3", agents.get("agent_3"));
+		queue.addAgent(agents.get("agent_1"));
+		queue.addAgent(agents.get("agent_2"));
+		queue.addAgent(agents.get("agent_3"));
 		
 		queue = new AcdQueue("queue_2");
 		queues.put("queue_2", queue);
-		queue.agents.put("agent_3", agents.get("agent_3"));
-		queue.agents.put("agent_4", agents.get("agent_4"));			
+		queue.addAgent(agents.get("agent_3"));
+		queue.addAgent(agents.get("agent_4"));
+
 	}
 	
 	public void init(){

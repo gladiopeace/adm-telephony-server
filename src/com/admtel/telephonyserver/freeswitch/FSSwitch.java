@@ -44,7 +44,7 @@ import com.admtel.telephonyserver.utils.CodecsUtils;
 
 public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 
-	static Logger log = Logger.getLogger(ASTSwitch.class);
+	static Logger log = Logger.getLogger(FSSwitch.class);
 
 	IoSession session;
 
@@ -181,6 +181,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	@Override
 	public void processBasicIoMessage(BasicIoMessage message) {
+		
 		switch (state){
 		case LoggingIn:
 			if (message != null) {
@@ -209,8 +210,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 		case LoggedIn:
 			if (message != null) {
 				FSEvent event = FSEvent.buildEvent(FSSwitch.this.getSwitchId(),
-						message.getMessage());
-				log.debug(String.format("%s\n\n", message.getMessage()));
+						message.getMessage());				
 				if (event == null) {
 					/* log.debug("Didn't create Event for message ..."); */
 					return;

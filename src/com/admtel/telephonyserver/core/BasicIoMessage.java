@@ -27,5 +27,12 @@ public class BasicIoMessage {
 	public void setMessage(String message) {
 		this.message = message;
 	}
+
+	@Override
+	public String toString() {
+		return "BasicIoMessage ["
+				+ (session != null ? "session=" + session + ", " : "")
+				+ (message != null ? "message=" + message : "") + "]";
+	}
 	
 }
