@@ -35,7 +35,8 @@ public abstract class Switch {
 	protected MessageHandler messageHandler = new QueuedMessageHandler() {
 
 		@Override
-		public void onMessage(Object message) {
+		public void onMessage(Object message) {			
+			Switch.log.trace(message);
 			if (message instanceof BasicIoMessage) {
 				Switch.this.processBasicIoMessage((BasicIoMessage) message);
 			} else if (message instanceof Request) {

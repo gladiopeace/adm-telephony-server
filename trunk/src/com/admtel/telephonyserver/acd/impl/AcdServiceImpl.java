@@ -39,7 +39,7 @@ public class AcdServiceImpl implements AcdService {
 				channel.agent.setStatus(Status.Ready);
 				channel.agent = null;
 			}
-			channel.acdQueue.waitingChannels.remove(channel);			
+			channel.acdQueue.remove(channel);			
 		}
 	}
 
@@ -55,12 +55,12 @@ public class AcdServiceImpl implements AcdService {
 		if (channel == null){
 			channel = new AcdChannel (acdQueue, channelId, setupTime, priority);
 			channels.put(channelId, channel);
-			acdQueue.waitingChannels.add(channel);
+			acdQueue.add(channel);
 			
 		}
 		else{
 			if (channel.agent == null){
-				acdQueue.waitingChannels.add(channel);
+				acdQueue.add(channel);
 			}
 			else{
 				channel.agent.setStatus(Status.Ready);
@@ -76,17 +76,17 @@ public class AcdServiceImpl implements AcdService {
 		log.trace("AcdServiceImpl, getNextDial ...");
 		
 		for (AcdQueue acdQueue: acdQueues.values()){
-			if (acdQueue.waitingChannels.size() > 0){
-				AcdChannel channel = acdQueue.waitingChannels.peek();
-				log.trace(String.format("Waiting channel(%s) - queue(%s) looking for a free agent", channel.channelId, channel.acdQueue.name));
+			if (acdQueue.hasWaitingChannels()){
+				AcdChannel channel = acdQueue.peek();
+				log.trace(String.format("Waiting channel(%s) - queue(%s) looking for a free agent", channel.channelId, channel.acdQueue));
 				if (channel != null){
 					AcdAgent agent = acdQueue.getFreeAgent();
 					if (agent != null){
-						channel = acdQueue.waitingChannels.poll();
+						channel = acdQueue.poll();
 						channel.agent = agent;
 						agent.setStatus(Status.Busy);
-						log.trace(String.format("Waiting channel(%s) - queue(%s) found agent (%s)", channel.channelId, channel.acdQueue.name, agent.name));
-						requests.add(new DialRequest(channel.channelId, agent.address, acdQueue.timeout));
+						log.trace(String.format("Waiting channel(%s) - queue(%s) found agent (%s)", channel.channelId, channel.acdQueue.getName(), agent.name));
+						requests.add(new DialRequest(channel.channelId, agent.address, acdQueue.getTimeout()));
 					}
 				}
 			}
@@ -108,7 +108,7 @@ public class AcdServiceImpl implements AcdService {
 				channel.agent.setStatus(Status.Ready);
 				channel.agent = null;
 			}
-			channel.acdQueue.waitingChannels.add(channel);			
+			channel.acdQueue.add(channel);			
 			return true;
 		}
 		return false;
