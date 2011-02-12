@@ -14,7 +14,7 @@ import com.admtel.telephonyserver.core.Conference;
 import com.admtel.telephonyserver.core.EventsManager;
 import com.admtel.telephonyserver.core.Participant;
 import com.admtel.telephonyserver.events.Event;
-import com.admtel.telephonyserver.events.HangupEvent;
+import com.admtel.telephonyserver.events.DisconnectedEvent;
 import com.admtel.telephonyserver.events.AlertingEvent;
 import com.admtel.telephonyserver.events.Event.EventType;
 import com.admtel.telephonyserver.interfaces.Authorizer;
@@ -129,8 +129,8 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 		case Alerting:
 			onAlerting((AlertingEvent) event);
 			break;
-		case Hangup:
-			onHangupEvent((HangupEvent) event);
+		case DISCONNECTED:
+			onHangupEvent((DisconnectedEvent) event);
 			break;
 		}
 		return false;
@@ -145,7 +145,7 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 		accountingStart(event.getChannel());
 	}
 
-	private void onHangupEvent(HangupEvent event) {
+	private void onHangupEvent(DisconnectedEvent event) {
 		log.trace(event);
 		accountingStop(event.getChannel());
 	}

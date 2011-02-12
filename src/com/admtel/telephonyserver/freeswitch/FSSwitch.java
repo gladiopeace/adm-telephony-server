@@ -1,6 +1,5 @@
 package com.admtel.telephonyserver.freeswitch;
 
-
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 
@@ -57,10 +56,13 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 	protected String decodingDelimiter;
 
 	Timer reconnectTimer = null;
-	private enum State {Connecting, LoggingIn, LoggedIn, Disconnecting, Disconnected};
-	
+
+	private enum State {
+		Connecting, LoggingIn, LoggedIn, Disconnecting, Disconnected
+	};
+
 	State state = State.Disconnected;
-	
+
 	public FSSwitch(SwitchDefinition definition) {
 		super(definition);
 		this.encodingDelimiter = "\n\n";
@@ -73,7 +75,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 		textLineCodecFactory.setEncoderMaxLineLength(8192);
 		connector.getFilterChain().addLast("codec",
 				new ProtocolCodecFilter(textLineCodecFactory));
-		connector.setHandler(this);		
+		connector.setHandler(this);
 	}
 
 	@Override
@@ -82,12 +84,12 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 		reconnectTimer = Timers.getInstance().startTimer(this, RECONNECT_AFTER,
 				false, null);
 	}
-	
+
 	@Override
 	public void stop() {
 		super.stop();
 	}
-	
+
 	@Override
 	public Result originate(String destination, long timeout, String callerId,
 			String calledId, String script, String data) {
@@ -118,8 +120,8 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	@Override
 	public void sessionClosed(IoSession session) throws Exception {
-		log.warn("Disconnected from switch "+this.getSwitchId());
-		state = State.Disconnected;		
+		log.warn("Disconnected from switch " + this.getSwitchId());
+		state = State.Disconnected;
 		this.start();
 
 	}
@@ -151,7 +153,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 			return true;// stop the timer
 		if (getDefinition().isEnabled() && state == State.Disconnected) {
 			return connect();
-		}		
+		}
 		return true;
 	}
 
@@ -161,12 +163,13 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	private boolean connect() {
 		log.debug(String.format("Trying to connect to %s:%d", getDefinition()
-				.getAddress(), getDefinition().getPort()));		
+				.getAddress(), getDefinition().getPort()));
 		state = State.Connecting;
 		try {
 			ConnectFuture connectFuture = connector
-					.connect(new InetSocketAddress(getDefinition().getAddress(),
-							getDefinition().getPort()));
+					.connect(new InetSocketAddress(
+							getDefinition().getAddress(), getDefinition()
+									.getPort()));
 			connectFuture.awaitUninterruptibly(CONNECT_TIMEOUT);
 			session = connectFuture.getSession();
 			log.debug(String.format("Connected to %s:%d", getDefinition()
@@ -174,15 +177,15 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 			return true;
 		} catch (Exception e) {
 			log.warn(AdmUtils.getStackTrace(e));
-			state = State.Disconnected;			
+			state = State.Disconnected;
 		}
 		return false;
 	}
 
 	@Override
 	public void processBasicIoMessage(BasicIoMessage message) {
-		
-		switch (state){
+
+		switch (state) {
 		case LoggingIn:
 			if (message != null) {
 				FSEvent event = FSEvent.buildEvent(FSSwitch.this.getSwitchId(),
@@ -210,31 +213,34 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 		case LoggedIn:
 			if (message != null) {
 				FSEvent event = FSEvent.buildEvent(FSSwitch.this.getSwitchId(),
-						message.getMessage());				
-				if (event == null) {
-					/* log.debug("Didn't create Event for message ..."); */
+						message.getMessage());
+				
+				if (event != null) {
+					log.trace(event);
+				}
+				else{
 					return;
 				}
 				switch (event.getEventType()) {
-				
+
 				case FsRegister: {
 					FSRegisterEvent registerEvent = (FSRegisterEvent) event;
 					if (registerEvent.getRegistered()) {
 						Registrar.getInstance().register(
 								new UserLocation(registerEvent.getSwitchId(),
-										registerEvent.getProtocol(), registerEvent.getUser()));
+										registerEvent.getProtocol(),
+										registerEvent.getUser()));
 					} else {
 						Registrar.getInstance().unregister(
 								registerEvent.getUser());
 					}
 				}
 					break;
-				case ChannelCreate:
-				{
+				case ChannelCreate: {
 					FSChannelCreateEvent cce = (FSChannelCreateEvent) event;
-					FSChannel channel = new FSChannel(FSSwitch.this, cce
-							.getChannelId(), message.getSession());
-					switch (cce.getDirection()){
+					FSChannel channel = new FSChannel(FSSwitch.this,
+							cce.getChannelId(), message.getSession());
+					switch (cce.getDirection()) {
 					case Inbound:
 						channel.setCallOrigin(CallOrigin.Inbound);
 						break;
@@ -242,7 +248,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 						channel.setCallOrigin(CallOrigin.Outbound);
 						break;
 					}
-					
+
 					FSSwitch.this.addChannel(channel);
 
 				}
@@ -252,39 +258,35 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 					FSChannelEvent channelEvent = (FSChannelEvent) event;
 					FSChannel channel = (FSChannel) FSSwitch.this
 							.getChannel(channelEvent.getChannelId());
-					if (channel == null){
+					if (channel == null) {
 						return;
 					}
-					
-						switch (event.getEventType()) {
-						case ChannelData:
-							// Replace the iosession, with the session from the
-							// incoming connection
-							
-							channel.setIoSession(message.getSession());
-							break;
-						case ChannelOriginate: {
-							FSChannelOriginateEvent coe = (FSChannelOriginateEvent) event;
-							FSChannel otherChannel = (FSChannel) FSSwitch.this
-									.getChannel(coe.getDestinationChannel());
-							if (otherChannel != null) {
-								otherChannel.putMessage(channelEvent);
-							}
-						}
-							break;
-						case ChannelBridge:{
-							FSChannelBridgeEvent cbe = (FSChannelBridgeEvent) event;
-							FSChannel otherChannel = (FSChannel) FSSwitch.this.getChannel(cbe.getPeerChannelId());
-							if (otherChannel != null){
-								otherChannel.putMessage(channelEvent);
-							}
-						}
+
+					switch (event.getEventType()) {
+					case ChannelData:
+						// Replace the iosession, with the session from the
+						// incoming connection
+
+						channel.setIoSession(message.getSession());
 						break;
-						}
-						channel.putMessage(channelEvent);
-					
+					case ChannelOriginate: {
+						FSChannelOriginateEvent coe = (FSChannelOriginateEvent) event;
+					}
+						break;
+					case ChannelBridge: {
+						FSChannelBridgeEvent cbe = (FSChannelBridgeEvent) event;
+					}
+						break;
+					}
+					channel.putMessage(channelEvent);
+					FSChannel otherChannel = (FSChannel) FSSwitch.this
+							.getChannel(channelEvent.getPeerChannel());
+					if (otherChannel != null) {
+						otherChannel.putMessage(channelEvent);
+					}
+
 				}
-			}			
+			}
 			break;
 		}
 	}

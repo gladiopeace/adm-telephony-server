@@ -14,10 +14,7 @@ public class FSChannelOutgoingEvent extends FSChannelEvent {
 	@Override
 	public String getChannelId() {
 		return values.get("Unique-ID");
-	}
-	public String getDestinationChannel(){
-		return values.get("Other-Leg-Unique-ID");
-	}
+	}	
 	public String getChannelAddress(){
 		return values.get("Caller-Network-Addr");
 	}

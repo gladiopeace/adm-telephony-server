@@ -10,9 +10,10 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import com.admtel.telephonyserver.core.Channel.CallState;
 import com.admtel.telephonyserver.events.DialStartedEvent;
 import com.admtel.telephonyserver.events.Event;
-import com.admtel.telephonyserver.events.HangupEvent;
+import com.admtel.telephonyserver.events.DisconnectedEvent;
 import com.admtel.telephonyserver.events.AlertingEvent;
 import com.admtel.telephonyserver.interfaces.EventListener;
 
@@ -111,8 +112,8 @@ public abstract class Script implements EventListener{
 
 		processEvent(event);
 		
-		if (event.getEventType() == Event.EventType.Hangup){
-			HangupEvent he = (HangupEvent) event;
+		if (event.getEventType() == Event.EventType.DISCONNECTED){
+			DisconnectedEvent he = (DisconnectedEvent) event;
 			removeChannel(he.getChannel());
 		}
 		if (channels.size() == 0){
@@ -163,9 +164,9 @@ public abstract class Script implements EventListener{
 		
 	}
 	
-	public Channel getChannel(CallOrigin callOrigin, Channel.State state){
+	public Channel getChannel(CallOrigin callOrigin, CallState state){
 		for (Channel c:channels){
-			if (c.getCallOrigin() == callOrigin && c.getState() == state){
+			if (c.getCallOrigin() == callOrigin && c.getCallState() == state){
 				return c;
 			}
 		}

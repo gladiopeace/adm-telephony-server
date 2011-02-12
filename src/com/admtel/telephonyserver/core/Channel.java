@@ -16,9 +16,12 @@ import com.admtel.telephonyserver.core.Timers.Timer;
 import com.admtel.telephonyserver.events.AcdQueueBridgeFailedEvent;
 import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
+import com.admtel.telephonyserver.events.DialFailedEvent;
+import com.admtel.telephonyserver.events.DialStartedEvent;
+import com.admtel.telephonyserver.events.DialStatus;
 import com.admtel.telephonyserver.events.DtmfEvent;
 import com.admtel.telephonyserver.events.Event;
-import com.admtel.telephonyserver.events.HangupEvent;
+import com.admtel.telephonyserver.events.DisconnectedEvent;
 import com.admtel.telephonyserver.events.AlertingEvent;
 import com.admtel.telephonyserver.events.Event.EventType;
 import com.admtel.telephonyserver.freeswitch.FSChannel;
@@ -36,10 +39,14 @@ import com.admtel.telephonyserver.utils.PromptsUtils;
 
 public abstract class Channel implements TimerNotifiable {
 
-	static Logger log = Logger.getLogger(Channel.class);
+	public static Logger log = Logger.getLogger(Channel.class);
 
-	public enum State {
-		Null, Idle, Clearing, Answering, Alering, MediaBusy, Busy, Conferenced, Queued, AcdQueued,
+	public enum CallState {
+		Null, Idle, Offered, Alerting, Accepted, Connected, Dialing, Disconnected, Dropped, Conferenced, AcdQueued, Queued,
+	}
+
+	public enum MediaState {
+		PlayAndGetDigits, Idle, Playback,
 	}
 
 	private enum TimersDefs {
@@ -51,7 +58,8 @@ public abstract class Channel implements TimerNotifiable {
 
 	private List<EventListener> listeners = new CopyOnWriteArrayList<EventListener>();
 
-	protected State state = State.Idle;
+	private CallState callState = CallState.Idle;
+	private MediaState mediaState = MediaState.Idle;
 	protected String id;
 	protected String dtmfBuffer = "";
 	protected Switch _switch;
@@ -73,12 +81,13 @@ public abstract class Channel implements TimerNotifiable {
 	protected Integer h323DisconnectCause = 16;// normal call clearing
 
 	protected String baseDirectory = SystemConfig.getInstance().serverDefinition
-	.getBaseDirectory();
+			.getBaseDirectory();
 
 	protected Locale language;
 
 	private String conferenceId;
-	private String memberId;
+	private String memberId;	
+	private Result lastResult = Result.Ok;
 
 	private MessageHandler messageHandler = new QueuedMessageHandler() {
 
@@ -239,14 +248,6 @@ public abstract class Channel implements TimerNotifiable {
 		return id;
 	}
 
-	public void setState(State state) {
-		this.state = state;
-	}
-
-	public State getState() {
-		return this.state;
-	}
-
 	public String getDtmfBuffer() {
 		return dtmfBuffer;
 	}
@@ -284,203 +285,294 @@ public abstract class Channel implements TimerNotifiable {
 
 	public abstract Result internalAcdQueue(String queueName);
 
+	private boolean isConnected() {
+		return getCallState() != CallState.Connected;
+	}
+
+	private boolean isMediaActive() {
+		return mediaState != MediaState.Idle;
+	}
+
 	final public Result playAndGetDigits(int max, String prompt, long timeout,
 			String terminators) {
-		if (state != State.Idle) {
+		log.trace(String.format("[%s] - playAndGetDigits(%d,%s,%d,%s)", this,
+				max, prompt, timeout, terminators));
+		if (!isConnected()) {
 			log.warn(String.format(
-					"Channel (%s), playAndGetDigits, invalid state(%s)", this,
-					state));
-			return Result.ChannelInvalidState;
+					"[%s], playAndGetDigits, invalid call state", this));
+			lastResult = Result.ChannelInvalidCallState;
+			return lastResult;
+		}
+
+		if (isMediaActive()) {
+			log.warn(String.format(
+					"[%s], playAndGetDigits, invalid media state", this));
+			
+			lastResult = Result.ChannelInvalidMediaState;
+			return lastResult;
 		}
 		prompt = PromptsUtils.prepend(prompt, baseDirectory, "/sounds/",
 				language.toString(), "/");
-		Result result = internalPlayAndGetDigits(max, prompt, timeout,
+		lastResult = internalPlayAndGetDigits(max, prompt, timeout,
 				terminators, true);
-		if (result == Result.Ok) {
-			state = State.MediaBusy;
+		if (lastResult == Result.Ok) {
+			mediaState = MediaState.PlayAndGetDigits;
 		}
-		return result;
+		return lastResult;
+	}
+	final public Result playAndGetDigits(int max, String[] prompt,
+			long timeout, String terminators) {
+		log.trace(String.format("[%s] - playAndGetDigits(%d,%s,%d,%s)", this,
+				max, prompt, timeout, terminators));
+		if (!isConnected()) {
+			log.warn(String.format(
+					"[%s], playAndGetDigits, invalid call state", this));
+			lastResult = Result.ChannelInvalidCallState;
+			return lastResult;
+		}
+
+		if (isMediaActive()) {
+			log.warn(String.format(
+					"[%s], playAndGetDigits, invalid media state", this));
+			
+			lastResult = Result.ChannelInvalidMediaState;
+			return lastResult;
+		}
+		prompt = PromptsUtils.prepend(prompt, baseDirectory, "/sounds/",
+				language.toString(), "/");
+		
+		lastResult = internalPlayAndGetDigits(max, prompt, timeout,
+				terminators, true);
+		if (lastResult == Result.Ok) {
+			mediaState = MediaState.PlayAndGetDigits;
+		}
+		return lastResult;
+
 	}
 
+
 	final public Result hangup(DisconnectCode disconnectCode) {
-		Result result = internalHangup(disconnectCode.ordinal());
-		if (result == Result.Ok) {
-			state = State.Clearing;
+				
+		log.trace(String.format("[%s] - hangup (%s)", this, disconnectCode));
+		if (getCallState() == CallState.Connected || getCallState() == CallState.Accepted
+				|| getCallState() == CallState.Alerting
+				|| getCallState() == CallState.Dialing
+				|| getCallState() == CallState.Offered || getCallState() == CallState.Conferenced) {
+			lastResult = internalHangup(disconnectCode.ordinal());
+			if (lastResult == Result.Ok){
+				setCallState(CallState.Dropped);
+			}
 		}
-		return result;// TODO need better request/response/event model
+		else{
+			log.warn(String.format("[%s] - hangup invalid call state"));
+			lastResult = Result.ChannelInvalidCallState;
+		}
+		return lastResult;
 	}
 
 	final public Result playback(String[] prompt, String terminators) {
-		if (state != State.Idle) {
-			log.warn(String.format("Channel (%s), playback, invalid state(%s)",
-					this, state));
-			return Result.ChannelInvalidState;
+		log.trace(String.format("[%s] - playback(%s,%s)", this,
+				 prompt, terminators));
+		if (!isConnected()) {
+			log.warn(String.format(
+					"[%s], playback, invalid call state", this));
+			lastResult =  Result.ChannelInvalidCallState;
+			return lastResult;
 		}
+
+		if (isMediaActive()) {
+			log.warn(String.format(
+					"[%s], playback, invalid media state", this));
+			lastResult = Result.ChannelInvalidMediaState;
+			return lastResult;
+		}
+
 		prompt = PromptsUtils.prepend(prompt, baseDirectory, "/sounds/",
 				language.toString(), "/");
 
-		Result result = internalPlayback(prompt, terminators);
-		if (result == Result.Ok) {
-			state = State.MediaBusy;
+		lastResult = internalPlayback(prompt, terminators);
+		if (lastResult == Result.Ok) {
+			mediaState = MediaState.Playback;
 		}
-		return result;
+		return lastResult;
 	}
 
 	final public Result playback(String prompt, String terminators) {
-		if (state != State.Idle) {
-			log.warn(String.format("Channel (%s), playback, invalid state(%s)",
-					this, state));
-			return Result.ChannelInvalidState;
+		log.trace(String.format("[%s] - playback(%s,%s)", this,
+				 prompt, terminators));
+		if (!isConnected()) {
+			log.warn(String.format(
+					"[%s], playback, invalid call state", this));
+			lastResult = Result.ChannelInvalidCallState;
+			return lastResult;
+		}
+
+		if (isMediaActive()) {
+			log.warn(String.format(
+					"[%s], playback, invalid media state", this));
+			lastResult = Result.ChannelInvalidMediaState;
+			return lastResult;
 		}
 		prompt = PromptsUtils.prepend(prompt, baseDirectory, "/sounds/",
 				language.toString(), "/");
 
-		Result result = internalPlayback(prompt, terminators);
-		if (result == Result.Ok) {
-			state = State.MediaBusy;
+		lastResult = internalPlayback(prompt, terminators);
+		if (lastResult == Result.Ok) {
+			mediaState = MediaState.Playback;
 		}
-		return result;
+		return lastResult;
 
 	}
 
 	final public Result answer() {
-		Result result = internalAnswer();
-		if (result == Result.Ok) {
-			state = State.Answering;
+		log.trace(String.format("[%s] - answer", this));
+		
+		if (getCallState() == CallState.Offered){
+			lastResult = internalAnswer();
 		}
-		return result;// TODO need better request/response/event model
+		else{
+			log.warn(String.format("[%s] - answer invalid call state", this));
+			lastResult = Result.ChannelInvalidCallState;
+		}
+		if (lastResult == Result.Ok) {
+			setCallState(CallState.Accepted);
+		}
+		return lastResult;
 	}
 
 	final public Result joinConference(String conferenceId, boolean moderator,
 			boolean startMuted, boolean startDeaf) { // TODO add more parameters
-		if (state != State.Idle) {
-			log.warn(String.format(
-					"Channel(%s), joinConference invalid state(%s)", this,
-					state));
-			return Result.ChannelInvalidState;
-		}
 
-		Result result = internalJoinConference(conferenceId, moderator,
-				startMuted, startDeaf);
-		if (result != Result.Ok) {
-			state = State.Idle;
+		log.trace(String.format("[%s] - joinConference (%s, %s, %s, %s)", conferenceId, moderator, startMuted, startDeaf));
+		if (getCallState() == CallState.Connected) {
+			 lastResult = internalJoinConference(conferenceId, moderator,
+					startMuted, startDeaf);
 		}
-		return result;
+		else{
+			log.warn(String.format("[%s] - hangup invalid call state"));
+			lastResult = Result.ChannelInvalidCallState;
+		}
+		if (lastResult == Result.Ok){
+			setCallState(CallState.Conferenced);
+		}
+		return lastResult;
 	}
 
 	public abstract Result internalJoinConference(String conferenceId,
 			boolean moderator, boolean startMuted, boolean startDeaf);
 
-	final public Result playAndGetDigits(int max, String[] prompt,
-			long timeout, String terminators) {
-		if (state != State.Idle) {
-			log.warn(String.format(
-					"Channel (%s), playAndGetDigits, invalid state(%s)", this,
-					state));
-			return Result.ChannelInvalidState;
-		}
-		prompt = PromptsUtils.prepend(prompt, baseDirectory, "/sounds/",
-				language.toString(), "/");
-		state = State.MediaBusy;
-		Result result = internalPlayAndGetDigits(max, prompt, timeout,
-				terminators, true);
-		if (result != Result.Ok) {
-			state = State.Idle;
-		}
-		return result;
-
-	}
 
 	public abstract Result internalConferenceMute(String conferenceId,
 			String memberId, boolean mute);
 
 	final public Result conferenceMute(boolean mute) {
-		if (state != State.Conferenced) {
+		log.trace(String.format("[%s] conferenceMute(%b)", this, mute));
+		if (getCallState() != CallState.Conferenced) {
 			log.warn(String.format(
-					"Channel (%s), conferenceMute(%b), invalid state (%s)",
-					this, mute, state));
-			return Result.ChannelInvalidState;
+					"Channel (%s), invalid state",
+					this));
+			lastResult = Result.ChannelInvalidCallState;
+			return lastResult;
 		}
-		return internalConferenceMute(conferenceId, memberId, mute);
+		lastResult = internalConferenceMute(conferenceId, memberId, mute);
+		
+		return lastResult;
 	}
 
 	final public Result dial(String address, long timeout) {
 
 		log.trace(String.format("Channel(%s) dialing %s", this, address));
+		
+		if (getCallState() == CallState.Connected || getCallState() == CallState.Accepted				
+				|| getCallState() == CallState.Offered || getCallState() == CallState.AcdQueued) {
 		String tAddress = address;
-		if (address.startsWith("user:")){
-			tAddress = address.substring(5);			
+		if (address.startsWith("user:")) {
+			tAddress = address.substring(5);
 			UserLocation location = Registrar.getInstance().find(tAddress);
-			if (location == null){
-				return Result.UserNotFound;
+			if (location == null) {
+				log.warn(String.format("Channel(%s) - User (%s) not found", this, address));
+				onEvent(new DialFailedEvent(this, DialStatus.InvalidNumber));
+				lastResult = Result.UserNotFound;
 			}
-			tAddress = location.getAddress(_switch);
+			else{
+				tAddress = location.getAddress(_switch);
+			}
 		}
-		Result result = internalDial(tAddress, timeout);
-		return result;
+		 lastResult = internalDial(tAddress, timeout);		
+		}
+		else{
+			log.warn(String.format(
+					"Channel (%s), invalid state",
+					this));
+			lastResult = Result.ChannelInvalidCallState;			
+		}
+		return lastResult;
 	}
 
 	public boolean onEvent(Event e) {
 		if (e == null)
 			return true;
-		log.trace("Channel " + this + ", got event " + e);
+		log.trace(String.format(">>>>> %s : %s", this, e));
 		switch (e.getEventType()) {
 		case DTMF: {
 			DtmfEvent event = (DtmfEvent) e;
 			dtmfBuffer += event.getDigit();
 		}
-		break;
+			break;
 		case PlaybackEnded:
 		case PlayAndGetDigitsEnded:
 		case AnswerFailed:
 		case PlaybackFailed:
 		case PlayAndGetDigitsFailed:
 		case QueueLeft:
-			state = State.Idle;
+			setCallState(CallState.Connected);
 			break;
-		case Answered:
-			state = State.Idle;
+		case Offered:
+			setCallState(CallState.Offered);
+			break;
+		case CONNECTED:
+			setCallState(CallState.Connected);
 			setAnswerTime(new DateTime());
 			sendInterimUpdate();
 			interimUpdateTimer = Timers.getInstance().startTimer(
 					this,
 					SystemConfig.getInstance().serverDefinition
-					.getInterimUpdate() * 1000, false,
+							.getInterimUpdate() * 1000, false,
 					TimersDefs.InterimUpdateTimer);
 
 			break;
 		case AcdQueueJoined:
-			state = State.AcdQueued;
+			setCallState(CallState.AcdQueued);
 			break;
 		case Alerting: {
 			AlertingEvent ie = (AlertingEvent) e;
-			state = State.Alering;
+			setCallState(CallState.Alerting);
 			setupTime = new DateTime();
 		}
-		break;
-		case Hangup: {
-			HangupEvent he = (HangupEvent) e;
+			break;
+		case DISCONNECTED: {
+			DisconnectedEvent he = (DisconnectedEvent) e;
 			hangupTime = new DateTime();
-			h323DisconnectCause = he.getHangupCause();
+			h323DisconnectCause = he.getDisconnectCause();
 			stopTimers();
 		}
-		break;
+			break;
 		case QueueJoined:
-			state = State.Queued;
+			setCallState(CallState.Queued);
 			break;
 		case ConferenceJoined: {
 			ConferenceJoinedEvent cje = (ConferenceJoinedEvent) e;
 			this.conferenceId = cje.getConferenceId();
 			this.memberId = cje.getParticipantId();
-			state = State.Conferenced;
+			setCallState(CallState.Conferenced);
 		}
-		break;
+			break;
 		case ConferenceLeft: {
 			this.conferenceId = null;
 			this.memberId = null;
-			state = State.Idle;
+			setCallState(CallState.Connected);
 		}
-		break;
+			break;
 		}
 
 		EventsManager.getInstance().onEvent(e);
@@ -493,10 +585,11 @@ public abstract class Channel implements TimerNotifiable {
 		} catch (Exception ex) {
 			log.fatal(AdmUtils.getStackTrace(ex));
 		}
-		if (e.getEventType() == EventType.Hangup) {
+		if (e.getEventType() == EventType.DISCONNECTED) {
 			removeAllEventListeners();
 			_switch.removeChannel(this);
 		}
+		log.trace(String.format("<<<<<< %s : %s", this, e));
 		return false;
 	}
 
@@ -525,17 +618,13 @@ public abstract class Channel implements TimerNotifiable {
 	@Override
 	public String toString() {
 		return "Channel ["
-		+ (callOrigin != null ? "callOrigin=" + callOrigin + ", " : "")
-		+ (id != null ? "id=" + id + ", " : "")
-		+ (getAccountCode() != null ? "getAccountCode()="
-				+ getAccountCode() + ", " : "")
-				+ (getLanguage() != null ? "getLanguage()=" + getLanguage()
-						+ ", " : "")
-						+ (getServiceNumber() != null ? "getServiceNumber()="
-								+ getServiceNumber() + ", " : "")
-								+ (getState() != null ? "getState()=" + getState() + ", " : "")
-								+ (getUserName() != null ? "getUserName()=" + getUserName()
-										: "") + "]";
+				+ (uniqueId != null ? "uniqueId=" + uniqueId + ", " : "")
+				+ (callState != null ? "callState=" + callState + ", " : "")
+				+ (mediaState != null ? "mediaState=" + mediaState + ", " : "")
+				+ (callOrigin != null ? "callOrigin=" + callOrigin + ", " : "")
+				+ (lastResult != null ? "lastResult=" + lastResult + ", " : "")
+				+ (channelData != null ? "channelData=" + channelData : "")
+				+ "]";
 	}
 
 	public Integer getH323DisconnectCause() {
@@ -601,21 +690,29 @@ public abstract class Channel implements TimerNotifiable {
 			HangupRequest hr = (HangupRequest) request;
 			Result result = hangup(hr.getDisconnectCode());
 		}
-		break;
+			break;
 		case AnswerRequest: {
 			answer();
 		}
-		break;
+			break;
 		case ParticipantMuteRequest: {
 			ParticipantMuteRequest pmr = (ParticipantMuteRequest) request;
 			conferenceMute(pmr.isMute());
 		}
-		break;
+			break;
 		case DialRequest: {
 			DialRequest dialRequest = (DialRequest) request;
 			dial(dialRequest.getDestination(), dialRequest.getTimeout());
 		}
-		break;
+			break;
 		}
+	}
+
+	public void setCallState(CallState callState) {
+		this.callState = callState;
+	}
+
+	public CallState getCallState() {
+		return callState;
 	}
 }

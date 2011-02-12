@@ -10,6 +10,22 @@ public class FSChannelExecuteCompleteEvent extends FSChannelEvent {
 	FSApplication application;
 	String applicationData;
 	
+	public FSApplication getApplication() {
+		return application;
+	}
+
+	public void setApplication(FSApplication application) {
+		this.application = application;
+	}
+
+	public String getApplicationData() {
+		return applicationData;
+	}
+
+	public void setApplicationData(String applicationData) {
+		this.applicationData = applicationData;
+	}
+
 	public FSChannelExecuteCompleteEvent(String switchId, Map values) {
 		super(switchId, values);
 		eventType = EventType.ChannelExecuteComplete;

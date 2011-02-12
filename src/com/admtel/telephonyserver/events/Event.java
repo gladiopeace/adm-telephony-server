@@ -4,8 +4,8 @@ public abstract class Event {
 	
 	
 	public enum EventType {		
-		Hangup,
-		Answered,
+		DISCONNECTED,
+		CONNECTED,
 		PlaybackStarted,
 		PlaybackEnded,
 		PlayAndGetDigitsStarted,
@@ -15,9 +15,8 @@ public abstract class Event {
 		PlayAndGetDigitsFailed, 
 		PlaybackFailed, 
 		HangupFailed, 		 
-		DialFailed, 
 		Linked, 
-		DialStarted, ConferenceJoined, ConferenceLeft, ConferenceTalk, QueueJoined, QueueLeft, QueueJoinFailed, ConferenceMuted, ChannelListed, QueueBridged, AcdQueueBridged, AcdQueueFailed, AcdQueueJoined, AcdQueueLeft, AcdQueueBridgeFailed,
+		DialStarted, ConferenceJoined, ConferenceLeft, ConferenceTalk, QueueJoined, QueueLeft, QueueJoinFailed, ConferenceMuted, ChannelListed, QueueBridged, AcdQueueBridged, AcdQueueFailed, AcdQueueJoined, AcdQueueLeft, AcdQueueBridgeFailed, DialFailed, Offered,
 	}
 	
 	protected EventType eventType;	

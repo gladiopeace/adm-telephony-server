@@ -5,9 +5,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import com.admtel.telephonyserver.events.AnsweredEvent;
+import com.admtel.telephonyserver.events.ConnectedEvent;
 import com.admtel.telephonyserver.events.Event;
-import com.admtel.telephonyserver.events.HangupEvent;
+import com.admtel.telephonyserver.events.DisconnectedEvent;
 import com.admtel.telephonyserver.events.AlertingEvent;
 import dp.lib.dto.geda.assembler.DTOAssembler;
 
@@ -49,8 +49,8 @@ public class EventDtoBuilder {
 		try{			
 		BUILDER_MAP.put(AlertingEvent.class,
 				AlertingEventDto.class);
-		BUILDER_MAP.put(AnsweredEvent.class, AnsweredEventDto.class);
-		BUILDER_MAP.put(HangupEvent.class, HangupEventDto.class);		
+		BUILDER_MAP.put(ConnectedEvent.class, AnsweredEventDto.class);
+		BUILDER_MAP.put(DisconnectedEvent.class, HangupEventDto.class);		
 		}
 		catch (Exception e){
 			log.fatal(e.getMessage(), e);

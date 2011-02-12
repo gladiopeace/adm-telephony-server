@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scripts>
+
+
+<script name="InboundTest">
+<called>1</called>
+<class>com.admtel.telephonyserver.scripts.InboundTestScript</class>
+</script>
+
+<script name="InboundTest2">
+<called>2</called>
+<class>com.admtel.telephonyserver.scripts.InboundTestScript2</class>
+</script>
+
  <script name="voicemail">
   <called>1234</called>
   <class>com.admtel.telephonyserver.scripts.SimpleTestScript</class>

@@ -242,7 +242,7 @@ public class CLI_Connection extends IoHandlerAdapter {
 				Channel channel = channelIt.next();
 				session.write(String.format("\t%s\t%s\t%s\n", _switch
 						.getDefinition().getId(), channel.getId(), channel
-						.getState()));
+						.getCallState()));
 			}
 		}
 
