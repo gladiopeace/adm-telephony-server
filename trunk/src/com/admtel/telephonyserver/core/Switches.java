@@ -16,7 +16,7 @@ import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.SwitchDefinition;
 import com.admtel.telephonyserver.events.ChannelEvent;
 import com.admtel.telephonyserver.events.Event;
-import com.admtel.telephonyserver.events.HangupEvent;
+import com.admtel.telephonyserver.events.DisconnectedEvent;
 import com.admtel.telephonyserver.freeswitch.FSSwitch;
 import com.admtel.telephonyserver.interfaces.EventListener;
 import com.admtel.telephonyserver.requests.ChannelRequest;
@@ -229,8 +229,8 @@ public class Switches implements DefinitionChangeListener, EventListener {
 	@Override
 	public boolean onEvent(Event event) {
 		switch (event.getEventType()) {
-		case Hangup: {
-			HangupEvent he = (HangupEvent) event;
+		case DISCONNECTED: {
+			DisconnectedEvent he = (DisconnectedEvent) event;
 			removeChannel(he.getChannel());
 		}
 			break;

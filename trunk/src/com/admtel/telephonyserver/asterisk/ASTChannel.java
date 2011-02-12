@@ -30,7 +30,7 @@ import com.admtel.telephonyserver.asterisk.events.ASTNewChannelEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTNewStateEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTEvent.EventType;
 import com.admtel.telephonyserver.core.Timers.Timer;
-import com.admtel.telephonyserver.events.AnsweredEvent;
+import com.admtel.telephonyserver.events.ConnectedEvent;
 import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
 import com.admtel.telephonyserver.events.ConferenceMutedEvent;
@@ -38,7 +38,7 @@ import com.admtel.telephonyserver.events.ConferenceTalkEvent;
 import com.admtel.telephonyserver.events.DialFailedEvent;
 import com.admtel.telephonyserver.events.DialStartedEvent;
 import com.admtel.telephonyserver.events.DialStatus;
-import com.admtel.telephonyserver.events.HangupEvent;
+import com.admtel.telephonyserver.events.DisconnectedEvent;
 import com.admtel.telephonyserver.events.AlertingEvent;
 import com.admtel.telephonyserver.events.PlayAndGetDigitsEndedEvent;
 import com.admtel.telephonyserver.events.PlayAndGetDigitsStartedEvent;
@@ -313,7 +313,7 @@ public class ASTChannel extends Channel {
 					currentState = new OutboundAlertingState();
 					break;
 				case Answer:
-					ASTChannel.this.onEvent(new AnsweredEvent(ASTChannel.this));
+					ASTChannel.this.onEvent(new ConnectedEvent(ASTChannel.this));
 					currentState = new IdleState();
 					break;
 				}
@@ -329,7 +329,7 @@ public class ASTChannel extends Channel {
 					currentState = new OutboundAlertingState();
 					break;
 				case Answer:
-					ASTChannel.this.onEvent(new AnsweredEvent(ASTChannel.this));
+					ASTChannel.this.onEvent(new ConnectedEvent(ASTChannel.this));
 					currentState = new IdleState();
 					break;
 				}
@@ -837,18 +837,18 @@ public class ASTChannel extends Channel {
 					.debug(String
 							.format(
 									"START processing event (%s) state (%s), internalState(%s)",
-									astEvent, state, currentState.getClass()
+									astEvent, getCallState(), currentState.getClass()
 											.getSimpleName()));
 
 			switch (astEvent.getEventType()) {
 			case Hangup: {
 				ASTHangupEvent asthe = (ASTHangupEvent) astEvent;
-				HangupEvent he = new HangupEvent(ASTChannel.this);
-				he.setHangupCauseStr(asthe.getCauseTxt());
+				DisconnectedEvent he = new DisconnectedEvent(ASTChannel.this);
+				he.setDisconnectCauseStr(asthe.getCauseTxt());
 				try {
-					he.setHangupCause(Integer.parseInt(asthe.getCause()));
+					he.setDisconnectCause(Integer.parseInt(asthe.getCause()));
 				} catch (Exception e) {
-					he.setHangupCause(16);
+					he.setDisconnectCause(16);
 				}
 				ASTChannel.this.onEvent(he);
 			}
@@ -856,7 +856,7 @@ public class ASTChannel extends Channel {
 			case NewState: {
 				ASTNewStateEvent nse = (ASTNewStateEvent) astEvent;
 				if (nse.getChannelState() == ASTChannelState.Answer) {
-					ASTChannel.this.onEvent(new AnsweredEvent(ASTChannel.this));
+					ASTChannel.this.onEvent(new ConnectedEvent(ASTChannel.this));
 				}
 			}
 				break;
@@ -868,7 +868,7 @@ public class ASTChannel extends Channel {
 			
 			log.debug(String.format(
 					"END processing event (%s) state (%s), internalState(%s)",
-					astEvent, state, currentState.getClass().getSimpleName()));
+					astEvent, getCallState(), currentState.getClass().getSimpleName()));
 		}
 	}
 

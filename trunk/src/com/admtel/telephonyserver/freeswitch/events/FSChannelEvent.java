@@ -36,5 +36,7 @@ public abstract class FSChannelEvent extends FSEvent {
 	public String getAccountCode(){
 		return values.get("variable_accountcode");
 	}
-
+	public String getPeerChannel(){
+		return values.get("Other-Leg-Unique-ID");
+	}
 }

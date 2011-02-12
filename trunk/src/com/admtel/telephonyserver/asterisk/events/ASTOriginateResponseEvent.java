@@ -2,7 +2,6 @@ package com.admtel.telephonyserver.asterisk.events;
 
 import java.util.Map;
 
-import com.admtel.telephonyserver.events.DialFailedEvent;
 import com.admtel.telephonyserver.events.DialStatus;
 
 public class ASTOriginateResponseEvent extends ASTChannelEvent {

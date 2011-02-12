@@ -17,8 +17,9 @@ import com.admtel.telephonyserver.core.Timers;
 import com.admtel.telephonyserver.events.AcdQueueBridgeFailedEvent;
 import com.admtel.telephonyserver.events.AcdQueueFailedEvent;
 import com.admtel.telephonyserver.events.DialFailedEvent;
+import com.admtel.telephonyserver.events.DialStatus;
 import com.admtel.telephonyserver.events.Event;
-import com.admtel.telephonyserver.events.HangupEvent;
+import com.admtel.telephonyserver.events.DisconnectedEvent;
 import com.admtel.telephonyserver.interfaces.EventListener;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.requests.DialRequest;
@@ -55,9 +56,9 @@ public class AcdManager implements EventListener, TimerNotifiable {
 	@Override
 	public boolean onEvent(Event event) {
 		switch (event.getEventType()) {
-		case Hangup: {
-			HangupEvent he = (HangupEvent) event;
-			if (he.getChannel().getState() == Channel.State.AcdQueued) {
+		case DISCONNECTED: {
+			DisconnectedEvent he = (DisconnectedEvent) event;
+			if (he.getChannel().getCallState() == Channel.CallState.AcdQueued) {
 				if (acdService.containsChannel(he.getChannel().getUniqueId())) {
 					acdService.unqueueChannel(he.getChannel().getUniqueId());
 				}
@@ -66,10 +67,15 @@ public class AcdManager implements EventListener, TimerNotifiable {
 		}
 			break;
 		case DialFailed: {
-			DialFailedEvent dfe = (DialFailedEvent) event;
-			if (dfe.getChannel().getState() == Channel.State.AcdQueued) {
-				if (acdService.containsChannel(dfe.getChannel().getUniqueId())) {
-					acdService.requeueChannel(dfe.getChannel().getUniqueId());
+			DialFailedEvent dee = (DialFailedEvent) event;
+			if (dee.getChannel().getCallState() == Channel.CallState.AcdQueued) {
+				if (acdService.containsChannel(dee.getChannel().getUniqueId())) {
+					if (dee.getDialStatus() != DialStatus.Answer){
+						acdService.requeueChannel(dee.getChannel().getUniqueId());
+					}
+					else{
+						acdService.unqueueChannel(dee.getChannel().getUniqueId());
+					}
 				}
 			}
 		}

@@ -13,8 +13,4 @@ public class FSChannelBridgeEvent extends FSChannelEvent {
 	public String getChannelId() {
 		return values.get("Unique-ID");
 	}
-	
-	public String getPeerChannelId(){
-		return values.get("Other-Leg-Unique-ID");
-	}
 }
