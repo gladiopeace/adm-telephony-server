@@ -7,32 +7,38 @@ import org.apache.log4j.Logger;
 import com.admtel.telephonyserver.config.DefinitionChangeListener;
 import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.RegistrarDefinition;
+import com.admtel.telephonyserver.events.Event;
+import com.admtel.telephonyserver.interfaces.EventListener;
 import com.admtel.telephonyserver.interfaces.RegistrarInterface;
 import com.admtel.telephonyserver.registrar.UserLocation;
 
-public class Registrar implements DefinitionChangeListener, RegistrarInterface {
+public class Registrar implements DefinitionChangeListener, RegistrarInterface,
+		EventListener {
 
 	Logger log = Logger.getLogger(Registrar.class);
-	
+
 	RegistrarInterface registrar;
 	Boolean enabled;
-	
-	private Registrar(){
-		
+
+	private Registrar() {
+
 	}
+
 	private static class SingletonHolder {
 		private final static Registrar instance = new Registrar();
 	}
-	
-	static public Registrar getInstance(){
+
+	static public Registrar getInstance() {
 		return SingletonHolder.instance;
 	}
-	
+
 	@Override
 	public void definitionAdded(DefinitionInterface definition) {
-		if (definition instanceof RegistrarDefinition){
-			RegistrarDefinition registrarDefinition = (RegistrarDefinition)definition;
-			registrar = SmartClassLoader.createInstance(RegistrarInterface.class, registrarDefinition.getClassName());
+		if (definition instanceof RegistrarDefinition) {
+			RegistrarDefinition registrarDefinition = (RegistrarDefinition) definition;
+			registrar = SmartClassLoader.createInstance(
+					RegistrarInterface.class,
+					registrarDefinition.getClassName());
 		}
 	}
 
@@ -51,7 +57,7 @@ public class Registrar implements DefinitionChangeListener, RegistrarInterface {
 
 	@Override
 	public UserLocation find(String user) {
-		if (registrar != null){
+		if (registrar != null) {
 			return registrar.find(user);
 		}
 		return null;
@@ -59,14 +65,14 @@ public class Registrar implements DefinitionChangeListener, RegistrarInterface {
 
 	@Override
 	public void register(UserLocation userLocation) {
-		if (registrar != null){
+		if (registrar != null) {
 			registrar.register(userLocation);
 		}
 	}
 
 	@Override
 	public void unregister(String user) {
-		if (registrar != null){
+		if (registrar != null) {
 			registrar.unregister(user);
 		}
 	}
@@ -79,5 +85,16 @@ public class Registrar implements DefinitionChangeListener, RegistrarInterface {
 	@Override
 	public long getCount() {
 		return registrar.getCount();
+	}
+
+	@Override
+	public boolean onEvent(Event event) {
+		switch (event.getEventType()) {
+		case Registered:
+			break;
+		case Unregistered:
+			break;
+		}
+		return false;
 	}
 }

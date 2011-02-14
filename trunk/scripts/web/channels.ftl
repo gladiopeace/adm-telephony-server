@@ -8,16 +8,20 @@
     <p>The messages are:
     <table border=0 cellspacing=2 cellpadding=2 width="100%">
       <tr align=center valign=top>
-        <th bgcolor="#C0C0C0">Id        
-        <th bgcolor="#C0C0C0">Calling Station Id      
-        <th bgcolor="#C0C0C0">Called Station Id        
-        <th bgcolor="#C0C0C0">Direction
+        <th bgcolor="#C0C0C0">Id</th>        
+        <th bgcolor="#C0C0C0">Calling Station Id</th>      
+        <th bgcolor="#C0C0C0">Called Station Id</th>  
+        <th bgcolor="#C0C0C0">Direction</th>
+        <th bgcolor="#C0C0C0">Call State</th>
+        <th bgcolor="#C0C0C0">Media State</th>
       <#list channels as c>
         <tr align=left valign=top>          
           <td bgcolor="#A0A0A0">${c.uniqueId}</td>
           <td bgcolor="#A0A0A0">${c.callingStationId}</td>
           <td bgcolor="#A0A0A0">${c.calledStationId}</td>
           <td bgcolor="#A0A0A0">${c.callOrigin}</td>
+          <td bgcolor="#A0A0A0">${c.callState}</td>
+          <td bgcolor="#A0A0A0">${c.mediaState}</td>
           <td bgcolor="#E0E0E0"><form action="webconf" method="get" enctype="application/x-www-form-urlencoded"><input name="destination" type="text" id="destination" />
             <label>
               <input type="text" name="timeout" id="timeout">

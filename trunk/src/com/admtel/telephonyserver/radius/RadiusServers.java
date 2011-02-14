@@ -129,7 +129,7 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 		case Alerting:
 			onAlerting((AlertingEvent) event);
 			break;
-		case DISCONNECTED:
+		case Disconnected:
 			onHangupEvent((DisconnectedEvent) event);
 			break;
 		}

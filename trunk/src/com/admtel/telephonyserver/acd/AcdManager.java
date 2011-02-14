@@ -56,7 +56,7 @@ public class AcdManager implements EventListener, TimerNotifiable {
 	@Override
 	public boolean onEvent(Event event) {
 		switch (event.getEventType()) {
-		case DISCONNECTED: {
+		case Disconnected: {
 			DisconnectedEvent he = (DisconnectedEvent) event;
 			if (he.getChannel().getCallState() == Channel.CallState.AcdQueued) {
 				if (acdService.containsChannel(he.getChannel().getUniqueId())) {

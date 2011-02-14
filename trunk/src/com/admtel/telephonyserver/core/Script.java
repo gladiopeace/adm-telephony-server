@@ -112,7 +112,7 @@ public abstract class Script implements EventListener{
 
 		processEvent(event);
 		
-		if (event.getEventType() == Event.EventType.DISCONNECTED){
+		if (event.getEventType() == Event.EventType.Disconnected){
 			DisconnectedEvent he = (DisconnectedEvent) event;
 			removeChannel(he.getChannel());
 		}

@@ -17,7 +17,7 @@ public class DisconnectedEvent extends ChannelEvent {
 	
 	public DisconnectedEvent(Channel channel) {
 		super(channel);
-		eventType = EventType.DISCONNECTED;
+		eventType = EventType.Disconnected;
 	}
 
 	public String getDisconnectCauseStr() {

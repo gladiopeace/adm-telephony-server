@@ -3,9 +3,13 @@ package com.admtel.telephonyserver.events;
 public abstract class Event {
 	
 	
+	@Override
+	public String toString() {
+		return (eventType != null ? "eventType=" + eventType : "");
+	}
 	public enum EventType {		
-		DISCONNECTED,
-		CONNECTED,
+		Disconnected,
+		Connected,
 		PlaybackStarted,
 		PlaybackEnded,
 		PlayAndGetDigitsStarted,
@@ -16,7 +20,7 @@ public abstract class Event {
 		PlaybackFailed, 
 		HangupFailed, 		 
 		Linked, 
-		DialStarted, ConferenceJoined, ConferenceLeft, ConferenceTalk, QueueJoined, QueueLeft, QueueJoinFailed, ConferenceMuted, ChannelListed, QueueBridged, AcdQueueBridged, AcdQueueFailed, AcdQueueJoined, AcdQueueLeft, AcdQueueBridgeFailed, DialFailed, Offered,
+		DialStarted, ConferenceJoined, ConferenceLeft, ConferenceTalk, QueueJoined, QueueLeft, QueueJoinFailed, ConferenceMuted, ChannelListed, QueueBridged, AcdQueueBridged, AcdQueueFailed, AcdQueueJoined, AcdQueueLeft, AcdQueueBridgeFailed, DialFailed, Offered, Registered, Unregistered,
 	}
 	
 	protected EventType eventType;	

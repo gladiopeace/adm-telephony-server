@@ -41,8 +41,8 @@ class PlayAndGetDigitsTest extends Script {
 	def waitForCall={
 			Event event = it
 			switch (event.getEventType()){
-			case Event.EventType.InboundAlerting:
-				InboundAlertingEvent iae = event
+			case Event.EventType.Offered:
+				OfferedEvent iae = event
 				iae.getChannel().answer()
 				currentState = answering
 				break;
@@ -51,8 +51,8 @@ class PlayAndGetDigitsTest extends Script {
 	def answering={
 		Event event = it
 		switch (event.getEventType()){
-			case Event.EventType.Answered:
-				AnsweredEvent ae = event
+			case Event.EventType.Connected:
+				ConnectedEvent ae = event
 			String[] prompts =["ivr/8000/ivr-sample_submenu",
 				"ivr/ivr-account_number",
 				"ivr/ivr-sample_submenu"]

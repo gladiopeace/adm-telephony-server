@@ -81,7 +81,7 @@ public class SimpleTestScript extends Script {
 	private void processAnsweringState(Event event) {
 		
 		switch (event.getEventType()){
-		case CONNECTED:
+		case Connected:
 		{
 			
 			String[] prompts={"ivr/ivr-welcome_to_freeswitch"};
