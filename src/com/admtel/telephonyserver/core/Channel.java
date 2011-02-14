@@ -286,7 +286,7 @@ public abstract class Channel implements TimerNotifiable {
 	public abstract Result internalAcdQueue(String queueName);
 
 	private boolean isConnected() {
-		return getCallState() != CallState.Connected;
+		return getCallState() == CallState.Connected;
 	}
 
 	private boolean isMediaActive() {
@@ -530,7 +530,7 @@ public abstract class Channel implements TimerNotifiable {
 		case Offered:
 			setCallState(CallState.Offered);
 			break;
-		case CONNECTED:
+		case Connected:
 			setCallState(CallState.Connected);
 			setAnswerTime(new DateTime());
 			sendInterimUpdate();
@@ -550,7 +550,7 @@ public abstract class Channel implements TimerNotifiable {
 			setupTime = new DateTime();
 		}
 			break;
-		case DISCONNECTED: {
+		case Disconnected: {
 			DisconnectedEvent he = (DisconnectedEvent) e;
 			hangupTime = new DateTime();
 			h323DisconnectCause = he.getDisconnectCause();
@@ -585,12 +585,20 @@ public abstract class Channel implements TimerNotifiable {
 		} catch (Exception ex) {
 			log.fatal(AdmUtils.getStackTrace(ex));
 		}
-		if (e.getEventType() == EventType.DISCONNECTED) {
+		if (e.getEventType() == EventType.Disconnected) {
 			removeAllEventListeners();
 			_switch.removeChannel(this);
 		}
 		log.trace(String.format("<<<<<< %s : %s", this, e));
 		return false;
+	}
+
+	public MediaState getMediaState() {
+		return mediaState;
+	}
+
+	public void setMediaState(MediaState mediaState) {
+		this.mediaState = mediaState;
 	}
 
 	public Switch get_switch() {
@@ -615,16 +623,12 @@ public abstract class Channel implements TimerNotifiable {
 		this.answerTime = answerTime;
 	}
 
-	@Override
+	
 	public String toString() {
 		return "Channel ["
-				+ (uniqueId != null ? "uniqueId=" + uniqueId + ", " : "")
 				+ (callState != null ? "callState=" + callState + ", " : "")
 				+ (mediaState != null ? "mediaState=" + mediaState + ", " : "")
-				+ (callOrigin != null ? "callOrigin=" + callOrigin + ", " : "")
-				+ (lastResult != null ? "lastResult=" + lastResult + ", " : "")
-				+ (channelData != null ? "channelData=" + channelData : "")
-				+ "]";
+				+ (uniqueId != null ? "uniqueId=" + uniqueId : "") + "]";
 	}
 
 	public Integer getH323DisconnectCause() {

@@ -7,6 +7,6 @@ public class ConnectedEvent extends ChannelEvent {
 
 	public ConnectedEvent(Channel channel) {
 		super(channel);
-		eventType = EventType.CONNECTED;
+		eventType = EventType.Connected;
 	}
 }

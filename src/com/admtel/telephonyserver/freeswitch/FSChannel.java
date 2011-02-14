@@ -9,13 +9,9 @@ import com.admtel.telephonyserver.acd.AcdManager;
 import com.admtel.telephonyserver.config.SwitchType;
 import com.admtel.telephonyserver.core.AdmAddress;
 import com.admtel.telephonyserver.core.Channel;
-import com.admtel.telephonyserver.core.QueuedMessageHandler;
 import com.admtel.telephonyserver.core.Result;
-import com.admtel.telephonyserver.core.Script;
 import com.admtel.telephonyserver.core.ScriptManager;
 import com.admtel.telephonyserver.core.Switch;
-import com.admtel.telephonyserver.core.Switches;
-import com.admtel.telephonyserver.events.AcdQueueBridgeFailedEvent;
 import com.admtel.telephonyserver.events.AcdQueueFailedEvent;
 import com.admtel.telephonyserver.events.AcdQueueJoinedEvent;
 import com.admtel.telephonyserver.events.ConnectedEvent;
@@ -28,8 +24,6 @@ import com.admtel.telephonyserver.events.DialStartedEvent;
 import com.admtel.telephonyserver.events.DialStatus;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.DisconnectedEvent;
-import com.admtel.telephonyserver.events.AlertingEvent;
-import com.admtel.telephonyserver.events.LinkedEvent;
 import com.admtel.telephonyserver.events.OfferedEvent;
 import com.admtel.telephonyserver.events.PlayAndGetDigitsEndedEvent;
 import com.admtel.telephonyserver.events.PlayAndGetDigitsFailedEvent;
@@ -44,19 +38,14 @@ import com.admtel.telephonyserver.freeswitch.commands.FSDialCommand;
 import com.admtel.telephonyserver.freeswitch.commands.FSMemberMuteCommand;
 import com.admtel.telephonyserver.freeswitch.commands.FSQueueCommand;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelAnsweredEvent;
-import com.admtel.telephonyserver.freeswitch.events.FSChannelBridgeEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelCreateEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelDataEvent;
-import com.admtel.telephonyserver.freeswitch.events.FSChannelDestroyEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelExecuteCompleteEvent;
-import com.admtel.telephonyserver.freeswitch.events.FSChannelExecuteEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelHangupEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelOriginateEvent;
-import com.admtel.telephonyserver.freeswitch.events.FSChannelOutgoingEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelStateEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSOriginateDisposition;
-import com.admtel.telephonyserver.freeswitch.events.FSChannelStateEvent.CallState;
 import com.admtel.telephonyserver.freeswitch.events.FSCommandReplyEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSConferenceJoinedEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSConferenceMuteEvent;
@@ -70,25 +59,20 @@ import com.admtel.telephonyserver.freeswitch.events.FSEvent.EventType;
 import com.admtel.telephonyserver.utils.AdmUtils;
 import com.admtel.telephonyserver.utils.CodecsUtils;
 import com.admtel.telephonyserver.utils.PromptsUtils;
-import com.admtel.telephonyserver.events.QueueLeftEvent;
 
 public class FSChannel extends Channel {
 
 	@Override
 	public String toString() {
 		return "FSChannel ["
-				+ (super.toString() != null ? "toString()=" + super.toString()
+				+ (internalState != null ? "currentCallState=" + internalState
 						+ ", " : "")
-				+ (currentCallState != null ? "currentCallState="
-						+ currentCallState + ", " : "")
-				+ (currentMediaState != null ? "currentMediaState="
-						+ currentMediaState + ", " : "")
-				+ (session != null ? "session=" + session : "") + "]";
+				+ (super.toString() != null ? "toString()=" + super.toString()
+						: "") + "]";
 	}
 
 	private IoSession session;
-	private State currentCallState = new NullState();
-	private State currentMediaState = new NullState();
+	private State internalState = new NullState();
 
 	static Logger fsChannelLog = Logger.getLogger(FSChannel.class);
 
@@ -97,7 +81,7 @@ public class FSChannel extends Channel {
 
 		public abstract boolean onTimer(Object data);
 
-		Result result;
+		Result result = Result.Ok;
 
 		public void setResult(Result result) {
 			this.result = result;
@@ -126,15 +110,15 @@ public class FSChannel extends Channel {
 			// TODO Auto-generated method stub
 
 		}
+
 		@Override
-		public String toString(){
+		public String toString() {
 			return "Idle";
 		}
 	}
 
 	private class AlertingState extends State {
 
-		
 		@Override
 		public boolean onTimer(Object data) {
 			// TODO Auto-generated method stub
@@ -143,17 +127,20 @@ public class FSChannel extends Channel {
 
 		@Override
 		public void processEvent(FSEvent fsEvent) {
-			
+
 		}
+
 		@Override
-		public String toString(){
+		public String toString() {
 			return "Alerting";
 		}
 	}
-	private class OfferedState extends State{
 
-		public OfferedState(){			
+	private class OfferedState extends State {
+
+		public OfferedState() {
 		}
+
 		@Override
 		public void processEvent(FSEvent fsEvent) {
 			switch (fsEvent.getEventType()) {
@@ -171,14 +158,10 @@ public class FSChannel extends Channel {
 			}
 				break;
 			case ChannelAnswered:
-				currentCallState = new ConnectedState();
-				FSChannel.this.onEvent(new ConnectedEvent (FSChannel.this));
-				break;	
-			case ChannelHangup:
-				currentCallState = new IdleState();
-				FSChannel.this.onEvent(new DisconnectedEvent(FSChannel.this));
+				internalState = new ConnectedState();
+				FSChannel.this.onEvent(new ConnectedEvent(FSChannel.this));
 				break;
-			}			
+			}
 		}
 
 		@Override
@@ -186,23 +169,20 @@ public class FSChannel extends Channel {
 			// TODO Auto-generated method stub
 			return false;
 		}
+
 		@Override
-		public String toString(){
+		public String toString() {
 			return "Offered";
 		}
 	}
 
-	private class ConnectedState extends State{
+	private class ConnectedState extends State {
 
 		@Override
 		public void processEvent(FSEvent fsEvent) {
-			switch (fsEvent.getEventType()){
-			case ChannelHangup:
-				currentCallState = new IdleState();
-				FSChannel.this.onEvent(new DisconnectedEvent(FSChannel.this));				
-				break;
+			switch (fsEvent.getEventType()) {
 			}
-			
+
 		}
 
 		@Override
@@ -210,17 +190,19 @@ public class FSChannel extends Channel {
 			// TODO Auto-generated method stub
 			return false;
 		}
+
 		@Override
-		public String toString(){
+		public String toString() {
 			return "Connected";
 		}
 	}
-	private class DisconnectedState extends State{
+
+	private class DisconnectedState extends State {
 
 		@Override
 		public void processEvent(FSEvent fsEvent) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
@@ -228,8 +210,9 @@ public class FSChannel extends Channel {
 			// TODO Auto-generated method stub
 			return false;
 		}
+
 		@Override
-		public String toString(){
+		public String toString() {
 			return "Disconnected";
 		}
 	}
@@ -261,14 +244,14 @@ public class FSChannel extends Channel {
 					getChannelData().setLoginIP(cse.getChannelAddress());
 					getChannelData().setAccountCode(cse.getAccountCode());
 					getChannelData().setServiceNumber(cse.getCalledIdNum());
-					switch (cse.getDirection()){
+					switch (cse.getDirection()) {
 					case Inbound:
-						currentCallState = new OfferedState();
+						internalState = new OfferedState();
 						break;
 					case Outbound:
-						currentCallState = new AlertingState();
+						internalState = new AlertingState();
 						break;
-					}										
+					}
 				}
 			}
 				break;
@@ -277,9 +260,10 @@ public class FSChannel extends Channel {
 		}
 
 		@Override
-		public String toString(){
+		public String toString() {
 			return "Null";
 		}
+
 		@Override
 		public boolean onTimer(Object data) {
 			// TODO Auto-generated method stub
@@ -305,7 +289,6 @@ public class FSChannel extends Channel {
 			this.prompt = prompt;
 			this.termDigit = "";
 			execute();
-
 		}
 
 		public PlayingAndGettingDigits(int max, String[] prompts, long timeout,
@@ -317,7 +300,7 @@ public class FSChannel extends Channel {
 			this.terminators = terminators;
 			this.interruptPlay = interruptPlay;
 			this.termDigit = "";
-			execute();
+			execute();			
 		}
 
 		@Override
@@ -410,11 +393,12 @@ public class FSChannel extends Channel {
 
 		String prompt;
 		String terminators;
+
 		public PlayingbackState(String prompt, String terminators) {
 
 			this.prompt = prompt;
 			this.terminators = terminators;
-			
+
 			session.write(buildMessage(getId(), "execute", "set",
 					"playback_delimiter=&"));
 			session.write(buildMessage(getId(), "execute", "set",
@@ -495,8 +479,9 @@ public class FSChannel extends Channel {
 			String fsAddress = _switch.getAddressTranslator().translate(
 					admAddress);
 
-			FSDialCommand cmd = new FSDialCommand(FSChannel.this, fsAddress, timeout);
-			session.write(cmd);			
+			FSDialCommand cmd = new FSDialCommand(FSChannel.this, fsAddress,
+					timeout);
+			session.write(cmd);
 		}
 
 		@Override
@@ -508,7 +493,7 @@ public class FSChannel extends Channel {
 		@Override
 		public void processEvent(FSEvent fsEvent) {
 			switch (fsEvent.getEventType()) {
-			
+
 			case ChannelExecuteComplete: {
 				String originateDisposition = fsEvent
 						.getValue("variable_originate_disposition");
@@ -522,7 +507,7 @@ public class FSChannel extends Channel {
 				FSChannelOriginateEvent coe = (FSChannelOriginateEvent) fsEvent;
 				FSChannel otherChannel = (FSChannel) FSChannel.this.getSwitch()
 						.getChannel(coe.getChannelId());
-				
+
 				if (otherChannel != null) {
 					otherChannel.getChannelData().setLoginIP(
 							coe.getChannelAddress());
@@ -545,18 +530,18 @@ public class FSChannel extends Channel {
 				if (cae.getChannelId() != FSChannel.this.getId()) {
 					FSChannel.this.onEvent(new DialFailedEvent(FSChannel.this,
 							DialStatus.Answer));
-					currentCallState = new IdleState();
+					internalState = new IdleState();
 				}
 			}
 				break;
-			case ChannelHangup:{
+			case ChannelHangup: {
 				FSChannelHangupEvent che = (FSChannelHangupEvent) fsEvent;
-				if (che.getChannelId() != FSChannel.this.getId()){
+				if (che.getChannelId() != FSChannel.this.getId()) {
 					FSChannel.this.onEvent(new DialFailedEvent(FSChannel.this,
-							DialStatus.Congested));//TODO proper hangup cause					
+							DialStatus.Congested));// TODO proper hangup cause
 				}
 			}
-			break;
+				break;
 			}
 
 		}
@@ -735,7 +720,7 @@ public class FSChannel extends Channel {
 			} else {
 				FSChannel.this.onEvent(new AcdQueueFailedEvent(FSChannel.this,
 						queueName, "TODO error"));
-				currentCallState = new IdleState();
+				internalState = new IdleState();
 			}
 		}
 
@@ -809,13 +794,13 @@ public class FSChannel extends Channel {
 	@Override
 	public Result internalDial(String address, long timeout) {
 		if (address != null && address.length() > 0) {
-			currentCallState = new DialingState(address, timeout);
+			internalState = new DialingState(address, timeout);
 		} else {
 			fsChannelLog.warn(String.format("%s, invalid dial string %s",
 					this.getId(), address));
 			return Result.InvalidParameters;
 		}
-		return currentCallState.getResult();
+		return internalState.getResult();
 	}
 
 	@Override
@@ -829,17 +814,17 @@ public class FSChannel extends Channel {
 	@Override
 	public Result internalPlayAndGetDigits(int max, String prompt,
 			long timeout, String terminators, boolean interruptPlay) {
-		currentCallState = new PlayingAndGettingDigits(max, prompt, timeout,
+		internalState = new PlayingAndGettingDigits(max, prompt, timeout,
 				terminators, interruptPlay);
-		return currentCallState.getResult();
+		return internalState.getResult();
 	}
 
 	@Override
 	public Result internalPlayAndGetDigits(int max, String[] prompt,
 			long timeout, String terminators, boolean interruptPlay) {
-		currentCallState = new PlayingAndGettingDigits(max, prompt, timeout,
+		internalState = new PlayingAndGettingDigits(max, prompt, timeout,
 				terminators, interruptPlay);
-		return currentCallState.getResult();
+		return internalState.getResult();
 	}
 
 	@Override
@@ -851,16 +836,16 @@ public class FSChannel extends Channel {
 
 	@Override
 	public Result internalPlayback(String prompt, String terminators) {
-		currentCallState = new PlayingbackState(prompt, terminators);
-		return currentCallState.getResult();
+		internalState = new PlayingbackState(prompt, terminators);
+		return internalState.getResult();
 	}
 
 	@Override
 	public Result internalJoinConference(String conferenceId,
 			boolean moderator, boolean startMuted, boolean startDeaf) {
-		currentCallState = new JoinConferenceState(conferenceId, moderator,
+		internalState = new JoinConferenceState(conferenceId, moderator,
 				startMuted, startDeaf);
-		return currentCallState.getResult();
+		return internalState.getResult();
 	}
 
 	private String buildMessage(String uuid, String command, String app,
@@ -878,20 +863,23 @@ public class FSChannel extends Channel {
 
 	@Override
 	public Result internalQueue(String queueName, boolean agent) {
-		currentCallState = new QueueState(queueName, agent);
-		return currentCallState.getResult();
+		internalState = new QueueState(queueName, agent);
+		return internalState.getResult();
 	}
 
 	@Override
-	synchronized protected void processNativeEvent(Object event) {		
+	synchronized protected void processNativeEvent(Object event) {
 		if (event instanceof FSEvent) {
 			FSEvent fsEvent = (FSEvent) event;
-			if (fsEvent.getEventType() == EventType.ChannelExecuteComplete){
+			if (fsEvent.getEventType() == EventType.ChannelExecuteComplete) {
 				processExecuteComplete((FSChannelExecuteCompleteEvent) fsEvent);
-			}else{
-			if (currentCallState != null && fsEvent instanceof FSChannelEvent) {				
-				currentCallState.processEvent(fsEvent);
 			}
+			if (internalState != null && fsEvent instanceof FSChannelEvent) {
+				internalState.processEvent(fsEvent);
+			}
+
+			if (fsEvent.getEventType() == EventType.ChannelHangup) {
+				FSChannel.this.onEvent(new DisconnectedEvent(FSChannel.this));
 			}
 		}
 	}
@@ -908,16 +896,16 @@ public class FSChannel extends Channel {
 
 	@Override
 	public Result internalAcdQueue(String queueName) {
-		currentCallState = new AcdQueueState(queueName);
+		internalState = new AcdQueueState(queueName);
 
-		return currentCallState.getResult();
+		return internalState.getResult();
 	}
-	
-	protected void processExecuteComplete(FSChannelExecuteCompleteEvent e){
-	 switch (e.getApplication()){
-	 case bridge:
-		 	
-		 break;
-	 }
+
+	protected void processExecuteComplete(FSChannelExecuteCompleteEvent e) {
+		switch (e.getApplication()) {
+		case bridge:
+
+			break;
+		}
 	}
 }

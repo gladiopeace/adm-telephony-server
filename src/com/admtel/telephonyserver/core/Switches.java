@@ -229,7 +229,7 @@ public class Switches implements DefinitionChangeListener, EventListener {
 	@Override
 	public boolean onEvent(Event event) {
 		switch (event.getEventType()) {
-		case DISCONNECTED: {
+		case Disconnected: {
 			DisconnectedEvent he = (DisconnectedEvent) event;
 			removeChannel(he.getChannel());
 		}
