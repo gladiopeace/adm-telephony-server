@@ -269,21 +269,12 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 						channel.setIoSession(message.getSession());
 						break;
-					case ChannelOriginate: {
-						FSChannelOriginateEvent coe = (FSChannelOriginateEvent) event;
-					}
-						break;
 					case ChannelBridge: {
 						FSChannelBridgeEvent cbe = (FSChannelBridgeEvent) event;
 					}
 						break;
 					}
-					channel.putMessage(channelEvent);
-					FSChannel otherChannel = (FSChannel) FSSwitch.this
-							.getChannel(channelEvent.getPeerChannel());
-					if (otherChannel != null) {
-						otherChannel.putMessage(channelEvent);
-					}
+					channel.putMessage(channelEvent);					
 
 				}
 			}

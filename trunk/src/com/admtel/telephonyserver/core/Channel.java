@@ -373,7 +373,7 @@ public abstract class Channel implements TimerNotifiable {
 			}
 		}
 		else{
-			log.warn(String.format("[%s] - hangup invalid call state"));
+			log.warn(String.format("[%s] - hangup invalid call state", this));
 			lastResult = Result.ChannelInvalidCallState;
 		}
 		return lastResult;
@@ -530,7 +530,7 @@ public abstract class Channel implements TimerNotifiable {
 	public boolean onEvent(Event e) {
 		if (e == null)
 			return true;
-		log.trace(String.format(">>>>> %s : %s", this, e));
+		log.trace(String.format("START : %s", e));
 		switch (e.getEventType()) {
 		case DTMF: {
 			DtmfEvent event = (DtmfEvent) e;
@@ -608,7 +608,7 @@ public abstract class Channel implements TimerNotifiable {
 			removeAllEventListeners();
 			_switch.removeChannel(this);
 		}
-		log.trace(String.format("<<<<<< %s : %s", this, e));
+		log.trace(String.format("END : %s", e));
 		return false;
 	}
 
@@ -643,11 +643,13 @@ public abstract class Channel implements TimerNotifiable {
 	}
 
 	
+	@Override
 	public String toString() {
-		return "Channel ["
-				+ (callState != null ? "callState=" + callState + ", " : "")
-				+ (mediaState != null ? "mediaState=" + mediaState + ", " : "")
-				+ (uniqueId != null ? "uniqueId=" + uniqueId : "") + "]";
+		return "\t" + (id != null ? "id=" + id + " \n\t" : "")
+				+ (_switch != null ? "_switch=" + _switch + " \n\t" : "")
+				+ (uniqueId != null ? "uniqueId=" + uniqueId + " \n\t" : "")
+				+ (callState != null ? "callState=" + callState + " \n\t" : "")
+				+ (mediaState != null ? "mediaState=" + mediaState : "");
 	}
 
 	public Integer getH323DisconnectCause() {

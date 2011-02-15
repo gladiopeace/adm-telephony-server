@@ -6,10 +6,12 @@ public class DisconnectedEvent extends ChannelEvent {
 
 	@Override
 	public String toString() {
-		return "DisconnectedEvent ["
+		return "\t"
+				+ (eventType != null ? "eventType=" + eventType + " \n\t" : "")
+				+ (channel != null ? "channel=" + channel + " \n\t" : "")
 				+ (disconnectCauseStr != null ? "disconnectCauseStr="
-						+ disconnectCauseStr + ", " : "") + "disconnectCause="
-				+ disconnectCause + "]";
+						+ disconnectCauseStr + " \n\t" : "")
+				+ "disconnectCause=" + disconnectCause;
 	}
 
 	String disconnectCauseStr;
