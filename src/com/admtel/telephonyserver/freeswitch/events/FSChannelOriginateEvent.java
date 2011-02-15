@@ -11,6 +11,9 @@ public class FSChannelOriginateEvent extends FSChannelEvent {
 
 	@Override
 	public String getChannelId() {
-		return values.get("Unique-ID");
+		return values.get("Other-Leg-Unique-ID");
 	}	
+	public String getPeerChannel(){
+		return values.get("Unique-ID");
+	}
 }

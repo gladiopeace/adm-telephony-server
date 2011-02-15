@@ -4,6 +4,12 @@ import com.admtel.telephonyserver.core.Channel;
 
 public class DialFailedEvent extends ChannelEvent {
 
+	@Override
+	public String toString() {
+		return "[" + (channel != null ? "channel=" + channel + ", " : "")
+				+ (eventType != null ? "eventType=" + eventType + ", " : "")
+				+ (dialStatus != null ? "dialStatus=" + dialStatus : "") + "]";
+	}
 	DialStatus dialStatus = DialStatus.Unknown;
 	
 	public DialFailedEvent(Channel channel) {

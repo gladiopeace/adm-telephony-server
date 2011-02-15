@@ -8,8 +8,8 @@ public class AlertingEvent extends ChannelEvent {
 	@Override
 	public String toString() {
 		return "AlertingEvent ["
-				+ (super.toString() != null ? "toString()=" + super.toString()
-						: "") + "]";
+				+ (channel != null ? "channel=" + channel + ", " : "")
+				+ (eventType != null ? "eventType=" + eventType : "") + "]";
 	}
 
 	public AlertingEvent(Channel channel) {

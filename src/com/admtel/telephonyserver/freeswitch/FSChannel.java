@@ -8,6 +8,7 @@ import org.apache.mina.core.session.IoSession;
 import com.admtel.telephonyserver.acd.AcdManager;
 import com.admtel.telephonyserver.config.SwitchType;
 import com.admtel.telephonyserver.core.AdmAddress;
+import com.admtel.telephonyserver.core.CallOrigin;
 import com.admtel.telephonyserver.core.Channel;
 import com.admtel.telephonyserver.core.Result;
 import com.admtel.telephonyserver.core.ScriptManager;
@@ -64,15 +65,15 @@ public class FSChannel extends Channel {
 
 	@Override
 	public String toString() {
-		return "FSChannel ["
-				+ (internalState != null ? "currentCallState=" + internalState
-						+ ", " : "")
+		return "["
 				+ (super.toString() != null ? "toString()=" + super.toString()
+						+ ", " : "")
+				+ (internalState != null ? "internalState=" + internalState
 						: "") + "]";
 	}
 
 	private IoSession session;
-	private State internalState = new NullState();
+	private State internalState;
 
 	static Logger fsChannelLog = Logger.getLogger(FSChannel.class);
 
@@ -95,10 +96,7 @@ public class FSChannel extends Channel {
 	private class IdleState extends State {
 
 		public IdleState() {
-			session.write(buildMessage(getId(), "execute", "set",
-					"hangup_after_bridge=false"));
-			session.write(buildMessage(getId(), "execute", "set",
-			"continue_on_fail=true"));
+
 		}
 
 		@Override
@@ -129,7 +127,7 @@ public class FSChannel extends Channel {
 
 		@Override
 		public void processEvent(FSEvent fsEvent) {
-			switch (fsEvent.getEventType()){
+			switch (fsEvent.getEventType()) {
 			case ChannelAnswered:
 				internalState = new ConnectedState();
 				FSChannel.this.onEvent(new ConnectedEvent(FSChannel.this));
@@ -225,6 +223,13 @@ public class FSChannel extends Channel {
 	}
 
 	private class NullState extends State {
+
+		public NullState() {
+			session.write(buildMessage(getId(), "execute", "set",
+					"hangup_after_bridge=false"));
+			session.write(buildMessage(getId(), "execute", "set",
+					"continue_on_fail=true"));
+		}
 
 		@Override
 		public void processEvent(FSEvent fsEvent) {
@@ -696,6 +701,7 @@ public class FSChannel extends Channel {
 	public FSChannel(Switch _switch, String id, IoSession session) {
 		super(_switch, id);
 		setIoSession(session);
+		internalState = new NullState();
 	}
 
 	public void setIoSession(IoSession session) {
@@ -808,23 +814,24 @@ public class FSChannel extends Channel {
 				break;
 			case ChannelOriginate: {
 				FSChannelOriginateEvent coe = (FSChannelOriginateEvent) fsEvent;
-				FSChannel otherChannel = (FSChannel) FSChannel.this.getSwitch()
-						.getChannel(coe.getChannelId());
+				FSChannel otherChannel = (FSChannel) getSwitch().getChannel(
+						coe.getPeerChannel());
 
-				if (otherChannel != null) {
+				if (otherChannel != null
+						&& otherChannel.getCallOrigin() == CallOrigin.Outbound) {
 					otherChannel.getChannelData().setLoginIP(
 							coe.getChannelAddress());
-					otherChannel.setAcctUniqueSessionId(FSChannel.this
-							.getAcctUniqueSessionId());
-					otherChannel.setUserName(FSChannel.this.getUserName());
+					otherChannel
+							.setAcctUniqueSessionId(getAcctUniqueSessionId());
+					otherChannel.setUserName(getUserName());
 					otherChannel.getChannelData().setDestinationNumberIn(
-							FSChannel.this.getChannelData().getCalledNumber());
-					otherChannel.getChannelData().setRemoteIP(
-							FSChannel.this.getLoginIP());
-					otherChannel.setOtherChannel(FSChannel.this);
+							getChannelData().getCalledNumber());
+					otherChannel.getChannelData().setRemoteIP(getLoginIP());
+					otherChannel.setOtherChannel(this);
 				}
 				FSChannel.this.onEvent(new DialStartedEvent(FSChannel.this,
 						otherChannel));
+
 			}
 				break;
 			}
@@ -844,14 +851,14 @@ public class FSChannel extends Channel {
 
 	@Override
 	public Result internalAcdQueue(String queueName) {
-				
+
 		Result result = AcdManager.getInstance().queueChannel(queueName,
 				FSChannel.this.getUniqueId(),
-				FSChannel.this.getSetupTime().toDate(), 0); 
-		if ( result == Result.Ok) {// TODO,
+				FSChannel.this.getSetupTime().toDate(), 0);
+		if (result == Result.Ok) {// TODO,
 			// priority
 			onEvent(new AcdQueueJoinedEvent(this, queueName, false));
-		} 
+		}
 
 		return result;
 	}
