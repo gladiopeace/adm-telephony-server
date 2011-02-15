@@ -97,6 +97,8 @@ public class FSChannel extends Channel {
 		public IdleState() {
 			session.write(buildMessage(getId(), "execute", "set",
 					"hangup_after_bridge=false"));
+			session.write(buildMessage(getId(), "execute", "set",
+			"continue_on_fail=true"));
 		}
 
 		@Override
@@ -127,7 +129,12 @@ public class FSChannel extends Channel {
 
 		@Override
 		public void processEvent(FSEvent fsEvent) {
-
+			switch (fsEvent.getEventType()){
+			case ChannelAnswered:
+				internalState = new ConnectedState();
+				FSChannel.this.onEvent(new ConnectedEvent(FSChannel.this));
+				break;
+			}
 		}
 
 		@Override
@@ -300,7 +307,7 @@ public class FSChannel extends Channel {
 			this.terminators = terminators;
 			this.interruptPlay = interruptPlay;
 			this.termDigit = "";
-			execute();			
+			execute();
 		}
 
 		@Override
@@ -464,95 +471,6 @@ public class FSChannel extends Channel {
 			// TODO Auto-generated method stub
 			return false;
 		}
-	}
-
-	private class DialingState extends State {
-
-		final Logger log = Logger.getLogger(DialingState.class);
-
-		AdmAddress admAddress;
-
-		public DialingState(String address, long timeout) {
-
-			admAddress = new AdmAddress(address);
-
-			String fsAddress = _switch.getAddressTranslator().translate(
-					admAddress);
-
-			FSDialCommand cmd = new FSDialCommand(FSChannel.this, fsAddress,
-					timeout);
-			session.write(cmd);
-		}
-
-		@Override
-		public boolean onTimer(Object data) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public void processEvent(FSEvent fsEvent) {
-			switch (fsEvent.getEventType()) {
-
-			case ChannelExecuteComplete: {
-				String originateDisposition = fsEvent
-						.getValue("variable_originate_disposition");
-				if (FSOriginateDisposition.fromString(originateDisposition) == FSOriginateDisposition.USER_NOT_REGISTERED) {
-					FSChannel.this.onEvent(new DialFailedEvent(FSChannel.this,
-							DialStatus.InvalidNumber));
-				}
-			}
-				break;
-			case ChannelOriginate: {
-				FSChannelOriginateEvent coe = (FSChannelOriginateEvent) fsEvent;
-				FSChannel otherChannel = (FSChannel) FSChannel.this.getSwitch()
-						.getChannel(coe.getChannelId());
-
-				if (otherChannel != null) {
-					otherChannel.getChannelData().setLoginIP(
-							coe.getChannelAddress());
-					otherChannel.getChannelData().setCalledNumber(
-							admAddress.getDestination());
-					otherChannel.setAcctUniqueSessionId(FSChannel.this
-							.getAcctUniqueSessionId());
-					otherChannel.setUserName(FSChannel.this.getUserName());
-					otherChannel.getChannelData().setDestinationNumberIn(
-							FSChannel.this.getChannelData().getCalledNumber());
-					otherChannel.getChannelData().setRemoteIP(
-							FSChannel.this.getLoginIP());
-				}
-				FSChannel.this.onEvent(new DialStartedEvent(FSChannel.this,
-						otherChannel));
-			}
-				break;
-			case ChannelAnswered: {
-				FSChannelAnsweredEvent cae = (FSChannelAnsweredEvent) fsEvent;
-				if (cae.getChannelId() != FSChannel.this.getId()) {
-					FSChannel.this.onEvent(new DialFailedEvent(FSChannel.this,
-							DialStatus.Answer));
-					internalState = new IdleState();
-				}
-			}
-				break;
-			case ChannelHangup: {
-				FSChannelHangupEvent che = (FSChannelHangupEvent) fsEvent;
-				if (che.getChannelId() != FSChannel.this.getId()) {
-					FSChannel.this.onEvent(new DialFailedEvent(FSChannel.this,
-							DialStatus.Congested));// TODO proper hangup cause
-				}
-			}
-				break;
-			}
-
-		}
-
-		@Override
-		public String toString() {
-			return "DialingState ["
-					+ (admAddress != null ? "admAddress=" + admAddress : "")
-					+ "]";
-		}
-
 	}
 
 	private class JoinConferenceState extends State {
@@ -794,7 +712,14 @@ public class FSChannel extends Channel {
 	@Override
 	public Result internalDial(String address, long timeout) {
 		if (address != null && address.length() > 0) {
-			internalState = new DialingState(address, timeout);
+			AdmAddress admAddress = new AdmAddress(address);
+
+			String fsAddress = _switch.getAddressTranslator().translate(
+					admAddress);
+
+			FSDialCommand cmd = new FSDialCommand(FSChannel.this, fsAddress,
+					timeout);
+			session.write(cmd);
 		} else {
 			fsChannelLog.warn(String.format("%s, invalid dial string %s",
 					this.getId(), address));
@@ -877,10 +802,33 @@ public class FSChannel extends Channel {
 			if (internalState != null && fsEvent instanceof FSChannelEvent) {
 				internalState.processEvent(fsEvent);
 			}
-
-			if (fsEvent.getEventType() == EventType.ChannelHangup) {
+			switch (fsEvent.getEventType()) {
+			case ChannelHangup:
 				FSChannel.this.onEvent(new DisconnectedEvent(FSChannel.this));
+				break;
+			case ChannelOriginate: {
+				FSChannelOriginateEvent coe = (FSChannelOriginateEvent) fsEvent;
+				FSChannel otherChannel = (FSChannel) FSChannel.this.getSwitch()
+						.getChannel(coe.getChannelId());
+
+				if (otherChannel != null) {
+					otherChannel.getChannelData().setLoginIP(
+							coe.getChannelAddress());
+					otherChannel.setAcctUniqueSessionId(FSChannel.this
+							.getAcctUniqueSessionId());
+					otherChannel.setUserName(FSChannel.this.getUserName());
+					otherChannel.getChannelData().setDestinationNumberIn(
+							FSChannel.this.getChannelData().getCalledNumber());
+					otherChannel.getChannelData().setRemoteIP(
+							FSChannel.this.getLoginIP());
+					otherChannel.setOtherChannel(FSChannel.this);
+				}
+				FSChannel.this.onEvent(new DialStartedEvent(FSChannel.this,
+						otherChannel));
 			}
+				break;
+			}
+
 		}
 	}
 
@@ -896,14 +844,28 @@ public class FSChannel extends Channel {
 
 	@Override
 	public Result internalAcdQueue(String queueName) {
-		internalState = new AcdQueueState(queueName);
+				
+		Result result = AcdManager.getInstance().queueChannel(queueName,
+				FSChannel.this.getUniqueId(),
+				FSChannel.this.getSetupTime().toDate(), 0); 
+		if ( result == Result.Ok) {// TODO,
+			// priority
+			onEvent(new AcdQueueJoinedEvent(this, queueName, false));
+		} 
 
-		return internalState.getResult();
+		return result;
 	}
 
 	protected void processExecuteComplete(FSChannelExecuteCompleteEvent e) {
 		switch (e.getApplication()) {
 		case bridge:
+			String originateDisposition = e
+					.getValue("variable_originate_disposition");
+			if (FSOriginateDisposition.fromString(originateDisposition) == FSOriginateDisposition.USER_NOT_REGISTERED) {
+				FSChannel.this.onEvent(new DialFailedEvent(FSChannel.this,
+						DialStatus.InvalidNumber));
+
+			}
 
 			break;
 		}

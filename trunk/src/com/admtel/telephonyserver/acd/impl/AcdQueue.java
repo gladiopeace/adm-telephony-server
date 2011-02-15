@@ -22,6 +22,7 @@ public class AcdQueue {
 
 	private AgentDequeuePolicy agentDequeuePolicy = AgentDequeuePolicy.LastUsed; 
 	private List<AcdAgent> rrAgents = new ArrayList<AcdAgent>();
+ 
 	public AcdQueue(){
 		
 	}
@@ -83,5 +84,8 @@ public class AcdQueue {
 	}
 	public String getName() {
 		return name;		
+	}
+	public String[] getChannels(){
+		return (String[]) waitingChannels.toArray();
 	}
 }

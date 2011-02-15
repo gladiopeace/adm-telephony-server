@@ -8,6 +8,7 @@ import com.admtel.telephonyserver.httpserver.HttpRequestMessage;
 import com.admtel.telephonyserver.httpserver.HttpResponseMessage;
 import com.admtel.telephonyserver.requests.*;
 import com.admtel.telephonyserver.httpserver.AdmServlet;
+import com.admtel.telephonyserver.acd.AcdManager;
 
 import freemarker.template.*;
 
@@ -49,6 +50,10 @@ class WebConfServlet extends AdmServlet {
 	def scripts(request){
 		def s = ScriptManager.getInstance().getScripts();
 		['scripts':s]
+	}
+	def queues(request){
+		String[] q = AcdManager.getInstance().getQueues();
+		['queues':q]
 	}
 	def dial(request){
 		String destination = URLDecoder.decode(request.getParameter('destination'))

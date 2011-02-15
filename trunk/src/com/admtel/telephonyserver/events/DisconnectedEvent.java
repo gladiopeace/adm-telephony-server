@@ -13,13 +13,13 @@ public class DisconnectedEvent extends ChannelEvent {
 	}
 
 	String disconnectCauseStr;
-	int disconnectCause;
+	int disconnectCause;	
 	
 	public DisconnectedEvent(Channel channel) {
 		super(channel);
-		eventType = EventType.Disconnected;
+		eventType = EventType.Disconnected;		
 	}
-
+	
 	public String getDisconnectCauseStr() {
 		return disconnectCauseStr;
 	}

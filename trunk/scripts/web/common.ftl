@@ -20,7 +20,11 @@
     	 		</tr>
 				<tr>
     	 			<td><a href="?action=scripts">Scripts</a></td>
+    	 		</tr>
+    	 		<tr>
+    	 			<td><a href="?action=queues">Queues</a></td>
     	 		</tr>    	 		
+    	 		    	 		
     	 	</table>
     	 </td>
     	 <td>

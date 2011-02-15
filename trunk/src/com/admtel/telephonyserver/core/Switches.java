@@ -235,6 +235,7 @@ public class Switches implements DefinitionChangeListener, EventListener {
 		}
 			break;
 		case Alerting:
+		case Offered:
 			ChannelEvent ce = (ChannelEvent) event;
 			addChannel(ce.getChannel());
 
