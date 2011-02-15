@@ -4,8 +4,7 @@
 <@com.page title="Channels">
   <#if channels?size = 0>
     <p>No channels.</p>
-  <#else>
-    <p>The messages are:
+  <#else>    
     <table border=0 cellspacing=2 cellpadding=2 width="100%">
       <tr align=center valign=top>
         <th bgcolor="#C0C0C0">Id</th>        

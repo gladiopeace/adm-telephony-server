@@ -1,10 +1,14 @@
 package com.admtel.telephonyserver.acd.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 import com.admtel.telephonyserver.acd.AcdService;
@@ -112,5 +116,20 @@ public class AcdServiceImpl implements AcdService {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String[] getQueues() {
+		Set<String> queues = acdQueues.keySet();
+		return queues.toArray(new String[queues.size()]);
+	}
+
+	@Override
+	public String[] getQueuedChannels(String queueId) {
+		AcdQueue queue = acdQueues.get(queueId);
+		if (queue == null){
+			return null;
+		}
+		return queue.getChannels();
 	}
 }

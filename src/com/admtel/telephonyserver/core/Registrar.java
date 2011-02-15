@@ -8,6 +8,8 @@ import com.admtel.telephonyserver.config.DefinitionChangeListener;
 import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.RegistrarDefinition;
 import com.admtel.telephonyserver.events.Event;
+import com.admtel.telephonyserver.events.RegisteredEvent;
+import com.admtel.telephonyserver.events.UnregisteredEvent;
 import com.admtel.telephonyserver.interfaces.EventListener;
 import com.admtel.telephonyserver.interfaces.RegistrarInterface;
 import com.admtel.telephonyserver.registrar.UserLocation;
@@ -91,8 +93,17 @@ public class Registrar implements DefinitionChangeListener, RegistrarInterface,
 	public boolean onEvent(Event event) {
 		switch (event.getEventType()) {
 		case Registered:
+		{
+			RegisteredEvent re = (RegisteredEvent) event;
+			register(new UserLocation(re.getUser(), re.getSigProtocol(), re.getSwitchId()));
+			
+		}
 			break;
 		case Unregistered:
+		{
+			UnregisteredEvent ue = (UnregisteredEvent) event;
+			unregister(ue.getUser());
+		}
 			break;
 		}
 		return false;

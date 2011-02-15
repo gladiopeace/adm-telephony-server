@@ -88,6 +88,15 @@ public abstract class Channel implements TimerNotifiable {
 	private String conferenceId;
 	private String memberId;	
 	private Result lastResult = Result.Ok;
+	private Channel otherChannel = null;
+
+	public Channel getOtherChannel() {
+		return otherChannel;
+	}
+
+	public void setOtherChannel(Channel otherChannel) {
+		this.otherChannel = otherChannel;
+	}
 
 	private MessageHandler messageHandler = new QueuedMessageHandler() {
 
@@ -493,12 +502,13 @@ public abstract class Channel implements TimerNotifiable {
 				log.warn(String.format("Channel(%s) - User (%s) not found", this, address));
 				onEvent(new DialFailedEvent(this, DialStatus.InvalidNumber));
 				lastResult = Result.UserNotFound;
+				return lastResult;
 			}
 			else{
 				tAddress = location.getAddress(_switch);
 			}
 		}
-		 lastResult = internalDial(tAddress, timeout);		
+		lastResult = internalDial(tAddress, timeout);		
 		}
 		else{
 			log.warn(String.format(
@@ -507,6 +517,14 @@ public abstract class Channel implements TimerNotifiable {
 			lastResult = Result.ChannelInvalidCallState;			
 		}
 		return lastResult;
+	}
+
+	public Result getLastResult() {
+		return lastResult;
+	}
+
+	public void setLastResult(Result lastResult) {
+		this.lastResult = lastResult;
 	}
 
 	public boolean onEvent(Event e) {
@@ -528,6 +546,7 @@ public abstract class Channel implements TimerNotifiable {
 			setCallState(CallState.Connected);
 			break;
 		case Offered:
+			setupTime = new DateTime();
 			setCallState(CallState.Offered);
 			break;
 		case Connected:

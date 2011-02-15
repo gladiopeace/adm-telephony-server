@@ -23,7 +23,7 @@ import com.admtel.telephonyserver.registrar.UserLocation;
 
 public abstract class Script implements EventListener{
 
-	static Logger log = Logger.getLogger(Script.class);
+	public static Logger log = Logger.getLogger(Script.class);
 
 	enum ScriptState {
 		Running, Stopped
