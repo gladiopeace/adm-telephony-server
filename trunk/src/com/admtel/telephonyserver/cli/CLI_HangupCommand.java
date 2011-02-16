@@ -1,6 +1,6 @@
 package com.admtel.telephonyserver.cli;
 
-import com.admtel.telephonyserver.core.DisconnectCode;
+import com.admtel.telephonyserver.events.DisconnectCode;
 import com.admtel.telephonyserver.requests.HangupRequest;
 import com.admtel.telephonyserver.requests.Request;
 

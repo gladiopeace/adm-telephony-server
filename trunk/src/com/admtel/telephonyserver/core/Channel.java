@@ -19,6 +19,7 @@ import com.admtel.telephonyserver.events.ConferenceLeftEvent;
 import com.admtel.telephonyserver.events.DialFailedEvent;
 import com.admtel.telephonyserver.events.DialStartedEvent;
 import com.admtel.telephonyserver.events.DialStatus;
+import com.admtel.telephonyserver.events.DisconnectCode;
 import com.admtel.telephonyserver.events.DtmfEvent;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.DisconnectedEvent;

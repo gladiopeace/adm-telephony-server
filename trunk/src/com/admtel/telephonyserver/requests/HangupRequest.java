@@ -1,6 +1,6 @@
 package com.admtel.telephonyserver.requests;
 
-import com.admtel.telephonyserver.core.DisconnectCode;
+import com.admtel.telephonyserver.events.DisconnectCode;
 
 public class HangupRequest extends ChannelRequest {
     DisconnectCode disconnectCode;

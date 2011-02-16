@@ -1,6 +1,6 @@
 package com.admtel.telephonyserver.tests;
 
-import com.admtel.telephonyserver.core.DisconnectCode;
+import com.admtel.telephonyserver.events.DisconnectCode;
 
 public class DisconnectCodesTest {
 

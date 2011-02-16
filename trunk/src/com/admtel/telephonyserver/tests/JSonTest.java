@@ -6,7 +6,7 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import com.admtel.telephonyserver.core.DisconnectCode;
+import com.admtel.telephonyserver.events.DisconnectCode;
 import com.admtel.telephonyserver.requests.HangupRequest;
 import com.admtel.telephonyserver.requests.Request;
 
