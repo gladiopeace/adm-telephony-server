@@ -32,19 +32,19 @@ public class ScriptManager implements DefinitionChangeListener, Loadable{
 		return SingletonHolder.instance;
 	}
 
-	public Script createScript(Channel channel) {
-		log.debug("Creating script for channel "+channel);
+	public Script createScript(Channel channel) {		
 		Script script = null;
 		for (ScriptFactory sf : scriptFactories.values()) {
 			script = sf.createScript(channel.getChannelData());
 			if (script != null) {				
-				log.trace(String.format("Script (%s) created for Channel (%s)", script, channel));
+				log.trace(String.format("Channel (%s) : Script(%s:%s)", channel.getUniqueId(), script.getId(), script.getDisplayStr()));
 				scripts.put(script.id, script);
 				script.addChannel(channel);
 				script.onStart();
 				return script;
 			}
 		}
+		log.trace(String.format("Channel (%s) : no script", channel.getUniqueId()));
 		return null;
 	}
 	

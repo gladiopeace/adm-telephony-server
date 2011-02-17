@@ -148,7 +148,7 @@
 			<type>freeswitch</type>
 			<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultFSAddressTranslator
 			</addresstranslator>
-			<enabled>true</enabled>
+			<enabled>false</enabled>
 		</switch>
 		<switch>
 			<name>Asterisk_VMWARE</name>
@@ -159,7 +159,7 @@
 			<type>asterisk</type>
 			<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator
 			</addresstranslator>
-			<enabled>false</enabled>
+			<enabled>true</enabled>
 		</switch>
 
 	</switches>

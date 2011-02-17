@@ -6,35 +6,18 @@ public class DisconnectedEvent extends ChannelEvent {
 
 	@Override
 	public String toString() {
-		return "\t"
-				+ (eventType != null ? "eventType=" + eventType + " \n\t" : "")
-				+ (channel != null ? "channel=" + channel + " \n\t" : "")
-				+ (disconnectCauseStr != null ? "disconnectCauseStr="
-						+ disconnectCauseStr + " \n\t" : "")
-				+ "disconnectCause=" + disconnectCause;
+		return String.format(
+				"\t\n\teventType=%s\n\tchannel=%s\n\tdisconnectCode=%s",
+				eventType, channel, disconnectCode);
 	}
 
-	String disconnectCauseStr;
-	int disconnectCause;	
-	
-	public DisconnectedEvent(Channel channel) {
+	DisconnectCode disconnectCode;
+	public DisconnectedEvent(Channel channel, DisconnectCode disconnectCode) {
 		super(channel);
 		eventType = EventType.Disconnected;		
+		this.disconnectCode = disconnectCode;
 	}
-	
-	public String getDisconnectCauseStr() {
-		return disconnectCauseStr;
-	}
-
-	public void setDisconnectCauseStr(String disconnectCauseStr) {
-		this.disconnectCauseStr = disconnectCauseStr;
-	}
-
-	public int getDisconnectCause() {
-		return disconnectCause;
-	}
-
-	public void setDisconnectCause(int disconnectCause) {
-		this.disconnectCause = disconnectCause;
+	public DisconnectCode getDisconnectCode() {
+		return disconnectCode;
 	}
 }

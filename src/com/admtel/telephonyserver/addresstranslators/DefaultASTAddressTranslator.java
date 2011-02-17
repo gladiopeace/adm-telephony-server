@@ -7,7 +7,7 @@ public class DefaultASTAddressTranslator implements AddressTranslator {
 
 	@Override
 	public String translate(AdmAddress address) {
-		String result = "";
+		String result = null;
 		if (address != null) {
 			switch (address.getProtocol()) {
 			case SIP:

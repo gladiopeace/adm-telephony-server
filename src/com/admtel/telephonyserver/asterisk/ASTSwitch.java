@@ -1,5 +1,6 @@
 package com.admtel.telephonyserver.asterisk;
 
+
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.util.UUID;
@@ -25,6 +26,7 @@ import com.admtel.telephonyserver.asterisk.events.ASTEvent.EventType;
 import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.SwitchDefinition;
 import com.admtel.telephonyserver.core.BasicIoMessage;
+import com.admtel.telephonyserver.core.EventsManager;
 import com.admtel.telephonyserver.core.QueuedMessageHandler;
 import com.admtel.telephonyserver.core.Registrar;
 import com.admtel.telephonyserver.core.Result;
@@ -37,6 +39,9 @@ import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.requests.Request;
 import com.admtel.telephonyserver.utils.AdmUtils;
+
+import com.admtel.telephonyserver.events.RegisteredEvent;
+import com.admtel.telephonyserver.events.UnregisteredEvent;
 
 public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 
@@ -240,11 +245,9 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 				case PeerStatus: {
 					ASTPeerStatusEvent pse = (ASTPeerStatusEvent) event;
 					if (pse.getRegistered()) {
-//						Registrar.getInstance().register(
-//								new UserLocation(event.getSwitchId(), "XXX",
-//										pse.getUser()));
+						EventsManager.getInstance().onEvent(new RegisteredEvent(pse.getSwitchId(), pse.getProtocol(), pse.getUser()));
 					} else {
-						Registrar.getInstance().unregister(pse.getUser());
+						EventsManager.getInstance().onEvent(new UnregisteredEvent(pse.getUser()));
 					}
 				}
 					break;
