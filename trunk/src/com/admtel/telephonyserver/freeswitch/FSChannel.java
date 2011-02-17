@@ -23,6 +23,7 @@ import com.admtel.telephonyserver.events.ConferenceTalkEvent;
 import com.admtel.telephonyserver.events.DialFailedEvent;
 import com.admtel.telephonyserver.events.DialStartedEvent;
 import com.admtel.telephonyserver.events.DialStatus;
+import com.admtel.telephonyserver.events.DisconnectCode;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.DisconnectedEvent;
 import com.admtel.telephonyserver.events.OfferedEvent;
@@ -65,11 +66,10 @@ public class FSChannel extends Channel {
 
 	@Override
 	public String toString() {
-		return "["
-				+ (super.toString() != null ? "toString()=" + super.toString()
-						+ ", " : "")
-				+ (internalState != null ? "internalState=" + internalState
-						: "") + "]";
+		return String
+				.format("\t\n\tuniqueId=%s\n\tcallState=%s\n\tmediaState=%s\n\tcallOrigin=%s\n\tinternalState=%s",
+						getUniqueId(), getCallState(), getMediaState(),
+						getCallOrigin(), internalState);
 	}
 
 	private IoSession session;
@@ -628,46 +628,6 @@ public class FSChannel extends Channel {
 
 	}
 
-	private class AcdQueueState extends State {
-
-		String queueName;
-
-		public AcdQueueState(String queueName) {
-			this.queueName = queueName;
-			if (AcdManager.getInstance().queueChannel(queueName,
-					FSChannel.this.getUniqueId(),
-					FSChannel.this.getSetupTime().toDate(), 0) == Result.Ok) {// TODO,
-				// priority
-				FSChannel.this.onEvent(new AcdQueueJoinedEvent(FSChannel.this,
-						queueName, false));
-			} else {
-				FSChannel.this.onEvent(new AcdQueueFailedEvent(FSChannel.this,
-						queueName, "TODO error"));
-				internalState = new IdleState();
-			}
-		}
-
-		@Override
-		public void processEvent(FSEvent fsEvent) {
-			switch (fsEvent.getEventType()) {
-			}
-
-		}
-
-		@Override
-		public boolean onTimer(Object data) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public String toString() {
-			return "AcdQueueState ["
-					+ (queueName != null ? "queueName=" + queueName : "") + "]";
-		}
-
-	}
-
 	/*
 	 * private MessageHandler messageHandler = new QueuedMessageHandler() {
 	 * 
@@ -718,12 +678,7 @@ public class FSChannel extends Channel {
 	@Override
 	public Result internalDial(String address, long timeout) {
 		if (address != null && address.length() > 0) {
-			AdmAddress admAddress = new AdmAddress(address);
-
-			String fsAddress = _switch.getAddressTranslator().translate(
-					admAddress);
-
-			FSDialCommand cmd = new FSDialCommand(FSChannel.this, fsAddress,
+			FSDialCommand cmd = new FSDialCommand(FSChannel.this, address,
 					timeout);
 			session.write(cmd);
 		} else {
@@ -731,7 +686,7 @@ public class FSChannel extends Channel {
 					this.getId(), address));
 			return Result.InvalidParameters;
 		}
-		return internalState.getResult();
+		return Result.Ok;
 	}
 
 	@Override
@@ -809,26 +764,20 @@ public class FSChannel extends Channel {
 				internalState.processEvent(fsEvent);
 			}
 			switch (fsEvent.getEventType()) {
-			case ChannelHangup:
-				FSChannel.this.onEvent(new DisconnectedEvent(FSChannel.this));
+			case ChannelHangup: {
+				FSChannelHangupEvent che = (FSChannelHangupEvent) fsEvent;
+				FSChannel.this
+						.onEvent(new DisconnectedEvent(FSChannel.this,
+								DisconnectCode.get((che.getHangupCause()
+										.toInteger()))));
+			}
 				break;
 			case ChannelOriginate: {
 				FSChannelOriginateEvent coe = (FSChannelOriginateEvent) fsEvent;
 				FSChannel otherChannel = (FSChannel) getSwitch().getChannel(
 						coe.getPeerChannel());
 
-				if (otherChannel != null
-						&& otherChannel.getCallOrigin() == CallOrigin.Outbound) {
-					otherChannel.getChannelData().setLoginIP(
-							coe.getChannelAddress());
-					otherChannel
-							.setAcctUniqueSessionId(getAcctUniqueSessionId());
-					otherChannel.setUserName(getUserName());
-					otherChannel.getChannelData().setDestinationNumberIn(
-							getChannelData().getCalledNumber());
-					otherChannel.getChannelData().setRemoteIP(getLoginIP());
-					otherChannel.setOtherChannel(this);
-				}
+				
 				FSChannel.this.onEvent(new DialStartedEvent(FSChannel.this,
 						otherChannel));
 

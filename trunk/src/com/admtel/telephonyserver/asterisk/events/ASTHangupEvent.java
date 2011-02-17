@@ -9,14 +9,22 @@ public class ASTHangupEvent extends ASTChannelEvent {
 		return "ASTHangupEvent [getCause()=" + getCause() + ", getCauseTxt()="
 				+ getCauseTxt() + "]";
 	}
+
 	public ASTHangupEvent(String switchId, Map<String, String> values) {
 		super(switchId, values);
 		eventType = EventType.Hangup;
 	}
-	public String getCause(){
-		return values.get("Cause");
+
+	public int getCause() {
+		try {
+			return Integer.parseInt(values.get("Cause"));
+		} catch (Exception e) {
+
+		}
+		return 0;
 	}
-	public String getCauseTxt(){
+
+	public String getCauseTxt() {
 		return values.get("Cause-txt");
 	}
 }

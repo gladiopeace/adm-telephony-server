@@ -25,4 +25,11 @@ public class FSChannelHangupEvent extends FSChannelEvent {
 	public FSHangupCause getHangupCause() {
 		return hangupCause;
 	}
+
+	@Override
+	public String toString() {
+		return String
+				.format("\t\n\tgetSwitchId()=%s\n\tgetEventType()=%s\n\thangupCause=%s",
+						getSwitchId(), getEventType(), hangupCause);
+	}
 }

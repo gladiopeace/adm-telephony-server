@@ -7,7 +7,7 @@ public class RegisteredEvent extends Event {
 	private SigProtocol sigProtocol;
 	private String switchId;
 
-	public RegisteredEvent(String user, SigProtocol sigProtocol, String switchId){
+	public RegisteredEvent(String switchId, SigProtocol sigProtocol, String user){
 		eventType = EventType.Registered;
 		this.user = user;
 		this.sigProtocol = sigProtocol;
