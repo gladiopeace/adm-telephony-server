@@ -33,6 +33,7 @@ import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.requests.AnswerRequest;
 import com.admtel.telephonyserver.requests.DialRequest;
 import com.admtel.telephonyserver.requests.HangupRequest;
+import com.admtel.telephonyserver.requests.JoinConferenceRequest;
 import com.admtel.telephonyserver.requests.ParticipantMuteRequest;
 import com.admtel.telephonyserver.requests.Request;
 import com.admtel.telephonyserver.utils.AdmUtils;
@@ -450,7 +451,7 @@ public abstract class Channel implements TimerNotifiable {
 			boolean startMuted, boolean startDeaf) { // TODO add more parameters
 
 		log.trace(String.format("[%s] - joinConference (%s, %s, %s, %s)",
-				conferenceId, moderator, startMuted, startDeaf));
+				this, conferenceId, moderator, startMuted, startDeaf));
 		if (getCallState() == CallState.Connected) {
 			lastResult = internalJoinConference(conferenceId, moderator,
 					startMuted, startDeaf);
@@ -543,10 +544,20 @@ public abstract class Channel implements TimerNotifiable {
 		}
 			break;
 		case PlaybackEnded:
+			setMediaState(MediaState.Idle);
+			break;
 		case PlayAndGetDigitsEnded:
+			setMediaState(MediaState.Idle);
+			break;
 		case AnswerFailed:
+			setCallState(CallState.Connected);
+			break;
 		case PlaybackFailed:
+			setMediaState(MediaState.Idle);
+			break;
 		case PlayAndGetDigitsFailed:
+			setMediaState(MediaState.Idle);
+			break;
 		case QueueLeft:
 			setCallState(CallState.Connected);
 			break;
@@ -753,6 +764,11 @@ public abstract class Channel implements TimerNotifiable {
 			dial(dialRequest.getDestination(), dialRequest.getTimeout());
 		}
 			break;
+		case JoinConferenceRequest:{
+			JoinConferenceRequest jcr = (JoinConferenceRequest) request;
+			joinConference(jcr.getConference(), jcr.isModerator(), jcr.isMuted(), jcr.isDeaf());
+		}
+		break;
 		}
 	}
 

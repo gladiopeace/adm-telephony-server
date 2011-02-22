@@ -104,7 +104,7 @@ public class FSEvent {
 					try {
 						return (FSEvent) ctor.newInstance(switchId, map);
 					} catch (Exception ex) {
-						log.fatal(ex.toString());
+						log.fatal(ex.toString(), ex);
 					}
 				}
 			}

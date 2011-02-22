@@ -1,7 +1,7 @@
 package com.admtel.telephonyserver.requests;
 
 abstract public class Request {
-	public enum RequestType {HangupRequest, AnswerRequest, ShowChannelsRequest, ReloadRequest, ShowStatusRequest, ShowSwitchRequest, ParticipantMuteRequest, DialRequest};
+	public enum RequestType {HangupRequest, AnswerRequest, ShowChannelsRequest, ReloadRequest, ShowStatusRequest, ShowSwitchRequest, ParticipantMuteRequest, DialRequest, JoinConferenceRequest};
 	
 	RequestType type;
 	
