@@ -19,15 +19,15 @@
 	</registrar>
 
 	<radius>
-<!--		<server>-->
-<!--			<id>first radius server</id>-->
-<!--			<address>172.16.140.129</address>-->
-<!--			<auth-port>1812</auth-port>-->
-<!--			<acct-port>1813</acct-port>-->
-<!--			<secret>test</secret>-->
-<!--			<retry-count>5</retry-count>-->
-<!--			<socket-timeout>5000</socket-timeout>-->
-<!--		</server>-->
+		<server>
+			<id>first radius server</id>
+			<address>172.16.140.129</address>
+			<auth-port>1812</auth-port>
+			<acct-port>1813</acct-port>
+			<secret>test</secret>
+			<retry-count>5</retry-count>
+			<socket-timeout>5000</socket-timeout>
+		</server>
 	</radius>
 
 	<!-- SWITCH LISTENERS START -->
@@ -148,7 +148,7 @@
 			<type>freeswitch</type>
 			<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultFSAddressTranslator
 			</addresstranslator>
-			<enabled>false</enabled>
+			<enabled>true</enabled>
 		</switch>
 		<switch>
 			<name>Asterisk_VMWARE</name>
@@ -159,7 +159,7 @@
 			<type>asterisk</type>
 			<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator
 			</addresstranslator>
-			<enabled>true</enabled>
+			<enabled>false</enabled>
 		</switch>
 
 	</switches>
@@ -252,17 +252,27 @@
 				<parameter name="port" value="1234"/>
 			</parameters>
 		</bean>
+<!--		<bean>-->
+<!--			<class>/Users/danny/workspace/adm-telephony-scripts/src/conference/DBConferenceHelperBean.groovy-->
+<!--			</class>-->
+<!--			<id>conferencer-helper</id>-->
+<!--			<parameters>-->
+<!--				<parameter name="dbUrl" value="jdbc:postgresql://localhost:5432/adm_appserver"/>-->
+<!--				<parameter name="dbUser" value="tester"/>-->
+<!--				<parameter name="dbPassword" value="tester1234"/>-->
+<!--				<parameter name="dbDriver" value="org.postgresql.Driver"/>-->
+<!--			</parameters>-->
+<!--		</bean>-->
 		<bean>
-			<class>/Users/danny/workspace/adm-telephony-scripts/src/conference/DBConferenceHelperBean.groovy
+			<class>/Users/danny/workspace/adm-telephony-scripts/src/conference/REST_ConferenceHelperBean.groovy
 			</class>
 			<id>conferencer-helper</id>
 			<parameters>
-				<parameter name="dbUrl" value="jdbc:postgresql://localhost:5432/adm_appserver"/>
-				<parameter name="dbUser" value="tester"/>
-				<parameter name="dbPassword" value="tester1234"/>
-				<parameter name="dbDriver" value="org.postgresql.Driver"/>
+				<parameter name="restURL" value="http://localhost:8085/adm-conference-api/"/>
+				<parameter name="authToken" value="123456"/>
 			</parameters>
 		</bean>
+
 
 		<bean>
 			<id>simple-security-provider</id>
