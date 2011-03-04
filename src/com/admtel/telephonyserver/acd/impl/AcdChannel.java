@@ -23,8 +23,7 @@ public class AcdChannel implements Comparable<AcdChannel> {
 		if (c1 != 0) {
 			return c1;
 		}
-		c1 = setupTime
-				.compareTo(acdChannel.setupTime);
+		c1 = setupTime.compareTo(acdChannel.setupTime);
 		return c1;
 	}
 }

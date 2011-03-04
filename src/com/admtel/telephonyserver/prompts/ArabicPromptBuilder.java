@@ -45,7 +45,7 @@ public class ArabicPromptBuilder extends GenericPromptBuilder {
 					result.add(value.toString());
 				}
 				if (value == 2){
-					result.add("2hundred");
+					result.add("2 hundred");
 				}
 				else{
 					result.add("hundred");

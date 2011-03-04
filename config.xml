@@ -3,9 +3,9 @@
 
 	<server>
 		<maxthreads>15</maxthreads>
-		<address>172.16.140.1</address>
+		<address>192.168.1.60</address>
 		<base-directory>/usr/local/adm</base-directory>
-		<script-path>.;./scripts;/Users/danny/workspace/adm-telephony-scripts/src
+		<script-path>.;./scripts;/home/user1/workspace/adm-telephony-scripts/src
 		</script-path>
 		<radius-start-accounting>true</radius-start-accounting>
 		<radius-stop-accounting>true</radius-stop-accounting>
@@ -21,7 +21,7 @@
 	<radius>
 		<server>
 			<id>first radius server</id>
-			<address>172.16.140.129</address>
+			<address>192.168.1.60</address>
 			<auth-port>1812</auth-port>
 			<acct-port>1813</acct-port>
 			<secret>test</secret>
@@ -34,7 +34,7 @@
 	<switch-listeners>
 		<switch-listener>
 			<address>
-				172.16.140.1
+				192.168.1.60
  	</address>
 			<port>
 				8084
@@ -45,7 +45,7 @@
 		</switch-listener>
 		<switch-listener>
 			<address>
-				172.16.34.1
+				192.168.1.60
  	</address>
 			<port>
 				4573
@@ -60,7 +60,7 @@
 	<!-- CLI LISTENERS START -->
 	<cli-listeners>
 		<cli-listener>
-			<address>172.16.140.1</address>
+			<address>192.168.1.60</address>
 			<port>8055</port>
 			<username>test</username>
 			<password>test</password>
@@ -72,11 +72,11 @@
 	<http-servers>
 		<http-server>
 			<id>Freeswitch Configurator</id>
-			<address>172.16.140.1</address>
+			<address>localhost</address>
 			<port>8057</port>
 			<adm-servlet>
 				<path>FSConfigurator</path>
-				<class>/Users/danny/workspace/adm-telephony-scripts/src/WSFreeSwitchConfigurator.groovy
+				<class>/home/user1/workspace/adm-telephony-scripts/src/WSFreeSwitchConfigurator.groovy
 				</class>
 			</adm-servlet>
 			<adm-servlet>
@@ -101,11 +101,11 @@
 		</http-server>
 		<http-server>
 			<id>dot34</id>
-			<address>172.16.34.1</address>
+			<address>192.168.1.60</address>
 			<port>8057</port>
 			<adm-servlet>
 				<path>FSConfigurator</path>
-				<class>/Users/danny/workspace/adm-telephony-scripts/src/WSFreeSwitchConfigurator.groovy
+				<class>/home/user1/workspace/adm-telephony-scripts/src/WSFreeSwitchConfigurator.groovy
 				</class>
 			</adm-servlet>
 			<adm-servlet>
@@ -141,7 +141,7 @@
 	<switches>
 		<switch>
 			<name>MyFreeswitch</name>
-			<address>172.16.140.129</address>
+			<address>192.168.1.60</address>
 			<port>8021</port>
 			<username>admin</username>
 			<password>admin</password>
@@ -152,7 +152,7 @@
 		</switch>
 		<switch>
 			<name>Asterisk_VMWARE</name>
-			<address>172.16.34.134</address>
+			<address>192.168.1.60</address>
 			<port>5038</port>
 			<username>admin</username>
 			<password>password</password>
@@ -248,12 +248,12 @@
 			<class>scripts/ManagerBean.groovy</class>
 			<id>manager</id>
 			<parameters>
-				<parameter name="address" value="172.16.140.1"/>
+				<parameter name="address" value="192.168.1.60"/>
 				<parameter name="port" value="1234"/>
 			</parameters>
 		</bean>
 <!--		<bean>-->
-<!--			<class>/Users/danny/workspace/adm-telephony-scripts/src/conference/DBConferenceHelperBean.groovy-->
+<!--			<class>/home/user1/workspace/adm-telephony-scripts/src/conference/DBConferenceHelperBean.groovy-->
 <!--			</class>-->
 <!--			<id>conferencer-helper</id>-->
 <!--			<parameters>-->
@@ -264,7 +264,7 @@
 <!--			</parameters>-->
 <!--		</bean>-->
 		<bean>
-			<class>/Users/danny/workspace/adm-telephony-scripts/src/conference/REST_ConferenceHelperBean.groovy
+			<class>/home/user1/workspace/adm-telephony-scripts/src/conference/REST_ConferenceHelperBean.groovy
 			</class>
 			<id>conferencer-helper</id>
 			<parameters>
