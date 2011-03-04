@@ -571,10 +571,8 @@ public class FSChannel extends Channel {
 			this.isAgent = agent;
 			this.queueName = queueName;
 
-			session.write(buildMessage(getId(), "execute", "set",
-					"hangup_after_bridge=false"));
-			FSQueueCommand queueCmd = new FSQueueCommand(FSChannel.this,
-					queueName, isAgent);
+			session.write(buildMessage(getId(), "execute", "set","hangup_after_bridge=false"));
+			FSQueueCommand queueCmd = new FSQueueCommand(FSChannel.this,	queueName, isAgent);
 			session.write(queueCmd);
 		}
 
@@ -734,11 +732,8 @@ public class FSChannel extends Channel {
 		return internalState.getResult();
 	}
 
-	private String buildMessage(String uuid, String command, String app,
-			String arg) {
-		return String
-				.format("SendMsg %s\ncall-command: %s\nexecute-app-name: %s\nexecute-app-arg: %s\n",
-						uuid, command, app, arg);
+	private String buildMessage(String uuid, String command, String app,String arg) {
+		return String.format("SendMsg %s\ncall-command: %s\nexecute-app-name: %s\nexecute-app-arg: %s\n",uuid, command, app, arg);
 	}
 
 	@Override
