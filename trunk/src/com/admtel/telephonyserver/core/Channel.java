@@ -13,7 +13,6 @@ import org.joda.time.Duration;
 import com.admtel.telephonyserver.acd.AcdManager;
 import com.admtel.telephonyserver.config.SystemConfig;
 import com.admtel.telephonyserver.core.Timers.Timer;
-import com.admtel.telephonyserver.events.AcdQueueBridgeFailedEvent;
 import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
 import com.admtel.telephonyserver.events.DialFailedEvent;
@@ -25,6 +24,7 @@ import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.DisconnectedEvent;
 import com.admtel.telephonyserver.events.AlertingEvent;
 import com.admtel.telephonyserver.events.Event.EventType;
+import com.admtel.telephonyserver.events.LinkedEvent;
 import com.admtel.telephonyserver.freeswitch.FSChannel;
 import com.admtel.telephonyserver.interfaces.EventListener;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
@@ -44,7 +44,7 @@ public abstract class Channel implements TimerNotifiable {
 	public static Logger log = Logger.getLogger(Channel.class);
 
 	public enum CallState {
-		Null, Idle, Offered, Alerting, Accepted, Connected, Dialing, Disconnected, Dropped, Conferenced, AcdQueued, Queued,
+		Null, Idle, Offered, Alerting, Accepted, Connected, Linked, Dialing, Disconnected, Dropped, Conferenced, AcdQueued, Queued,
 	}
 
 	public enum MediaState {
@@ -533,6 +533,16 @@ public abstract class Channel implements TimerNotifiable {
 		case Offered:
 			setupTime = new DateTime();
 			setCallState(CallState.Offered);
+			break;
+		case Linked:{
+			LinkedEvent le = (LinkedEvent) e;
+			this.otherChannel =  le.getPeerChannel();
+			setCallState(CallState.Linked);
+		}
+			break;
+		case Unlinked:
+			this.otherChannel = null;
+			setCallState(CallState.Connected);
 			break;
 		case Connected:
 			setCallState(CallState.Connected);

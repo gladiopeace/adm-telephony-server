@@ -16,7 +16,6 @@ import com.admtel.telephonyserver.core.Result;
 import com.admtel.telephonyserver.core.SmartClassLoader;
 import com.admtel.telephonyserver.core.Switches;
 import com.admtel.telephonyserver.core.Timers;
-import com.admtel.telephonyserver.events.AcdQueueBridgeFailedEvent;
 import com.admtel.telephonyserver.events.AcdQueueFailedEvent;
 import com.admtel.telephonyserver.events.DialFailedEvent;
 import com.admtel.telephonyserver.events.DialStartedEvent;
@@ -61,35 +60,38 @@ public class AcdManager implements EventListener, TimerNotifiable {
 		switch (event.getEventType()) {
 		case Disconnected: {
 			DisconnectedEvent he = (DisconnectedEvent) event;
-			if (he.getChannel().getCallState() == Channel.CallState.AcdQueued) { // Caller disconnected
-				if (acdService.containsChannel(he.getChannel().getUniqueId())) {
-					acdService.unqueueChannel(he.getChannel().getUniqueId());
-				}
+			// Caller disconnected
+			if (acdService.containsChannel(he.getChannel().getUniqueId())) {
+				acdService.unqueueChannel(he.getChannel().getUniqueId());
 			}
-			else if (he.getChannel().getOtherChannel() != null){
-				if (he.getChannel().getOtherChannel().getCallState() == Channel.CallState.AcdQueued){//Agent disconnected
-					acdService.requeueChannel(he.getChannel().getOtherChannel().getUniqueId());
-				}
+
+			else if (he.getChannel().getOtherChannel() != null) {
+				// Agent disconnected
+				acdService.requeueChannel(he.getChannel().getOtherChannel()
+						.getUniqueId());
+
 			}
 		}
-		break;
+			break;
 		case DialFailed: {
 			DialFailedEvent dee = (DialFailedEvent) event;
 			if (dee.getChannel().getCallState() == Channel.CallState.AcdQueued) {
-						acdService.requeueChannel(dee.getChannel().getUniqueId());
-				}			
+				acdService.requeueChannel(dee.getChannel().getUniqueId());
+			}
 		}
-		break;		
+			break;
 		}
 		return false;
 	}
 
-	public String[] getQueues (){
+	public String[] getQueues() {
 		return acdService.getQueues();
 	}
-	public String[] getQueuedChannels(String queueId){
+
+	public String[] getQueuedChannels(String queueId) {
 		return acdService.getQueuedChannels(queueId);
 	}
+
 	@Override
 	public boolean onTimer(Object data) {
 		List<DialRequest> dialRequests = acdService.getNextDial();

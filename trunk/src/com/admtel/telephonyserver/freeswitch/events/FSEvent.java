@@ -42,6 +42,7 @@ public class FSEvent {
 			EVENTS_MAP.put("CHANNEL_ORIGINATE", FSChannelOriginateEvent.class
 					.getConstructor(String.class, Map.class));
 			EVENTS_MAP.put("CHANNEL_BRIDGE", FSChannelBridgeEvent.class.getConstructor(String.class, Map.class));
+			EVENTS_MAP.put("CHANNEL_UNBRIDGE",  FSChannelUnbridgeEvent.class.getConstructor(String.class, Map.class));
 			EVENTS_MAP.put("CHANNEL_STATE", FSChannelStateEvent.class.getConstructor(String.class, Map.class));
 
 		} catch (Exception e) {
@@ -128,7 +129,7 @@ public class FSEvent {
 
 	public enum EventType {
 		AuthRequest, CommandReply, HeartBeat, ChannelExecute, ChannelExecuteComplete, ChannelData, SessionDisconnect, ChannelDestroy, DTMF, ChannelHangup, ChannelBridge, ChannelAnswered, ChannelCreate, ChannelOutgoing, ChannelState, ChannelOriginate,
-		FsRegister, ConferenceJoined, ConferenceRemoved, Queue, ConferenceTalking, ConferenceMute
+		FsRegister, ConferenceJoined, ConferenceRemoved, Queue, ConferenceTalking, ConferenceMute, ChannelUnbridge
 	}
 
 	EventType eventType;

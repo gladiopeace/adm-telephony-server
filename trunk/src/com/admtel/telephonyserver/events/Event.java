@@ -31,15 +31,13 @@ public abstract class Event {
 		ConferenceMuted, 
 		ChannelListed, 
 		QueueBridged, 
-		AcdQueueBridged, 
 		AcdQueueFailed, 
 		AcdQueueJoined, 
 		AcdQueueLeft, 
-		AcdQueueBridgeFailed, 
 		DialFailed, 
 		Offered, 
 		Registered, 
-		Unregistered,
+		Unregistered, Unlinked,
 	}
 	
 	protected EventType eventType;	

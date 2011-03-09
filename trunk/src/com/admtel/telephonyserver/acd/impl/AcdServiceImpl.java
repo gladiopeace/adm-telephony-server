@@ -132,4 +132,19 @@ public class AcdServiceImpl implements AcdService {
 		}
 		return queue.getChannels();
 	}
+
+	@Override
+	public String[] getAgents() {
+		Set<String> agents = acdAgents.keySet();
+		return agents.toArray(new String[agents.size()]);		
+	}
+
+	@Override
+	public String getAgentForChannel(String channelId) {
+		AcdChannel channel = channels.get(channelId);
+		if (channel != null){
+			return channel.agent.getName();
+		}
+		return "";
+	}
 }
