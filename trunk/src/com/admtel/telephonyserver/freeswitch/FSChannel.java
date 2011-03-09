@@ -768,19 +768,19 @@ public class FSChannel extends Channel {
 				internalState.processEvent(fsEvent);
 			}
 			switch (fsEvent.getEventType()) {
-			/*case ChannelHangup: {
-				FSChannelHangupEvent che = (FSChannelHangupEvent) fsEvent;
-				onEvent(new DisconnectedEvent(this,
-								DisconnectCode.get((che.getHangupCause()
-										.toInteger()))));
-			}
-				break;*/
-			case ChannelState:
+			
+/*			case ChannelState:
 				FSChannelStateEvent cse = (FSChannelStateEvent) fsEvent;
 				if (cse.getChannelState() == ChannelState.CS_REPORTING && cse.getCallState() == FSChannelStateEvent.CallState.HANGUP){
 					onEvent(new DisconnectedEvent(this, DisconnectCode.None)); //TODO
 				}
 				break;
+*/			case ChannelHangup:
+			{
+				FSChannelHangupEvent che = (FSChannelHangupEvent) fsEvent;
+				onEvent(new DisconnectedEvent(this, DisconnectCode.get(che.getHangupCause().toInteger())));
+			}
+			break;
 			case ChannelOriginate: {
 				FSChannelOriginateEvent coe = (FSChannelOriginateEvent) fsEvent;
 				FSChannel otherChannel = (FSChannel) getSwitch().getChannel(

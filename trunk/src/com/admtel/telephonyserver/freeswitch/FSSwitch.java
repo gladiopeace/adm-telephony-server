@@ -187,7 +187,6 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	@Override
 	public void processBasicIoMessage(BasicIoMessage message) {
-
 		switch (state) {
 		case LoggingIn:
 			if (message != null) {
@@ -222,6 +221,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 					log.trace(event);
 				}
 				else{
+					log.warn("Event is null");
 					return;
 				}
 				switch (event.getEventType()) {
@@ -259,6 +259,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 					FSChannel channel = (FSChannel) FSSwitch.this
 							.getChannel(channelEvent.getChannelId());
 					if (channel == null) {
+						log.warn(String.format("Got event %s , but channel not found in the switch ", event));
 						return;
 					}
 
