@@ -26,6 +26,7 @@ import com.admtel.telephonyserver.events.DialStatus;
 import com.admtel.telephonyserver.events.DisconnectCode;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.DisconnectedEvent;
+import com.admtel.telephonyserver.events.LinkedEvent;
 import com.admtel.telephonyserver.events.OfferedEvent;
 import com.admtel.telephonyserver.events.PlayAndGetDigitsEndedEvent;
 import com.admtel.telephonyserver.events.PlayAndGetDigitsFailedEvent;
@@ -36,10 +37,12 @@ import com.admtel.telephonyserver.events.PlaybackStartedEvent;
 import com.admtel.telephonyserver.events.QueueBridgedEvent;
 import com.admtel.telephonyserver.events.QueueFailedEvent;
 import com.admtel.telephonyserver.events.QueueJoinedEvent;
+import com.admtel.telephonyserver.events.UnlinkedEvent;
 import com.admtel.telephonyserver.freeswitch.commands.FSDialCommand;
 import com.admtel.telephonyserver.freeswitch.commands.FSMemberMuteCommand;
 import com.admtel.telephonyserver.freeswitch.commands.FSQueueCommand;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelAnsweredEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelBridgeEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelCreateEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelDataEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelEvent;
@@ -47,6 +50,7 @@ import com.admtel.telephonyserver.freeswitch.events.FSChannelExecuteCompleteEven
 import com.admtel.telephonyserver.freeswitch.events.FSChannelHangupEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelOriginateEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelStateEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelUnbridgeEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSOriginateDisposition;
 import com.admtel.telephonyserver.freeswitch.events.FSCommandReplyEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSConferenceJoinedEvent;
@@ -571,8 +575,10 @@ public class FSChannel extends Channel {
 			this.isAgent = agent;
 			this.queueName = queueName;
 
-			session.write(buildMessage(getId(), "execute", "set","hangup_after_bridge=false"));
-			FSQueueCommand queueCmd = new FSQueueCommand(FSChannel.this,	queueName, isAgent);
+			session.write(buildMessage(getId(), "execute", "set",
+					"hangup_after_bridge=false"));
+			FSQueueCommand queueCmd = new FSQueueCommand(FSChannel.this,
+					queueName, isAgent);
 			session.write(queueCmd);
 		}
 
@@ -732,8 +738,11 @@ public class FSChannel extends Channel {
 		return internalState.getResult();
 	}
 
-	private String buildMessage(String uuid, String command, String app,String arg) {
-		return String.format("SendMsg %s\ncall-command: %s\nexecute-app-name: %s\nexecute-app-arg: %s\n",uuid, command, app, arg);
+	private String buildMessage(String uuid, String command, String app,
+			String arg) {
+		return String
+				.format("SendMsg %s\ncall-command: %s\nexecute-app-name: %s\nexecute-app-arg: %s\n",
+						uuid, command, app, arg);
 	}
 
 	@Override
@@ -759,22 +768,39 @@ public class FSChannel extends Channel {
 				internalState.processEvent(fsEvent);
 			}
 			switch (fsEvent.getEventType()) {
-			case ChannelHangup: {
+			/*case ChannelHangup: {
 				FSChannelHangupEvent che = (FSChannelHangupEvent) fsEvent;
-				FSChannel.this
-						.onEvent(new DisconnectedEvent(FSChannel.this,
+				onEvent(new DisconnectedEvent(this,
 								DisconnectCode.get((che.getHangupCause()
 										.toInteger()))));
 			}
+				break;*/
+			case ChannelState:
+				FSChannelStateEvent cse = (FSChannelStateEvent) fsEvent;
+				if (cse.getChannelState() == ChannelState.CS_REPORTING && cse.getCallState() == FSChannelStateEvent.CallState.HANGUP){
+					onEvent(new DisconnectedEvent(this, DisconnectCode.None)); //TODO
+				}
 				break;
 			case ChannelOriginate: {
 				FSChannelOriginateEvent coe = (FSChannelOriginateEvent) fsEvent;
 				FSChannel otherChannel = (FSChannel) getSwitch().getChannel(
 						coe.getPeerChannel());
 
-				
-				FSChannel.this.onEvent(new DialStartedEvent(FSChannel.this,
+				onEvent(new DialStartedEvent(this,
 						otherChannel));
+
+			}
+				break;
+			case ChannelBridge: {
+				FSChannelBridgeEvent cbe = (FSChannelBridgeEvent) fsEvent;
+				FSChannel otherChannel = (FSChannel) getSwitch().getChannel(cbe.getPeerChannel());
+				onEvent(new LinkedEvent(this, otherChannel));
+			}
+				break;
+			case ChannelUnbridge: {
+				FSChannelUnbridgeEvent cube = (FSChannelUnbridgeEvent) fsEvent;
+				FSChannel otherChannel = (FSChannel) getSwitch().getChannel(cube.getPeerChannel());
+				onEvent(new UnlinkedEvent(this, otherChannel));
 
 			}
 				break;

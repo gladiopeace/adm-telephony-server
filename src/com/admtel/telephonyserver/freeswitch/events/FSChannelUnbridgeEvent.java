@@ -2,11 +2,11 @@ package com.admtel.telephonyserver.freeswitch.events;
 
 import java.util.Map;
 
-public class FSChannelBridgeEvent extends FSChannelEvent {
+public class FSChannelUnbridgeEvent extends FSChannelEvent {
 
-	public FSChannelBridgeEvent(String switchId, Map values) {
+	public FSChannelUnbridgeEvent(String switchId, Map values) {
 		super(switchId, values);
-		eventType = EventType.ChannelBridge;
+		eventType = EventType.ChannelUnbridge;
 	}
 
 	@Override
@@ -16,4 +16,5 @@ public class FSChannelBridgeEvent extends FSChannelEvent {
 	public String getPeerChannel(){
 		return values.get("Other-Leg-Unique-ID");
 	}
+
 }
