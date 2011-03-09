@@ -21,7 +21,7 @@ public class FSEvent {
 					.getDeclaredConstructor(String.class, Map.class));
 			EVENTS_MAP.put("DTMF", FSDtmfEvent.class.getDeclaredConstructor(
 					String.class, Map.class));
-			EVENTS_MAP.put("CHANNEL_HANGUP_COMPLETE",
+			EVENTS_MAP.put("CHANNEL_HANGUP",
 					FSChannelHangupEvent.class.getDeclaredConstructor(
 							String.class, Map.class));
 			EVENTS_MAP.put("CHANNEL_DATA", FSChannelDataEvent.class
