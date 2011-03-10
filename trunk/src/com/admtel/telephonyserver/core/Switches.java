@@ -191,10 +191,8 @@ public class Switches implements DefinitionChangeListener, EventListener {
 	public void processRequest(Request request) {
 		if (request instanceof ChannelRequest) {
 			ChannelRequest channelRequest = (ChannelRequest) request;
-			Channel channel = synchronizedChannels.get(channelRequest
-					.getChannelId());
-			log.trace(String.format("Request(%s) for channel (%s)", request,
-					channel));
+			Channel channel = synchronizedChannels.get(channelRequest.getChannelId());
+			log.trace(String.format("Request(%s) for channel (%s)", request, channel));
 			if (channel != null) {
 				channel.putMessage(request);
 			}

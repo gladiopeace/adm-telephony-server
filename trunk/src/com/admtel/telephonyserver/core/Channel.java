@@ -350,9 +350,9 @@ public abstract class Channel implements TimerNotifiable {
 	}
 
 	final public Result hangup(DisconnectCode disconnectCode) {
-
+		log.trace("Result hangup Start ( " + getCallState() + ")*****************************************************************************");
 		log.trace(String.format("[%s] - hangup (%s)", this, disconnectCode));
-		if (getCallState() == CallState.Connected|| getCallState() == CallState.Accepted|| getCallState() == CallState.Alerting|| getCallState() == CallState.Dialing|| getCallState() == CallState.Offered|| getCallState() == CallState.Conferenced) {
+		if (getCallState() == CallState.Connected|| getCallState() == CallState.Accepted|| getCallState() == CallState.Alerting|| getCallState() == CallState.Dialing|| getCallState() == CallState.Offered|| getCallState() == CallState.Conferenced || getCallState() == CallState.Linked || getCallState() == CallState.AcdQueued) {
 			lastResult = internalHangup(disconnectCode.ordinal());
 			if (lastResult == Result.Ok) {
 				setCallState(CallState.Dropped);
@@ -361,6 +361,7 @@ public abstract class Channel implements TimerNotifiable {
 			log.warn(String.format("[%s] - hangup invalid call state", this));
 			lastResult = Result.ChannelInvalidCallState;
 		}
+		log.trace("Result hangup End ( " + getCallState() + ")*****************************************************************************");
 		return lastResult;
 	}
 

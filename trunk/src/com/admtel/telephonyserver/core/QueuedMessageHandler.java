@@ -5,12 +5,12 @@ import java.util.Queue;
 
 import org.apache.log4j.Logger;
 
+
 public abstract class QueuedMessageHandler implements Runnable, MessageHandler {
 
 	Logger log = Logger.getLogger(QueuedMessageHandler.class);
 	
 	Queue<Object> messages = new LinkedList<Object>();
-
 
    @Override
    public void putMessage(Object message){
