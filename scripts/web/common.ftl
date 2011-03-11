@@ -23,7 +23,10 @@
     	 		</tr>
     	 		<tr>
     	 			<td><a href="?action=queues">Queues</a></td>
-    	 		</tr>    	 		
+    	 		</tr>  
+    	 		<tr>
+    	 			<td><a href="?action=login">Logout</a></td>
+    	 		</tr>      	 		
     	 		    	 		
     	 	</table>
     	 </td>

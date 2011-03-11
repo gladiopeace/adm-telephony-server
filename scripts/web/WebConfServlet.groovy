@@ -3,6 +3,7 @@ import com.admtel.telephonyserver.core.*;
 import java.io.StringWriter;
 
 import org.apache.log4j.Logger;
+import org.omg.Dynamic.Parameter;
 
 import com.admtel.telephonyserver.httpserver.HttpRequestMessage;
 import com.admtel.telephonyserver.httpserver.HttpResponseMessage;
@@ -42,6 +43,31 @@ class WebConfServlet extends AdmServlet {
 		def c = ConferenceManager.getInstance().getAll()
 		['conferences':c]
 	}
+	
+	def login(request){
+		['login':'']
+	}
+	
+	def auth(request){
+		def usernameList = ["mohd","ali","hasan","hussein","jaafar","bilal"]
+		def passwordList = ["mohd","ali","hasan","hussein","jaafar","bilal"]
+		//def authMap = [username:usernameList,password:passwordList]
+		if ((request.getParameter('username') =="") ||(request.getParameter('password') =="")){
+			return [result:0]
+		}
+		def userNameValue = request.getParameter('username')
+		def userPassValue =request.getParameter('password')
+		if ((usernameList.contains(userNameValue)) && (passwordList.contains(userPassValue))){
+			if (userPassValue == passwordList.getAt(usernameList.indexOf(userNameValue))){
+				return [result:1]
+			}else{
+				return [result:0]
+			}
+		}
+		return [result:0]
+	}
+	
+	
 	def channels(request){
 		List<Channel> channels =  Switches.getInstance().getAllChannels();
 		def root =["channels":channels]
@@ -69,15 +95,17 @@ class WebConfServlet extends AdmServlet {
 		
 		def action = request.getParameter("action")
 		if (!(action?.length()>0)){
-			action = 'index'
+			action = 'login'
 		}
 		try{
 			Template t = config.getTemplate("${action}.ftl")			
 			def model = "${action}"(request)
+			println model
 			model['context'] = request.getContext()
 			StringWriter writer = new StringWriter()
 			t.process(model, writer)
-			response.appendBody(writer.toString())	
+			response.appendBody(writer.toString())
+			[auth:'login']	
 		}	
 		catch (Exception e){
 			log.fatal(e.getMessage(), e)
