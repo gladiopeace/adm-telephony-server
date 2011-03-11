@@ -1,4 +1,4 @@
-package com.admtel.telephonyserver.acd.impl;
+package com.admtel.telephonyserver.acd;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-import com.admtel.telephonyserver.acd.impl.AcdAgent.Status;
+import com.admtel.telephonyserver.acd.AcdAgent.Status;
+import com.admtel.telephonyserver.acd.impl.AgentDequeuePolicy;
 
 public class AcdQueue {
 	

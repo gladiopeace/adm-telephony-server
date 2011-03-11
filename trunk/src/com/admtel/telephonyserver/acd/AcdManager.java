@@ -91,6 +91,9 @@ public class AcdManager implements EventListener, TimerNotifiable {
 	public String[] getQueuedChannels(String queueId) {
 		return acdService.getQueuedChannels(queueId);
 	}
+	public String getChannelForAgent(String agentId){
+		return acdService.getChannelForAgent(agentId);
+	}
 
 	@Override
 	public boolean onTimer(Object data) {
