@@ -1,4 +1,4 @@
-import com.admtel.telephonyserver.acd.AcdManager;
+import com.admtel.telephonyserver.acd.AcdChannel;
 import org.mortbay.jetty.HttpStatus;
 
 import com.admtel.telephonyserver.core.*;
@@ -11,10 +11,7 @@ import com.admtel.telephonyserver.httpserver.HttpRequestMessage;
 import com.admtel.telephonyserver.httpserver.HttpResponseMessage;
 import groovy.xml.MarkupBuilder;
 import com.admtel.telephonyserver.httpserver.AdmServlet;
-import com.admtel.telephonyserver.interfaces.TokenSecurityProvider;
 
-import java.net.URLDecoder;
-import net.sf.json.groovy.JsonGroovyBuilder;
 
 class WebAPI extends AdmServlet {
 	
@@ -131,16 +128,16 @@ class WebAPI extends AdmServlet {
 	}
 	def get_agent_channel(request){
 		String agentId = request.getParameter('agent')
-		String channelId = AcdManager.getInstance().getChannelForAgent(agentId)		
+		AcdChannel acdChannel = AcdManager.getInstance().getChannelForAgent(agentId)		
 		def result = new JsonGroovyBuilder().json{
 			agent = agentId
-			channel = channelId
+			channel = acdChannel.getChannelId()
 		}.toString()
 		return result
 	}
 	def agent_login(request){
 		String agentId = request.getParameter('agent')
-		String
+	
 	}
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
