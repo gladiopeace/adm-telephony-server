@@ -1,8 +1,9 @@
-package com.admtel.telephonyserver.acd.impl;
+package com.admtel.telephonyserver.acd;
 
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Random;
+
 
 public class AcdAgent {
 	public enum Status{Ready, Busy};
@@ -11,6 +12,7 @@ public class AcdAgent {
 	Status status = Status.Ready;
 	Date lastUsedDate = new Date();
 	Integer useCounter = 0;
+	private AcdChannel channel;
 	
 	static public DateComparator dateComparator = new DateComparator();
 	static public UseComparator useComparator = new UseComparator();
@@ -69,5 +71,11 @@ public class AcdAgent {
 			useCounter ++;
 		}
 		this.status = status;
+	}
+	public void setChannel(AcdChannel channel) {
+		this.channel = channel;
+	}
+	public AcdChannel getChannel() {
+		return channel;
 	}
 }

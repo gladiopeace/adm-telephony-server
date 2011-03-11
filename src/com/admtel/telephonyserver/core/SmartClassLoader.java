@@ -80,7 +80,11 @@ public class SmartClassLoader {
 	
 	static public <T> T createInstance(Class<T> classType, String className){
 		log.trace("Creating instance of class " + className);
-		return SmartClassLoader.getInstance().createInstanceI(classType, className);
+		T result = SmartClassLoader.getInstance().createInstanceI(classType, className);
+		if (result == null){
+			log.warn("Couldn't create class " + className);
+		}
+		return result;
 	}
 	
 }

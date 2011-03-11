@@ -3,6 +3,9 @@ package com.admtel.telephonyserver.acd.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.admtel.telephonyserver.acd.AcdAgent;
+import com.admtel.telephonyserver.acd.AcdQueue;
+
 
 public class AcdDataProviderImpl implements AcdDataProvider {	
 	

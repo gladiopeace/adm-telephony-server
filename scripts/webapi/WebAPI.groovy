@@ -1,4 +1,20 @@
+import com.admtel.telephonyserver.acd.AcdManager;
+import org.mortbay.jetty.HttpStatus;
+
+import com.admtel.telephonyserver.core.*;
+
+import java.io.StringWriter;
+
+import org.apache.log4j.Logger;
+import com.admtel.telephonyserver.requests.*;
+import com.admtel.telephonyserver.httpserver.HttpRequestMessage;
+import com.admtel.telephonyserver.httpserver.HttpResponseMessage;
+import groovy.xml.MarkupBuilder;
+import com.admtel.telephonyserver.httpserver.AdmServlet;
+import com.admtel.telephonyserver.interfaces.TokenSecurityProvider;
+
 import java.net.URLDecoder;
+import net.sf.json.groovy.JsonGroovyBuilder;
 
 class WebAPI extends AdmServlet {
 	
@@ -64,14 +80,14 @@ class WebAPI extends AdmServlet {
 						p.each{
 							Channel channel = it.getChannel()
 							participant(
-								id:uniqueId, 
-								time:it.joinTime, 
-								caller:channel?.getCallingStationId(), 
-								memberId:it.memberId, 
-								talking:it.isTalking(), 
-								deaf:it.isDeaf(), 
-								moderator:it.isModerator(), 
-								muted:it.isMuted())
+									id:uniqueId, 
+									time:it.joinTime, 
+									caller:channel?.getCallingStationId(), 
+									memberId:it.memberId, 
+									talking:it.isTalking(), 
+									deaf:it.isDeaf(), 
+									moderator:it.isModerator(), 
+									muted:it.isMuted())
 						}
 					}
 				}
@@ -93,9 +109,42 @@ class WebAPI extends AdmServlet {
 		String conference = request.getParameter('conference')
 		//ConferenceJoinRequest cjr
 	}
+	
+	def get_channel_data(request){
+		String channelId = request.getParameter('channel')
+		String keyId = request.getParameter('key')
+		Channel channel = Switches.getInstance().getChannelById() 
+		def result = new JsonGroovyBuilder().json{
+			key = keyId
+			value = channel?.getUserData(keyId)
+		}.toString()
+	}
+	def set_channel_data(request){
+		String channelId = request.getParameter('channel')
+		String key = request.getParameter('key')
+		String value = request.getParameter('value')
+		Channel channel = Switches.getInstance().getChannelById(channelId)
+		if (channel != null){
+			channel.setUserData(key, value)
+		}
+		""
+	}
+	def get_agent_channel(request){
+		String agentId = request.getParameter('agent')
+		String channelId = AcdManager.getInstance().getChannelForAgent(agentId)		
+		def result = new JsonGroovyBuilder().json{
+			agent = agentId
+			channel = channelId
+		}.toString()
+		return result
+	}
+	def agent_login(request){
+		String agentId = request.getParameter('agent')
+		String
+	}
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
-		//TODO check token
+		
 		this.securityProvider = BeansManager.getInstance().getBean(getParameter('SecurityProvider'))
 		if (securityProvider.getSecurityLevel(request.getParameter('token')) > 0){
 			

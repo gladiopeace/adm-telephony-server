@@ -1,8 +1,10 @@
 package com.admtel.telephonyserver.core;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -69,6 +71,7 @@ public abstract class Channel implements TimerNotifiable {
 	private String uniqueId;
 
 	private ChannelData channelData = new ChannelData();
+	private Map<String, String> userData = new HashMap<String, String>();
 
 	protected DateTime createdTime = new DateTime();
 	protected CallOrigin callOrigin = CallOrigin.Inbound;
@@ -99,6 +102,18 @@ public abstract class Channel implements TimerNotifiable {
 		this.otherChannel = otherChannel;
 	}
 
+	public String getUserData(String key){
+		return userData.get(key);
+	}
+	public void setUserData(String key, String value){
+		userData.put(key, value);
+	}
+	public Map<String, String> getUserData(){
+		return userData;
+	}
+	public void setUserData(Map<String, String> userData){
+		this.userData = userData;
+	}
 	private MessageHandler messageHandler = new QueuedMessageHandler() {
 
 		@Override

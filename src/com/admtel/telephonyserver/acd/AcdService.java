@@ -16,4 +16,5 @@ public interface AcdService {
 	public String[] getQueuedChannels(String queueId);
 	public String[] getAgents();
 	public String getAgentForChannel(String channelId);
+	public String getChannelForAgent(String agentId);
 }

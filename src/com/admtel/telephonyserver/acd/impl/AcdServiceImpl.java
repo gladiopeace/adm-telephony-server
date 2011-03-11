@@ -11,8 +11,11 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import com.admtel.telephonyserver.acd.AcdAgent;
+import com.admtel.telephonyserver.acd.AcdChannel;
+import com.admtel.telephonyserver.acd.AcdQueue;
 import com.admtel.telephonyserver.acd.AcdService;
-import com.admtel.telephonyserver.acd.impl.AcdAgent.Status;
+import com.admtel.telephonyserver.acd.AcdAgent.Status;
 import com.admtel.telephonyserver.requests.DialRequest;
 
 public class AcdServiceImpl implements AcdService {
@@ -39,11 +42,12 @@ public class AcdServiceImpl implements AcdService {
 		AcdChannel channel = channels.get(channelId);
 		if (channel != null){
 			channels.remove(channelId);
-			if (channel.agent != null){
-				channel.agent.setStatus(Status.Ready);
-				channel.agent = null;
+			if (channel.getAgent() != null){
+				channel.getAgent().setStatus(Status.Ready);
+				channel.getAgent().setChannel(null);
+				channel.setAgent(null);
 			}
-			channel.acdQueue.remove(channel);			
+			channel.getAcdQueue().remove(channel);			
 		}
 	}
 
@@ -63,12 +67,12 @@ public class AcdServiceImpl implements AcdService {
 			
 		}
 		else{
-			if (channel.agent == null){
+			if (channel.getAgent() == null){
 				acdQueue.add(channel);
 			}
 			else{
-				channel.agent.setStatus(Status.Ready);
-				channel.agent = null;
+				channel.getAgent().setStatus(Status.Ready);
+				channel.setAgent(null);
 			}			
 		}
 		return true;
@@ -82,15 +86,16 @@ public class AcdServiceImpl implements AcdService {
 		for (AcdQueue acdQueue: acdQueues.values()){
 			if (acdQueue.hasWaitingChannels()){
 				AcdChannel channel = acdQueue.peek();
-				log.trace(String.format("Waiting channel(%s) - queue(%s) looking for a free agent", channel.channelId, channel.acdQueue));
+				log.trace(String.format("Waiting channel(%s) - queue(%s) looking for a free agent", channel.getChannelId(), channel.getAcdQueue()));
 				if (channel != null){
 					AcdAgent agent = acdQueue.getFreeAgent();
 					if (agent != null){
 						channel = acdQueue.poll();
-						channel.agent = agent;
+						channel.setAgent(agent);
+						agent.setChannel(channel);
 						agent.setStatus(Status.Busy);
-						log.trace(String.format("Waiting channel(%s) - queue(%s) found agent (%s)", channel.channelId, channel.acdQueue.getName(), agent.name));
-						requests.add(new DialRequest(channel.channelId, agent.address, acdQueue.getTimeout()));
+						log.trace(String.format("Waiting channel(%s) - queue(%s) found agent (%s)", channel.getChannelId(), channel.getAcdQueue().getName(), agent.getName()));
+						requests.add(new DialRequest(channel.getChannelId(), agent.getAddress(), acdQueue.getTimeout()));
 					}
 				}
 			}
@@ -108,11 +113,12 @@ public class AcdServiceImpl implements AcdService {
 		log.trace(String.format("Requeuing channel (%s)", channelId));
 		AcdChannel channel = channels.get(channelId);
 		if (channel != null){
-			if (channel.agent != null){
-				channel.agent.setStatus(Status.Ready);
-				channel.agent = null;
+			if (channel.getAgent() != null){
+				channel.getAgent().setStatus(Status.Ready);
+				channel.getAgent().setChannel(null);
+				channel.setAgent(null);
 			}
-			channel.acdQueue.add(channel);			
+			channel.getAcdQueue().add(channel);			
 			return true;
 		}
 		return false;
@@ -143,7 +149,16 @@ public class AcdServiceImpl implements AcdService {
 	public String getAgentForChannel(String channelId) {
 		AcdChannel channel = channels.get(channelId);
 		if (channel != null){
-			return channel.agent.getName();
+			return channel.getAgent().getName();
+		}
+		return "";
+	}
+
+	@Override
+	public String getChannelForAgent(String agentId) {
+		AcdAgent agent = acdAgents.get(agentId);
+		if (agent != null && agent.getChannel() != null){
+			return agent.getChannel().getChannelId();
 		}
 		return "";
 	}
