@@ -1,4 +1,3 @@
-import com.admtel.telephonyserver.acd.AcdChannel;
 import org.mortbay.jetty.HttpStatus;
 
 import com.admtel.telephonyserver.core.*;
@@ -11,7 +10,10 @@ import com.admtel.telephonyserver.httpserver.HttpRequestMessage;
 import com.admtel.telephonyserver.httpserver.HttpResponseMessage;
 import groovy.xml.MarkupBuilder;
 import com.admtel.telephonyserver.httpserver.AdmServlet;
-
+import com.admtel.telephonyserver.interfaces.TokenSecurityProvider;
+import com.admtel.telephonyserver.acd.*;
+import java.net.URLDecoder;
+import net.sf.json.groovy.JsonGroovyBuilder;
 
 class WebAPI extends AdmServlet {
 	
@@ -137,7 +139,25 @@ class WebAPI extends AdmServlet {
 	}
 	def agent_login(request){
 		String agentId = request.getParameter('agent')
-	
+		AcdAgent agent = AcdManager.getInstance().getAgent(agentId)
+		if (agent != null && agent.getPassword() == request.getParameter('password')){
+			def result = new JsonGroovyBuilder().json{
+				requestId=1234
+				message=""
+				status=0
+				sipProxy="172.16.140.129"
+				sipUsername="1000"
+				sipPassword="1234"
+				sipSecure = false
+			}.toString()
+			
+			return result;
+		}
+		return new JsonGroovyBuilder().json{
+			requestId=1234
+			message="Invalid"
+			status=-1
+		}.toString()
 	}
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){

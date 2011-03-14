@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -125,13 +126,12 @@ public class AcdServiceImpl implements AcdService {
 	}
 
 	@Override
-	public String[] getQueues() {
-		Set<String> queues = acdQueues.keySet();
-		return queues.toArray(new String[queues.size()]);
+	public Map<String, AcdQueue> getQueues() {
+		return acdQueues;
 	}
 
 	@Override
-	public String[] getQueuedChannels(String queueId) {
+	public Queue<AcdChannel> getQueuedChannels(String queueId) {
 		AcdQueue queue = acdQueues.get(queueId);
 		if (queue == null){
 			return null;
@@ -140,26 +140,30 @@ public class AcdServiceImpl implements AcdService {
 	}
 
 	@Override
-	public String[] getAgents() {
-		Set<String> agents = acdAgents.keySet();
-		return agents.toArray(new String[agents.size()]);		
+	public Map<String, AcdAgent> getAgents() {		
+		return acdAgents;		
 	}
 
 	@Override
-	public String getAgentForChannel(String channelId) {
+	public AcdAgent getAgentForChannel(String channelId) {
 		AcdChannel channel = channels.get(channelId);
 		if (channel != null){
-			return channel.getAgent().getName();
+			return channel.getAgent();
 		}
-		return "";
+		return null;
 	}
 
 	@Override
-	public String getChannelForAgent(String agentId) {
+	public AcdChannel getChannelForAgent(String agentId) {
 		AcdAgent agent = acdAgents.get(agentId);
 		if (agent != null && agent.getChannel() != null){
-			return agent.getChannel().getChannelId();
+			return agent.getChannel();
 		}
-		return "";
+		return null;
+	}
+
+	@Override
+	public AcdAgent getAgent(String agentId) {
+		return acdAgents.get(agentId);
 	}
 }

@@ -3,6 +3,8 @@ package com.admtel.telephonyserver.acd;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -84,14 +86,17 @@ public class AcdManager implements EventListener, TimerNotifiable {
 		return false;
 	}
 
-	public String[] getQueues() {
+	public Map<String, AcdQueue> getQueues() {
 		return acdService.getQueues();
 	}
 
-	public String[] getQueuedChannels(String queueId) {
+	public AcdAgent getAgent(String agentId){
+		return acdService.getAgent(agentId);
+	}
+	public Queue<AcdChannel> getQueuedChannels(String queueId) {
 		return acdService.getQueuedChannels(queueId);
 	}
-	public String getChannelForAgent(String agentId){
+	public AcdChannel getChannelForAgent(String agentId){
 		return acdService.getChannelForAgent(agentId);
 	}
 

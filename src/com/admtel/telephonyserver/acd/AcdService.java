@@ -1,6 +1,8 @@
 package com.admtel.telephonyserver.acd;
 
 import java.util.Date;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import java.util.List;
@@ -12,9 +14,10 @@ public interface AcdService {
 	public List<DialRequest> getNextDial();
 	public boolean containsChannel(String uniqueId);
 	public boolean requeueChannel(String channelId);
-	public String[] getQueues ();
-	public String[] getQueuedChannels(String queueId);
-	public String[] getAgents();
-	public String getAgentForChannel(String channelId);
-	public String getChannelForAgent(String agentId);
+	public Map<String, AcdQueue> getQueues ();
+	public Queue<AcdChannel> getQueuedChannels(String queueId);
+	public Map<String, AcdAgent> getAgents();
+	public AcdAgent getAgentForChannel(String channelId);
+	public AcdChannel getChannelForAgent(String agentId);
+	public AcdAgent getAgent(String agentId);
 }

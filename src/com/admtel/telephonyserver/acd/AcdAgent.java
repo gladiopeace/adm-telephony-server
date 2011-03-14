@@ -8,6 +8,7 @@ import java.util.Random;
 public class AcdAgent {
 	public enum Status{Ready, Busy};
 	String name;
+	String password;
 	String address;
 	Status status = Status.Ready;
 	Date lastUsedDate = new Date();
@@ -46,9 +47,16 @@ public class AcdAgent {
 		
 	}
 	
-	public AcdAgent(String name, String address) {
+	public AcdAgent(String name, String password, String address) {
 		this.name = name;
+		this.password = password;
 		this.address = address;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	public String getName() {
 		return name;
