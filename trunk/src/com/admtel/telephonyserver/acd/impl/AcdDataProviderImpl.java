@@ -13,10 +13,10 @@ public class AcdDataProviderImpl implements AcdDataProvider {
 	Map<String, AcdAgent> agents = new HashMap<String, AcdAgent>();
 	
 	public AcdDataProviderImpl(){
-		agents.put("agent_1", new AcdAgent("agent_1", "user:1000"));
-		agents.put("agent_2", new AcdAgent("agent_2", "user:1001"));
-		agents.put("agent_3", new AcdAgent("agent_3", "user:1002"));
-		agents.put("agent_4", new AcdAgent("agent_4", "user:1003"));
+		agents.put("agent_1", new AcdAgent("agent_1", "agent_1", "user:1000"));
+		agents.put("agent_2", new AcdAgent("agent_2", "agent_2", "user:1001"));
+		agents.put("agent_3", new AcdAgent("agent_3", "agent_3", "user:1002"));
+		agents.put("agent_4", new AcdAgent("agent_4", "agent_4", "user:1003"));
 		AcdQueue queue = new AcdQueue("queue_1");
 		queues.put("queue_1", queue);
 		queue.addAgent(agents.get("agent_1"));

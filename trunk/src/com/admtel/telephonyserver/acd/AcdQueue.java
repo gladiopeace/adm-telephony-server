@@ -86,7 +86,7 @@ public class AcdQueue {
 	public String getName() {
 		return name;		
 	}
-	public String[] getChannels(){
-		return (String[]) waitingChannels.toArray();
+	public Queue<AcdChannel> getChannels(){
+		return waitingChannels;
 	}
 }
