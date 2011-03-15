@@ -145,7 +145,7 @@ class WebAPI extends AdmServlet {
 				requestId=1234
 				message=""
 				status=0
-				sipProxy="172.16.140.129"
+				sipProxy="192.168.1.60"
 				sipUsername="1000"
 				sipPassword="1234"
 				sipSecure = false

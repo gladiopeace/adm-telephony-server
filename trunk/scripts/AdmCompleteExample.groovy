@@ -1,18 +1,25 @@
+import com.admtel.telephonyserver.events.Event.EventType;
+import com.admtel.telephonyserver.core.Channel;
+import com.admtel.telephonyserver.events.Event;
+import com.admtel.telephonyserver.events.PlayAndGetDigitsEndedEvent;
+import com.admtel.telephonyserver.prompts.PromptBuilder;
+import com.admtel.telephonyserver.events.AlertingEvent;
+import com.admtel.telephonyserver.events.OfferedEvent;
+import com.admtel.telephonyserver.core.Script;
+import com.admtel.telephonyserver.prompts.*;
 
-class AdmCompleteExample extends Script {
+public class  AdmCompleteExample extends Script {
 	
 	def state="WaitingForCall";
 	Channel a;
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	protected void onTimer() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -37,7 +44,9 @@ class AdmCompleteExample extends Script {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	void processPlaying_State(Event event){
+	
+	@Override
+	protected void processPlaying_State(Event event){
 		switch(event.getEventType()){
 			case EventType.PlayAndGetDigitsEnded:
 				PlayAndGetDigitsEndedEvent e = event
@@ -46,18 +55,20 @@ class AdmCompleteExample extends Script {
 			break
 		}
 	}
-	void processWaitingForCall_State(Event event){
+	
+	@Override
+	protected void processWaitingForCall_State(Event event){
 		switch (event.getEventType()){
-			case EventType.InboundAlerting:
-				InboundAlertingEvent e = event
+			case EventType.Offered:
+				OfferedEvent e = event
 				a = e.getChannel()
 				if (a != null){					
 					a.answer()
 				}
 				state = "Answering"
 			break
-			case EventType.OutboundAlerting:
-				OutboundAlertingEvent e = event
+			case EventType.Alerting:
+				AlertingEvent e = event
 				a = e.getChannel()
 				if (a!=null){
 				println "*********** outbound alerting on channel " + a
@@ -66,15 +77,18 @@ class AdmCompleteExample extends Script {
 				break
 		}
 	}
-	void processAnswering_State(Event event){
+	
+	@Override
+	protected void processAnswering_State(Event event){
+		println "Start *************************************processAnswering_State*****************************************"
 		switch (event.getEventType()){
-			case EventType.Answered:
+			case EventType.Connected:
 			a.setHangupAfter(50000);
 			PromptBuilder pb = PromptBuilderFactory.getInstance().getPromptBuilder(a.getLanguage())
 			def prompts = pb.currencyToPrompt(new BigDecimal(120.34))
-			prompts += (pb.numberToPrompt(13245))
-			prompts += (pb.numberToPrompt(33245))
-			prompts += (pb.numberToPrompt(34245))
+			//prompts += (pb.numberToPrompt(13245))
+			prompts += (pb.dateToPrompt(new Date()))
+			//prompts += (pb.numberToPrompt(34245))
 			println prompts
 			a.playAndGetDigits(10, (String[])prompts, 1000, "#")
 			
@@ -84,11 +98,11 @@ class AdmCompleteExample extends Script {
 			state = "Playing"
 			break
 		}
+		println "End *************************************processAnswering_State*****************************************"
 	}
 	
 	@Override
-	protected void onStart(){
-	
+	public void onStart(){
 	}
 
 }

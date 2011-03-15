@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import com.admtel.telephonyserver.config.DefinitionChangeListener;
 import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.RadiusDefinition;
+import com.admtel.telephonyserver.config.SystemConfig;
 import com.admtel.telephonyserver.core.Channel;
 import com.admtel.telephonyserver.core.Conference;
 import com.admtel.telephonyserver.core.EventsManager;
@@ -152,6 +153,10 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 
 	public boolean accountingInterimUpdate(Channel channel) {
 		if (!isEnabled()) return false;
+		if (SystemConfig.getInstance().serverDefinition.getInterimUpdate() <= 0){
+			return false;
+		}
+		log.trace("**************************************accountingStart***************************************");
 		RadiusServer radiusServer = getAvailableServer();
 		if (radiusServer != null){
 			radiusServer.accountingInterimUpdate(channel);
@@ -161,6 +166,10 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 
 	public boolean accountingStart(Channel channel) {
 		if (!isEnabled()) return false;
+		if (!SystemConfig.getInstance().serverDefinition.getStartAccounting()){
+			return false;
+		}
+		log.trace("**************************************accountingStart***************************************");
 		RadiusServer radiusServer = getAvailableServer();
 		if (radiusServer != null){
 			radiusServer.accountingStart(channel);
@@ -170,6 +179,10 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 
 	public boolean accountingStop(Channel channel) {
 		if (!isEnabled()) return false;
+		if (!SystemConfig.getInstance().serverDefinition.getStopAccounting()){
+			return false;
+		}
+		log.trace("**************************************accountingStart***************************************");
 		RadiusServer radiusServer = getAvailableServer();
 		if (radiusServer != null){
 			radiusServer.accountingStop(channel);
