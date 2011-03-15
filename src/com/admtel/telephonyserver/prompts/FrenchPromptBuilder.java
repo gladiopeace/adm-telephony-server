@@ -2,18 +2,24 @@ package com.admtel.telephonyserver.prompts;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-public class FrenchPromptBuilder extends GenericPromptBuilder  {
+import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+
+public class FrenchPromptBuilder extends GenericPromptBuilder {
+
+	static Logger log = Logger.getLogger(EnglishPromptBuilder.class);
 
 	@Override
 	public List<String> numberToPrompt(Long number) {
 		List<String> result = new ArrayList<String>();
 
 		Long currentNumber = Math.abs(number);
-		if (number<0){
+		if (number < 0) {
 			result.add("minus");
-			
+
 		}
 		if (number == 0) {
 			result.add("0");
@@ -21,9 +27,9 @@ public class FrenchPromptBuilder extends GenericPromptBuilder  {
 		while (currentNumber > 0) {
 			if (currentNumber <= 20) {
 				if (currentNumber == 1 && result.size() > 0) { // 21:
-																// vingt-et-un
-																// (twenty and
-																// one)
+					// vingt-et-un
+					// (twenty and
+					// one)
 					result.add("and");
 				}
 				result.add(currentNumber.toString());
@@ -64,6 +70,123 @@ public class FrenchPromptBuilder extends GenericPromptBuilder  {
 			}
 		}
 		return result;
-	}	
+	}
 
+	@Override
+	public List<String> dateToPrompt(Date date) {
+		List<String> result = new ArrayList<String>();
+		DateTime newDate = new DateTime(date);
+		result.add("le");
+		returnDay(newDate, result);
+		result.add(returnMonth(newDate));
+		returnYear(newDate, result);
+		log.trace("Franch: ////////////////////////////////////////////////////////////////////////////////////"
+						+ result
+						+ "===================================================");
+		return result;
+	}
+
+	public void returnDay(DateTime date, List<String> result) {
+		int dayOfYear = date.getDayOfMonth();
+		Long day = Long.valueOf(dayOfYear);
+		if (day <= 20) {
+			result.add(day.toString());
+		} else if (day < 31) {
+			Long remainder = day % 10;
+			Long value = day - remainder;
+			result.add(value.toString());
+			if (remainder > 0) {
+				result.add(remainder.toString());
+			}
+		}
+	}
+
+	public String returnMonth(DateTime date) {
+		String month = "";
+		switch (date.getMonthOfYear()) {
+		case 1:
+			month = "janvier";
+			break;
+		case 2:
+			month = "février";
+			break;
+		case 3:
+			month = "mars";
+			break;
+		case 4:
+			month = "avril";
+			break;
+		case 5:
+			month = "mai";
+			break;
+		case 6:
+			month = "juin";
+			break;
+		case 7:
+			month = "juillet";
+			break;
+		case 8:
+			month = "août";
+			break;
+		case 9:
+			month = "septembre";
+			break;
+		case 10:
+			month = "octobre";
+			break;
+		case 11:
+			month = "novembre";
+			break;
+		case 12:
+			month = "décembre";
+			break;
+		}
+		return month;
+	}
+
+	public void returnYear(DateTime date, List<String> result) {
+		int newYear = date.getYear();
+		Long year = Long.valueOf(newYear);
+
+		if (year < 3000) {
+			Long remainder = year % 1000;
+			Long value = (year - remainder) / 1000;
+			if (value == 1) {
+				result.add("thousand");
+			} else if (value == 2) {
+				result.add("2");
+				result.add("thousand");
+			} else if (value == 3) {
+				result.add("3");
+				result.add("thousand");
+			}
+			year = remainder;
+			if (year < 1000) {
+				remainder = year % 100;
+				value = (year - remainder) / 100;
+				if (value == 1) {
+					result.add("hundred");
+				} else if (value == 2) {
+					result.add("2");
+					result.add("hundred");
+				} else if (value > 2) {
+					result.add(value.toString());
+					result.add("hundred");
+				}
+				year = remainder;
+				if (year < 100) {
+					remainder = year % 10;
+					value = year - remainder;
+					if (year <= 20) {
+						result.add(year.toString());
+					} else {
+						if (remainder > 0) {
+							result.add(remainder.toString());
+						}
+						result.add(value.toString());
+					}
+				}
+			}
+		}
+	}
 }
