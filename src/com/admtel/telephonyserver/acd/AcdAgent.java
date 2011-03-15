@@ -10,6 +10,7 @@ public class AcdAgent {
 	String name;
 	String password;
 	String address;
+	
 	Status status = Status.Ready;
 	Date lastUsedDate = new Date();
 	Integer useCounter = 0;

@@ -64,6 +64,9 @@ public class SmartClassLoader {
 	}	
 	
 	public <T> T createInstanceI(Class<T> classType, String className){
+		if (className.startsWith("#")){
+			return (T)BeansManager.getInstance().getBean(className.substring(1));
+		}
 		Class c = getClassI(className);
 		if (c == null) return null;
 		if (classType.isAssignableFrom(c)){
@@ -83,6 +86,9 @@ public class SmartClassLoader {
 		T result = SmartClassLoader.getInstance().createInstanceI(classType, className);
 		if (result == null){
 			log.warn("Couldn't create class " + className);
+		}
+		else{
+			log.trace("Created class returned " + result);
 		}
 		return result;
 	}

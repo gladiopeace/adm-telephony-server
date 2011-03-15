@@ -146,8 +146,8 @@ class WebAPI extends AdmServlet {
 				message=""
 				status=0
 				sipProxy="192.168.1.60"
-				sipUsername="1000"
-				sipPassword="1234"
+				sipUsername = agent.getName()
+				sipPassword = agent.getPassword()
 				sipSecure = false
 			}.toString()
 			
