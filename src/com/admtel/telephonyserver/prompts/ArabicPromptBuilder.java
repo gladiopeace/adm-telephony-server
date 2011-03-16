@@ -102,10 +102,6 @@ public class ArabicPromptBuilder extends GenericPromptBuilder {
 		returnDay(newDate, result);
 		result.add(returnMonth(newDate));
 		returnYear(newDate, result);
-		log
-				.trace("Arabic: ////////////////////////////////////////////////////////////////////////////////////"
-						+ result
-						+ "===================================================");
 		return result;
 	}
 
@@ -129,40 +125,40 @@ public class ArabicPromptBuilder extends GenericPromptBuilder {
 		String month = "";
 		switch (date.getMonthOfYear()) {
 		case 1:
-			month = "Kanon Al-thani";
+			month = "mon-0";
 			break;
 		case 2:
-			month = "Chbat";
+			month = "mon-1";
 			break;
 		case 3:
-			month = "Azar";
+			month = "mon-2";
 			break;
 		case 4:
-			month = "Nisan";
+			month = "mon-3";
 			break;
 		case 5:
-			month = "Ayyar";
+			month = "mon-4";
 			break;
 		case 6:
-			month = "Hozayran";
+			month = "mon-5";
 			break;
 		case 7:
-			month = "Tamoz";
+			month = "mon-6";
 			break;
 		case 8:
-			month = "Aab";
+			month = "mon-7";
 			break;
 		case 9:
-			month = "Ayloul";
+			month = "mon-8";
 			break;
 		case 10:
-			month = "Teshren Al-awal";
+			month = "mon-9";
 			break;
 		case 11:
-			month = "Teshren Al-thani";
+			month = "mon-10";
 			break;
 		case 12:
-			month = "Kanon Al-awal";
+			month = "mon-11";
 			break;
 		}
 		return month;
@@ -229,7 +225,6 @@ public class ArabicPromptBuilder extends GenericPromptBuilder {
 			String num = currentNumber.substring(i,i + 1);
 			result.add(num);
 		}
-		log.trace("Arabic: ++++++++result++++++++++++++++++++++++++++++++++++++++" + result + "++++++++++++++++++++++++++++++++++");
 		return result;
 	}
 }
