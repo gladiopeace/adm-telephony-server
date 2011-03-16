@@ -1,6 +1,7 @@
-package com.admtel.telephonyserver.acd;
+package com.admtel.telephonyserver.acd.impl;
 
 import java.util.Date;
+
 
 
 public class AcdChannel implements Comparable<AcdChannel> {
