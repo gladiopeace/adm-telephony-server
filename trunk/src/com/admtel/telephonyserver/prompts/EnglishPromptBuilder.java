@@ -59,8 +59,6 @@ public class EnglishPromptBuilder extends GenericPromptBuilder {
 		for (String str : result) {
 			number_result += ", " + str;
 		}
-		log.trace("Building number for " + number + ", result = "
-				+ number_result);
 		return result;
 	}
 
@@ -71,10 +69,6 @@ public class EnglishPromptBuilder extends GenericPromptBuilder {
 		returnDay(newDate, result);
 		result.add(returnMonth(newDate));
 		returnYear(newDate, result);
-		log
-				.trace("English: ////////////////////////////////////////////////////////////////////////////////////"
-						+ result
-						+ "===================================================");
 		return result;
 	}
 
@@ -107,40 +101,40 @@ public class EnglishPromptBuilder extends GenericPromptBuilder {
 		String month = "";
 		switch (date.getMonthOfYear()) {
 		case 1:
-			month = "January";
+			month = "mon-0";
 			break;
 		case 2:
-			month = "February";
+			month = "mon-1";
 			break;
 		case 3:
-			month = "March";
+			month = "mon-2";
 			break;
 		case 4:
-			month = "April";
+			month = "mon-3";
 			break;
 		case 5:
-			month = "May";
+			month = "mon-4";
 			break;
 		case 6:
-			month = "June";
+			month = "mon-5";
 			break;
 		case 7:
-			month = "July";
+			month = "mon-6";
 			break;
 		case 8:
-			month = "Augest";
+			month = "mon-7";
 			break;
 		case 9:
-			month = "September";
+			month = "mon-8";
 			break;
 		case 10:
-			month = "October";
+			month = "mon-9";
 			break;
 		case 11:
-			month = "November";
+			month = "mon-10";
 			break;
 		case 12:
-			month = "December";
+			month = "mon-11";
 			break;
 		}
 		return month;
@@ -200,7 +194,6 @@ public class EnglishPromptBuilder extends GenericPromptBuilder {
 			String num = currentNumber.substring(i,i + 1);
 			result.add(num);
 		}
-		log.trace("English: ++++++++result++++++++++++++++++++++++++++++++++++++++" + result + "++++++++++++++++++++++++++++++++++");
 		return result;
 	}
 }
