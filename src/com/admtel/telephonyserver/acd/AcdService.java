@@ -6,6 +6,10 @@ import java.util.Queue;
 import java.util.Set;
 
 import java.util.List;
+
+import com.admtel.telephonyserver.acd.impl.AcdAgent;
+import com.admtel.telephonyserver.acd.impl.AcdChannel;
+import com.admtel.telephonyserver.acd.impl.AcdQueue;
 import com.admtel.telephonyserver.requests.DialRequest;
 
 public interface AcdService {
