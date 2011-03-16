@@ -86,15 +86,12 @@ public class  AdmCompleteExample extends Script {
 			a.setHangupAfter(50000);
 			PromptBuilder pb = PromptBuilderFactory.getInstance().getPromptBuilder(a.getLanguage())
 			def prompts = pb.currencyToPrompt(new BigDecimal(120.34))
-			//prompts += (pb.numberToPrompt(13245))
+			prompts += (pb.numberToPrompt(13245))
 			prompts += (pb.dateToPrompt(new Date()))
-			//prompts += (pb.numberToPrompt(34245))
+			prompts += (pb.digitToPrompt("0123456789"))
 			println prompts
 			a.playAndGetDigits(10, (String[])prompts, 1000, "#")
-			
 			println "*******" + prompts
-			
-			
 			state = "Playing"
 			break
 		}

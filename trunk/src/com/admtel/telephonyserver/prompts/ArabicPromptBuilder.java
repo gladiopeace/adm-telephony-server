@@ -220,4 +220,16 @@ public class ArabicPromptBuilder extends GenericPromptBuilder {
 			}
 		}
 	}
+
+	@Override
+	public List<String> digitToPrompt(String number) {
+		List<String> result = new ArrayList<String>();
+		String currentNumber = number.toString();
+		for (int i = 0; i <=currentNumber.length() - 1; i++){
+			String num = currentNumber.substring(i,i + 1);
+			result.add(num);
+		}
+		log.trace("Arabic: ++++++++result++++++++++++++++++++++++++++++++++++++++" + result + "++++++++++++++++++++++++++++++++++");
+		return result;
+	}
 }
