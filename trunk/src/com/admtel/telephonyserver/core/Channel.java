@@ -1,5 +1,6 @@
 package com.admtel.telephonyserver.core;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -33,6 +34,7 @@ import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.radius.RadiusServers;
 import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.requests.AnswerRequest;
+import com.admtel.telephonyserver.requests.ChannelRequest;
 import com.admtel.telephonyserver.requests.DialRequest;
 import com.admtel.telephonyserver.requests.HangupRequest;
 import com.admtel.telephonyserver.requests.JoinConferenceRequest;
@@ -727,13 +729,18 @@ public abstract class Channel implements TimerNotifiable {
 		// TODO send response events
 
 		log.trace(String.format("processRequest{%s}", request));
+		if (request instanceof ChannelRequest){
+			ChannelRequest cr = (ChannelRequest) request;
+			appendUserData(cr.getUserData());
+		}
 		switch (request.getType()) {
 		case HangupRequest: {
-			HangupRequest hr = (HangupRequest) request;
-			Result result = hangup(hr.getDisconnectCode());
+			HangupRequest hr = (HangupRequest) request;			
+			Result result = hangup(hr.getDisconnectCode());			
 		}
 			break;
 		case AnswerRequest: {
+			
 			answer();
 		}
 			break;
@@ -753,6 +760,11 @@ public abstract class Channel implements TimerNotifiable {
 		}
 		break;
 		}
+	}
+
+	private void appendUserData(Map<String, String> userData2) {
+		userData.putAll(userData2);
+		
 	}
 
 	public void setCallState(CallState callState) {

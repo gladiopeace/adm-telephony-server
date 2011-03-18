@@ -1,9 +1,22 @@
 package com.admtel.telephonyserver.requests;
 
-import com.admtel.telephonyserver.requests.Request.RequestType;
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class ChannelRequest extends Request {
 
+	Map<String, String> userData = new HashMap<String, String>();
+	
+	public Map<String, String> getUserData() {
+		return userData;
+	}
+	public void setUserData(Map<String, String> userData) {
+		this.userData = userData;
+	}
+	public void setUserData (String key, String value){
+		userData.put(key, value);
+	}
 	public ChannelRequest(){
 		
 	}
