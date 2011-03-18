@@ -73,7 +73,7 @@ public class Timers extends Thread{
 	public static Timers getInstance(){
 		return SingletonHolder.instance;
 	}
-	public Timer startTimer(TimerNotifiable notifiable, long duration, boolean oneShot, Object data){
+	synchronized public Timer startTimer(TimerNotifiable notifiable, long duration, boolean oneShot, Object data){
 		log.trace("Timer " + data + ", for " + notifiable+", added");
 		if (duration == 0){
 			return null;

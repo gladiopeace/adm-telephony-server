@@ -1,77 +1,88 @@
 package com.admtel.telephonyserver.acd.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
+import java.util.PriorityQueue;
+import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import com.admtel.telephonyserver.acd.AcdCall;
 import com.admtel.telephonyserver.acd.AcdService;
-import com.admtel.telephonyserver.acd.impl.AcdAgent.Status;
+import com.admtel.telephonyserver.acd.AcdQueue;
+import com.admtel.telephonyserver.acd.data.AcdDataProvider;
 import com.admtel.telephonyserver.requests.DialRequest;
+import com.admtel.telephonyserver.acd.AcdAgent;
 
 public class AcdServiceImpl implements AcdService {
 
 	static Logger log = Logger.getLogger(AcdServiceImpl.class);
-	
-	Map<String, AcdQueue> acdQueues;
-	Map<String, AcdAgent> acdAgents;
-	Map<String, AcdChannel> channels = new HashMap<String, AcdChannel>();
-	
+
 	public AcdDataProvider acdDataProvider;
+	PriorityQueue<AcdCall> calls = new PriorityQueue<AcdCall>();
+	Map<String, AcdCall> callsBM = new HashMap<String, AcdCall>();
 
-	public void init(){
-		acdQueues = acdDataProvider.getQueues();
-		acdAgents = acdDataProvider.getAgents();
-		
+	static private DateComparator dateComparator = new DateComparator();
+	static private UseComparator useComparator = new UseComparator();
+	static private RandomComparator randomComparator = new RandomComparator();
+
+	static class DateComparator implements Comparator<AcdAgent> {
+
+		@Override
+		public int compare(AcdAgent arg0, AcdAgent arg1) {
+			return arg0.getLastUsedDate().compareTo(arg1.getLastUsedDate());
+		}
+
+	}
+
+	static class UseComparator implements Comparator<AcdAgent> {
+
+		@Override
+		public int compare(AcdAgent o1, AcdAgent o2) {
+			return o1.getUseCounter().compareTo(o2.getUseCounter());
+		}
+
+	}
+
+	static class RandomComparator implements Comparator<AcdAgent> {
+
+		static Random rand = new Random(System.currentTimeMillis());
+
+		@Override
+		public int compare(AcdAgent o1, AcdAgent o2) {
+			return rand.nextInt(3) - rand.nextInt(3);
+		}
+
+	}
+
+	public void init() {
 		log.trace("AcdServiceImpl initialized ... ");
-		log.trace(String.format("acdQueues = %d, acdAgents = %d", acdQueues.size(), acdAgents.size()));
-	}
-	
-	@Override
-	synchronized public void unqueueChannel(String channelId) {
-		log.trace(String.format("Unqueueing channel %s", channelId));
-		AcdChannel channel = channels.get(channelId);
-		if (channel != null){
-			channels.remove(channelId);
-			if (channel.getAgent() != null){
-				channel.getAgent().setStatus(Status.Ready);
-				channel.getAgent().setChannel(null);
-				channel.setAgent(null);
-			}
-			channel.getAcdQueue().remove(channel);			
-		}
 	}
 
 	@Override
-	synchronized public boolean queueChannel(String queueName, String channelId, Date setupTime, int priority) {
-		log.trace(String.format("Queueing channel (%s) in queue(%s)", queueName, channelId));
-		AcdQueue acdQueue = acdQueues.get(queueName);
-		if (acdQueue == null){
-			log.warn(String.format("Queue %s doesn't exist", queueName));
+	synchronized public boolean queueChannel(String queueId, String channelId,
+			Date setupTime, int priority) {
+		log.trace(String.format("Queueing channel (%s) in queue(%s)", queueId,
+				channelId));
+		AcdQueue queue = acdDataProvider.getQueue(queueId);
+		if (queue != null) {
+			AcdCall call = new AcdCall(channelId, priority, queueId,
+					queue.getPriority(), setupTime);
+			queue.incrementCurrentSessions();
+			acdDataProvider.updateQueue(queue);
+			calls.add(call);
+			callsBM.put(call.getChannelId(), call);
+		} else {
+			log.warn(String.format("Queue %s not found", queueId));
 			return false;
-		}
-		AcdChannel channel = channels.get(channelId);
-		if (channel == null){
-			channel = new AcdChannel (acdQueue, channelId, setupTime, priority);
-			channels.put(channelId, channel);
-			acdQueue.add(channel);
-			
-		}
-		else{
-			if (channel.getAgent() == null){
-				acdQueue.add(channel);
-			}
-			else{
-				channel.getAgent().setStatus(Status.Ready);
-				channel.setAgent(null);
-			}			
 		}
 		return true;
 	}
@@ -80,87 +91,160 @@ public class AcdServiceImpl implements AcdService {
 	synchronized public List<DialRequest> getNextDial() {
 		List<DialRequest> requests = new ArrayList<DialRequest>();
 		log.trace("AcdServiceImpl, getNextDial ...");
-		
-		for (AcdQueue acdQueue: acdQueues.values()){
-			if (acdQueue.hasWaitingChannels()){
-				AcdChannel channel = acdQueue.peek();
-				log.trace(String.format("Waiting channel(%s) - queue(%s) looking for a free agent", channel.getChannelId(), channel.getAcdQueue()));
-				if (channel != null){
-					AcdAgent agent = acdQueue.getFreeAgent();
-					if (agent != null){
-						channel = acdQueue.poll();
-						channel.setAgent(agent);
-						agent.setChannel(channel);
-						agent.setStatus(Status.Busy);
-						log.trace(String.format("Waiting channel(%s) - queue(%s) found agent (%s)", channel.getChannelId(), channel.getAcdQueue().getName(), agent.getName()));
-						requests.add(new DialRequest(channel.getChannelId(), agent.getAddress(), acdQueue.getTimeout()));
+
+		Iterator<AcdCall> it = calls.iterator();
+		while (it.hasNext()) {
+			AcdCall call = it.next();
+			List<AcdAgent> agents = acdDataProvider
+					.getAvailableQueueAgents(call.getQueueId());
+			if (!agents.isEmpty()) {
+				AcdQueue queue = acdDataProvider.getQueue(call.getQueueId());
+				if (queue != null) {
+					switch (queue.getAgentDequeuePolicy()) {
+					case LastUsed:
+						Collections.sort(agents, dateComparator);
+
+						break;
+					case Random:
+						Collections.sort(agents, randomComparator);
+
+						break;
+					case LeastUsed:
+						Collections.sort(agents, useComparator);
+
+						break;
+					// TODO
+					/*
+					 * case RoundRobin: Collections.rotate(rrAgents, 1); break;
+					 */
 					}
+				}
+				if (callsBM.get(call.getChannelId()) == null) {
+					it.remove();
+				} else if (call.getAgentId() == null) {
+					AcdAgent agent = agents.get(0);
+					agent.setCallChannelId(call.getChannelId());
+					call.setAgentId(agent.getId());
+					acdDataProvider.updateAgent(agent);
+					DialRequest dr =new DialRequest(call.getChannelId(), agent
+							.getAddress(), queue.getTimeout());
+					dr.setUserData("dialed_agent", agent.getId());
+					dr.setUserData("queue", call.getQueueId());
+					requests.add(dr);
 				}
 			}
 		}
+
 		return requests;
 	}
 
 	@Override
-	public boolean containsChannel(String uniqueId) {		
-		return channels.containsKey(uniqueId);
-	}
-
-	@Override
-	synchronized public boolean requeueChannel(String channelId) {
-		log.trace(String.format("Requeuing channel (%s)", channelId));
-		AcdChannel channel = channels.get(channelId);
-		if (channel != null){
-			if (channel.getAgent() != null){
-				channel.getAgent().setStatus(Status.Ready);
-				channel.getAgent().setChannel(null);
-				channel.setAgent(null);
+	public void agentDialStarted(String agentId, String channelId) {
+		log.trace(String.format("Agent(%s) dial started on channel (%s)", agentId, channelId));
+			AcdAgent agent = acdDataProvider.getAgent(agentId);
+			if (agent != null) {
+				agent.setChannelId(channelId);
+				acdDataProvider.updateAgent(agent);
 			}
-			channel.getAcdQueue().add(channel);			
-			return true;
+	}
+	@Override
+	public void agentConnected(String agentId) {
+		log.trace(String.format("*************Agent(%s) Connected .....", agentId));
+		//Remove call from the queue
+		AcdAgent agent = acdDataProvider.getAgent(agentId);
+		if (agent != null){
+			log.trace(String.format("Removing channel (%s) from queue", agent.getCallChannelId()));
+			AcdCall call = callsBM.get(agent.getCallChannelId());
+			if (call != null){
+				AcdQueue queue = acdDataProvider.getQueue(call.getQueueId());
+				queue.decrementCurrentSessions();
+				acdDataProvider.updateQueue(queue);
+			}
+			callsBM.remove(agent.getCallChannelId());
 		}
-		return false;
+		
 	}
 
 	@Override
-	public Map<String, AcdQueue> getQueues() {
-		return acdQueues;
+	public void callerDisconnected(String channelId) {
+		AcdCall call = callsBM.get(channelId);
+		if (call != null){
+			AcdAgent agent = acdDataProvider.getAgent(call.getAgentId());
+			if (agent != null){
+				agent.setCallChannelId(null);
+				acdDataProvider.updateAgent(agent);
+			}
+			AcdQueue queue = acdDataProvider.getQueue(call.getQueueId());
+			if (queue != null){
+				queue.decrementCurrentSessions();
+				acdDataProvider.updateQueue(queue);
+			}
+			callsBM.remove(channelId);
+			
+		}		
 	}
 
 	@Override
-	public Queue<AcdChannel> getQueuedChannels(String queueId) {
-		AcdQueue queue = acdQueues.get(queueId);
-		if (queue == null){
-			return null;
+	public void agentDisconnected(String agentId) {
+		AcdAgent agent = acdDataProvider.getAgent(agentId);
+		if (agent != null){
+			AcdCall call = callsBM.get(agent.getCallChannelId());
+			if (call != null){
+				call.setAgentId(null);
+			}
+			agent.setCallChannelId(null);
+			agent.setChannelId(null);
+			acdDataProvider.updateAgent(agent);
 		}
-		return queue.getChannels();
+		
+	}
+	@Override
+	public AcdQueue[] getQueues() {
+		Collection<AcdQueue> c = acdDataProvider.getQueues().values();
+		return c.toArray(new AcdQueue[c.size()]);
 	}
 
 	@Override
-	public Map<String, AcdAgent> getAgents() {		
-		return acdAgents;		
+	public AcdAgent[] getAgents() {
+		Collection<AcdAgent> c = acdDataProvider.getAgents().values();
+		return c.toArray(new AcdAgent[c.size()]);
 	}
 
 	@Override
-	public AcdAgent getAgentForChannel(String channelId) {
-		AcdChannel channel = channels.get(channelId);
-		if (channel != null){
-			return channel.getAgent();
+	public AcdCall[] getQueueCalls(String queueId) {
+		//Consider a map of maps for the binding map 
+		log.trace("Get Queue Calls for queue " + queueId);
+		List<AcdCall> c = new ArrayList<AcdCall>();
+		Iterator<AcdCall> it = callsBM.values().iterator();
+		while (it.hasNext()){
+			AcdCall call = it.next();
+			log.trace(String.format("getQueueCalls(%s), call = %s", queueId,
+					call));
+			if (queueId == null || queueId.isEmpty()
+					|| call.getQueueId() == queueId) {
+				c.add(call);
+			}
 		}
-		return null;
+		log.trace(String
+				.format("Get Queue Calls for queue %s, has %d calls, total queue has %d calls",
+						queueId, c.size(), calls.size()));
+		return c.toArray(new AcdCall[c.size()]);
 	}
+	
 
 	@Override
-	public AcdChannel getChannelForAgent(String agentId) {
-		AcdAgent agent = acdAgents.get(agentId);
-		if (agent != null && agent.getChannel() != null){
-			return agent.getChannel();
+	public void agentDialFailed(String agentId) {
+		AcdAgent agent = acdDataProvider.getAgent(agentId);
+		if (agent != null){
+			AcdCall call = callsBM.get(agent.getCallChannelId());
+			if (call != null){
+				call.setAgentId(null);
+			}
+			agent.setCallChannelId(null);
+			agent.setChannelId(null);
+			acdDataProvider.updateAgent(agent);
 		}
-		return null;
+		
 	}
 
-	@Override
-	public AcdAgent getAgent(String agentId) {
-		return acdAgents.get(agentId);
-	}
 }

@@ -13,6 +13,8 @@
         <th bgcolor="#C0C0C0">Direction</th>
         <th bgcolor="#C0C0C0">Call State</th>
         <th bgcolor="#C0C0C0">Media State</th>
+        <th bgcolor="#C0C0C0">Setup Time</th>
+        <th bgcolor="#C0C0C0">Answer Time</th>
       <#list channels as c>
         <tr align=left valign=top>          
           <td bgcolor="#A0A0A0">${c.uniqueId}</td>
@@ -21,6 +23,8 @@
           <td bgcolor="#A0A0A0">${c.callOrigin}</td>
           <td bgcolor="#A0A0A0">${c.callState}</td>
           <td bgcolor="#A0A0A0">${c.mediaState}</td>
+          <td bgcolor="#A0A0A0">${c.setupTime?default("")}</td>
+          <td bgcolor="#A0A0A0">${c.answerTime?default("")}</td>
           <td bgcolor="#E0E0E0"><form action="webconf" method="get" enctype="application/x-www-form-urlencoded"><input name="destination" type="text" id="destination" />
             <label>
               <input type="text" name="timeout" id="timeout">

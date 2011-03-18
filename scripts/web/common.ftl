@@ -23,6 +23,9 @@
     	 		</tr>
     	 		<tr>
     	 			<td><a href="?action=queues">Queues</a></td>
+    	 		</tr>
+    	 		<tr>
+    	 			<td><a href="?action=queue_calls">Queue Calls</a></td>
     	 		</tr>  
     	 		<tr>
     	 			<td><a href="?action=login">Logout</a></td>

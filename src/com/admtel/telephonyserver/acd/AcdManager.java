@@ -1,30 +1,17 @@
 package com.admtel.telephonyserver.acd;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-
-import com.admtel.telephonyserver.acd.impl.AcdAgent;
-import com.admtel.telephonyserver.acd.impl.AcdChannel;
-import com.admtel.telephonyserver.acd.impl.AcdDataProviderImpl;
-import com.admtel.telephonyserver.acd.impl.AcdQueue;
-import com.admtel.telephonyserver.acd.impl.AcdServiceImpl;
 import com.admtel.telephonyserver.core.BeansManager;
 import com.admtel.telephonyserver.core.Channel;
 import com.admtel.telephonyserver.core.EventsManager;
 import com.admtel.telephonyserver.core.Result;
-import com.admtel.telephonyserver.core.SmartClassLoader;
 import com.admtel.telephonyserver.core.Switches;
 import com.admtel.telephonyserver.core.Timers;
-import com.admtel.telephonyserver.events.AcdQueueFailedEvent;
+import com.admtel.telephonyserver.events.ConnectedEvent;
 import com.admtel.telephonyserver.events.DialFailedEvent;
 import com.admtel.telephonyserver.events.DialStartedEvent;
-import com.admtel.telephonyserver.events.DialStatus;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.DisconnectedEvent;
 import com.admtel.telephonyserver.interfaces.EventListener;
@@ -65,42 +52,58 @@ public class AcdManager implements EventListener, TimerNotifiable {
 		switch (event.getEventType()) {
 		case Disconnected: {
 			DisconnectedEvent he = (DisconnectedEvent) event;
-			// Caller disconnected
-			if (acdService.containsChannel(he.getChannel().getUniqueId())) {
-				acdService.unqueueChannel(he.getChannel().getUniqueId());
+			if (he.getChannel().getUserData("queue") != null) {
+				if (he.getChannel().getUserData("agent") == null) { // caller
+																	// disconnected
+					acdService
+							.callerDisconnected(he.getChannel().getUniqueId());
+				} else { // agent disconnected
+					acdService.agentDisconnected(he.getChannel().getUserData(
+							"agent"));
+				}
 			}
+		}
+			break;
+		case DialStarted: {
 
-			else if (he.getChannel().getOtherChannel() != null) {
-				// Agent disconnected
-				acdService.requeueChannel(he.getChannel().getOtherChannel()
+			DialStartedEvent dse = (DialStartedEvent) event;
+			String dialedAgent = dse.getChannel().getUserData("dialed_agent");
+			String queue = dse.getChannel().getUserData("queue");
+			log.trace(String.format(
+					"Channel (%s) dial started to agent (%s) for queue (%s)",
+					dse.getChannel().getUniqueId(), dialedAgent, queue));
+			if (dialedAgent != null) {
+				dse.getDialedChannel().setUserData("queue", queue);
+				dse.getDialedChannel().setUserData("agent", dialedAgent);
+				acdService.agentDialStarted(dialedAgent, dse.getDialedChannel()
 						.getUniqueId());
+			}
+		}
+			break;
+		case Connected: {
+			ConnectedEvent ce = (ConnectedEvent) event;
 
+			String agentId = ce.getChannel().getUserData("agent");
+			String queueId = ce.getChannel().getUserData("queue");
+			log.trace(String.format(
+					"Channel (%s) connected queue = %s, agent = %s", ce
+							.getChannel().getUniqueId(), queueId, agentId));
+			if (ce.getChannel().getUserData("queue") != null
+					&& ce.getChannel().getUserData("agent") != null) {
+				acdService.agentConnected(agentId);
 			}
 		}
 			break;
 		case DialFailed: {
 			DialFailedEvent dee = (DialFailedEvent) event;
-			if (dee.getChannel().getCallState() == Channel.CallState.AcdQueued) {
-				acdService.requeueChannel(dee.getChannel().getUniqueId());
+			String dialedAgent = dee.getChannel().getUserData("dialed_agent");
+			if (dialedAgent != null) {
+				acdService.agentDialFailed(dialedAgent);
 			}
 		}
 			break;
 		}
 		return false;
-	}
-
-	public Map<String, AcdQueue> getQueues() {
-		return acdService.getQueues();
-	}
-
-	public AcdAgent getAgent(String agentId){
-		return acdService.getAgent(agentId);
-	}
-	public Queue<AcdChannel> getQueuedChannels(String queueId) {
-		return acdService.getQueuedChannels(queueId);
-	}
-	public AcdChannel getChannelForAgent(String agentId){
-		return acdService.getChannelForAgent(agentId);
 	}
 
 	@Override
@@ -112,4 +115,15 @@ public class AcdManager implements EventListener, TimerNotifiable {
 		return false;
 	}
 
+	public AcdQueue[] getQueues() {
+		return acdService.getQueues();
+	}
+
+	public AcdAgent[] getAgents() {
+		return acdService.getAgents();
+	}
+
+	public AcdCall[] getQueueCalls(String queueId) {
+		return acdService.getQueueCalls(queueId);
+	}
 }
