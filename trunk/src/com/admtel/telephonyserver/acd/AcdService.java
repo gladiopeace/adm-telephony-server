@@ -23,4 +23,6 @@ public interface AcdService {
 	public AcdAgent[] getAgents();
 	public AcdCall[] getQueueCalls(String queueId);
 	public void agentDialFailed(String agentId);
+
+	public AcdAgent getAgent(String agentId);
 }
