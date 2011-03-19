@@ -247,4 +247,9 @@ public class AcdServiceImpl implements AcdService {
 		
 	}
 
+	@Override
+	public AcdAgent getAgent(String agentId) {
+		return acdDataProvider.getAgent(agentId);
+	}
+
 }

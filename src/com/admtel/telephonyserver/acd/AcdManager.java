@@ -126,4 +126,7 @@ public class AcdManager implements EventListener, TimerNotifiable {
 	public AcdCall[] getQueueCalls(String queueId) {
 		return acdService.getQueueCalls(queueId);
 	}
+	public AcdAgent getAgent(String agentId){
+		return acdService.getAgent(agentId);
+	}
 }

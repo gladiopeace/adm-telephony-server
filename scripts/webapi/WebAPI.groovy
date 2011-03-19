@@ -130,23 +130,25 @@ class WebAPI extends AdmServlet {
 	}
 	def get_agent_channel(request){
 		String agentId = request.getParameter('agent')
-		AcdChannel acdChannel = AcdManager.getInstance().getChannelForAgent(agentId)		
+		AcdAgent tAgent= AcdManager.getInstance().getAgent(agentId)		
 		def result = new JsonGroovyBuilder().json{
 			agent = agentId
-			channel = acdChannel.getChannelId()
+			channel = tAgent.getChannelId()
+			callChannel = tAgent.getCallChannelId()			
 		}.toString()
 		return result
 	}
 	def agent_login(request){
 		String agentId = request.getParameter('agent')
 		AcdAgent agent = AcdManager.getInstance().getAgent(agentId)
+		Switch _switch = Switches.getInstance().getRandom();
 		if (agent != null && agent.getPassword() == request.getParameter('password')){
 			def result = new JsonGroovyBuilder().json{
 				requestId=1234
 				message=""
 				status=0
-				sipProxy="192.168.1.60"
-				sipUsername = agent.getName()
+				sipProxy= _switch.getDefinition().getAddress();
+				sipUsername = agent.getId()
 				sipPassword = agent.getPassword()
 				sipSecure = false
 			}.toString()

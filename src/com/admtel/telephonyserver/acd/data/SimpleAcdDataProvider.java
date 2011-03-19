@@ -20,9 +20,9 @@ public class SimpleAcdDataProvider implements AcdDataProvider {
 	public void init(){
 		AcdQueue queue_1 = new AcdQueue ("queue_1", 0, 10000);
 		AcdQueue queue_2 = new AcdQueue ("queue_2", 0, 10000);
-		AcdAgent agent_1 = new AcdAgent ("agent_1", "agent_1", "user:1000");
-		AcdAgent agent_2 = new AcdAgent ("agent_2", "agent_2", "user:1001");
-		AcdAgent agent_3 = new AcdAgent ("agent_3", "agent_3", "user:1002");
+		AcdAgent agent_1 = new AcdAgent ("agent_1", "agent_1", "user:agent_1");
+		AcdAgent agent_2 = new AcdAgent ("agent_2", "agent_2", "user:agent_2");
+		AcdAgent agent_3 = new AcdAgent ("agent_3", "agent_3", "user:agent_3");
 		
 		
 		queues.put(queue_1.getId(), queue_1);
