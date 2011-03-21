@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 import com.admtel.telephonyserver.acd.AcdCall;
 import com.admtel.telephonyserver.acd.AcdService;
 import com.admtel.telephonyserver.acd.AcdQueue;
-import com.admtel.telephonyserver.acd.data.AcdDataProvider;
 import com.admtel.telephonyserver.requests.DialRequest;
 import com.admtel.telephonyserver.acd.AcdAgent;
 
