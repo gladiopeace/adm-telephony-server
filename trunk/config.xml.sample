@@ -278,6 +278,17 @@
 			<id>simple-security-provider</id>
 			<class>com.admtel.telephonyserver.misc.SimpleSecurityProvider</class>
 		</bean>
+				<bean>
+			<id>simple-user-dao</id>
+			<class>scripts/SimpleUserDAOImpl.groovy</class>
+		</bean>
+		<bean>
+			<id>FSConfiguratorServlet</id>
+			<class>scripts/FSConfiguratorServlet.groovy</class>
+			<parameters>
+				<parameter name="userDAO" value="simple-user-dao"/>
+			</parameters>
+		</bean>		
 	</beans>
 
 </config>

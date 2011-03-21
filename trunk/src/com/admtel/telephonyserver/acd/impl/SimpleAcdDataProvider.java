@@ -1,4 +1,4 @@
-package com.admtel.telephonyserver.acd.data;
+package com.admtel.telephonyserver.acd.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
