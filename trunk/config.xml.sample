@@ -223,7 +223,7 @@
 <!--		</bean>-->
 		
 		<bean>
-			<class>com.admtel.telephonyserver.acd.impl.AcdDataProviderImpl</class>
+			<class>com.admtel.telephonyserver.acd.impl.SimpleAcdDataProvider</class>			
 			<id>simpleAcdDataProvider</id>
 		</bean>
 		
