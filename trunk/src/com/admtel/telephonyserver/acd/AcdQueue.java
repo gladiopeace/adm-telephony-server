@@ -4,8 +4,8 @@ public class AcdQueue {
 	
 	String id;
 	String name;
-	Integer priority;
-	Integer timeout;
+	Integer priority=0;
+	Integer timeout=10000;
 	Integer currentSessions=0;
 	
 	public void incrementCurrentSessions(){

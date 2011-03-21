@@ -112,7 +112,7 @@ class WebAPI extends AdmServlet {
 	def get_channel_data(request){
 		String channelId = request.getParameter('channel')
 		String keyId = request.getParameter('key')
-		Channel channel = Switches.getInstance().getChannelById() 
+		Channel channel = Switches.getInstance().getChannelById(channelId) 
 		def result = new JsonGroovyBuilder().json{
 			key = keyId
 			value = channel?.getUserData(keyId)
@@ -129,14 +129,33 @@ class WebAPI extends AdmServlet {
 		""
 	}
 	def get_agent_channel(request){
-		String agentId = request.getParameter('agent')
-		AcdAgent tAgent= AcdManager.getInstance().getAgent(agentId)		
+		String agentName = request.getParameter('agent')
+		AcdAgent tAgent= AcdManager.getInstance().getAgentByName(agentName)	
 		def result = new JsonGroovyBuilder().json{
 			agent = agentId
 			channel = tAgent.getChannelId()
 			callChannel = tAgent.getCallChannelId()			
 		}.toString()
 		return result
+	}
+	def get_agent_application_uri(){
+		String agentName = request.getParameter('agent')
+		AcdAgent tAgent = AcdManager.getInstance().getAgentByName(agentName)
+		if (tAgent!=null){
+			Channel channel = Switches.getInstance().getChannelById(tAgent.getChannelId())
+			if (channel != null){
+				def result = new JsonGroovyBuilder().json{
+					key = "application_uri"
+					value = channel?.getUserData("application_uri")
+				}
+				return result
+			}
+		}
+		return new JsonGroovyBuilder().json{
+			requestId=1234
+			message="Invalid"
+			status=-1
+		}.toString()
 	}
 	def agent_login(request){
 		String agentName = request.getParameter('agent')
