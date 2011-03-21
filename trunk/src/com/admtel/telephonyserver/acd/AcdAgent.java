@@ -5,6 +5,7 @@ import java.util.Date;
 public class AcdAgent {
 	
 	String id;
+	String name;
 	String password;
 	String address;
 	AcdAgentStatus status = AcdAgentStatus.Ready;
@@ -15,13 +16,22 @@ public class AcdAgent {
 
 	
 
-	public AcdAgent(String id, String password, String address) {
+	public AcdAgent(String id, String name, String password, String address) {
 		super();
 		this.id = id;
+		this.name = name;
 		this.password = password;
 		this.address = address;
 	}
 	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public String getId() {
 		return id;
 	}
