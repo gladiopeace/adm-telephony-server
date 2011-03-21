@@ -3,6 +3,7 @@ package com.admtel.telephonyserver.acd;
 public class AcdQueue {
 	
 	String id;
+	String name;
 	Integer priority;
 	Integer timeout;
 	Integer currentSessions=0;
@@ -21,11 +22,18 @@ public class AcdQueue {
 	}
 	private AgentDequeuePolicy agentDequeuePolicy = AgentDequeuePolicy.LastUsed; 
 	
-	public AcdQueue(String id, Integer priority, Integer timeout) {
+	public AcdQueue(String id, String name,  Integer priority, Integer timeout) {
 		super();
 		this.id = id;
+		this.name = name;
 		this.priority = priority;
 		this.timeout = timeout;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
 	}
 	public AgentDequeuePolicy getAgentDequeuePolicy() {
 		return agentDequeuePolicy;

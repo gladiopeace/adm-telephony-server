@@ -68,20 +68,20 @@ public class AcdServiceImpl implements AcdService {
 	}
 
 	@Override
-	synchronized public boolean queueChannel(String queueId, String channelId,
+	synchronized public boolean queueChannel(String queueName, String channelId,
 			Date setupTime, int priority) {
-		log.trace(String.format("Queueing channel (%s) in queue(%s)", queueId,
+		log.trace(String.format("Queueing channel (%s) in queue(%s)", queueName,
 				channelId));
-		AcdQueue queue = acdDataProvider.getQueue(queueId);
+		AcdQueue queue = acdDataProvider.getQueueByName(queueName);
 		if (queue != null) {
-			AcdCall call = new AcdCall(channelId, priority, queueId,
+			AcdCall call = new AcdCall(channelId, priority, queue.getId(),
 					queue.getPriority(), setupTime);
 			queue.incrementCurrentSessions();
 			acdDataProvider.updateQueue(queue);
 			calls.add(call);
 			callsBM.put(call.getChannelId(), call);
 		} else {
-			log.warn(String.format("Queue %s not found", queueId));
+			log.warn(String.format("Queue %s not found", queueName));
 			return false;
 		}
 		return true;
@@ -98,7 +98,7 @@ public class AcdServiceImpl implements AcdService {
 			List<AcdAgent> agents = acdDataProvider
 					.getAvailableQueueAgents(call.getQueueId());
 			if (!agents.isEmpty()) {
-				AcdQueue queue = acdDataProvider.getQueue(call.getQueueId());
+				AcdQueue queue = acdDataProvider.getQueueById(call.getQueueId());
 				if (queue != null) {
 					switch (queue.getAgentDequeuePolicy()) {
 					case LastUsed:
@@ -141,7 +141,7 @@ public class AcdServiceImpl implements AcdService {
 	@Override
 	public void agentDialStarted(String agentId, String channelId) {
 		log.trace(String.format("Agent(%s) dial started on channel (%s)", agentId, channelId));
-			AcdAgent agent = acdDataProvider.getAgent(agentId);
+			AcdAgent agent = acdDataProvider.getAgentById(agentId);
 			if (agent != null) {
 				agent.setChannelId(channelId);
 				acdDataProvider.updateAgent(agent);
@@ -151,12 +151,12 @@ public class AcdServiceImpl implements AcdService {
 	public void agentConnected(String agentId) {
 		log.trace(String.format("*************Agent(%s) Connected .....", agentId));
 		//Remove call from the queue
-		AcdAgent agent = acdDataProvider.getAgent(agentId);
+		AcdAgent agent = acdDataProvider.getAgentById(agentId);
 		if (agent != null){
 			log.trace(String.format("Removing channel (%s) from queue", agent.getCallChannelId()));
 			AcdCall call = callsBM.get(agent.getCallChannelId());
 			if (call != null){
-				AcdQueue queue = acdDataProvider.getQueue(call.getQueueId());
+				AcdQueue queue = acdDataProvider.getQueueById(call.getQueueId());
 				queue.decrementCurrentSessions();
 				acdDataProvider.updateQueue(queue);
 			}
@@ -169,12 +169,12 @@ public class AcdServiceImpl implements AcdService {
 	public void callerDisconnected(String channelId) {
 		AcdCall call = callsBM.get(channelId);
 		if (call != null){
-			AcdAgent agent = acdDataProvider.getAgent(call.getAgentId());
+			AcdAgent agent = acdDataProvider.getAgentById(call.getAgentId());
 			if (agent != null){
 				agent.setCallChannelId(null);
 				acdDataProvider.updateAgent(agent);
 			}
-			AcdQueue queue = acdDataProvider.getQueue(call.getQueueId());
+			AcdQueue queue = acdDataProvider.getQueueById(call.getQueueId());
 			if (queue != null){
 				queue.decrementCurrentSessions();
 				acdDataProvider.updateQueue(queue);
@@ -186,7 +186,7 @@ public class AcdServiceImpl implements AcdService {
 
 	@Override
 	public void agentDisconnected(String agentId) {
-		AcdAgent agent = acdDataProvider.getAgent(agentId);
+		AcdAgent agent = acdDataProvider.getAgentById(agentId);
 		if (agent != null){
 			AcdCall call = callsBM.get(agent.getCallChannelId());
 			if (call != null){
@@ -234,7 +234,7 @@ public class AcdServiceImpl implements AcdService {
 
 	@Override
 	public void agentDialFailed(String agentId) {
-		AcdAgent agent = acdDataProvider.getAgent(agentId);
+		AcdAgent agent = acdDataProvider.getAgentById(agentId);
 		if (agent != null){
 			AcdCall call = callsBM.get(agent.getCallChannelId());
 			if (call != null){
@@ -248,8 +248,13 @@ public class AcdServiceImpl implements AcdService {
 	}
 
 	@Override
-	public AcdAgent getAgent(String agentId) {
-		return acdDataProvider.getAgent(agentId);
+	public AcdAgent getAgentById(String agentId) {
+		return acdDataProvider.getAgentById(agentId);
+	}
+
+	@Override
+	public AcdAgent getAgentByName(String agentName) {
+		return acdDataProvider.getAgentByName(agentName);
 	}
 
 }
