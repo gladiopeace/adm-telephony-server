@@ -88,8 +88,7 @@ public class AcdServiceImpl implements AcdService {
 
 	@Override
 	synchronized public List<DialRequest> getNextDial() {
-		List<DialRequest> requests = new ArrayList<DialRequest>();
-		log.trace("AcdServiceImpl, getNextDial ...");
+		List<DialRequest> requests = new ArrayList<DialRequest>();		
 
 		Iterator<AcdCall> it = calls.iterator();
 		while (it.hasNext()) {

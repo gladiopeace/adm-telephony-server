@@ -1,6 +1,23 @@
 package com.admtel.telephonyserver.events;
 
 public class UnregisteredEvent extends Event {
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("UnregisteredEvent [");
+		if (eventType != null) {
+			builder.append("eventType=");
+			builder.append(eventType);
+			builder.append(", ");
+		}
+		if (user != null) {
+			builder.append("user=");
+			builder.append(user);
+		}
+		builder.append("]");
+		return builder.toString();
+	}
+
 	private String user;
 
 	public UnregisteredEvent(String user){

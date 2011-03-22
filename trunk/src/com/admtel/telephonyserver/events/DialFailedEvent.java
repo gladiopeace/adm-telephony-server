@@ -6,9 +6,24 @@ public class DialFailedEvent extends ChannelEvent {
 
 	@Override
 	public String toString() {
-		return "[" + (channel != null ? "channel=" + channel + ", " : "")
-				+ (eventType != null ? "eventType=" + eventType + ", " : "")
-				+ (dialStatus != null ? "dialStatus=" + dialStatus : "") + "]";
+		StringBuilder builder = new StringBuilder();
+		builder.append("DialFailedEvent [");
+		if (channel != null) {
+			builder.append("channel=");
+			builder.append(channel);
+			builder.append(", ");
+		}
+		if (eventType != null) {
+			builder.append("eventType=");
+			builder.append(eventType);
+			builder.append(", ");
+		}
+		if (dialStatus != null) {
+			builder.append("dialStatus=");
+			builder.append(dialStatus);
+		}
+		builder.append("]");
+		return builder.toString();
 	}
 	DialStatus dialStatus = DialStatus.Unknown;
 	

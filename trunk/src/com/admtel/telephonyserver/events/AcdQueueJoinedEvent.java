@@ -6,9 +6,29 @@ public class AcdQueueJoinedEvent extends ChannelEvent {
 
 	@Override
 	public String toString() {
-		return "AcdQueueJoinedEvent ["
-				+ (queueName != null ? "queueName=" + queueName + ", " : "")
-				+ (isAgent != null ? "isAgent=" + isAgent : "") + "]";
+		StringBuilder builder = new StringBuilder();
+		builder.append("AcdQueueJoinedEvent [");
+		if (channel != null) {
+			builder.append("channel=");
+			builder.append(channel);
+			builder.append(", ");
+		}
+		if (eventType != null) {
+			builder.append("eventType=");
+			builder.append(eventType);
+			builder.append(", ");
+		}
+		if (queueName != null) {
+			builder.append("queueName=");
+			builder.append(queueName);
+			builder.append(", ");
+		}
+		if (isAgent != null) {
+			builder.append("isAgent=");
+			builder.append(isAgent);
+		}
+		builder.append("]");
+		return builder.toString();
 	}
 
 	private String queueName;

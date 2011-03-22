@@ -3,6 +3,33 @@ package com.admtel.telephonyserver.events;
 import com.admtel.telephonyserver.core.SigProtocol;
 
 public class RegisteredEvent extends Event {
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("RegisteredEvent [");
+		if (eventType != null) {
+			builder.append("eventType=");
+			builder.append(eventType);
+			builder.append(", ");
+		}
+		if (user != null) {
+			builder.append("user=");
+			builder.append(user);
+			builder.append(", ");
+		}
+		if (sigProtocol != null) {
+			builder.append("sigProtocol=");
+			builder.append(sigProtocol);
+			builder.append(", ");
+		}
+		if (switchId != null) {
+			builder.append("switchId=");
+			builder.append(switchId);
+		}
+		builder.append("]");
+		return builder.toString();
+	}
+
 	private String user;
 	private SigProtocol sigProtocol;
 	private String switchId;

@@ -132,29 +132,44 @@ class WebAPI extends AdmServlet {
 		String agentName = request.getParameter('agent')
 		AcdAgent tAgent= AcdManager.getInstance().getAgentByName(agentName)	
 		def result = new JsonGroovyBuilder().json{
-			agent = agentId
+			agent = tAgent.getId()
 			channel = tAgent.getChannelId()
-			callChannel = tAgent.getCallChannelId()			
+			callChannel = tAgent.getCallChannelId()
 		}.toString()
 		return result
 	}
-	def get_agent_application_uri(){
+	def get_agent_data(request){
 		String agentName = request.getParameter('agent')
+		String dataKey = request.getParameter('key')
 		AcdAgent tAgent = AcdManager.getInstance().getAgentByName(agentName)
+		log.trace(tAgent.getCallChannelId())
+		String t_message = "No Error"
 		if (tAgent!=null){
-			Channel channel = Switches.getInstance().getChannelById(tAgent.getChannelId())
+			Channel channel = Switches.getInstance().getChannelById(tAgent.getCallChannelId())
+			
 			if (channel != null){
-				def result = new JsonGroovyBuilder().json{
-					key = "application_uri"
-					value = channel?.getUserData("application_uri")
+				if (channel.getUserData(dataKey) != null){
+					def result = new JsonGroovyBuilder().json{
+						request=1234
+						message=""
+						status=0
+						key = dataKey
+						value = channel?.getUserData(dataKey)
+					}.toString()
+					return result
 				}
-				return result
+				else{
+					t_message = "Key ${dataKey} not found in channel ${channel.getUniqueId()}"
+				}
+			}
+			else{
+				t_message = "Channel not found"
 			}
 		}
 		return new JsonGroovyBuilder().json{
 			requestId=1234
-			message="Invalid"
-			status=-1
+			message=t_message
+			status=-1 //TODO put proper status
 		}.toString()
 	}
 	def agent_login(request){
