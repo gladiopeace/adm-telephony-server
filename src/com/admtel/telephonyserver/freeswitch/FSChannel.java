@@ -15,6 +15,7 @@ import com.admtel.telephonyserver.core.ScriptManager;
 import com.admtel.telephonyserver.core.Switch;
 import com.admtel.telephonyserver.events.AcdQueueFailedEvent;
 import com.admtel.telephonyserver.events.AcdQueueJoinedEvent;
+import com.admtel.telephonyserver.events.AlertingEvent;
 import com.admtel.telephonyserver.events.ConnectedEvent;
 import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
@@ -70,10 +71,11 @@ public class FSChannel extends Channel {
 
 	@Override
 	public String toString() {
-		return String
-				.format("\t\n\tuniqueId=%s\n\tcallState=%s\n\tmediaState=%s\n\tcallOrigin=%s\n\tinternalState=%s",
-						getUniqueId(), getCallState(), getMediaState(),
-						getCallOrigin(), internalState);
+		return "FSChannel ["
+				+ (super.toString() != null ? "toString()=" + super.toString()
+						+ ", " : "")
+				+ (internalState != null ? "internalState=" + internalState
+						: "") + "]";
 	}
 
 	private IoSession session;
@@ -135,6 +137,14 @@ public class FSChannel extends Channel {
 			case ChannelAnswered:
 				internalState = new ConnectedState();
 				FSChannel.this.onEvent(new ConnectedEvent(FSChannel.this));
+				break;
+			case ChannelState:
+			{
+				FSChannelStateEvent cse = (FSChannelStateEvent) fsEvent;
+				if (cse.getChannelState() == ChannelState.CS_CONSUME_MEDIA && cse.getCallState() == FSChannelStateEvent.CallState.RINGING){
+					FSChannel.this.onEvent(new AlertingEvent(FSChannel.this));
+				}
+			}
 				break;
 			}
 		}

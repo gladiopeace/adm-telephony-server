@@ -1,5 +1,6 @@
 package com.admtel.telephonyserver.core;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,6 +46,19 @@ import com.admtel.telephonyserver.utils.PromptsUtils;
 
 public abstract class Channel implements TimerNotifiable {
 
+	private String toString(Collection<?> collection, int maxLen) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("[");
+		int i = 0;
+		for (Iterator<?> iterator = collection.iterator(); iterator.hasNext()
+				&& i < maxLen; i++) {
+			if (i > 0)
+				builder.append(", ");
+			builder.append(iterator.next());
+		}
+		builder.append("]");
+		return builder.toString();
+	}
 	public static Logger log = Logger.getLogger(Channel.class);
 
 	public enum CallState {
@@ -668,7 +682,17 @@ public abstract class Channel implements TimerNotifiable {
 
 	@Override
 	public String toString() {
-		return String.format("\t\n\tuniqueId=%s\n\tcallState=%s\n\tmediaState=%s\n\tcallOrigin=%s",	uniqueId, callState, mediaState, callOrigin);
+		final int maxLen = 20;
+		return "Channel ["
+				+ (uniqueId != null ? "uniqueId=" + uniqueId + ", " : "")
+				+ (callOrigin != null ? "callOrigin=" + callOrigin + ", " : "")
+				+ (setupTime != null ? "setupTime=" + setupTime + ", " : "")
+				+ (answerTime != null ? "answerTime=" + answerTime + ", " : "")
+				+ (hangupTime != null ? "hangupTime=" + hangupTime + ", " : "")
+				+ (channelData != null ? "channelData=" + channelData + ", "
+						: "")
+				+ (userData != null ? "userData="
+						+ toString(userData.entrySet(), maxLen) : "") + "]";
 	}
 
 	public Integer getH323DisconnectCause() {

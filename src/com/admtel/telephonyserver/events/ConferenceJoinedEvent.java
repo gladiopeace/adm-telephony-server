@@ -8,22 +8,32 @@ public class ConferenceJoinedEvent extends ChannelEvent {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("ConferenceJoinedEvent [");
+		if (channel != null) {
+			builder.append("channel=");
+			builder.append(channel);
+			builder.append(", ");
+		}
+		if (eventType != null) {
+			builder.append("eventType=");
+			builder.append(eventType);
+			builder.append(", ");
+		}
+		if (participantId != null) {
+			builder.append("participantId=");
+			builder.append(participantId);
+			builder.append(", ");
+		}
 		if (conferenceId != null) {
 			builder.append("conferenceId=");
 			builder.append(conferenceId);
 			builder.append(", ");
 		}
-		builder.append("deaf=");
-		builder.append(deaf);
-		builder.append(", moderator=");
+		builder.append("moderator=");
 		builder.append(moderator);
 		builder.append(", muted=");
 		builder.append(muted);
-		builder.append(", ");
-		if (participantId != null) {
-			builder.append("participantId=");
-			builder.append(participantId);
-		}
+		builder.append(", deaf=");
+		builder.append(deaf);
 		builder.append("]");
 		return builder.toString();
 	}

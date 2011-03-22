@@ -15,11 +15,24 @@ public class QueueBridgedEvent extends ChannelEvent {
 	}
 	@Override
 	public String toString() {
-		return "QueueBridgedEvent ["
-				+ (peerChannel != null ? "peerChannel=" + peerChannel + ", "
-						: "")
-				+ (channel != null ? "channel=" + channel + ", " : "")
-				+ (eventType != null ? "eventType=" + eventType : "") + "]";
+		StringBuilder builder = new StringBuilder();
+		builder.append("QueueBridgedEvent [");
+		if (channel != null) {
+			builder.append("channel=");
+			builder.append(channel);
+			builder.append(", ");
+		}
+		if (eventType != null) {
+			builder.append("eventType=");
+			builder.append(eventType);
+			builder.append(", ");
+		}
+		if (peerChannel != null) {
+			builder.append("peerChannel=");
+			builder.append(peerChannel);
+		}
+		builder.append("]");
+		return builder.toString();
 	}
 
 }

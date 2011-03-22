@@ -4,6 +4,33 @@ import com.admtel.telephonyserver.core.Channel;
 
 public class DtmfEvent extends ChannelEvent {
 	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("DtmfEvent [");
+		if (channel != null) {
+			builder.append("channel=");
+			builder.append(channel);
+			builder.append(", ");
+		}
+		if (eventType != null) {
+			builder.append("eventType=");
+			builder.append(eventType);
+			builder.append(", ");
+		}
+		if (digit != null) {
+			builder.append("digit=");
+			builder.append(digit);
+			builder.append(", ");
+		}
+		if (digitEdge != null) {
+			builder.append("digitEdge=");
+			builder.append(digitEdge);
+		}
+		builder.append("]");
+		return builder.toString();
+	}
+
 	String digit;
 	enum DigitEdge{Begin, End};
 	

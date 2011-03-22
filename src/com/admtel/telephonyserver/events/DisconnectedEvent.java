@@ -6,9 +6,24 @@ public class DisconnectedEvent extends ChannelEvent {
 
 	@Override
 	public String toString() {
-		return String.format(
-				"\t\n\teventType=%s\n\tchannel=%s\n\tdisconnectCode=%s",
-				eventType, channel, disconnectCode);
+		StringBuilder builder = new StringBuilder();
+		builder.append("DisconnectedEvent [");
+		if (channel != null) {
+			builder.append("channel=");
+			builder.append(channel);
+			builder.append(", ");
+		}
+		if (eventType != null) {
+			builder.append("eventType=");
+			builder.append(eventType);
+			builder.append(", ");
+		}
+		if (disconnectCode != null) {
+			builder.append("disconnectCode=");
+			builder.append(disconnectCode);
+		}
+		builder.append("]");
+		return builder.toString();
 	}
 
 	DisconnectCode disconnectCode;

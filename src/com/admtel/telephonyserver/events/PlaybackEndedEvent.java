@@ -4,6 +4,36 @@ import com.admtel.telephonyserver.core.Channel;
 
 public class PlaybackEndedEvent extends ChannelEvent {
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("PlaybackEndedEvent [");
+		if (channel != null) {
+			builder.append("channel=");
+			builder.append(channel);
+			builder.append(", ");
+		}
+		if (eventType != null) {
+			builder.append("eventType=");
+			builder.append(eventType);
+			builder.append(", ");
+		}
+		if (interruptingDigit != null) {
+			builder.append("interruptingDigit=");
+			builder.append(interruptingDigit);
+			builder.append(", ");
+		}
+		builder.append("success=");
+		builder.append(success);
+		builder.append(", ");
+		if (interruptedFile != null) {
+			builder.append("interruptedFile=");
+			builder.append(interruptedFile);
+		}
+		builder.append("]");
+		return builder.toString();
+	}
+
 	String interruptingDigit="";
 	boolean success;
 	String interruptedFile="";	

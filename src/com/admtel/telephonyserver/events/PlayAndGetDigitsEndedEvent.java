@@ -8,14 +8,19 @@ public class PlayAndGetDigitsEndedEvent extends ChannelEvent {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("PlayAndGetDigitsEndedEvent [");
+		if (channel != null) {
+			builder.append("channel=");
+			builder.append(channel);
+			builder.append(", ");
+		}
+		if (eventType != null) {
+			builder.append("eventType=");
+			builder.append(eventType);
+			builder.append(", ");
+		}
 		if (digits != null) {
 			builder.append("digits=");
 			builder.append(digits);
-			builder.append(", ");
-		}
-		if (interruptedFile != null) {
-			builder.append("interruptedFile=");
-			builder.append(interruptedFile);
 			builder.append(", ");
 		}
 		builder.append("success=");
@@ -24,6 +29,11 @@ public class PlayAndGetDigitsEndedEvent extends ChannelEvent {
 		if (terminatingDigit != null) {
 			builder.append("terminatingDigit=");
 			builder.append(terminatingDigit);
+			builder.append(", ");
+		}
+		if (interruptedFile != null) {
+			builder.append("interruptedFile=");
+			builder.append(interruptedFile);
 		}
 		builder.append("]");
 		return builder.toString();

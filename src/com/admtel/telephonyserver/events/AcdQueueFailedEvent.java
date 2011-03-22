@@ -9,9 +9,29 @@ public class AcdQueueFailedEvent extends ChannelEvent {
 
 	@Override
 	public String toString() {
-		return "AcdQueueFailedEvent ["
-				+ (queueName != null ? "queueName=" + queueName + ", " : "")
-				+ (reason != null ? "reason=" + reason : "") + "]";
+		StringBuilder builder = new StringBuilder();
+		builder.append("AcdQueueFailedEvent [");
+		if (channel != null) {
+			builder.append("channel=");
+			builder.append(channel);
+			builder.append(", ");
+		}
+		if (eventType != null) {
+			builder.append("eventType=");
+			builder.append(eventType);
+			builder.append(", ");
+		}
+		if (queueName != null) {
+			builder.append("queueName=");
+			builder.append(queueName);
+			builder.append(", ");
+		}
+		if (reason != null) {
+			builder.append("reason=");
+			builder.append(reason);
+		}
+		builder.append("]");
+		return builder.toString();
 	}
 
 	public String getQueueName() {

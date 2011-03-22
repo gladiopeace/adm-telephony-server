@@ -137,12 +137,6 @@ public abstract class Script implements EventListener{
 
 	protected abstract void onStop();
 	
-	protected abstract void  processAnswering_State(Event event);
-	
-	protected abstract void processWaitingForCall_State(Event event);
-	
-	protected abstract void processPlaying_State(Event event);
-	
 	public abstract void onStart();
 	
 	public void addChannel(Channel channel) {
