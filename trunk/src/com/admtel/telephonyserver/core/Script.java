@@ -23,7 +23,7 @@ import com.admtel.telephonyserver.registrar.UserLocation;
 
 public abstract class Script implements EventListener{
 
-	public static Logger log = Logger.getLogger(Script.class);
+	static Logger log = Logger.getLogger(Script.class);
 
 	enum ScriptState {
 		Running, Stopped
@@ -100,9 +100,7 @@ public abstract class Script implements EventListener{
 			// Add the dialed channel to the list of channels, and add us to the
 			// listeners
 			log.debug(this+", Dial Started ....");
-			if (dse.getDialedChannel() != null) {
-				log.debug(String.format("%s, DialStarted : %s--->%s", this, dse
-						.getChannel().getId(), dse.getDialedChannel().getId()));
+			if (dse.getDialedChannel() != null) {				
 				dse.getDialedChannel().addEventListener(this);
 				addChannel(dse.getDialedChannel());
 			}
