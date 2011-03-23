@@ -122,6 +122,7 @@ public abstract class Channel implements TimerNotifiable {
 		return userData.get(key);
 	}
 	public void setUserData(String key, String value){
+		log.trace(String.format("{%s} %s = %s", this.getUniqueId(), key, value));
 		userData.put(key, value);
 	}
 	public Map<String, String> getUserData(){
