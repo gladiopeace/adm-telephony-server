@@ -122,6 +122,7 @@ public class AcdServiceImpl implements AcdService {
 				} else if (call.getAgentId() == null) {
 					AcdAgent agent = agents.get(0);
 					agent.setCallChannelId(call.getChannelId());
+					agent.setLastUsedDate(new Date());
 					call.setAgentId(agent.getId());
 					acdDataProvider.updateAgent(agent);
 					DialRequest dr =new DialRequest(call.getChannelId(), agent
