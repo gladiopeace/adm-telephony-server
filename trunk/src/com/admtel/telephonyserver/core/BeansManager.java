@@ -83,7 +83,7 @@ public class BeansManager implements DefinitionChangeListener {
 							field.set(obj, bean);
 						}
 					} catch (Exception e) {
-						log.error(e.getMessage(), e);
+						log.error(String.format("Error loading class {%s} : %s", parameter.getValue(), e.getMessage()), e);
 					}
 				}
 				try {

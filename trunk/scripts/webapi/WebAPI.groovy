@@ -176,7 +176,9 @@ class WebAPI extends AdmServlet {
 		String agentName = request.getParameter('agent')
 		AcdAgent agent = AcdManager.getInstance().getAgentByName(agentName)
 		Switch _switch = Switches.getInstance().getRandom();
-		if (agent != null && agent.getPassword() == request.getParameter('password')){
+		String tMessage = "Invalid"
+		if (agent != null){
+		 if (agent.getPassword().equals(request.getParameter('password'))){
 			def result = new JsonGroovyBuilder().json{
 				requestId=1234
 				message=""
@@ -188,10 +190,17 @@ class WebAPI extends AdmServlet {
 			}.toString()
 			
 			return result;
+		 }
+		 else{
+			 tMessage = "Agent ${agentName} Wrong password, entered ${request.getParameter('password')}, got ${agent.getPassword()}"
+		 }
+		}
+		else{
+			tMessage = "agent ${agentName} not found"
 		}
 		return new JsonGroovyBuilder().json{
 			requestId=1234
-			message="Invalid"
+			message=tMessage
 			status=-1
 		}.toString()
 	}
