@@ -53,7 +53,7 @@ public class HttpServer implements IoHandler {
 		// Check that we can service the request context
 		// response.appendBody("<html><body>");
 
-		//log.trace(message);
+		log.trace(message);
 		HttpRequestMessage request = (HttpRequestMessage) message;
 
 		HttpResponseMessage response = new HttpResponseMessage();
