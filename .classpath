@@ -11,7 +11,6 @@
 	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
 	<classpathentry kind="lib" path="lib/groovy-all-1.7.1.jar"/>
 	<classpathentry kind="lib" path="lib/joda-time-1.6.jar"/>
-	<classpathentry kind="lib" path="lib/mina-core-2.0.0-RC1.jar" sourcepath="/Users/danny/adm/apps/mina-2.0.0-RC1/src"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.5.0.jar"/>
 	<classpathentry kind="lib" path="lib/TinyRadius-1.0.jar"/>
@@ -32,5 +31,6 @@
 	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="lib/ezmorph-1.0.6.jar"/>
+	<classpathentry kind="lib" path="lib/mina-core-2.0.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

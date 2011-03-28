@@ -13,7 +13,7 @@
 
 		<unzip dest="dist/temp">
 			<fileset dir="lib">
-				<include name="mina-core-2.0.0-RC1.jar" />
+				<include name="mina-core-2.0.2.jar" />
 				<include name="jline-0.9.94.jar" />
 				<include name="slf4j-api-1.5.0.jar" />
 				<include name="slf4j-log4j12-1.5.0.jar" />
