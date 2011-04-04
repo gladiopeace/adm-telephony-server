@@ -125,6 +125,10 @@ public class Switches implements DefinitionChangeListener, EventListener {
 						.getId()));
 				return;
 			}
+			if (!switchDefinition.isEnabled()){
+				log.debug(String.format("Switch %s, not enabled", definition.getId()));
+				return;
+			}
 
 			switch (switchDefinition.getSwitchType()) {
 			case Asterisk: {
