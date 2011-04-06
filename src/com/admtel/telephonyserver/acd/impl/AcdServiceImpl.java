@@ -95,6 +95,7 @@ public class AcdServiceImpl implements AcdService {
 			AcdCall call = it.next();
 			List<AcdAgent> agents = acdDataProvider
 					.getAvailableQueueAgents(call.getQueueId());
+			log.trace(String.format("getNextDial returned %d agents", agents.size()));
 			if (!agents.isEmpty()) {
 				AcdQueue queue = acdDataProvider.getQueueById(call.getQueueId());
 				if (queue != null) {

@@ -129,8 +129,8 @@ class WebAPI extends AdmServlet {
 		""
 	}
 	def get_agent_channel(request){
-		String agentName = request.getParameter('agent')
-		AcdAgent tAgent= AcdManager.getInstance().getAgentByName(agentName)	
+		String agentId = request.getParameter('agent')
+		AcdAgent tAgent= AcdManager.getInstance().getAgentById(agentId)	
 		def result = new JsonGroovyBuilder().json{
 			agent = tAgent.getId()
 			channel = tAgent.getChannelId()
@@ -140,8 +140,15 @@ class WebAPI extends AdmServlet {
 	}
 	def get_agent_data(request){
 		String agentName = request.getParameter('agent')
+		String agentId = request.getParameter('agentId')
 		String dataKey = request.getParameter('key')
-		AcdAgent tAgent = AcdManager.getInstance().getAgentByName(agentName)
+		String requestId = request.getParameter('requestId')
+		AcdAgent tAgent = null
+		if (agentId)
+			tAgent = AcdManager.getInstance().getAgentById(agentId)
+		else if (agentName)
+			tAgent = AcdManager.getInstance().getAgentByName(agentName)
+			
 		log.trace(tAgent.getCallChannelId())
 		String t_message = "No Error"
 		if (tAgent!=null){
@@ -150,7 +157,7 @@ class WebAPI extends AdmServlet {
 			if (channel != null){
 				if (channel.getUserData(dataKey) != null){
 					def result = new JsonGroovyBuilder().json{
-						request=1234
+						request=requestId
 						message=""
 						status=0
 						key = dataKey
@@ -161,6 +168,36 @@ class WebAPI extends AdmServlet {
 				else{
 					t_message = "Key ${dataKey} not found in channel ${channel.getUniqueId()}"
 				}
+			}
+			else{
+				t_message = "Channel not found"
+			}
+		}
+		return new JsonGroovyBuilder().json{
+			requestId=1234
+			message=t_message
+			status=-1 //TODO put proper status
+		}.toString()
+	}
+	def set_agent_data(request){
+		String agentName = request.getParameter('agent')
+		String agentId = request.getParameter('agentId')
+		String dataKey = request.getParameter('key')
+		String requestId = request.getParameter('requestId')
+		String dataValue = request.getParameter('value')
+		AcdAgent tAgent = null
+		if (agentId)
+			tAgent = AcdManager.getInstance().getAgentById(agentId)
+		else if (agentName)
+			tAgent = AcdManager.getInstance().getAgentByName(agentName)
+		log.trace(tAgent.getCallChannelId())
+		String t_message = "No Error"
+		if (tAgent!=null){
+			Channel channel = Switches.getInstance().getChannelById(tAgent.getCallChannelId())
+			
+			if (channel){
+				channel.setUserData(dataKey, dataValue)
+				t_message = "value set"
 			}
 			else{
 				t_message = "Channel not found"
