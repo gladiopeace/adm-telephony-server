@@ -105,8 +105,14 @@ class WebAPI extends AdmServlet {
 	}
 	def join_conference(request){
 		String channel = request.getParameter('channel')
-		String conference = request.getParameter('conference')
-		//ConferenceJoinRequest cjr
+		Channel c = Switches.getInstance().getChannelById(channel)
+		if (c){		
+			String conferenceNumber = request.getParameter('conferenceNumber')
+			if (!conferenceNumber)
+				conferenceNumber = c.getUserData("conferenceNumber")
+			JoinConferenceRequest jcr = new JoinConferenceRequest(channel, conferenceNumber, false, false, false)
+			Switches.getInstance().processRequest(jcr)
+		}// TODO result code
 	}
 	
 	def get_channel_data(request){
