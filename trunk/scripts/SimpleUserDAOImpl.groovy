@@ -16,8 +16,8 @@ class SimpleUserDAOImpl implements UserDAO{
 		User user = new User()
 		user.setId('agent_1')
 		user.setPassword('agent_1')
-		user.setDomain('172.16.140.129')
-		users.put('agent_1@172.16.140.129', user)
+		user.setDomain('192.168.1.60')
+		users.put('agent_1@192.168.1.60', user)
 	}
 	public User getUser(String id, String domain){		
 		User user = users.get(id+"@"+domain)
