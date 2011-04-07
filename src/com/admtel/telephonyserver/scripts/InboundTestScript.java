@@ -35,22 +35,5 @@ public class InboundTestScript extends Script {
 
 	}
 
-	@Override
-	protected void processAnswering_State(Event event) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void processWaitingForCall_State(Event event) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected void processPlaying_State(Event event) {
-		// TODO Auto-generated method stub
-		
-	}
 
 }
