@@ -465,10 +465,10 @@ public abstract class Channel implements TimerNotifiable {
 			boolean startMuted, boolean startDeaf) { // TODO add more parameters
 
 		log.trace(String.format("[%s] - joinConference (%s, %s, %s, %s)",this, conferenceId, moderator, startMuted, startDeaf));
-		if (getCallState() == CallState.Connected) {
+		if (getCallState() == CallState.Connected || getCallState() == CallState.Linked) {
 			lastResult = internalJoinConference(conferenceId, moderator,startMuted, startDeaf);
 		} else {
-			log.warn(String.format("[%s] - hangup invalid call state"));
+			log.warn(String.format("[%s] - hangup invalid call state", this));
 			lastResult = Result.ChannelInvalidCallState;
 		}
 		if (lastResult == Result.Ok) {

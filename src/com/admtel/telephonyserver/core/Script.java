@@ -47,6 +47,12 @@ public abstract class Script implements EventListener{
 		return null;
 	}
 
+	public String getParameter(String key, String defaultValue){
+		if (parameters==null || parameters.get(key) == null){
+			return defaultValue;
+		}
+		return parameters.get(key);
+	}
 	public void setParameters (Map<String, String> parameters){
 		this.parameters = parameters;
 	}
