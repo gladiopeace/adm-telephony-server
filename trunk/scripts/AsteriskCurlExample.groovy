@@ -2,7 +2,7 @@ import com.admtel.telephonyserver.httpserver.AdmServlet;
 import com.admtel.telephonyserver.httpserver.HttpRequestMessage;
 import com.admtel.telephonyserver.httpserver.HttpResponseMessage;
 
-class AsteriskCurlExample implements AdmServlet {
+class AsteriskCurlExample extends AdmServlet {
 	
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
