@@ -12,6 +12,7 @@ import groovy.xml.MarkupBuilder;
 import com.admtel.telephonyserver.httpserver.AdmServlet;
 import com.admtel.telephonyserver.interfaces.TokenSecurityProvider;
 import com.admtel.telephonyserver.acd.*;
+import com.admtel.telephonyserver.events.DisconnectCode;
 import java.net.URLDecoder;
 import net.sf.json.groovy.JsonGroovyBuilder;
 
@@ -143,6 +144,17 @@ class WebAPI extends AdmServlet {
 			callChannel = tAgent.getCallChannelId()
 		}.toString()
 		return result
+	}
+	def hangup_agent(request){
+		String agentId = request.getParameter('agentId')
+		AcdAgent tAgent = AcdManager.getInstance().getAgentById(agentId)
+		if (tAgent != null){
+			String channelId = tAgent.getChannelId()
+			HangupRequest hangupRequest = new HangupRequest(channelId, DisconnectCode.Normal)
+			Switches.getInstance().processRequest(hangupRequest)
+			return "Agent(${agentId}) hangup"
+		}
+		return "Agent ID ${agentId} not found"
 	}
 	def get_agent_data(request){
 		String agentName = request.getParameter('agent')
