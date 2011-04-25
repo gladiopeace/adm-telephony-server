@@ -1,5 +1,8 @@
 package com.admtel.telephonyserver.config;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class SwitchDefinition implements DefinitionInterface {
 	String name;
 	String address;
@@ -10,6 +13,8 @@ public class SwitchDefinition implements DefinitionInterface {
 	String addressTranslatorClass;
 	boolean enabled;
 
+	Map<String, String> features = new HashMap<String, String>();
+	Map<String, String> parameters = new HashMap<String, String>();
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -77,6 +82,22 @@ public class SwitchDefinition implements DefinitionInterface {
 
 	public void setAddressTranslatorClass(String addressTranslatorClass) {
 		this.addressTranslatorClass = addressTranslatorClass;
+	}
+
+	public Map<String, String> getFeatures() {
+		return features;
+	}
+
+	public void setFeatures(Map<String, String> features) {
+		this.features = features;
+	}
+
+	public Map<String, String> getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(Map<String, String> parameters) {
+		this.parameters = parameters;
 	}
 
 	@Override

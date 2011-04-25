@@ -259,6 +259,26 @@ class WebAPI extends AdmServlet {
 			status=-1
 		}.toString()
 	}
+	
+	def get_random_switch(request){
+		Switch _switch = Switches.getInstance().getRandom()
+		if (_switch){
+			def result = new JsonGroovyBuilder().json{
+				requestId=1234
+				message=""
+				id=_switch.getDefinition().getId()
+				address= _switch.getDefinition().getAddress();
+			}.toString()
+			return result
+		}
+		else{
+			return new JsonGroovyBuilder().json{
+				requestId=1234
+				message="Switch not found"
+				status=-1
+			}.toString()
+		}
+	}
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
 		
