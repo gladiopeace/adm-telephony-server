@@ -123,6 +123,28 @@ public class SystemConfig {
 					definition.setAddressTranslatorClass(subnode
 							.getString("addresstranslator"));
 					definition.setEnabled(subnode.getBoolean("enabled", true));
+					
+					try{
+						HierarchicalConfiguration parametersConfig = config
+								.configurationAt(String.format("switches.switch(%d).parameters",
+										counter));
+						 Map<String,String>parameters = ConfigUtils.loadParameters(parametersConfig);
+						 definition.setParameters(parameters);
+						}
+						catch (Exception e){
+							log.warn(e.getMessage());
+						}
+						try{
+							HierarchicalConfiguration parametersConfig = config
+									.configurationAt(String.format("switches.switch(%d).features",
+											counter));
+							 Map<String,String>features = ConfigUtils.loadFeatures(parametersConfig);
+							 definition.setFeatures(features);
+							}
+							catch (Exception e){
+								log.warn(e.getMessage());
+							}
+					
 					futureDefinitions.put(definition.getId(), definition);
 				} else {
 					return;
