@@ -1,12 +1,12 @@
-import com.admtel.telephonyserver.events.Event.EventType;
 import com.admtel.telephonyserver.core.Channel;
-import com.admtel.telephonyserver.events.Event;
-import com.admtel.telephonyserver.events.PlayAndGetDigitsEndedEvent;
-import com.admtel.telephonyserver.prompts.PromptBuilder;
-import com.admtel.telephonyserver.events.AlertingEvent;
-import com.admtel.telephonyserver.events.OfferedEvent;
 import com.admtel.telephonyserver.core.Script;
-import com.admtel.telephonyserver.prompts.*;
+import com.admtel.telephonyserver.events.*;
+import com.admtel.telephonyserver.events.OfferedEvent;
+import com.admtel.telephonyserver.events.AlertingEvent;
+import com.admtel.telephonyserver.events.PlayAndGetDigitsEndedEvent;
+import com.admtel.telephonyserver.events.Event.EventType;
+import com.admtel.telephonyserver.prompts.PromptBuilder;
+import com.admtel.telephonyserver.prompts.PromptBuilderFactory;
 
 public class  AdmCompleteExample extends Script {
 	
@@ -78,28 +78,82 @@ public class  AdmCompleteExample extends Script {
 		}
 	}
 	
-	@Override
-	protected void processAnswering_State(Event event){
-		println "Start *************************************processAnswering_State*****************************************"
-		switch (event.getEventType()){
-			case EventType.Connected:
-			a.setHangupAfter(50000);
-			PromptBuilder pb = PromptBuilderFactory.getInstance().getPromptBuilder(a.getLanguage())
-			def prompts = pb.currencyToPrompt(new BigDecimal(120.34))
-			prompts += (pb.numberToPrompt(13245))
-			prompts += (pb.dateToPrompt(new Date()))
-			prompts += (pb.digitToPrompt("0123456789"))
-			println prompts
-			a.playAndGetDigits(10, (String[])prompts, 1000, "#")
-			println "*******" + prompts
-			state = "Playing"
-			break
-		}
-		println "End *************************************processAnswering_State*****************************************"
-	}
+	//playAndGetDigits(int max, String[] prompt,long timeout, String terminators)
+//	@Override
+//	protected void processAnswering_State(Event event){
+//		println "Start *************************************processAnswering_State -- playAndGetDigits([])*****************************************"
+//		switch (event.getEventType()){
+//			case EventType.Connected:
+//			a.setHangupAfter(50000);
+//			PromptBuilder pb = PromptBuilderFactory.getInstance().getPromptBuilder(a.getLanguage())
+//			def prompts = pb.currencyToPrompt(new BigDecimal(120.34))
+//			prompts += (pb.numberToPrompt(13245))
+//			prompts += (pb.dateToPrompt(new Date()))
+//			prompts += (pb.digitToPrompt("0123456789"))
+//			println "*******" + prompts
+//			a.playAndGetDigits(10, (String[])prompts, 1000, "#")
+//			state = "Playing"
+//			break
+//		}
+//		println "End *************************************processAnswering_State -- playAndGetDigits([])*****************************************"
+//	}
+	
+	//playAndGetDigits(int max, String prompt, long timeout,String terminators)
+//	@Override
+//	protected void processAnswering_State(Event event){
+//		println "Start *************************************processAnswering_State -- playAndGetDigits()*****************************************"
+//		switch (event.getEventType()){
+//			case EventType.Connected:
+//			a.setHangupAfter(50000);
+//			PromptBuilder pb = PromptBuilderFactory.getInstance().getPromptBuilder(a.getLanguage())
+//			def prompts = pb.digitToPrompt("0123456789")
+//			println "*******" + prompts
+//			a.playAndGetDigits(10, (String)prompts, 1000, "#")
+//			state = "Playing"
+//			break
+//		}
+//		println "End *************************************processAnswering_State -- playAndGetDigits()*****************************************"
+//	}
+	
+	//playback(String prompt, String terminators)
+//	@Override
+//	protected void processAnswering_State(Event event){
+//		println "Start *************************************processAnswering_State -- playback()*****************************************"
+//		switch (event.getEventType()){
+//			case EventType.Connected:
+//			a.setHangupAfter(50000);
+//			PromptBuilder pb = PromptBuilderFactory.getInstance().getPromptBuilder(a.getLanguage())
+//			def prompts = pb.digitToPrompt("0123456789")
+//			println "*******" + prompts
+//			a.playback((String)prompts, "#")
+//			state = "Playing"
+//			break
+//		}
+//		println "End *************************************processAnswering_State -- playback()*****************************************"
+//	}
+	
+	//playback(String[] prompt, String terminators)
+//	@Override
+//	protected void processAnswering_State(Event event){
+//		println "Start *************************************processAnswering_State -- playback([])*****************************************"
+//		switch (event.getEventType()){
+//			case EventType.Connected:
+//			a.setHangupAfter(50000);
+//			PromptBuilder pb = PromptBuilderFactory.getInstance().getPromptBuilder(a.getLanguage())
+//			def prompts = pb.currencyToPrompt(new BigDecimal(120.34))
+//			prompts += (pb.numberToPrompt(13245))
+//			prompts += (pb.dateToPrompt(new Date()))
+//			prompts += (pb.digitToPrompt("0123456789"))
+//			println "*******" + prompts
+//			a.playback((String[])prompts, "#")
+//			state = "Playing"
+//			break
+//		}
+//		println "End *************************************processAnswering_State -- playback([])*****************************************"
+//	}
 	
 	@Override
 	public void onStart(){
 	}
-
+	
 }
