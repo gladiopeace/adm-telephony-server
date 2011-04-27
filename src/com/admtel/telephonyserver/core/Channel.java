@@ -356,9 +356,9 @@ public abstract class Channel implements TimerNotifiable {
 		return lastResult;
 	}
 
-	final public Result playAndGetDigits(int max, String[] prompt,
-			long timeout, String terminators) {
+	final public Result playAndGetDigits(int max, String[] prompt,long timeout, String terminators) {
 		log.trace(String.format("[%s] - playAndGetDigits(%d,%s,%d,%s)", this,	max, prompt, timeout, terminators));
+		
 		if (!isConnected()) {
 			log.warn(String.format("[%s], playAndGetDigits, invalid call state", this));
 			lastResult = Result.ChannelInvalidCallState;
@@ -367,18 +367,18 @@ public abstract class Channel implements TimerNotifiable {
 
 		if (isMediaActive()) {
 			log.warn(String.format("[%s], playAndGetDigits, invalid media state", this));
-
 			lastResult = Result.ChannelInvalidMediaState;
 			return lastResult;
 		}
+		
 		prompt = PromptsUtils.prepend(prompt, baseDirectory, "/sounds/",language.toString(), "/");
-
 		lastResult = internalPlayAndGetDigits(max, prompt, timeout,	terminators, true);
+		
 		if (lastResult == Result.Ok) {
 			mediaState = MediaState.PlayAndGetDigits;
 		}
+		
 		return lastResult;
-
 	}
 
 	final public Result hangup(DisconnectCode disconnectCode) {
