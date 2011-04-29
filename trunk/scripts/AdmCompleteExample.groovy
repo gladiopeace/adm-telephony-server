@@ -79,24 +79,24 @@ public class  AdmCompleteExample extends Script {
 	}
 	
 	//playAndGetDigits(int max, String[] prompt,long timeout, String terminators)
-//	@Override
-//	protected void processAnswering_State(Event event){
-//		println "Start *************************************processAnswering_State -- playAndGetDigits([])*****************************************"
-//		switch (event.getEventType()){
-//			case EventType.Connected:
-//			a.setHangupAfter(50000);
-//			PromptBuilder pb = PromptBuilderFactory.getInstance().getPromptBuilder(a.getLanguage())
-//			def prompts = pb.currencyToPrompt(new BigDecimal(120.34))
-//			prompts += (pb.numberToPrompt(13245))
-//			prompts += (pb.dateToPrompt(new Date()))
-//			prompts += (pb.digitToPrompt("0123456789"))
-//			println "*******" + prompts
-//			a.playAndGetDigits(10, (String[])prompts, 1000, "#")
-//			state = "Playing"
-//			break
-//		}
-//		println "End *************************************processAnswering_State -- playAndGetDigits([])*****************************************"
-//	}
+	@Override
+	protected void processAnswering_State(Event event){
+		println "Start *************************************processAnswering_State -- playAndGetDigits([])*****************************************"
+		switch (event.getEventType()){
+			case EventType.Connected:
+			a.setHangupAfter(50000);
+			PromptBuilder pb = PromptBuilderFactory.getInstance().getPromptBuilder(a.getLanguage())
+			def prompts = pb.currencyToPrompt(new BigDecimal(120.34))
+			prompts += (pb.numberToPrompt(13245))
+			prompts += (pb.dateToPrompt(new Date()))
+			prompts += (pb.digitToPrompt("0123456789"))
+			println "*******" + prompts
+			a.playAndGetDigits(10, (String[])prompts, 1000, "#")
+			state = "Playing"
+			break
+		}
+		println "End *************************************processAnswering_State -- playAndGetDigits([])*****************************************"
+	}
 	
 	//playAndGetDigits(int max, String prompt, long timeout,String terminators)
 //	@Override
