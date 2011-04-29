@@ -134,6 +134,7 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	@Override
 	public void start() {
+		log.trace("*************************************start asterisk **************************************");
 		super.start();
 		reconnectTimer = Timers.getInstance().startTimer(this, RECONNECT_AFTER,
 				false, null);
@@ -141,6 +142,7 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	@Override
 	public void stop() {
+		log.trace("*************************************stop asterisk **************************************");
 		super.stop();		
 	}
 
@@ -180,6 +182,7 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 	}
 
 	private boolean isConnected() {
+		log.trace("**********************************isConnected*****************************************");
 		return (session != null && session.isConnected());
 	}
 
