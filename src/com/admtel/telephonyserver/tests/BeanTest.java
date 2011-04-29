@@ -13,11 +13,11 @@ import javax.xml.transform.stream.*;
 import org.w3c.dom.*;
 
 public class BeanTest {
-	// public String address;
-	// public int port;
+	 public static String address;
+	 public static int port;
 
 	public static void main(String[] argv) throws Exception {
-		// System.out.println("BeanTest initialized with address="+address+", port="+port);
+		System.out.println("BeanTest initialized with address="+address+", port="+port);
 		generateCsvFile("/home/user1/" + new Date() + ".csv");
 		generateXMLFile("/home/user1/test.xml");
 	}
@@ -84,17 +84,4 @@ public class BeanTest {
 		StreamResult result = new StreamResult(new File(sFileName));
 		transformer.transform(source, result);
 	}
-	
-//	private static void generateTextFile(String sFileName) {
-//		try{
-//		    FileWriter fstream = new FileWriter(sFileName);
-//	        BufferedWriter out = new BufferedWriter(fstream);
-//		    out.write("Hello Java");
-//		    out.close();
-//		}catch (Exception e){
-//		     System.err.println("Error: " + e.getMessage());
-//		}
-//	}
-	
-
 }
