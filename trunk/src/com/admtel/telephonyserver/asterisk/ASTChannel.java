@@ -865,7 +865,7 @@ public class ASTChannel extends Channel {
 	public ASTChannel(Switch _switch, String id, IoSession session) {
 		super(_switch, id);
 		this.session = session;
-
+		log.trace("*************************************ASTChannel asterisk **************************************");
 		if (id.toLowerCase().startsWith("sip")) {
 			channelProtocol = SigProtocol.SIP;
 		} else if (id.toLowerCase().startsWith("iax2")) {

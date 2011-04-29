@@ -116,6 +116,7 @@ public abstract class SwitchListener implements IoHandler{
 		
 	}
 	protected Switch getSwitch(IoSession session) {
+		log.trace("********************Switch get switch************************");
 		InetSocketAddress address = (InetSocketAddress) session.getRemoteAddress();
 		String ip = address.getAddress().toString();
 		if (ip.startsWith("/")){

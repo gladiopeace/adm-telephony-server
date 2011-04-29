@@ -14,6 +14,7 @@ import com.admtel.telephonyserver.asterisk.ASTSwitch;
 import com.admtel.telephonyserver.config.DefinitionChangeListener;
 import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.SwitchDefinition;
+import com.admtel.telephonyserver.core.Switch.SwitchStatus;
 import com.admtel.telephonyserver.events.ChannelEvent;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.DisconnectedEvent;
@@ -184,6 +185,73 @@ public class Switches implements DefinitionChangeListener, EventListener {
 		for (Switch _switch : switches) {
 			if (index == 0)
 				return _switch;
+			index--;
+		}
+		return null;
+	}
+	
+	public Switch getLeastUsed() {
+		Switch leastUsed = null;
+		Collection<Switch> switches = getAll();
+		int index = switches.size() -1;
+		for (Switch _switch : switches) {
+			if (index == switches.size() - 1){
+				leastUsed = _switch;
+			}else if (index < 0){
+				return leastUsed;
+			}else{
+				if (leastUsed.getAllChannels().size() > _switch.getAllChannels().size()){
+				leastUsed = _switch;	
+				}					
+			}
+			index--;
+		}
+		return leastUsed;
+	}
+	
+	public Switch getSwitchByStatus() {
+		Collection<Switch> switches = getAll();
+		int index = switches.size() -1;
+		for (Switch _switch : switches) {
+			if (index < 0){
+				return null;
+			}else{
+				if (_switch.getStatus() == SwitchStatus.Ready){
+					return _switch;	
+				}					
+			}
+			index--;
+		}
+		return null;
+	}
+	
+	public Switch getSwitchBySwitchDefinition() {
+		Collection<Switch> switches = getAll();
+		int index = switches.size() -1;
+		for (Switch _switch : switches) {
+			if (index < 0){
+				return null;
+			}else{
+				if (_switch.getDefinition().isEnabled()){
+					return _switch;	
+				}					
+			}
+			index--;
+		}
+		return null;
+	}
+	
+	public Switch getLoad() {
+		Collection<Switch> switches = getAll();
+		int index = switches.size() -1;
+		for (Switch _switch : switches) {
+			if (index < 0){
+				return null;
+			}else{
+				if (_switch.getAllChannels().size() == 0){
+				return _switch;	
+				}					
+			}
 			index--;
 		}
 		return null;

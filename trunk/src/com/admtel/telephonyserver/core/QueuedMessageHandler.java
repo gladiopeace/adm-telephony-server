@@ -25,6 +25,7 @@ public abstract class QueuedMessageHandler implements Runnable, MessageHandler {
 	
 	@Override
 	public void run() {
+		log.trace("************************************run*******************************");
 		while (true){
 			Object message = null;
 			synchronized(messages){
