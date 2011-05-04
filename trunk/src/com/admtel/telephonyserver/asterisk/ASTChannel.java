@@ -313,15 +313,15 @@ public class ASTChannel extends Channel {
 				getChannelData().setAccountCode(nce.getAccountCode());
 				switch (nce.getChannelState()) {
 				case Ring:
-					currentState = new OfferedState();
+					internalState = new OfferedState();
 					break;
 				case Ringing:
-					currentState = new AlertingState();
+					internalState = new AlertingState();
 					break;
 				case Answer:
 					ASTChannel.this
 							.onEvent(new ConnectedEvent(ASTChannel.this));
-					currentState = new IdleState();
+					internalState = new IdleState();
 					break;
 				}
 			}
@@ -330,15 +330,15 @@ public class ASTChannel extends Channel {
 				ASTNewStateEvent nse = (ASTNewStateEvent) astEvent;
 				switch (nse.getChannelState()) {
 				case Ring:
-					currentState = new OfferedState();
+					internalState = new OfferedState();
 					break;
 				case Ringing:
-					currentState = new AlertingState();
+					internalState = new AlertingState();
 					break;
 				case Answer:
 					ASTChannel.this
 							.onEvent(new ConnectedEvent(ASTChannel.this));
-					currentState = new IdleState();
+					internalState = new IdleState();
 					break;
 				}
 
@@ -424,9 +424,9 @@ public class ASTChannel extends Channel {
 				ASTNewStateEvent nse = (ASTNewStateEvent) astEvent;
 				switch (nse.getChannelState()) {
 				case Answer:
+					internalState = new IdleState();
 					ASTChannel.this
-							.onEvent(new ConnectedEvent(ASTChannel.this));
-					currentState = new IdleState();
+							.onEvent(new ConnectedEvent(ASTChannel.this));					
 					break;
 				}
 
@@ -510,9 +510,9 @@ public class ASTChannel extends Channel {
 				ASTNewStateEvent nse = (ASTNewStateEvent) astEvent;
 				switch (nse.getChannelState()) {
 				case Answer:
+					internalState = new IdleState();
 					ASTChannel.this
 							.onEvent(new ConnectedEvent(ASTChannel.this));
-					currentState = new IdleState();
 					break;
 				}
 
@@ -597,7 +597,7 @@ public class ASTChannel extends Channel {
 								}
 
 								substate = ENDED;
-								ASTChannel.this.currentState = new IdleState();
+								ASTChannel.this.internalState = new IdleState();
 								ASTChannel.this.onEvent(pe);
 
 							} else {
@@ -615,7 +615,7 @@ public class ASTChannel extends Channel {
 												.get(this.playedPromptCount));
 									}
 									substate = ENDED;
-									ASTChannel.this.currentState = new IdleState();
+									ASTChannel.this.internalState = new IdleState();
 									ASTChannel.this.onEvent(pe);
 
 								} else {
@@ -647,7 +647,7 @@ public class ASTChannel extends Channel {
 							}
 
 							substate = ENDED;
-							ASTChannel.this.currentState = new IdleState();
+							ASTChannel.this.internalState = new IdleState();
 							ASTChannel.this.onEvent(pe);
 							Timers.getInstance().stopTimer(maxDtmfTimer);
 						}
@@ -740,7 +740,7 @@ public class ASTChannel extends Channel {
 					PlayAndGetDigitsEndedEvent pe = new PlayAndGetDigitsEndedEvent(
 							ASTChannel.this, this.digits);
 					substate = ENDED;
-					ASTChannel.this.currentState = new IdleState();
+					ASTChannel.this.internalState = new IdleState();
 					ASTChannel.this.onEvent(pe);
 				}
 			}
@@ -809,7 +809,7 @@ public class ASTChannel extends Channel {
 	// END STATES LOGIC
 	// ////////////////////////////////////////////////////////////////////////////////////////
 
-	protected State currentState = new NullState();
+	protected State internalState = new NullState();
 	protected IoSession session;
 
 	protected SigProtocol channelProtocol = SigProtocol.Unknown;
@@ -819,7 +819,7 @@ public class ASTChannel extends Channel {
 			ASTEvent astEvent = (ASTEvent) event;
 			log.debug(String
 					.format("START processing event (%s) state (%s), internalState(%s)",
-							astEvent, getCallState(), currentState.getClass()
+							astEvent, getCallState(), internalState.getClass()
 									.getSimpleName()));
 
 			switch (astEvent.getEventType()) {
@@ -851,13 +851,13 @@ public class ASTChannel extends Channel {
 			}
 				break;
 			}
-			if (currentState != null) {
-				currentState.processEvent(astEvent);
+			if (internalState != null) {
+				internalState.processEvent(astEvent);
 			}
 
 			log.debug(String.format(
 					"END processing event (%s) state (%s), internalState(%s)",
-					astEvent, getCallState(), currentState.getClass()
+					astEvent, getCallState(), internalState.getClass()
 							.getSimpleName()));
 		}
 	}
@@ -934,7 +934,7 @@ public class ASTChannel extends Channel {
 	@Override
 	public Result internalPlayAndGetDigits(int max, String prompt,
 			long timeout, String terminators, boolean interruptPlay) {
-		currentState = new PlayingAndGettingDigitsState(max, prompt, timeout,
+		internalState = new PlayingAndGettingDigitsState(max, prompt, timeout,
 				terminators, interruptPlay);
 		return Result.Ok;
 	}
@@ -942,21 +942,21 @@ public class ASTChannel extends Channel {
 	@Override
 	public Result internalPlayAndGetDigits(int max, String[] prompt,
 			long timeout, String terminators, boolean interruptPlay) {
-		currentState = new PlayingAndGettingDigitsState(max, prompt, timeout,
+		internalState = new PlayingAndGettingDigitsState(max, prompt, timeout,
 				terminators, interruptPlay);
 		return Result.Ok;
 	}
 
 	@Override
 	public Result internalPlayback(String[] prompt, String terminators) {
-		currentState = new PlayingState(prompt, terminators);
+		internalState = new PlayingState(prompt, terminators);
 
 		return Result.Ok;
 	}
 
 	@Override
 	public Result internalPlayback(String prompt, String terminators) {
-		currentState = new PlayingState(prompt, terminators);
+		internalState = new PlayingState(prompt, terminators);
 		return Result.Ok;
 	}
 
@@ -973,7 +973,7 @@ public class ASTChannel extends Channel {
 	@Override
 	public Result internalJoinConference(String conferenceId,
 			boolean moderator, boolean startMuted, boolean startDeaf) {
-		currentState = new JoinConferenceState(conferenceId, moderator,
+		internalState = new JoinConferenceState(conferenceId, moderator,
 				startMuted, startDeaf);// TODO check state
 		return Result.Ok;
 	}
@@ -984,7 +984,7 @@ public class ASTChannel extends Channel {
 
 	@Override
 	public Result internalQueue(String queueName, boolean isAgent) {
-		currentState = new QueueState(queueName, isAgent);
+		internalState = new QueueState(queueName, isAgent);
 		return Result.Ok;
 	}
 

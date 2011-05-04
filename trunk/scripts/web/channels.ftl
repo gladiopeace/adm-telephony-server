@@ -18,8 +18,8 @@
       <#list channels as c>
         <tr align=left valign=top>          
           <td bgcolor="#A0A0A0">${c.uniqueId}</td>
-          <td bgcolor="#A0A0A0">${c.callingStationId}</td>
-          <td bgcolor="#A0A0A0">${c.calledStationId}</td>
+          <td bgcolor="#A0A0A0">${c.callingStationId?default("")}</td>
+          <td bgcolor="#A0A0A0">${c.calledStationId?default("")}</td>
           <td bgcolor="#A0A0A0">${c.callOrigin}</td>
           <td bgcolor="#A0A0A0">${c.callState}</td>
           <td bgcolor="#A0A0A0">${c.mediaState}</td>

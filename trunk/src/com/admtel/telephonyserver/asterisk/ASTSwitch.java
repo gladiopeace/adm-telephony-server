@@ -234,7 +234,7 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 				}
 				if (event instanceof ASTChannelEvent) {
 					ASTChannelEvent channelEvent = (ASTChannelEvent) event;
-					if (channelEvent.getChannelId().startsWith("Bridge/"))
+					if (channelEvent.getChannelId().startsWith("Bridge/") || channelEvent.getChannelId().contains("pseudo"))
 						return;
 				}
 				switch (event.getEventType()) {
