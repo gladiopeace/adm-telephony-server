@@ -86,7 +86,13 @@ public class Switches implements DefinitionChangeListener, EventListener {
 	}
 
 	public Collection<Switch> getAll() {
-		return idMap.values();
+		Collection<Switch> switches = new ArrayList<Switch>();
+		for (Switch _switch:idMap.values()){
+			if (_switch.getDefinition().isEnabled()){
+				switches.add(_switch);
+			}
+		}
+		return switches;
 	}
 
 	public List<Channel> getAllChannels() {
