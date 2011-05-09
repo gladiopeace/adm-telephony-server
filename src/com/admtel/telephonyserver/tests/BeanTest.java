@@ -1,21 +1,25 @@
 package com.admtel.telephonyserver.tests;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import com.admtel.telephonyserver.eventlisteners.SimpleEventListener;
 import org.joda.time.DateTime;
+import org.xml.sax.SAXException;
 
 public class BeanTest {
 	// public static String address;
 	 //public static int port;
 
-	public static void main(String[] argv) throws Exception {
+	public static void main(String[] argv) throws ParserConfigurationException, TransformerException, SAXException, IOException {
 		//System.out.println("BeanTest initialized with address="+address+", port="+port);
-		SimpleEventListener simpleEventListenerInstance = new SimpleEventListener();
-		Date date = new Date();
-		simpleEventListenerInstance.generateCsvFile("/home/user1/ZZZ/" + new DateTime().getDayOfMonth() + "-" + new DateTime().getMonthOfYear() + "-" + new DateTime().getYear() + ".csv", "Hang Up", date.toString());
-		simpleEventListenerInstance.generateXMLFile("/home/user1/ZZZ/" + new DateTime().getDayOfMonth() + "-" + new DateTime().getMonthOfYear() + "-" + new DateTime().getYear() + ".xml", "Hang Up", date.toString());
+		//for (int i=0; i<1000; i++){
+			SimpleEventListener simpleEventListenerInstance = new SimpleEventListener();
+			simpleEventListenerInstance.generateFiles("HangUp");
+		//}
 	}
-
-
 }

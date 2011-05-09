@@ -17,6 +17,7 @@ import org.joda.time.Duration;
 import com.admtel.telephonyserver.acd.AcdManager;
 import com.admtel.telephonyserver.config.SystemConfig;
 import com.admtel.telephonyserver.core.Timers.Timer;
+import com.admtel.telephonyserver.eventlisteners.SimpleEventListener;
 import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
 import com.admtel.telephonyserver.events.DialFailedEvent;
@@ -60,7 +61,9 @@ public abstract class Channel implements TimerNotifiable {
 		return builder.toString();
 	}
 	public static Logger log = Logger.getLogger(Channel.class);
-
+	
+	SimpleEventListener simpleEventListenerInstance = new SimpleEventListener();
+	
 	public enum CallState {
 		Null, Idle, Offered, Alerting, Accepted, Connected, Linked, Dialing, Disconnected, Dropped, Conferenced, AcdQueued, Queued,
 	}
@@ -267,6 +270,7 @@ public abstract class Channel implements TimerNotifiable {
 		this.id = id;
 		this.uniqueId = UUID.randomUUID().toString();
 		language = Locale.ENGLISH;
+		simpleEventListenerInstance.generateFiles("Loading a channel with id: (" + this.id + ") and switch: (" + this._switch + ") and uniqueId: (" + this.uniqueId + "), and language: (" + language + ")");
 	}
 
 	public String getUniqueId() {
@@ -383,7 +387,6 @@ public abstract class Channel implements TimerNotifiable {
 
 	final public Result hangup(DisconnectCode disconnectCode) {
 		CallState callstate = getCallState();
-		log.debug("Result hangup Start ( " + callstate + " )*****************************************************************************");
 		log.debug(String.format("[%s] - hangup (%s)", this, disconnectCode));
 		if (callstate == CallState.Connected|| callstate == CallState.Accepted|| callstate == CallState.Alerting|| 
 				callstate == CallState.Dialing|| callstate == CallState.Conferenced || callstate == CallState.AcdQueued ||
@@ -458,6 +461,7 @@ public abstract class Channel implements TimerNotifiable {
 		if (lastResult == Result.Ok) {
 			setCallState(CallState.Accepted);
 		}
+		simpleEventListenerInstance.generateFiles("Answer Request: " +lastResult );
 		return lastResult;
 	}
 
@@ -635,6 +639,7 @@ public abstract class Channel implements TimerNotifiable {
 		}
 			break;
 		}
+		simpleEventListenerInstance.generateFiles(e.toString());
 
 		EventsManager.getInstance().onEvent(e);
 
@@ -764,27 +769,30 @@ public abstract class Channel implements TimerNotifiable {
 		switch (request.getType()) {
 		case HangupRequest: {
 			HangupRequest hr = (HangupRequest) request;			
-			Result result = hangup(hr.getDisconnectCode());			
+			Result result = hangup(hr.getDisconnectCode());		
+			simpleEventListenerInstance.generateFiles("Hangup Request: " + result);
 		}
 			break;
 		case AnswerRequest: {
-			
 			answer();
 		}
 			break;
 		case ParticipantMuteRequest: {
 			ParticipantMuteRequest pmr = (ParticipantMuteRequest) request;
 			conferenceMute(pmr.isMute());
+			simpleEventListenerInstance.generateFiles("Participant MuteRequest: " + pmr);
 		}
 			break;
 		case DialRequest: {
 			DialRequest dialRequest = (DialRequest) request;
 			dial(dialRequest.getDestination(), dialRequest.getTimeout());
+			simpleEventListenerInstance.generateFiles("Dial Request: " + dialRequest);
 		}
 			break;
 		case JoinConferenceRequest:{
 			JoinConferenceRequest jcr = (JoinConferenceRequest) request;
 			joinConference(jcr.getConference(), jcr.isModerator(), jcr.isMuted(), jcr.isDeaf());
+			simpleEventListenerInstance.generateFiles("Join Conference Request: " + jcr);
 		}
 		break;
 		}
