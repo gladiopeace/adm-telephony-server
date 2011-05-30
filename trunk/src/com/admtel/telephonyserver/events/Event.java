@@ -37,7 +37,7 @@ public abstract class Event {
 		DialFailed, 
 		Offered, 
 		Registered, 
-		Unregistered, Unlinked,
+		Unregistered, Unlinked, Destroy,
 	}
 	
 	protected EventType eventType;	
