@@ -109,6 +109,17 @@ public abstract class Channel implements TimerNotifiable {
 	protected Locale language;
 
 	private String conferenceId;
+	public String getMemberId() {
+		return memberId;
+	}
+
+	public void setMemberId(String memberId) {
+		this.memberId = memberId;
+	}
+
+	public void setConferenceId(String conferenceId) {
+		this.conferenceId = conferenceId;
+	}
 	private String memberId;
 	private Result lastResult = Result.Ok;
 	private Channel otherChannel = null;
@@ -651,7 +662,7 @@ public abstract class Channel implements TimerNotifiable {
 		} catch (Exception ex) {
 			log.fatal(AdmUtils.getStackTrace(ex));
 		}
-		if (e.getEventType() == EventType.Disconnected) {
+		if (e.getEventType() == EventType.Destroy) {
 			removeAllEventListeners();
 			_switch.removeChannel(this);
 		}
@@ -809,5 +820,9 @@ public abstract class Channel implements TimerNotifiable {
 
 	public CallState getCallState() {
 		return callState;
+	}
+
+	public String getConferenceId() {
+		return conferenceId;
 	}
 }

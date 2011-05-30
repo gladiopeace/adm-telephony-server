@@ -21,6 +21,7 @@ import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
 import com.admtel.telephonyserver.events.ConferenceMutedEvent;
 import com.admtel.telephonyserver.events.ConferenceTalkEvent;
+import com.admtel.telephonyserver.events.DestroyEvent;
 import com.admtel.telephonyserver.events.DialFailedEvent;
 import com.admtel.telephonyserver.events.DialStartedEvent;
 import com.admtel.telephonyserver.events.DialStatus;
@@ -46,6 +47,7 @@ import com.admtel.telephonyserver.freeswitch.events.FSChannelAnsweredEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelBridgeEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelCreateEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelDataEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSChannelDestroyEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelExecuteCompleteEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelHangupEvent;
@@ -791,6 +793,10 @@ public class FSChannel extends Channel {
 				onEvent(new DisconnectedEvent(this, DisconnectCode.get(che.getHangupCause().toInteger())));
 			}
 			break;
+			case ChannelDestroy:{
+				onEvent(new DestroyEvent(this));
+			}
+				break;
 			case ChannelOriginate: {
 				FSChannelOriginateEvent coe = (FSChannelOriginateEvent) fsEvent;
 				FSChannel otherChannel = (FSChannel) getSwitch().getChannel(
