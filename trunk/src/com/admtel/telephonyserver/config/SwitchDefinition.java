@@ -12,6 +12,15 @@ public class SwitchDefinition implements DefinitionInterface {
 	SwitchType switchType;
 	String addressTranslatorClass;
 	boolean enabled;
+	String signallingIp;
+
+	public String getSignallingIp() {
+		return signallingIp;
+	}
+
+	public void setSignallingIp(String signallingIp) {
+		this.signallingIp = signallingIp;
+	}
 
 	Map<String, String> features = new HashMap<String, String>();
 	Map<String, String> parameters = new HashMap<String, String>();
@@ -102,18 +111,12 @@ public class SwitchDefinition implements DefinitionInterface {
 
 	@Override
 	public String toString() {
-		return "SwitchDefinition ["
-				+ (name != null ? "name=" + name + ", " : "")
-				+ (address != null ? "address=" + address + ", " : "")
-				+ "port="
-				+ port
-				+ ", "
-				+ (username != null ? "username=" + username + ", " : "")
-				+ (password != null ? "password=" + password + ", " : "")
-				+ (switchType != null ? "switchType=" + switchType + ", " : "")
-				+ (addressTranslatorClass != null ? "addressTranslatorClass="
-						+ addressTranslatorClass + ", " : "") + "enabled="
-				+ enabled + "]";
+		return "SwitchDefinition [name=" + name + ", address=" + address
+				+ ", port=" + port + ", username=" + username + ", password="
+				+ password + ", switchType=" + switchType
+				+ ", addressTranslatorClass=" + addressTranslatorClass
+				+ ", enabled=" + enabled + ", signallingIp=" + signallingIp
+				+ ", features=" + features + ", parameters=" + parameters + "]";
 	}
 
 	@Override
@@ -126,10 +129,16 @@ public class SwitchDefinition implements DefinitionInterface {
 				+ ((addressTranslatorClass == null) ? 0
 						: addressTranslatorClass.hashCode());
 		result = prime * result + (enabled ? 1231 : 1237);
+		result = prime * result
+				+ ((features == null) ? 0 : features.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result
+				+ ((parameters == null) ? 0 : parameters.hashCode());
 		result = prime * result
 				+ ((password == null) ? 0 : password.hashCode());
 		result = prime * result + port;
+		result = prime * result
+				+ ((signallingIp == null) ? 0 : signallingIp.hashCode());
 		result = prime * result
 				+ ((switchType == null) ? 0 : switchType.hashCode());
 		result = prime * result
@@ -158,10 +167,20 @@ public class SwitchDefinition implements DefinitionInterface {
 			return false;
 		if (enabled != other.enabled)
 			return false;
+		if (features == null) {
+			if (other.features != null)
+				return false;
+		} else if (!features.equals(other.features))
+			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
+			return false;
+		if (parameters == null) {
+			if (other.parameters != null)
+				return false;
+		} else if (!parameters.equals(other.parameters))
 			return false;
 		if (password == null) {
 			if (other.password != null)
@@ -169,6 +188,11 @@ public class SwitchDefinition implements DefinitionInterface {
 		} else if (!password.equals(other.password))
 			return false;
 		if (port != other.port)
+			return false;
+		if (signallingIp == null) {
+			if (other.signallingIp != null)
+				return false;
+		} else if (!signallingIp.equals(other.signallingIp))
 			return false;
 		if (switchType != other.switchType)
 			return false;
@@ -191,7 +215,8 @@ public class SwitchDefinition implements DefinitionInterface {
 				|| switchDefinition.getPort() != getPort()
 				|| switchDefinition.getSwitchType() != getSwitchType()
 				|| !switchDefinition.getUsername().equals(getUsername())
-				|| switchDefinition.isEnabled() != isEnabled();
+				|| switchDefinition.isEnabled() != isEnabled() 
+				|| !switchDefinition.getSignallingIp().equals(getSignallingIp());
 	}
 
 }

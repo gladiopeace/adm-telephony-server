@@ -149,6 +149,7 @@
 			<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultFSAddressTranslator
 			</addresstranslator>
 			<enabled>true</enabled>
+			<signalling-ip>10.0.2.1</signalling-ip>
 		</switch>
 		<switch>
 			<name>Asterisk_VMWARE</name>
@@ -160,6 +161,7 @@
 			<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator
 			</addresstranslator>
 			<enabled>false</enabled>
+			<signalling-ip>10.0.2.1</signalling-ip>
 		</switch>
 
 	</switches>

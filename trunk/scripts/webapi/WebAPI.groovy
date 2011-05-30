@@ -238,7 +238,7 @@ class WebAPI extends AdmServlet {
 				requestId=1234
 				message=""
 				status=0
-				sipProxy= _switch.getDefinition().getAddress();
+				sipProxy= _switch.getDefinition().getSignallingIp();
 				sipUsername = agent.getName()
 				sipPassword = agent.getPassword()
 				sipSecure = false
@@ -267,7 +267,8 @@ class WebAPI extends AdmServlet {
 				requestId=1234
 				message=""
 				id=_switch.getDefinition().getId()
-				address= _switch.getDefinition().getAddress();
+				address= _switch.getDefinition().getAddress()
+				signallingIp=_switch.getDefinition().getSignallingIp()
 			}.toString()
 			return result
 		}
