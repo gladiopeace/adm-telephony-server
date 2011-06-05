@@ -74,7 +74,7 @@ public class BeansManager implements DefinitionChangeListener {
 						} else if (fieldType.isAssignableFrom(String.class)) {
 							field.set(obj, parameter.getValue());
 						} else {
-							Object bean = getBean(parameter.getValue());
+							Object bean = getBean(parameter.getValue()); //must be an object
 							if (bean == null) {
 								throw new Exception(String.format(
 										"Invalid bean (%s)",

@@ -7,7 +7,6 @@ public class DefaultAdmServlet extends AdmServlet {
 
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response) {
-
 		Map<String, String[]> headers = request.getHeaders();
 		 Iterator<Map.Entry<String, String[]>> it = headers.entrySet().iterator();
 		    while (it.hasNext()) {

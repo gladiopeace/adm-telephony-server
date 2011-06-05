@@ -14,8 +14,8 @@
     	 		<tr><td><br /></td></tr>
     	 		<tr>
     	 			<td>
-    	 					<input name="auth" type="submit" value="Login" id="auth" />
-    	 					<input name="action" type="hidden" value="auth" id="action" />
+    	 					<input name="login" type="submit" value="Login" id="login" />
+    	 					<input name="action" type="hidden" value="login" id="action" />
     	 			</td>
     	 		</tr>
     	 	</table>
