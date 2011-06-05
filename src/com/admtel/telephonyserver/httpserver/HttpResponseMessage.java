@@ -24,7 +24,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.mina.core.buffer.IoBuffer;
 
@@ -43,6 +45,7 @@ public class HttpResponseMessage {
 
     /** Map<String, String> */
     private Map<String, String> headers = new HashMap<String, String>();
+    
 
     /** Storage for body of HTTP response. */
     private ByteArrayOutputStream body = new ByteArrayOutputStream(1024);
@@ -61,6 +64,25 @@ public class HttpResponseMessage {
                 "EEE, dd MMM yyyy HH:mm:ss zzz").format(new Date()));
     }
 
+    public void addToCookie(String key, String value){
+    	String cookie = headers.get("Set-Cookie");
+    	String v = "";
+    	if (key == null) return;
+    	if (value == null){
+    		v = key;
+    	}
+    	else{
+    		v = key+"="+value;
+    	}
+    	
+    	if (cookie == null){
+    		headers.put("Set-Cookie", v);
+    	}
+    	else{
+    		cookie +=" ; " + v;
+    		headers.put("Set-Cookie", cookie);
+    	}    	
+    }
     public Map getHeaders() {
         return headers;
     }

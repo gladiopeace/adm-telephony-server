@@ -73,7 +73,7 @@ public class HttpServer implements IoHandler {
 			if (servlet == null){
 				servlet = admServlet;
 			}
-			servlet.process(request, response);
+			servlet.internalProcess(request, response);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
