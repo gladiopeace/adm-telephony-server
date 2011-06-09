@@ -179,7 +179,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 					.getAddress(), getDefinition().getPort()));
 			return true;
 		} catch (Exception e) {
-			log.warn(AdmUtils.getStackTrace(e));
+			log.warn(e.getMessage());
 			state = State.Disconnected;
 		}
 		return false;
