@@ -33,7 +33,9 @@ class WebConfServlet extends AdmServlet {
 			log.fatal(e.getMessage(), e)
 		}
 	}
-	
+	public init(){
+		
+	}
 	def index(request, response){
 		
 		[message:"welcome"]

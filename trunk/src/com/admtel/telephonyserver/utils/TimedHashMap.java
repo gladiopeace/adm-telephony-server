@@ -62,6 +62,13 @@ public class TimedHashMap<K,V> implements Map<K,V> {
 		this.timeout = timeout;
 	}
 
+	public TimedHashMap(){
+		super();
+		this.timeout = 300000; // 5 minutes
+	}
+	public void setTimeout(int timeout){
+		this.timeout = timeout;
+	}
 	@Override
 	public void clear() {
 		baseMap.clear();

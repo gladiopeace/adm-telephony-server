@@ -21,8 +21,10 @@ class WebAPI extends AdmServlet {
 	static Logger log = Logger.getLogger(WebAPI.class)
 	
 	
-	TokenSecurityProvider securityProvider;
-	
+	public TokenSecurityProvider securityProvider;
+	public init(){
+		
+	}
 	def index(request){
 		println "*********** index ${securityProvider}"
 		"Welcome"
@@ -282,8 +284,7 @@ class WebAPI extends AdmServlet {
 	}
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
-		
-		this.securityProvider = BeansManager.getInstance().getBean(getParameter('SecurityProvider'))
+				
 		if (securityProvider.getSecurityLevel(request.getParameter('token')) > 0){
 			
 			
