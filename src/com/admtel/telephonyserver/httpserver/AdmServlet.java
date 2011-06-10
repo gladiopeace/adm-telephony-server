@@ -9,27 +9,28 @@ import com.admtel.telephonyserver.utils.AdmUtils;
 import com.admtel.telephonyserver.utils.TimedHashMap;
 
 abstract public class AdmServlet {
-	Map<String, String> parameters = Collections.emptyMap();
-	TimedHashMap<String, Object> sessions = new TimedHashMap<String, Object>(15000); //TODO parameterize 
-	public Map<String, String> getParameters() {
-		return parameters;
+	TimedHashMap<String, Object> sessions = new TimedHashMap<String, Object>();  
+	
+	Object getSession(String sessionId){
+		synchronized(sessions){
+			return sessions.get(sessionId);
+		}
 	}
+	void setSession(HttpResponseMessage response, String sessionId, Object session, int timeout){
+		response.addToCookie("session", sessionId);
+		synchronized(sessions){
+			sessions.setTimeout(timeout);		
+			sessions.put(sessionId, session);
+		}
 
-	public void setParameters(Map<String, String> parameters) {
-		this.parameters = parameters;
-	}
-
-	public String getParameter(String key){
-		if (parameters == null) return null;
-		return parameters.get(key);
-	}
-	Object getSession(String sessionId){	
-		return sessions.get(sessionId);
 	}
 	void setSession(HttpResponseMessage response, String sessionId, Object session){
 		response.addToCookie("session", sessionId);
-		sessions.put(sessionId, session);
+		synchronized (sessions){
+			sessions.put(sessionId, session);
+		}
 	}
+	
 	final public void internalProcess(HttpRequestMessage request, HttpResponseMessage response){		
 		String[] cookieArr = request.getHeader("Cookie");
 		if (cookieArr != null && cookieArr.length>0){

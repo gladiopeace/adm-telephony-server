@@ -212,17 +212,6 @@ public class SystemConfig {
 								servletDefinition.setClassName(servletSubnode.getString("class"));
 								servletDefinition.setPath(servletSubnode.getString("path"));
 								definition.putServletDefinition(servletDefinition.getPath(), servletDefinition);
-								try{
-									HierarchicalConfiguration parametersConfig = subnode
-											.configurationAt(String.format("adm-servlet(%d).parameters",
-													servletCounter));
-									 Map<String, String>parameters = ConfigUtils.loadParameters(parametersConfig);
-									 servletDefinition.setParameters(parameters);
-									 
-									}
-									catch (Exception e){
-										log.warn(e.getMessage());
-									}
 							}
 						}
 						catch (Exception e){

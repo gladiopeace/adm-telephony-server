@@ -66,8 +66,7 @@ public class HttpServer implements IoHandler {
 			AdmServlet servlet = null;
 			if (servletDefinition != null){
 				servlet = SmartClassLoader.createInstance(AdmServlet.class, servletDefinition.getClassName());
-				log.trace(servlet);
-				servlet.setParameters(servletDefinition.getParameters());
+				log.trace(servlet);				
 			}
 			
 			if (servlet == null){
