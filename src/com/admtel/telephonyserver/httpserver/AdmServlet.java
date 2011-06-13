@@ -16,14 +16,6 @@ abstract public class AdmServlet {
 			return sessions.get(sessionId);
 		}
 	}
-	void setSession(HttpResponseMessage response, String sessionId, Object session, int timeout){
-		response.addToCookie("session", sessionId);
-		synchronized(sessions){
-			sessions.setTimeout(timeout);		
-			sessions.put(sessionId, session);
-		}
-
-	}
 	void setSession(HttpResponseMessage response, String sessionId, Object session){
 		response.addToCookie("session", sessionId);
 		synchronized (sessions){
@@ -44,8 +36,17 @@ abstract public class AdmServlet {
 				request.getHeaders().put("@".concat(key), a);
 			}
 		}
-		}
+		}		
 		process(request, response);
+		String sessionId = request.getParameter("session");
+		if (sessionId != null){
+			synchronized(sessions){
+				Object session = sessions.get(sessionId);
+				if (session != null){
+					sessions.put(sessionId, session);//reset timer
+				}
+			}
+		}
 	}
 	abstract public void process (HttpRequestMessage request, HttpResponseMessage response);
 }
