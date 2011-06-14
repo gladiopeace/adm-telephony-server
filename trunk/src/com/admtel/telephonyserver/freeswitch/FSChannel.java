@@ -797,6 +797,13 @@ public class FSChannel extends Channel {
 				onEvent(new DestroyEvent(this));
 			}
 				break;
+			case ChannelState:{
+				FSChannelStateEvent sse = (FSChannelStateEvent) fsEvent;
+				if (sse.getChannelState() == ChannelState.CS_DESTROY){
+					onEvent(new DestroyEvent(this));
+				}
+			}
+			break;
 			case ChannelOriginate: {
 				FSChannelOriginateEvent coe = (FSChannelOriginateEvent) fsEvent;
 				FSChannel otherChannel = (FSChannel) getSwitch().getChannel(
