@@ -126,14 +126,7 @@
 			<adm-servlet>
 				<path>asterisk-curl/single</path>
 				<class>scripts/AsteriskCurlExample.groovy</class>
-			</adm-servlet>
-		</http-server>
-		<!-- <http-server> -->
-		<!-- <id>Manager</id> -->
-		<!-- <address>172.16.140.1</address> -->
-		<!-- <port>8058</port> -->
-		<!-- <adm-servlet>scripts/HttpManager.groovy</adm-servlet> -->
-		<!-- </http-server> -->
+			</adm-servlet>		
 	</http-servers>
 	<!-- HTTP LISTENERS START -->
 
@@ -214,15 +207,6 @@
 
 
 	<beans>
-<!--		<bean>-->
-<!--			<class>com.admtel.telephonyserver.remote.JSonSocketManagerBean-->
-<!--			</class>-->
-<!--			<id>json_api</id>-->
-<!--			<parameters>-->
-<!--				<parameter name="address" value="172.16.140.1"/>-->
-<!--				<parameter name="port" value="12341"/>-->
-<!--			</parameters>-->
-<!--		</bean>-->
 		
 		<bean>
 			<class>com.admtel.telephonyserver.acd.impl.SimpleAcdDataProvider</class>			
@@ -254,17 +238,6 @@
 				<parameter name="port" value="1234"/>
 			</parameters>
 		</bean>
-<!--		<bean>-->
-<!--			<class>/home/user1/workspace/adm-telephony-scripts/src/conference/DBConferenceHelperBean.groovy-->
-<!--			</class>-->
-<!--			<id>conferencer-helper</id>-->
-<!--			<parameters>-->
-<!--				<parameter name="dbUrl" value="jdbc:postgresql://localhost:5432/adm_appserver"/>-->
-<!--				<parameter name="dbUser" value="tester"/>-->
-<!--				<parameter name="dbPassword" value="tester1234"/>-->
-<!--				<parameter name="dbDriver" value="org.postgresql.Driver"/>-->
-<!--			</parameters>-->
-<!--		</bean>-->
 		<bean>
 			<class>/home/user1/workspace/adm-telephony-scripts/src/conference/REST_ConferenceHelperBean.groovy
 			</class>

@@ -15,6 +15,7 @@ import com.admtel.telephonyserver.acd.*;
 import com.admtel.telephonyserver.events.DisconnectCode;
 import java.net.URLDecoder;
 import net.sf.json.groovy.JsonGroovyBuilder;
+import net.sf.json.*;
 
 class WebAPI extends AdmServlet {
 	
@@ -106,6 +107,7 @@ class WebAPI extends AdmServlet {
 		Switches.getInstance().processRequest(dialRequest)
 		"${channel} -> Dialed -> ${destination}"
 	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def join_conference(request){
 		String channel = request.getParameter('channel')
 		Channel c = Switches.getInstance().getChannelById(channel)
@@ -117,7 +119,7 @@ class WebAPI extends AdmServlet {
 			Switches.getInstance().processRequest(jcr)
 		}// TODO result code
 	}
-	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def get_channel_data(request){
 		String channelId = request.getParameter('channel')
 		String keyId = request.getParameter('key')
@@ -127,6 +129,7 @@ class WebAPI extends AdmServlet {
 			value = channel?.getUserData(keyId)
 		}.toString()
 	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def set_channel_data(request){
 		String channelId = request.getParameter('channel')
 		String key = request.getParameter('key')
@@ -137,6 +140,7 @@ class WebAPI extends AdmServlet {
 		}
 		""
 	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def get_agent_channel(request){
 		String agentId = request.getParameter('agent')
 		AcdAgent tAgent= AcdManager.getInstance().getAgentById(agentId)	
@@ -147,6 +151,7 @@ class WebAPI extends AdmServlet {
 		}.toString()
 		return result
 	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def hangup_agent(request){
 		String agentId = request.getParameter('agentId')
 		AcdAgent tAgent = AcdManager.getInstance().getAgentById(agentId)
@@ -158,6 +163,7 @@ class WebAPI extends AdmServlet {
 		}
 		return "Agent ID ${agentId} not found"
 	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def get_agent_data(request){
 		String agentName = request.getParameter('agent')
 		String agentId = request.getParameter('agentId')
@@ -199,6 +205,7 @@ class WebAPI extends AdmServlet {
 			status=-1 //TODO put proper status
 		}.toString()
 	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def set_agent_data(request){
 		String agentName = request.getParameter('agent')
 		String agentId = request.getParameter('agentId')
@@ -229,6 +236,7 @@ class WebAPI extends AdmServlet {
 			status=-1 //TODO put proper status
 		}.toString()
 	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def agent_login(request){
 		String agentName = request.getParameter('agent')
 		AcdAgent agent = AcdManager.getInstance().getAgentByName(agentName)
@@ -261,18 +269,17 @@ class WebAPI extends AdmServlet {
 			status=-1
 		}.toString()
 	}
-	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def get_random_switch(request){
 		Switch _switch = Switches.getInstance().getRandom()
 		if (_switch){
-			def result = new JsonGroovyBuilder().json{
-				requestId=1234
-				message=""
-				id=_switch.getDefinition().getId()
-				address= _switch.getDefinition().getAddress()
-				signallingIp=_switch.getDefinition().getSignallingIp()
-			}.toString()
-			return result
+						
+			def jsonObject = _switch.getDefinition().getParameters() as JSONObject
+			jsonObject.put("requestId", "1234")
+			jsonObject.put("message", "")
+			jsonObject.put("id", _switch.getDefinition().getId())
+			jsonObject.put("address", _switch.getDefinition().getAddress())
+			return jsonObject.toString()
 		}
 		else{
 			return new JsonGroovyBuilder().json{
@@ -282,6 +289,7 @@ class WebAPI extends AdmServlet {
 			}.toString()
 		}
 	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
 				
