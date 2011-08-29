@@ -32,5 +32,6 @@
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="lib/ezmorph-1.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/mina-core-2.0.2.jar"/>
+	<classpathentry exported="true" kind="con" path="GROOVY_DSL_SUPPORT"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
