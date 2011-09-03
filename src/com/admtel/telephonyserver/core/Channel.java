@@ -397,6 +397,7 @@ public abstract class Channel implements TimerNotifiable {
 	}
 
 	final public Result hangup(DisconnectCode disconnectCode) {
+		if (disconnectCode == null) disconnectCode = DisconnectCode.Normal;
 		CallState callstate = getCallState();
 		log.debug(String.format("[%s] - hangup (%s)", this, disconnectCode));
 		if (callstate == CallState.Connected|| callstate == CallState.Accepted|| callstate == CallState.Alerting|| 

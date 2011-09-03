@@ -12,15 +12,6 @@ public class SwitchDefinition implements DefinitionInterface {
 	SwitchType switchType;
 	String addressTranslatorClass;
 	boolean enabled;
-	String signallingIp;
-
-	public String getSignallingIp() {
-		return signallingIp;
-	}
-
-	public void setSignallingIp(String signallingIp) {
-		this.signallingIp = signallingIp;
-	}
 
 	Map<String, String> features = new HashMap<String, String>();
 	Map<String, String> parameters = new HashMap<String, String>();
@@ -115,8 +106,8 @@ public class SwitchDefinition implements DefinitionInterface {
 				+ ", port=" + port + ", username=" + username + ", password="
 				+ password + ", switchType=" + switchType
 				+ ", addressTranslatorClass=" + addressTranslatorClass
-				+ ", enabled=" + enabled + ", signallingIp=" + signallingIp
-				+ ", features=" + features + ", parameters=" + parameters + "]";
+				+ ", enabled=" + enabled + ", features=" + features
+				+ ", parameters=" + parameters + "]";
 	}
 
 	@Override
@@ -137,8 +128,6 @@ public class SwitchDefinition implements DefinitionInterface {
 		result = prime * result
 				+ ((password == null) ? 0 : password.hashCode());
 		result = prime * result + port;
-		result = prime * result
-				+ ((signallingIp == null) ? 0 : signallingIp.hashCode());
 		result = prime * result
 				+ ((switchType == null) ? 0 : switchType.hashCode());
 		result = prime * result
@@ -189,11 +178,6 @@ public class SwitchDefinition implements DefinitionInterface {
 			return false;
 		if (port != other.port)
 			return false;
-		if (signallingIp == null) {
-			if (other.signallingIp != null)
-				return false;
-		} else if (!signallingIp.equals(other.signallingIp))
-			return false;
 		if (switchType != other.switchType)
 			return false;
 		if (username == null) {
@@ -215,8 +199,7 @@ public class SwitchDefinition implements DefinitionInterface {
 				|| switchDefinition.getPort() != getPort()
 				|| switchDefinition.getSwitchType() != getSwitchType()
 				|| !switchDefinition.getUsername().equals(getUsername())
-				|| switchDefinition.isEnabled() != isEnabled() 
-				|| !switchDefinition.getSignallingIp().equals(getSignallingIp());
+				|| switchDefinition.isEnabled() != isEnabled();
 	}
 
 }

@@ -125,6 +125,10 @@ public class RadiusServer implements Authorizer {
 		ar.setDictionary(dictionary);
 		arDecorator.addAttribute("NAS-IP-Address",
 				SystemConfig.getInstance().serverDefinition.getAddress());
+		arDecorator.addAttribute("NAS-Port-Type", "Async");// TODO, set proper
+		// value
+		arDecorator.addAttribute("NAS-Port", "0"); //TODO set proper value
+
 		arDecorator.addAttribute("Service-Type", serviceType);
 		arDecorator.addAttribute("Calling-Station-Id", callingStationId);
 		arDecorator.addAttribute("Called-Station-Id", calledStationId);
@@ -279,6 +283,7 @@ public class RadiusServer implements Authorizer {
 				+ AdmUtils.dateToRadiusStr(channel.getSetupTime()));
 		arDecorator.addAttribute("Acct-Delay-Time", "0");
 		arDecorator.addAttribute("NAS-Port-Type", "Async");// TODO, set proper
+		arDecorator.addAttribute("NAS-Port", "0"); //TODO set proper value
 		// value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel
 				.getAcctUniqueSessionId());
@@ -335,6 +340,7 @@ public class RadiusServer implements Authorizer {
 				+ AdmUtils.dateToRadiusStr(channel.getSetupTime()));
 		arDecorator.addAttribute("Acct-Delay-Time", "0");
 		arDecorator.addAttribute("NAS-Port-Type", "Async");// TODO, set proper
+		arDecorator.addAttribute("NAS-Port", "0"); //TODO set proper value
 		// value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel
 				.getAcctUniqueSessionId());
@@ -389,6 +395,7 @@ public class RadiusServer implements Authorizer {
 				.getSessionTime()));
 		arDecorator.addAttribute("NAS-Port-Type", "Async");// TODO, set proper
 		// value
+		arDecorator.addAttribute("NAS-Port", "0"); //TODO set proper value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel
 				.getAcctUniqueSessionId());
 		arDecorator.addAttribute("h323-disconnect-cause",
@@ -451,6 +458,7 @@ public class RadiusServer implements Authorizer {
 		arDecorator.addAttribute("Acct-Delay-Time", "0");
 		arDecorator.addAttribute("NAS-Port-Type", "Async");// TODO, set proper
 		// value
+		arDecorator.addAttribute("NAS-Port", "0"); //TODO set proper value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel
 				.getAcctUniqueSessionId());
 		arDecorator.addAttribute("Login-IP-Host", channel.getLoginIP());
@@ -502,6 +510,7 @@ public class RadiusServer implements Authorizer {
 		arDecorator.addAttribute("Acct-Delay-Time", "0");
 		arDecorator.addAttribute("NAS-Port-Type", "Async");// TODO, set proper
 		// value
+		arDecorator.addAttribute("NAS-Port", "0"); //TODO set proper value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel
 				.getAcctUniqueSessionId());
 		arDecorator.addAttribute("Login-IP-Host", channel.getLoginIP());
@@ -553,6 +562,7 @@ public class RadiusServer implements Authorizer {
 				.toString(sessionTime));
 		arDecorator.addAttribute("NAS-Port-Type", "Async");// TODO, set proper
 		// value
+		arDecorator.addAttribute("NAS-Port", "0"); //TODO set proper value
 		arDecorator.addAttribute("Acct-Multi-Session-Id", channel
 				.getAcctUniqueSessionId());
 		arDecorator.addAttribute("h323-disconnect-cause",

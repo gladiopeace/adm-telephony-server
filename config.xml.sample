@@ -4,7 +4,7 @@
 	<server>
 		<maxthreads>15</maxthreads>
 		<address>192.168.1.60</address>
-		<base-directory>/usr/local/adm</base-directory>
+		<base-directory>/usr/local/adm</base-directory> <!-- for sounds files location -->
 		<script-path>.;./scripts;/home/user1/workspace/adm-telephony-scripts/src
 		</script-path>
 		<radius-start-accounting>true</radius-start-accounting>
@@ -142,7 +142,14 @@
 			<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultFSAddressTranslator
 			</addresstranslator>
 			<enabled>true</enabled>
-			<signalling-ip>10.0.2.1</signalling-ip>
+			<parameters>			
+				<parameter name="udp_sip_address" value="77.42.246.148"/>
+				<parameter name="udp_sip_port" value="5080"/>
+				<parameter name="tcp_sip_address" value="77.42.246.148"/>
+				<parameter name="tcp_sip_port" value="5082"/>
+				<parameter name="tls_sip_address" value="77.42.246.148"/>
+				<parameter name="tls_sip_port" value="5081"/>	
+			</parameters>	
 		</switch>
 		<switch>
 			<name>Asterisk_VMWARE</name>
@@ -154,7 +161,14 @@
 			<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator
 			</addresstranslator>
 			<enabled>false</enabled>
-			<signalling-ip>10.0.2.1</signalling-ip>
+			<parameters>			
+				<parameter name="udp_sip_address" value="77.42.246.148"/>
+				<parameter name="udp_sip_port" value="5080"/>
+				<parameter name="tcp_sip_address" value="77.42.246.148"/>
+				<parameter name="tcp_sip_port" value="5082"/>
+				<parameter name="tls_sip_address" value="77.42.246.148"/>
+				<parameter name="tls_sip_port" value="5081"/>	
+			</parameters>	
 		</switch>
 
 	</switches>
