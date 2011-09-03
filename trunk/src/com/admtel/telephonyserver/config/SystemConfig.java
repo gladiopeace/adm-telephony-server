@@ -123,7 +123,6 @@ public class SystemConfig {
 					definition.setAddressTranslatorClass(subnode
 							.getString("addresstranslator"));
 					definition.setEnabled(subnode.getBoolean("enabled", true));
-					definition.setSignallingIp(subnode.getString("signalling-ip"));
 					
 					try{
 						HierarchicalConfiguration parametersConfig = config
@@ -146,9 +145,6 @@ public class SystemConfig {
 								log.warn(e.getMessage());
 							}
 					
-					if (definition.getSignallingIp() == null || definition.getSignallingIp().isEmpty()){
-						definition.setSignallingIp(definition.getAddress());
-					}
 					futureDefinitions.put(definition.getId(), definition);
 				} else {
 					return;
