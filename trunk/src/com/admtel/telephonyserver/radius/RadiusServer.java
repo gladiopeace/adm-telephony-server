@@ -134,7 +134,7 @@ public class RadiusServer implements Authorizer {
 		arDecorator.addAttribute("Called-Station-Id", calledStationId);
 		arDecorator.addAttribute("Login-IP-Host", loginIp);
 		if (serviceNumber != null) {
-			arDecorator.addAttribute("Cisco-AVPair", "service-number="
+			arDecorator.addAttribute("Cisco-AVPair", "access-number="
 					+ serviceNumber);
 		}
 
@@ -289,7 +289,7 @@ public class RadiusServer implements Authorizer {
 				.getAcctUniqueSessionId());
 		arDecorator.addAttribute("Login-IP-Host", channel.getLoginIP());
 		if (channel.getServiceNumber() != null) {
-			arDecorator.addAttribute("Cisco-AVPair", "service-number="
+			arDecorator.addAttribute("Cisco-AVPair", "access-number="
 					+ channel.getServiceNumber());
 		}
 
@@ -346,7 +346,7 @@ public class RadiusServer implements Authorizer {
 				.getAcctUniqueSessionId());
 		arDecorator.addAttribute("Login-IP-Host", channel.getLoginIP());
 		if (channel.getServiceNumber() != null) {
-			arDecorator.addAttribute("Cisco-AVPair", "service-number="
+			arDecorator.addAttribute("Cisco-AVPair", "access-number="
 					+ channel.getServiceNumber());
 		}
 
@@ -406,7 +406,7 @@ public class RadiusServer implements Authorizer {
 		arDecorator.addAttribute("xpgk-dst-number-in", channel.getChannelData()
 				.getDestinationNumberIn());
 		if (channel.getServiceNumber() != null) {
-			arDecorator.addAttribute("Cisco-AVPair", "service-number="
+			arDecorator.addAttribute("Cisco-AVPair", "access-number="
 					+ channel.getServiceNumber());
 		}
 
@@ -463,7 +463,7 @@ public class RadiusServer implements Authorizer {
 				.getAcctUniqueSessionId());
 		arDecorator.addAttribute("Login-IP-Host", channel.getLoginIP());
 		if (channel.getServiceNumber() != null) {
-			arDecorator.addAttribute("Cisco-AVPair", "service-number="
+			arDecorator.addAttribute("Cisco-AVPair", "access-number="
 					+ channel.getServiceNumber());
 		}
 
@@ -515,7 +515,7 @@ public class RadiusServer implements Authorizer {
 				.getAcctUniqueSessionId());
 		arDecorator.addAttribute("Login-IP-Host", channel.getLoginIP());
 		if (channel.getServiceNumber() != null) {
-			arDecorator.addAttribute("Cisco-AVPair", "service-number="
+			arDecorator.addAttribute("Cisco-AVPair", "access-number="
 					+ channel.getServiceNumber());
 		}
 
@@ -573,7 +573,7 @@ public class RadiusServer implements Authorizer {
 		arDecorator.addAttribute("xpgk-dst-number-in", channel.getChannelData()
 				.getDestinationNumberIn());
 		if (channel.getServiceNumber() != null) {
-			arDecorator.addAttribute("Cisco-AVPair", "service-number="
+			arDecorator.addAttribute("Cisco-AVPair", "access-number="
 					+ channel.getServiceNumber());
 		}
 
