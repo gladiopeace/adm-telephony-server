@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-
 	<server>
+		<!-- Maximum number of threads spawned by the server -->
 		<maxthreads>15</maxthreads>
-		<address>192.168.1.60</address>
+		
+		<!-- Server address, used in instances where we need to identify ourselves
+			Example: the Nas-IP-Address send to the radius server
+		-->
+		<address>192.168.1.60</address> 
+		
 		<base-directory>/usr/local/adm</base-directory> <!-- for sounds files location -->
 		<script-path>.;./scripts;/home/user1/workspace/adm-telephony-scripts/src
 		</script-path>
