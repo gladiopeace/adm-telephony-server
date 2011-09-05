@@ -24,8 +24,7 @@ import com.admtel.telephonyserver.requests.SwitchRequest;
 
 public class AdmTelephonyServer {
 
-	private static final int PORT = 9999;
-	private static ServerSocket socket;
+	private static final int PORT = 9999;	
 
 	static Logger log = Logger.getLogger(AdmTelephonyServer.class);
 
@@ -42,17 +41,35 @@ public class AdmTelephonyServer {
 	/**
 	 * @param args
 	 */
+	static private boolean isOnlyInstance(){
+		
+		ServerSocket socket = null;
+		try{
+			socket = new ServerSocket(PORT, 0, InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }));
+		}
+		catch (Exception e){
+			return false;
+		}
+		if (socket != null){
+			try {
+				socket.close();
+			} catch (IOException e) {
+				log.warn(e);
+			}
+			socket = null;
+		}
+		return true;
+	}
+	
 	public static void main(String[] args) {
 
+		if (!isOnlyInstance()){
+			log.error("Server already running ");
+			System.exit(1);
+		}
 		try {
-			// Bind to localhost adapter with a zero connection queue
-			socket = new ServerSocket(PORT, 0, InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }));
-
 			log.debug("Adm Telephony Server started ...");
 			getInstance().start();
-
-			// TODO remove, for testing only
-			log.trace("Prompt builder "+ PromptBuilderFactory.getInstance().getPromptBuilder(Locale.ENGLISH));
 
 			while (true) {
 				try {
@@ -63,18 +80,8 @@ public class AdmTelephonyServer {
 				}
 				// log.debug("Server running...");
 			}
-
-		} catch (BindException e) {
-			System.err
-					.println("**********************************Already running.");
-			System.exit(1);
-		} catch (IOException e) {
-			System.err
-					.println("************************************Unexpected error.");
-			e.printStackTrace();
-			System.exit(2);
 		} catch (Exception e) {
-			System.err.println("************************************ Error");
+			log.error("Failed to start server ... : "+e.getMessage()); 
 		}
 	}
 
@@ -134,22 +141,4 @@ public class AdmTelephonyServer {
 
 		BeansManager.getInstance().init();
 	}
-
-	// private static void checkIfRunning() {
-	// try {
-	// //Bind to localhost adapter with a zero connection queue
-	// socket = new ServerSocket(PORT,0,InetAddress.getByAddress(new byte[]
-	// {127,0,0,1}));
-	// }
-	// catch (BindException e) {
-	// System.err.println("Already running.");
-	// System.exit(1);
-	// }
-	// catch (IOException e) {
-	// System.err.println("Unexpected error.");
-	// e.printStackTrace();
-	// System.exit(2);
-	// }
-	// }
-
 }
