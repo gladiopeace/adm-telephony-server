@@ -62,8 +62,6 @@ public abstract class Channel implements TimerNotifiable {
 	}
 	public static Logger log = Logger.getLogger(Channel.class);
 	
-	SimpleEventListener simpleEventListenerInstance = new SimpleEventListener();
-	
 	public enum CallState {
 		Null, Idle, Offered, Alerting, Accepted, Connected, Linked, Dialing, Disconnected, Dropped, Conferenced, AcdQueued, Queued,
 	}
@@ -281,7 +279,6 @@ public abstract class Channel implements TimerNotifiable {
 		this.id = id;
 		this.uniqueId = UUID.randomUUID().toString();
 		language = Locale.ENGLISH;
-		simpleEventListenerInstance.generateFiles("Loading a channel with id: (" + this.id + ") and switch: (" + this._switch + ") and uniqueId: (" + this.uniqueId + "), and language: (" + language + ")");
 	}
 
 	public String getUniqueId() {
@@ -473,7 +470,6 @@ public abstract class Channel implements TimerNotifiable {
 		if (lastResult == Result.Ok) {
 			setCallState(CallState.Accepted);
 		}
-		simpleEventListenerInstance.generateFiles("Answer Request: " +lastResult );
 		return lastResult;
 	}
 
@@ -651,8 +647,6 @@ public abstract class Channel implements TimerNotifiable {
 		}
 			break;
 		}
-		simpleEventListenerInstance.generateFiles(e.toString());
-
 		EventsManager.getInstance().onEvent(e);
 
 		try {
@@ -703,17 +697,21 @@ public abstract class Channel implements TimerNotifiable {
 
 	@Override
 	public String toString() {
-		final int maxLen = 20;
-		return "Channel ["
-				+ (uniqueId != null ? "uniqueId=" + uniqueId + ", " : "")
-				+ (callOrigin != null ? "callOrigin=" + callOrigin + ", " : "")
-				+ (setupTime != null ? "setupTime=" + setupTime + ", " : "")
-				+ (answerTime != null ? "answerTime=" + answerTime + ", " : "")
-				+ (hangupTime != null ? "hangupTime=" + hangupTime + ", " : "")
-				+ (channelData != null ? "channelData=" + channelData + ", "
-						: "")
-				+ (userData != null ? "userData="
-						+ toString(userData.entrySet(), maxLen) : "") + "]";
+		return "Channel [hangupTimer=" + hangupTimer + ", interimUpdateTimer="
+				+ interimUpdateTimer + ", listeners=" + listeners
+				+ ", callState=" + callState + ", mediaState=" + mediaState
+				+ ", id=" + id + ", dtmfBuffer=" + dtmfBuffer + ", _switch="
+				+ _switch + ", uniqueId=" + uniqueId + ", channelData="
+				+ channelData + ", userData=" + userData + ", createdTime="
+				+ createdTime + ", callOrigin=" + callOrigin + ", setupTime="
+				+ setupTime + ", hangupTime=" + hangupTime + ", answerTime="
+				+ answerTime + ", h323CallOrigin=" + h323CallOrigin
+				+ ", acctUniqueSessionId=" + acctUniqueSessionId
+				+ ", h323DisconnectCause=" + h323DisconnectCause
+				+ ", baseDirectory=" + baseDirectory + ", language=" + language
+				+ ", conferenceId=" + conferenceId + ", memberId=" + memberId
+				+ ", lastResult=" + lastResult + ", otherChannel="
+				+ otherChannel + ", messageHandler=" + messageHandler + "]";
 	}
 
 	public Integer getH323DisconnectCause() {
@@ -782,7 +780,6 @@ public abstract class Channel implements TimerNotifiable {
 		case HangupRequest: {
 			HangupRequest hr = (HangupRequest) request;			
 			Result result = hangup(hr.getDisconnectCode());		
-			simpleEventListenerInstance.generateFiles("Hangup Request: " + result);
 		}
 			break;
 		case AnswerRequest: {
@@ -792,19 +789,16 @@ public abstract class Channel implements TimerNotifiable {
 		case ParticipantMuteRequest: {
 			ParticipantMuteRequest pmr = (ParticipantMuteRequest) request;
 			conferenceMute(pmr.isMute());
-			simpleEventListenerInstance.generateFiles("Participant MuteRequest: " + pmr);
 		}
 			break;
 		case DialRequest: {
 			DialRequest dialRequest = (DialRequest) request;
 			dial(dialRequest.getDestination(), dialRequest.getTimeout());
-			simpleEventListenerInstance.generateFiles("Dial Request: " + dialRequest);
 		}
 			break;
 		case JoinConferenceRequest:{
 			JoinConferenceRequest jcr = (JoinConferenceRequest) request;
 			joinConference(jcr.getConference(), jcr.isModerator(), jcr.isMuted(), jcr.isDeaf());
-			simpleEventListenerInstance.generateFiles("Join Conference Request: " + jcr);
 		}
 		break;
 		}
