@@ -1,5 +1,4 @@
 <#import "common.ftl" as com>
-<#escape x as x?html>
 
 <@com.page title="Conferences">
   <#if conferences?size = 0>
@@ -11,12 +10,9 @@
         <th bgcolor="#C0C0C0">Message</th>
       <#list conferences as c>
         <tr align=left valign=top>
-          <td bgcolor="#E0E0E0">${c.id}</td>
-          <td bgcolor="#E0E0E0"><a href="${context}?action=viewConference&conf_id=${c.id}"/> View Detail</td>
+          <td bgcolor="#E0E0E0">${c.id}</td>          
         </tr>             
       </#list>
     </table>
   </#if>
 </@com.page>
-
-</#escape>
