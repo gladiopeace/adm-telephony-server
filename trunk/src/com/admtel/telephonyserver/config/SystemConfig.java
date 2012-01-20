@@ -14,6 +14,88 @@ import org.apache.log4j.Logger;
 
 public class SystemConfig {
 
+	private static final String CONFIG_XML = "config.xml";
+
+	private static final String LANGUAGE = "language";
+
+	private static final String PROMPT_BUILDERS_PROMPT_BUILDER_D = "prompt-builders.prompt-builder(%d)";
+
+	private static final String BEANS_BEAN_D_PARAMETERS = "beans.bean(%d).parameters";
+
+	private static final String BEANS_BEAN_D = "beans.bean(%d)";
+
+	private static final String EVENT_LISTENERS_EVENT_LISTENER_D = "event-listeners.event-listener(%d)";
+
+	private static final String SCRIPTFACTORIES_SCRIPTFACTORY_D = "scriptfactories.scriptfactory(%d)";
+
+	private static final String CLI_LISTENERS_CLI_LISTENER_D = "cli-listeners.cli-listener(%d)";
+
+	private static final String PATH = "path";
+
+	private static final String CLASS = "class";
+
+	private static final String ADM_SERVLET_D = "adm-servlet(%d)";
+
+	private static final String HTTP_SERVERS_HTTP_SERVER_D = "http-servers.http-server(%d)";
+
+	private static final String LOG2 = "log";
+
+	private static final String SOCKET_TIMEOUT = "socket-timeout";
+
+	private static final String RETRY_COUNT = "retry-count";
+
+	private static final String SECRET = "secret";
+
+	private static final String ACCT_PORT = "acct-port";
+
+	private static final String AUTH_PORT = "auth-port";
+
+	private static final String ID = "id";
+
+	private static final String RADIUS_SERVER_D = "radius.server(%d)";
+
+	private static final String SWITCHES_SWITCH_D_FEATURES = "switches.switch(%d).features";
+
+	private static final String SWITCHES_SWITCH_D_PARAMETERS = "switches.switch(%d).parameters";
+
+	private static final String ADDRESSTRANSLATOR = "addresstranslator";
+
+	private static final String PASSWORD = "password";
+
+	private static final String USERNAME = "username";
+
+	private static final String NAME = "name";
+
+	private static final String SWITCHES_SWITCH_D = "switches.switch(%d)";
+
+	private static final String TYPE = "type";
+
+	private static final String PORT = "port";
+
+	private static final String ADDRESS = "address";
+
+	private static final String SWITCH_LISTENERS_SWITCH_LISTENER_D = "switch-listeners.switch-listener(%d)";
+
+	private static final String REGISTRAR_ENABLED = "registrar.enabled";
+
+	private static final String DEFAULT_REGISTRAR = "com.admtel.telephonyserver.registrar.SimpleRegistrar";
+
+	private static final String REGISTRAR_CLASS = "registrar.class";
+
+	private static final String SERVER_RADIUS_INTERIM_UPDATE = "server.radius-interim-update";
+
+	private static final String SERVER_RADIUS_STOP_ACCOUNTING = "server.radius-stop-accounting";
+
+	private static final String SERVER_RADIUS_START_ACCOUNTING = "server.radius-start-accounting";
+
+	private static final String SERVER_SCRIPT_PATH = "server.script-path";
+
+	private static final String SERVER_BASE_DIRECTORY = "server.base-directory";
+
+	private static final String SERVER_ADDRESS = "server.address";
+
+	private static final String SERVER_MAXTHREADS = "server.maxthreads";
+
 	static Logger log = Logger.getLogger(SystemConfig.class);
 	
 	XMLConfiguration config;
@@ -54,26 +136,26 @@ public class SystemConfig {
 	// //////////////////////////////////////////////////////////////////////
 	public void loadServerDefinition() {
 		ServerDefinition serverDefinition = new ServerDefinition();
-		serverDefinition.setMaxThreads(config.getInt("server.maxthreads"));
-		serverDefinition.setAddress(config.getString("server.address"));
+		serverDefinition.setMaxThreads(config.getInt(SERVER_MAXTHREADS));
+		serverDefinition.setAddress(config.getString(SERVER_ADDRESS));
 		serverDefinition.setBaseDirectory(config
-				.getString("server.base-directory"));
-		serverDefinition.setScriptPath(config.getString("server.script-path"));
+				.getString(SERVER_BASE_DIRECTORY));
+		serverDefinition.setScriptPath(config.getString(SERVER_SCRIPT_PATH));
 		serverDefinition.setStartAccounting(config.getBoolean(
-				"server.radius-start-accounting", true));
+				SERVER_RADIUS_START_ACCOUNTING, true));
 		serverDefinition.setStopAccounting(config.getBoolean(
-				"server.radius-stop-accounting", true));
+				SERVER_RADIUS_STOP_ACCOUNTING, true));
 		serverDefinition.setInterimUpdate(config
 				.getInt(
-				"server.radius-interim-update", 0));
+				SERVER_RADIUS_INTERIM_UPDATE, 0));
 		this.serverDefinition = serverDefinition;
 	}
 
 	public void loadRegistrarDefinition() {
 		RegistrarDefinition registrarDefinition = new RegistrarDefinition();
-		registrarDefinition.setClassName(config.getString("registrar.class",
-				"com.admtel.telephonyserver.registrar.SimpleRegistrar"));
-		registrarDefinition.setEnabled(config.getBoolean("registrar.enabled",
+		registrarDefinition.setClassName(config.getString(REGISTRAR_CLASS,
+				DEFAULT_REGISTRAR));
+		registrarDefinition.setEnabled(config.getBoolean(REGISTRAR_ENABLED,
 				true));
 		futureDefinitions.put(registrarDefinition.getId(), registrarDefinition);
 	}
@@ -84,13 +166,13 @@ public class SystemConfig {
 		while (true) {
 			try {
 				subnode = config.configurationAt(String.format(
-						"switch-listeners.switch-listener(%d)", counter));
+						SWITCH_LISTENERS_SWITCH_LISTENER_D, counter));
 				if (subnode != null) {
 					SwitchListenerDefinition definition = new SwitchListenerDefinition();
-					definition.setAddress(subnode.getString("address"));
-					definition.setPort(subnode.getInt("port"));
+					definition.setAddress(subnode.getString(ADDRESS));
+					definition.setPort(subnode.getInt(PORT));
 					definition.setSwitchType(SwitchType.fromString(subnode
-							.getString("type")));
+							.getString(TYPE)));
 					futureDefinitions.put(definition.getId(), definition);
 				} else {
 					return;
@@ -110,23 +192,23 @@ public class SystemConfig {
 		while (true) {
 			try {
 				subnode = config.configurationAt(String.format(
-						"switches.switch(%d)", counter));
+						SWITCHES_SWITCH_D, counter));
 				if (subnode != null) {
 					SwitchDefinition definition = new SwitchDefinition();
-					definition.setName(subnode.getString("name"));
-					definition.setAddress(subnode.getString("address"));
-					definition.setPort(subnode.getInt("port"));
-					definition.setUsername(subnode.getString("username"));
-					definition.setPassword(subnode.getString("password"));
+					definition.setName(subnode.getString(NAME));
+					definition.setAddress(subnode.getString(ADDRESS));
+					definition.setPort(subnode.getInt(PORT));
+					definition.setUsername(subnode.getString(USERNAME));
+					definition.setPassword(subnode.getString(PASSWORD));
 					definition.setSwitchType(SwitchType.fromString(subnode
-							.getString("type")));
+							.getString(TYPE)));
 					definition.setAddressTranslatorClass(subnode
-							.getString("addresstranslator"));
+							.getString(ADDRESSTRANSLATOR));
 					definition.setEnabled(subnode.getBoolean("enabled", true));
 					
 					try{
 						HierarchicalConfiguration parametersConfig = config
-								.configurationAt(String.format("switches.switch(%d).parameters",
+								.configurationAt(String.format(SWITCHES_SWITCH_D_PARAMETERS,
 										counter));
 						 Map<String,String>parameters = ConfigUtils.loadParameters(parametersConfig);
 						 definition.setParameters(parameters);
@@ -136,7 +218,7 @@ public class SystemConfig {
 						}
 						try{
 							HierarchicalConfiguration parametersConfig = config
-									.configurationAt(String.format("switches.switch(%d).features",
+									.configurationAt(String.format(SWITCHES_SWITCH_D_FEATURES,
 											counter));
 							 Map<String,String>features = ConfigUtils.loadFeatures(parametersConfig);
 							 definition.setFeatures(features);
@@ -164,18 +246,18 @@ public class SystemConfig {
 		while (true) {
 			try {
 				subnode = config.configurationAt(String.format(
-						"radius.server(%d)", counter));
+						RADIUS_SERVER_D, counter));
 				if (subnode != null) {
 					RadiusDefinition definition = new RadiusDefinition();
-					definition.setId(subnode.getString("id"));
-					definition.setAddress(subnode.getString("address"));
-					definition.setAuthPort(subnode.getInt("auth-port", 1812));
-					definition.setAcctPort(subnode.getInt("acct-port", 1813));
-					definition.setSecret(subnode.getString("secret"));
-					definition.setRetryCount(subnode.getInt("retry-count", 5));
+					definition.setId(subnode.getString(ID));
+					definition.setAddress(subnode.getString(ADDRESS));
+					definition.setAuthPort(subnode.getInt(AUTH_PORT, 1812));
+					definition.setAcctPort(subnode.getInt(ACCT_PORT, 1813));
+					definition.setSecret(subnode.getString(SECRET));
+					definition.setRetryCount(subnode.getInt(RETRY_COUNT, 5));
 					definition.setSocketTimeout(subnode.getInt(
-							"socket-timeout", 5000));
-					definition.setLog(subnode.getBoolean("log", false));
+							SOCKET_TIMEOUT, 5000));
+					definition.setLog(subnode.getBoolean(LOG2, false));
 					futureDefinitions.put(definition.getId(), definition);
 				}
 			} catch (Exception e) {
@@ -192,21 +274,21 @@ public class SystemConfig {
 		while (true) {
 			try {
 				subnode = config.configurationAt(String.format(
-						"http-servers.http-server(%d)", counter));
+						HTTP_SERVERS_HTTP_SERVER_D, counter));
 				if (subnode != null) {
 					HttpServerDefinition definition = new HttpServerDefinition();
-					definition.setId(subnode.getString("id"));
-					definition.setAddress(subnode.getString("address"));
-					definition.setPort(subnode.getInt("port"));
+					definition.setId(subnode.getString(ID));
+					definition.setAddress(subnode.getString(ADDRESS));
+					definition.setPort(subnode.getInt(PORT));
 					int servletCounter = 0;
 					while (true){
 						try{
-							SubnodeConfiguration servletSubnode = subnode.configurationAt(String.format("adm-servlet(%d)", servletCounter));
+							SubnodeConfiguration servletSubnode = subnode.configurationAt(String.format(ADM_SERVLET_D, servletCounter));
 							if (servletSubnode != null){
 
 								AdmServletDefinition servletDefinition = new AdmServletDefinition();
-								servletDefinition.setClassName(servletSubnode.getString("class"));
-								servletDefinition.setPath(servletSubnode.getString("path"));
+								servletDefinition.setClassName(servletSubnode.getString(CLASS));
+								servletDefinition.setPath(servletSubnode.getString(PATH));
 								definition.putServletDefinition(servletDefinition.getPath(), servletDefinition);
 							}
 						}
@@ -232,13 +314,13 @@ public class SystemConfig {
 		while (true) {
 			try {
 				subnode = config.configurationAt(String.format(
-						"cli-listeners.cli-listener(%d)", counter));
+						CLI_LISTENERS_CLI_LISTENER_D, counter));
 				if (subnode != null) {
 					CLI_ListenerDefinition definition = new CLI_ListenerDefinition();
-					definition.setAddress(subnode.getString("address"));
-					definition.setPort(subnode.getInt("port"));
-					definition.setUsername(subnode.getString("username"));
-					definition.setPassword(subnode.getString("password"));
+					definition.setAddress(subnode.getString(ADDRESS));
+					definition.setPort(subnode.getInt(PORT));
+					definition.setUsername(subnode.getString(USERNAME));
+					definition.setPassword(subnode.getString(PASSWORD));
 					futureDefinitions.put(definition.getId(), definition);
 				} else {
 					return;
@@ -258,10 +340,10 @@ public class SystemConfig {
 		while (true) {
 			try {
 				subnode = config.configurationAt(String.format(
-						"scriptfactories.scriptfactory(%d)", counter));
+						SCRIPTFACTORIES_SCRIPTFACTORY_D, counter));
 				if (subnode != null) {
 					ScriptFactoryDefinition definition = new ScriptFactoryDefinition();
-					definition.setClassName(subnode.getString("class"));
+					definition.setClassName(subnode.getString(CLASS));
 					futureDefinitions.put(definition.getId(), definition);
 				} else {
 					return;
@@ -281,10 +363,10 @@ public class SystemConfig {
 		while (true) {
 			try {
 				subnode = config.configurationAt(String.format(
-						"event-listeners.event-listener(%d)", counter));
+						EVENT_LISTENERS_EVENT_LISTENER_D, counter));
 				if (subnode != null) {
 					EventListenerDefinition definition = new EventListenerDefinition();
-					definition.setClassName(subnode.getString("class"));
+					definition.setClassName(subnode.getString(CLASS));
 					futureDefinitions.put(definition.getId(), definition);
 				} else {
 					return;
@@ -304,15 +386,15 @@ public class SystemConfig {
 		while (true) {
 			try {
 				subnode = config.configurationAt(String.format(
-						"beans.bean(%d)", counter));
+						BEANS_BEAN_D, counter));
 				if (subnode != null) {
 					BeanDefinition definition = new BeanDefinition();
-					definition.setClassName(subnode.getString("class"));
-					definition.setId(subnode.getString("id"));
+					definition.setClassName(subnode.getString(CLASS));
+					definition.setId(subnode.getString(ID));
 					
 					try{
 						HierarchicalConfiguration parametersConfig = config
-								.configurationAt(String.format("beans.bean(%d).parameters",
+								.configurationAt(String.format(BEANS_BEAN_D_PARAMETERS,
 										counter));
 						 Map<String,String>parameters = ConfigUtils.loadParameters(parametersConfig);
 						 definition.setParameters(parameters);
@@ -340,11 +422,11 @@ public class SystemConfig {
 		while (true) {
 			try {
 				subnode = config.configurationAt(String.format(
-						"prompt-builders.prompt-builder(%d)", counter));
+						PROMPT_BUILDERS_PROMPT_BUILDER_D, counter));
 				if (subnode != null) {
 					PromptBuilderDefinition definition = new PromptBuilderDefinition();
-					definition.setClassName(subnode.getString("class"));
-					definition.setLanguage(subnode.getString("language"));
+					definition.setClassName(subnode.getString(CLASS));
+					definition.setLanguage(subnode.getString(LANGUAGE));
 					futureDefinitions.put(definition.getId(), definition);
 				} else {
 					return;
@@ -423,7 +505,7 @@ public class SystemConfig {
 
 	private SystemConfig() {
 		try {
-			config = new XMLConfiguration("config.xml");
+			config = new XMLConfiguration(CONFIG_XML);
 			config.setReloadingStrategy(new FileChangedReloadingStrategy());
 			// config.setExpressionEngine(new XPathExpressionEngine());
 		} catch (Exception e) {
