@@ -73,13 +73,12 @@
  	-->
 	<scriptfactories>
 		<scriptfactory>
-			<class>/Users/danny/AdmTel_Source/adm-telephony-scripts/src/WSScriptFactory.groovy</class>
-		</scriptfactory>
-		<scriptfactory>
+			<!-- VariableScriptFactory uses the variable passed when the call is received to create the script, the variable contains the script's class -->
 			<class>com.admtel.telephonyserver.scriptfactories.VariableScriptFactory</class>
 		</scriptfactory>
 		<scriptfactory>
-			<class>com.admtel.telephonyserver.scriptfactories.XMLScriptFactory
+			<!-- Loads the script based on the configuration file scripts.xml -->
+			<class>com.admtel.telephonyserver.scriptfactories.XMLScriptFactory 
 			</class>
 		</scriptfactory>
 	</scriptfactories>
@@ -97,7 +96,8 @@
 			<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultFSAddressTranslator
 			</addresstranslator>
 			<enabled>true</enabled>
-			<parameters>			
+			<!-- Extra parameters or properties of this switch, those properties can be queried by the REST API. -->
+			<parameters> 
 				<parameter name="udp_sip_address" value="77.42.246.148"/>
 				<parameter name="udp_sip_port" value="5080"/>
 				<parameter name="tcp_sip_address" value="77.42.246.148"/>
@@ -107,7 +107,7 @@
 			</parameters>	
 		</switch>
 		<switch>
-			<name>Asterisk_VMWARE</name>
+			<name>Asterisk_1</name>
 			<address>192.168.1.60</address>
 			<port>5038</port>
 			<username>admin</username>
@@ -139,6 +139,8 @@
 	</cli-listeners>
 
 	<!-- Built-in webserver configuration -->
+	<!-- the path maps to one and only one AdmServlet, to create your own servlet you must implement the proper interface -->
+	<!-- class can be the full path of the class,  a relative path (combined with the root directory), or a named bean from the beans section -->
 	<http-servers>
 		<http-server>
 			<id>Freeswitch Configurator</id>
@@ -199,24 +201,22 @@
 			</adm-servlet>		
 	</http-servers>
 
-	<!--EVENT LISTENERS START -->
+	<!-- Event listeners are special classes that will receive the top level server events -->
 	<event-listeners>
-<!--		<event-listener>-->
-<!--			<class>com.admtel.telephonyserver.eventlisteners.SimpleEventListener-->
-<!--			</class>-->
-<!--		</event-listener>-->
-<!--		<event-listener>-->
-<!--			<class>scripts/MyEventListener.groovy</class>-->
-<!--		</event-listener>-->
+		<event-listener>
+			<class>com.admtel.telephonyserver.eventlisteners.SimpleEventListener</class>
+		</event-listener>
+		<event-listener>
+			<class>scripts/MyEventListener.groovy</class>
+		</event-listener>
 	</event-listeners>
-	<!--EVENT LISTENERS END -->
 
-	<!--PROMPT BUILDERS START -->
+
+	<!-- prompt builders, use by the play api to play numbers and dates. Can be customized per language -->
 	<prompt-builders>
 		<prompt-builder>
 			<language>en</language>
-			<class>com.admtel.telephonyserver.prompts.EnglishPromptBuilder
-			</class>
+			<class>com.admtel.telephonyserver.prompts.EnglishPromptBuilder</class>
 		</prompt-builder>
 		<prompt-builder>
 			<language>ar</language>
@@ -227,11 +227,10 @@
 			<class>com.admtel.telephonyserver.prompts.FrenchPromptBuilder</class>
 		</prompt-builder>
 	</prompt-builders>
-	<!--PROMPT BUILDERS END -->
 
-
-	<beans>
-		
+	
+	<!-- Beans are a simple implementation of IOC, they can be used by name and can reference each other -->
+	<beans>		
 		<bean>
 			<class>com.admtel.telephonyserver.acd.impl.SimpleAcdDataProvider</class>			
 			<id>simpleAcdDataProvider</id>
