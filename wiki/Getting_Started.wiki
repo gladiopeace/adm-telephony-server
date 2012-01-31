@@ -1,9 +1,12 @@
-#Getting started from source or compiled jars.
+Getting started from source or compiled jars.
 
-= Introduction =
+= Compiling from source =
 
-Add your content here.
-
+  # Go to directory where you would like to checkout source code
+  # Checkout from svn 
+{{{
+svn checkout http://adm-telephony-server.googlecode.com/svn/trunk/ adm-telephony-server-read-only
+}}}
 
 = Details =
 
