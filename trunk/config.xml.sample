@@ -142,14 +142,18 @@
 	<!-- the path maps to one and only one AdmServlet, to create your own servlet you must implement the proper interface -->
 	<!-- class can be the full path of the class,  a relative path (combined with the root directory), or a named bean from the beans section -->
 	<http-servers>
+<http-servers>
 		<http-server>
-			<id>Freeswitch Configurator</id>
-			<address>localhost</address>
+			<id>dot34</id>
+			<address>10.0.3.1</address>
 			<port>8057</port>
 			<adm-servlet>
 				<path>FSConfigurator</path>
-				<class>/home/user1/workspace/adm-telephony-scripts/src/WSFreeSwitchConfigurator.groovy
-				</class>
+				<class>#FSConfiguratorServlet</class>
+			</adm-servlet>
+			<adm-servlet>
+				<path>asterisk-curl/single</path>
+				<class>#ASTConfiguratorServlet</class>
 			</adm-servlet>
 			<adm-servlet>
 				<path>test</path>
@@ -157,28 +161,24 @@
 			</adm-servlet>
 			<adm-servlet>
 				<path>webconf</path>
-				<class>scripts/web/WebConfServlet.groovy</class>
+				<class>#webconf</class>
 			</adm-servlet>
 			<adm-servlet>
 				<path>webapi</path>
-				<class>scripts/webapi/WebAPI.groovy</class>
-				<parameters>
-					<parameter name="SecurityProvider" value="simple-security-provider"/>
-				</parameters>
-			</adm-servlet>
-			<adm-servlet>
-				<path>asterisk-curl/single</path>
-				<class>scripts/AsteriskCurlExample.groovy</class>
-			</adm-servlet>
+				<class>#webapi</class>
+			</adm-servlet>			
 		</http-server>
 		<http-server>
 			<id>dot34</id>
 			<address>192.168.1.60</address>
 			<port>8057</port>
-			<adm-servlet>
+<adm-servlet>
 				<path>FSConfigurator</path>
-				<class>/home/user1/workspace/adm-telephony-scripts/src/WSFreeSwitchConfigurator.groovy
-				</class>
+				<class>#FSConfiguratorServlet</class>
+			</adm-servlet>
+			<adm-servlet>
+				<path>asterisk-curl/single</path>
+				<class>#ASTConfiguratorServlet</class>
 			</adm-servlet>
 			<adm-servlet>
 				<path>test</path>
@@ -186,19 +186,12 @@
 			</adm-servlet>
 			<adm-servlet>
 				<path>webconf</path>
-				<class>scripts/web/WebConfServlet.groovy</class>
+				<class>#webconf</class>
 			</adm-servlet>
 			<adm-servlet>
 				<path>webapi</path>
-				<class>scripts/webapi/WebAPI.groovy</class>
-				<parameters>
-					<parameter name="SecurityProvider" value="simple-security-provider"/>
-				</parameters>
-			</adm-servlet>
-			<adm-servlet>
-				<path>asterisk-curl/single</path>
-				<class>scripts/AsteriskCurlExample.groovy</class>
-			</adm-servlet>
+				<class>#webapi</class>
+			</adm-servlet>			
 		</http-server>
 	</http-servers>
 
@@ -231,17 +224,35 @@
 
 	
 	<!-- Beans are a simple implementation of IOC, they can be used by name and can reference each other -->
-	<beans>		
+	<beans>
+<!--		<bean>-->
+<!--			<class>com.admtel.telephonyserver.remote.JSonSocketManagerBean-->
+<!--			</class>-->
+<!--			<id>json_api</id>-->
+<!--			<parameters>-->
+<!--				<parameter name="address" value="10.0.2.1"/>-->
+<!--				<parameter name="port" value="12341"/>-->
+<!--			</parameters>-->
+<!--		</bean>-->
+		
 		<bean>
-			<class>com.admtel.telephonyserver.acd.impl.SimpleAcdDataProvider</class>			
-			<id>simpleAcdDataProvider</id>
+			<class>/Users/danny/Admtel_Source/adm-telephony-scripts/src/data/DB_AcdDataProvider.groovy</class>
+			<parameters>
+
+				<parameter name="dbUrl" value="jdbc:postgresql://10.0.3.1:5432/adm_appserver"/>
+				<parameter name="dbUser" value="tester"/>
+				<parameter name="dbPassword" value="tester1234"/>
+				<parameter name="dbDriver" value="org.postgresql.Driver"/>
+			</parameters>
+
+			<id>dbAcdDataProvider</id>
 		</bean>
 		
 		<bean>
 		 <class>com.admtel.telephonyserver.acd.impl.AcdServiceImpl</class>
 		 <id>acdService</id>
 		 <parameters>
-		 	<parameter name="acdDataProvider" value="simpleAcdDataProvider"/>
+		 	<parameter name="acdDataProvider" value="dbAcdDataProvider"/>
 		 </parameters>
 		</bean>
 		
@@ -262,12 +273,23 @@
 				<parameter name="port" value="1234"/>
 			</parameters>
 		</bean>
+<!--		<bean>-->
+<!--			<class>/opt/admtel/adm-telephony-scripts/src/conference/DBConferenceHelperBean.groovy-->
+<!--			</class>-->
+<!--			<id>conferencer-helper</id>-->
+<!--			<parameters>-->
+<!--				<parameter name="dbUrl" value="jdbc:postgresql://10.0.2.1:5432/adm_appserver"/>-->
+<!--				<parameter name="dbUser" value="tester"/>-->
+<!--				<parameter name="dbPassword" value="tester1234"/>-->
+<!--				<parameter name="dbDriver" value="org.postgresql.Driver"/>-->
+<!--			</parameters>-->
+<!--		</bean>-->
 		<bean>
-			<class>/home/user1/workspace/adm-telephony-scripts/src/conference/REST_ConferenceHelperBean.groovy
+			<class>/Users/danny/Admtel_Source/adm-telephony-scripts/src/conference/REST_ConferenceHelperBean.groovy
 			</class>
 			<id>conferencer-helper</id>
 			<parameters>
-				<parameter name="restURL" value="http://localhost:8085/adm-conference-api/"/>
+				<parameter name="restURL" value="http://10.0.3.1:8058/adm-conference-server/"/>
 				<parameter name="authToken" value="123456"/>
 			</parameters>
 		</bean>
@@ -277,17 +299,51 @@
 			<id>simple-security-provider</id>
 			<class>com.admtel.telephonyserver.misc.SimpleSecurityProvider</class>
 		</bean>
-				<bean>
+		<bean>
 			<id>simple-user-dao</id>
 			<class>scripts/SimpleUserDAOImpl.groovy</class>
+		</bean>
+		<bean>
+			<id>db-user-dao</id>
+			<class>/Users/danny/Admtel_Source/adm-telephony-scripts/src/data/DB_UserDAO.groovy</class>
+			<parameters>
+				<parameter name="dbUrl" value="jdbc:postgresql://localhost:5432/adm_appserver"/>
+				<parameter name="dbUser" value="postgres"/>
+				<parameter name="dbPassword" value="password"/>
+				<parameter name="dbDriver" value="org.postgresql.Driver"/>
+			</parameters>
 		</bean>
 		<bean>
 			<id>FSConfiguratorServlet</id>
 			<class>scripts/FSConfiguratorServlet.groovy</class>
 			<parameters>
-				<parameter name="userDAO" value="simple-user-dao"/>
+				<parameter name="userDAO" value="db-user-dao"/>
 			</parameters>
-		</bean>		
+		</bean>
+		<bean>
+			<id> ASTConfiguratorServlet</id>
+			<class>scripts/ASTConfiguratorServlet.groovy</class>
+			<parameters>
+				<parameter name="userDAO" value="db-user-dao"/>
+			</parameters>
+		</bean>
+		<bean>
+			<id>webconf</id>
+			<class>scripts/web/WebConfServlet.groovy</class>
+			<parameters>
+				<parameter name="userAuthorizer" value="WebConfAuthorizer"/>
+			</parameters>
+		</bean>
+		<bean>
+			<id>webapi</id>
+			<class>scripts/webapi/WebAPI.groovy</class>
+			<parameters>
+				<parameter name="securityProvider" value="simple-security-provider"/>
+			</parameters>			
+		</bean>
+		<bean>
+			<id>WebConfAuthorizer</id>
+			<class>scripts/WebConfAuthBean.groovy</class>
+		</bean>
 	</beans>
-
 </config>
