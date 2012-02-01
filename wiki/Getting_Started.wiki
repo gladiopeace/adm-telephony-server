@@ -2,10 +2,10 @@ Getting started from source or compiled jars.
 
 = Compiling =
 
-  # Go to directory where you would like to checkout source code
-  # Checkout from svn 
+  * Go to directory where you would like to checkout source code
+  * Checkout from svn 
 {{{
 svn checkout http://adm-telephony-server.googlecode.com/svn/trunk/ adm-telephony-server-read-only
 }}}
 
-  # 
+  * 
