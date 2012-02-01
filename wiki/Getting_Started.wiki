@@ -9,5 +9,16 @@ svn checkout http://adm-telephony-server.googlecode.com/svn/trunk/ adm-telephony
 }}}
 
   * Goto to the checked-out directory (adm-telephony-server-read-only)
-  * Run : ant release (ant 1.8 or above should be installed)
-  * 
+  * Run ant (ant 1.8 or above should be installed).
+{{{
+ant release
+}}}
+  * Release files are in dist directory.
+
+
+= Installing =
+
+  * Create an install directory
+  * Unzip adm-telephony-server_snaphot.zip
+  * Copy config.xml.sample to config.xml
+  * Copy scripts.xml.sample to scripts.xml
