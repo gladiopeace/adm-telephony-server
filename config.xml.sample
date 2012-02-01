@@ -18,11 +18,11 @@
 		<radius-stop-accounting>true</radius-stop-accounting>
 		<!-- Time interval in seconds between interim update radius packets -->
 		<radius-interim-update>30</radius-interim-update>
-		<-- Enable logging -->
+		<!-- Enable logging -->
 		<log>true</log>
 	</server>
 
-	<-- Keeps track of the user registrations (switch the user is registered to)
+	<!-- Keeps track of the user registrations (switch the user is registered to)
 		The default registrar implementation uses hash table and might not be suitable for production
 		To implemenent your own registrar, you need to implement the following interface
 			public interface RegistrarInterface {
@@ -198,7 +198,8 @@
 			<adm-servlet>
 				<path>asterisk-curl/single</path>
 				<class>scripts/AsteriskCurlExample.groovy</class>
-			</adm-servlet>		
+			</adm-servlet>
+		</http-server>
 	</http-servers>
 
 	<!-- Event listeners are special classes that will receive the top level server events -->
