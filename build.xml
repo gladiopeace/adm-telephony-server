@@ -1,10 +1,27 @@
 <project>
 
-	<target name="simple">
+	<target name="simple" depends="clean, compile">
 		<delete file="dist/adm-telephony-server.jar" />
 		<jar destfile="dist/adm-telephony-server.jar" basedir="bin" includes="**/*.class,com/admtel/telephonyserver/radius/adm_dictionary" excludes="**/src/**,build.xml,**/*.xml,log4j.properties">
 
 		</jar>
+	</target>
+
+	<target name="clean">
+	  <delete includeemptydirs="true">
+	    <fileset dir="bin" includes="**/*"/>
+	  </delete>
+	</target>
+	<target name="compile">
+	  <path id="master-classpath">
+	  <fileset dir="./lib">
+	    <include name="*.jar"/>
+	  </fileset>
+	 </path>
+	  <javac destdir="bin" source="1.6" >
+	        <src path="src"/>
+	        <classpath refid="master-classpath"/>
+	  </javac>
 	</target>
 
 	<target name="ats-console">
