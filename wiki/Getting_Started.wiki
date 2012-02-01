@@ -8,4 +8,6 @@ Getting started from source or compiled jars.
 svn checkout http://adm-telephony-server.googlecode.com/svn/trunk/ adm-telephony-server-read-only
 }}}
 
+  * Goto to the checked-out directory (adm-telephony-server-read-only)
+  * Run : ant release (ant 1.8 or above should be installed)
   * 
