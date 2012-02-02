@@ -6,7 +6,7 @@ This page describes the FreeSwitch related configuration.
  *  Modify xml_curl.conf.xml:
 {{{
 To get the user directory add:
-		<param name="gateway-url" 						value="http://<ATSIP>:8057/FSConfigurator" bindings="directory"/> 
+<param name="gateway-url" 	value="http://<ATSIP>:8057/FSConfigurator" bindings="directory"/> 
 }}}
  *  Modify dialplan/default.xml
 {{{
