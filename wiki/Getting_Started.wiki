@@ -19,6 +19,11 @@ ant release
 = Installing =
 
   * Create an install directory
-  * Unzip adm-telephony-server_snaphot.zip
+  * Unzip adm-telephony-server_snaphot.zip (obtained from previous step or downloaded)
   * Copy config.xml.sample to config.xml
   * Copy scripts.xml.sample to scripts.xml
+  * Modify config.xml and scripts.xml to meet your requirements.
+  * Run (make sure the execute bit is set, chmod +x run.sh)
+{{{
+./run.sh
+}}}
