@@ -142,7 +142,6 @@
 	<!-- the path maps to one and only one AdmServlet, to create your own servlet you must implement the proper interface -->
 	<!-- class can be the full path of the class,  a relative path (combined with the root directory), or a named bean from the beans section -->
 	<http-servers>
-<http-servers>
 		<http-server>
 			<id>dot34</id>
 			<address>10.0.3.1</address>
@@ -172,7 +171,7 @@
 			<id>dot34</id>
 			<address>192.168.1.60</address>
 			<port>8057</port>
-<adm-servlet>
+			<adm-servlet>
 				<path>FSConfigurator</path>
 				<class>#FSConfiguratorServlet</class>
 			</adm-servlet>
