@@ -29,7 +29,10 @@
     	 		</tr>  
     	 		<tr>
     	 			<td><a href="?action=login">Logout</a></td>
-    	 		</tr>      	 		
+    	 		</tr> 
+    	 		<tr>
+    	 			<td><a href="?action=users">Users</a></td>
+    	 		</tr>     	 		
     	 		    	 		
     	 	</table>
     	 </td>

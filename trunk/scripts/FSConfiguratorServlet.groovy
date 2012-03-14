@@ -21,10 +21,11 @@ class FSConfiguratorServlet extends AdmServlet {
 	public void process(HttpRequestMessage request, HttpResponseMessage response){								
 		
 		def mDomain = request.getParameter("domain")
-		def mUser = request.getParameter("user")
+		def mUser = request.getParameter("sip_auth_username")
+		def mRealm = request.getParameter("sip_auth_realm")
 		
-		User u = userDAO.getUser(mUser, mDomain)
-		
+		User u = userDAO.getUser(mUser)
+		log.trace("Looking up user ${mUser} in ${mRealm} - result ${u}")
 		def writer = new StringWriter()
 		def xml = new MarkupBuilder(writer)
 		
@@ -56,6 +57,7 @@ class FSConfiguratorServlet extends AdmServlet {
 			}
 		}
 		
+		log.trace(writer.toString())
 		response.appendBody(writer.toString())
 	}
 }

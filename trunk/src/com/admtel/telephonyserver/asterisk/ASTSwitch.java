@@ -248,9 +248,9 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 				case PeerStatus: {
 					ASTPeerStatusEvent pse = (ASTPeerStatusEvent) event;
 					if (pse.getRegistered()) {
-						EventsManager.getInstance().onEvent(new RegisteredEvent(pse.getSwitchId(), pse.getProtocol(), pse.getUser()));
+						EventsManager.getInstance().onEvent(new RegisteredEvent("MYID", pse.getSwitchId(), pse.getProtocol(), pse.getUser()));
 					} else {
-						EventsManager.getInstance().onEvent(new UnregisteredEvent(pse.getUser()));
+						EventsManager.getInstance().onEvent(new UnregisteredEvent("MYID", pse.getUser()));
 					}
 				}
 					break;

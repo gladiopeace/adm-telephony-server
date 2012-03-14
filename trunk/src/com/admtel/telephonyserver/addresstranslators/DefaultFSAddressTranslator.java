@@ -1,12 +1,16 @@
 package com.admtel.telephonyserver.addresstranslators;
 
+import org.apache.log4j.Logger;
+
 import com.admtel.telephonyserver.core.AdmAddress;
 import com.admtel.telephonyserver.interfaces.AddressTranslator;
 
 public class DefaultFSAddressTranslator implements AddressTranslator {
 
+	public static Logger log = Logger.getLogger(DefaultFSAddressTranslator.class);
 	@Override
 	public String translate(AdmAddress address){
+		log.trace("Translating address " + address);
 		String result = "";
 		if (address != null){
 			switch (address.getProtocol()){

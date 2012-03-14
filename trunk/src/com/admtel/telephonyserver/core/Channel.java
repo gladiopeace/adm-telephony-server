@@ -697,21 +697,22 @@ public abstract class Channel implements TimerNotifiable {
 
 	@Override
 	public String toString() {
-		return "Channel [hangupTimer=" + hangupTimer + ", interimUpdateTimer="
-				+ interimUpdateTimer + ", listeners=" + listeners
-				+ ", callState=" + callState + ", mediaState=" + mediaState
-				+ ", id=" + id + ", dtmfBuffer=" + dtmfBuffer + ", _switch="
-				+ _switch + ", uniqueId=" + uniqueId + ", channelData="
-				+ channelData + ", userData=" + userData + ", createdTime="
-				+ createdTime + ", callOrigin=" + callOrigin + ", setupTime="
-				+ setupTime + ", hangupTime=" + hangupTime + ", answerTime="
-				+ answerTime + ", h323CallOrigin=" + h323CallOrigin
-				+ ", acctUniqueSessionId=" + acctUniqueSessionId
-				+ ", h323DisconnectCause=" + h323DisconnectCause
-				+ ", baseDirectory=" + baseDirectory + ", language=" + language
-				+ ", conferenceId=" + conferenceId + ", memberId=" + memberId
-				+ ", lastResult=" + lastResult + ", otherChannel="
-				+ otherChannel + ", messageHandler=" + messageHandler + "]";
+		StringBuilder builder = new StringBuilder();
+		builder.append("Channel [callState=").append(callState)
+				.append(", mediaState=").append(mediaState).append(", id=")
+				.append(id).append(", _switch=").append(_switch)
+				.append(", uniqueId=").append(uniqueId)
+				.append(", channelData=").append(channelData)
+				.append(", userData=").append(userData)
+				.append(", createdTime=").append(createdTime)
+				.append(", callOrigin=").append(callOrigin)
+				.append(", setupTime=").append(setupTime)
+				.append(", hangupTime=").append(hangupTime)
+				.append(", answerTime=").append(answerTime)
+				.append(", acctUniqueSessionId=").append(acctUniqueSessionId)
+				.append(", h323DisconnectCause=").append(h323DisconnectCause)
+				.append("]");
+		return builder.toString();
 	}
 
 	public Integer getH323DisconnectCause() {

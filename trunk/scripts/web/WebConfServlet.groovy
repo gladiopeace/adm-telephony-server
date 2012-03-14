@@ -64,7 +64,13 @@ class WebConfServlet extends AdmServlet {
 		}
 		['page':'login.ftl']
 	}
-		
+	def users(request, response){
+		def params = request.getParameterMap()
+		log.trace("Users with request params : " + params)
+		if (!params.max) params.max = 25 
+		if (!params.offset) params.offset = 0
+		['page':'users.ftl', users:Registrar.getInstance().get(params.offset, params.max)]
+	}
 	def channels(request, response){
 		List<Channel> channels =  Switches.getInstance().getAllChannels();
 		def root =["channels":channels]

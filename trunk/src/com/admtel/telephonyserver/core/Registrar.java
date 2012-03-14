@@ -68,16 +68,16 @@ public class Registrar implements DefinitionChangeListener, RegistrarInterface,
 	@Override
 	public void register(UserLocation userLocation) {
 		if (registrar != null) {
-			log.trace(String.format("User (%s) registered", userLocation.getUser()));
+			log.trace(String.format("User (%s) registered", userLocation.getUsername()));
 			registrar.register(userLocation);
 		}
 	}
 
 	@Override
-	public void unregister(String user) {
+	public void unregister(String registrationId) {
 		if (registrar != null) {
-			log.trace(String.format("User (%s) unregistered", user));
-			registrar.unregister(user);
+			log.trace(String.format("User (%s) unregistered", registrationId));
+			registrar.unregister(registrationId);
 		}
 	}
 
@@ -97,14 +97,14 @@ public class Registrar implements DefinitionChangeListener, RegistrarInterface,
 		case Registered:
 		{
 			RegisteredEvent re = (RegisteredEvent) event;
-			register(new UserLocation(re.getSwitchId(), re.getSigProtocol(), re.getUser()));
+			register(new UserLocation(re.getRegistrationId(), re.getSwitchId(), re.getSigProtocol(), re.getUser()));
 			
 		}
 			break;
 		case Unregistered:
 		{
 			UnregisteredEvent ue = (UnregisteredEvent) event;
-			unregister(ue.getUser());
+			unregister(ue.getRegistrationId());
 		}
 			break;
 		}
