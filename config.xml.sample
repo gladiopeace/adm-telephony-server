@@ -20,6 +20,8 @@
 		<radius-interim-update>30</radius-interim-update>
 		<!-- Enable logging -->
 		<log>true</log>
+		<!-- comma separated list of ip addresses allowed to interact with the system -->
+		<acl></acl>
 	</server>
 
 	<!-- Keeps track of the user registrations (switch the user is registered to)

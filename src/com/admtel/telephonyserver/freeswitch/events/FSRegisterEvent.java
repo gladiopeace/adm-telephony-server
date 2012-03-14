@@ -28,7 +28,13 @@ public class FSRegisterEvent extends FSEvent {
 		this.registered = registered;
 	}
 	public String getUser(){
-		return values.get("from-user");
+		return values.get("username");
+	}
+	public String getRealm(){
+		return values.get("realm");
+	}
+	public String getRegistrationId() {
+		return values.get("from-user")+"@"+values.get("from-host");
 	}
 
 }

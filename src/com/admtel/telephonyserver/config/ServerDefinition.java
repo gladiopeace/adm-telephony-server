@@ -9,7 +9,6 @@ public class ServerDefinition implements DefinitionInterface {
 	Boolean stopAccounting = true;
 	int interimUpdate =10;
 	String scriptPath=".;./scripts";
-
 	
 	public String getScriptPath() {
 		return scriptPath;

@@ -229,10 +229,12 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 				case FsRegister: {
 					FSRegisterEvent registerEvent = (FSRegisterEvent) event;
 					if (registerEvent.getRegistered()) {
-						EventsManager.getInstance().onEvent(new RegisteredEvent(registerEvent.getSwitchId(), registerEvent.getProtocol(), registerEvent.getUser()));
+						EventsManager.getInstance().onEvent(
+								new RegisteredEvent(registerEvent.getRegistrationId(), registerEvent.getSwitchId(), 
+										registerEvent.getProtocol(), registerEvent.getUser()));
 					} else {
 						EventsManager.getInstance().onEvent(
-								new UnregisteredEvent(registerEvent.getUser()));
+								new UnregisteredEvent(registerEvent.getRegistrationId(), registerEvent.getUser()));
 					}
 				}
 					break;

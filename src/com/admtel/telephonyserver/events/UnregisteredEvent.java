@@ -19,10 +19,20 @@ public class UnregisteredEvent extends Event {
 	}
 
 	private String user;
+	private String registrationId;
 
-	public UnregisteredEvent(String user){
+	public UnregisteredEvent(String registrationId, String user){
 		eventType = EventType.Unregistered;
 		this.user = user;
+		this.registrationId = registrationId;
+	}
+
+	public String getRegistrationId() {
+		return registrationId;
+	}
+
+	public void setRegistrationId(String registrationId) {
+		this.registrationId = registrationId;
 	}
 
 	public String getUser() {

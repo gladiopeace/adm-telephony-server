@@ -19,6 +19,7 @@
  */
 package com.admtel.telephonyserver.httpserver;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -43,23 +44,50 @@ public class HttpRequestMessage {
 
     public String getContext() {
         String[] context = (String[]) headers.get("Context");
-        return context == null ? "" : context[0];
+        return (context == null || context.length ==0) ? "" : context[0];
     }
 
     public String getParameter(String name) {
-        String[] param = (String[]) headers.get("@".concat(name));
-        return param == null ? "" : param[0];
+        String[] param = (String[]) headers.get("@".concat(name));        
+        return (param == null || param.length ==0) ? "" : param[0];
     }
 
     public String[] getParameters(String name) {
         String[] param = (String[]) headers.get("@".concat(name));
-        return param == null ? new String[] {} : param;
+        return (param == null || param.length == 0) ? new String[] {} : param;
     }
 
     public String[] getHeader(String name) {
         return (String[]) headers.get(name);
     }
 
+    public Map<String,String> getParameterMap(){
+    	Iterator it = headers.entrySet().iterator();
+    	HashMap result= new HashMap();
+    	while (it.hasNext()){
+    		Entry entry = (Entry) it.next();
+    		String key = entry.getKey().toString().trim();
+    		if (key.startsWith("@")){
+    			key = key.substring(1);
+    		}
+    		if (entry.getValue().getClass().isArray()){
+    			String[] values = (String[]) entry.getValue();
+    			for (int i=0;i<values.length;i++){
+    				if (i>0){
+    					result.put(String.format("%s_%d", key, i), values[i]);
+    					//Form multiple values for the same key, an index will be appended to the key (only if it is more than 1)
+    				}
+    				else{
+    					result.put(key, values[i]);
+    				}
+    			}
+    		}
+    		else{
+    			result.put(key, entry.getValue());
+    		}
+    	}
+    	return result;
+    }
     public String toString() {
         StringBuilder str = new StringBuilder();
 

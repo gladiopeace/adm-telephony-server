@@ -4,28 +4,36 @@ import com.admtel.telephonyserver.core.SigProtocol;
 import com.admtel.telephonyserver.core.Switch;
 
 public class UserLocation {
-	String user;
+	String registrationId;
+	String username;
 	SigProtocol protocol;
 	String switchId;
 	
-	public UserLocation(String switchId, SigProtocol protocol, String user) {
+	public UserLocation(String registrationId, String switchId, SigProtocol protocol, String username) {
 		super();
-		this.user = user;
+		this.username = username;
 		this.protocol = protocol;
 		this.switchId = switchId;
+		this.registrationId = registrationId;
 	}
 	@Override
 	public String toString() {
 		return "UserLocation [protocol=" + protocol + ", switchId=" + switchId
-				+ ", user=" + user + "]";
+				+ ", user=" + username + "]";
 	}
-	public String getUser() {
-		return user;
+	public String getUsername() {
+		return username;
 	}
-	public void setUser(String user) {
-		this.user = user;
+	public void setUsername(String user) {
+		this.username = user;
 	}
-
+	
+	public String getRegistrationId() {
+		return registrationId;
+	}
+	public void setRegistrationId(String registrationId) {
+		this.registrationId = registrationId;
+	}
 	public SigProtocol getProtocol() {
 		return protocol;
 	}
@@ -40,10 +48,10 @@ public class UserLocation {
 	}
 	public String getAddress(Switch _switch) {
 		if (_switch.getSwitchId().equals(switchId)){
-			return String.format("%s:%s", protocol, user);
+			return String.format("%s:%s", protocol, username);
 		}
 		else{
-			return String.format("%s:%s@%s", protocol, user, _switch.getDefinition().getAddress());
+			return String.format("%s:%s@%s", protocol, username, _switch.getDefinition().getAddress());
 		}
 	}
 	

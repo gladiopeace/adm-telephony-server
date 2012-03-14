@@ -138,7 +138,7 @@ public class AdmTelephonyServer {
 				.getInstance());
 		sysConfig.addDefinitionChangeListener(BeansManager.getInstance());
 		SystemConfig.getInstance().load();
-
+		definition = sysConfig.serverDefinition;
 		BeansManager.getInstance().init();
 	}
 }
