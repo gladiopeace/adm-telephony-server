@@ -30,17 +30,15 @@ public class RegisteredEvent extends Event {
 		return builder.toString();
 	}
 
-	private String registrationId;
 	private String user;
 	private SigProtocol sigProtocol;
 	private String switchId;
 
-	public RegisteredEvent(String registrationId, String switchId, SigProtocol sigProtocol, String user){
+	public RegisteredEvent(String switchId, SigProtocol sigProtocol, String user){
 		eventType = EventType.Registered;
 		this.user = user;
 		this.sigProtocol = sigProtocol;
 		this.switchId = switchId;
-		this.registrationId = registrationId;
 	}
 
 	public String getUser() {
@@ -64,11 +62,5 @@ public class RegisteredEvent extends Event {
 
 	public void setSwitchId(String switchId) {
 		this.switchId = switchId;
-	}
-	public String getRegistrationId(){
-		return this.registrationId;
-	}
-	public void setRegistrationId(String registrationId){
-		this.registrationId = registrationId;
 	}
 }

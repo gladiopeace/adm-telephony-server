@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.admtel.telephonyserver.events.ConferenceDeafenedEvent;
 import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
 import com.admtel.telephonyserver.events.ConferenceMutedEvent;
@@ -108,6 +109,14 @@ public class ConferenceManager implements TimerNotifiable, EventListener{
 			if (c != null){
 				c.onConferenceMuted(cme);
 			}
+		}
+			break;
+		case ConferenceDeafened:{
+			ConferenceDeafenedEvent cde = (ConferenceDeafenedEvent) event;
+			Conference c = conferences.get(cde.getConferenceId());
+			if (c != null){
+				c.onConferenceDeafened(cde);
+			}			
 		}
 			break;
 		}

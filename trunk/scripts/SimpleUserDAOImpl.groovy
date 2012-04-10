@@ -9,18 +9,21 @@ class SimpleUserDAOImpl implements UserDAO{
 	
 	static Logger log = Logger.getLogger(SimpleUserDAOImpl.class)
 	
-	Map<String, User> users = new HashMap<String, User>()
-		
+	def users = [:]
+
+	private void addUser(String pName, String pPassword, String pAccount){
+		def user = [name:pName,password:pPassword, account:pAccount] as User
+		users[user.name] = user
+	}
 	public init(){
-		log.trace("Simple UserDAOImpl Init")
-		User user = new User()
-		user.setName('agent_1')
-		user.setPassword('agent_1')
-		users.put('agent_1@192.168.1.60', user)
+		addUser('conference$tandium','conference1234','conference_account')
+		addUser('test$tandium','test1234','testaccount')
+		addUser('test2$tandium', 'test1234','testaccount')
+		
 	}
 	public User getUser(String name){		
-		User user = users.get(name)
-		log.trace("Looking up user ${id}")
+		User user = users[name]
+		log.trace("Looking up user ${name}")
 		return user
 	}
 }

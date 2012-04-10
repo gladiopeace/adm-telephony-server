@@ -1013,4 +1013,11 @@ public class ASTChannel extends Channel {
 
 		return result;
 	}
+
+	@Override
+	public Result internalConferenceDeaf(String conferenceId, String memberId,
+			boolean deaf) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

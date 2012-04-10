@@ -36,8 +36,7 @@ class WebAPI extends AdmServlet {
 		Switches.getInstance().processRequest(hangupRequest)
 		"Channel hangup request " + request.getParameters('channel')
 	}	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	def participant_disconnect(request){
+	def conference_action(request){
 		Conference c = ConferenceManager.getInstance().getConferenceById(request.getParameter('conference'))
 		if (c == null){
 			return "conference not found"
@@ -46,28 +45,25 @@ class WebAPI extends AdmServlet {
 		if (p == null){
 			return "Participant not found"
 		}
-		HangupRequest hangupRequest = new HangupRequest(p.getChannel().getId(), DisconnectCode.Normal)
-		Switches.getInstance().processRequest(hangupRequest)
-		"Participant " + request.getParameter('participant') + " on channel " + p.getChannel().getUniqueId()+", disconnected"
-	}
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	def participant_mute(request){
-		Conference c = ConferenceManager.getInstance().getConferenceById(request.getParameter('conference'))
-		if (c == null){
-			return "conference not found"
+		String action = request.getParameter('subAction')
+		switch(action){
+			case 'mute': 
+			Switches.getInstance().processRequest(new ConferenceMuteRequest(p.getChannel().getUniqueId(), true ))
+			break;
+			case 'unmute': 
+			Switches.getInstance().processRequest(new ConferenceMuteRequest(p.getChannel().getUniqueId(), false ))
+			break;
+			case 'deaf':
+			Switches.getInstance().processRequest( new ConferenceDeafRequest(p.getChannel().getUniqueId(), true ))
+			break;
+			case 'undeaf':
+			Switches.getInstance().processRequest( new ConferenceDeafRequest(p.getChannel().getUniqueId(), false ))
+			break;
+			case 'kick':
+			Switches.getInstance().processRequest(new HangupRequest(p.getChannel().getUniqueId(), DisconnectCode.Normal))
+			break;
 		}
-		Participant p = c.getParticipant(request.getParameter('participant'))
-		if (p==null) return "Participant not found"
-		String mutedStr = request.getParameter('mute')
-		
-		boolean muted = false
-		if (mutedStr != null){
-			muted = Boolean.parseBoolean(mutedStr)
-		}
-		
-		ParticipantMuteRequest pmr = new ParticipantMuteRequest(p.getChannel().getUniqueId(), muted )
-		Switches.getInstance().processRequest(pmr)
-		"Participant ${p.getChannel().getUniqueId()} mute = ${muted}"
+		""
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def conference_details(request){

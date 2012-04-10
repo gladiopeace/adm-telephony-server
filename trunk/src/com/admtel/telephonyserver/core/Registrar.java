@@ -97,14 +97,14 @@ public class Registrar implements DefinitionChangeListener, RegistrarInterface,
 		case Registered:
 		{
 			RegisteredEvent re = (RegisteredEvent) event;
-			register(new UserLocation(re.getRegistrationId(), re.getSwitchId(), re.getSigProtocol(), re.getUser()));
+			register(new UserLocation( re.getSwitchId(), re.getSigProtocol(), re.getUser()));
 			
 		}
 			break;
 		case Unregistered:
 		{
 			UnregisteredEvent ue = (UnregisteredEvent) event;
-			unregister(ue.getRegistrationId());
+			unregister(ue.getUser());
 		}
 			break;
 		}

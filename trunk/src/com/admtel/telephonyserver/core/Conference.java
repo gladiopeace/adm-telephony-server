@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.joda.time.DateTime;
 
+import com.admtel.telephonyserver.events.ConferenceDeafenedEvent;
 import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
 import com.admtel.telephonyserver.events.ConferenceMutedEvent;
@@ -116,6 +117,12 @@ public class Conference implements TimerNotifiable {
 			p.setMuted(cme.isMuted());
 		}
 		
+	}
+	public void onConferenceDeafened(ConferenceDeafenedEvent cde){
+		Participant p = participants.get(cde.getParticipantId());
+		if (p != null){
+			p.setDeaf(cde.isDeafened());
+		}
 	}
 
 }
