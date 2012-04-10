@@ -43,6 +43,9 @@ class FSConfiguratorServlet extends AdmServlet {
 										params{
 											param(name:"password", value:u.getPassword())
 										}
+										variables{
+											variable(name:'accountcode', value:u.getAccount())
+										}
 									}
 								}
 							}

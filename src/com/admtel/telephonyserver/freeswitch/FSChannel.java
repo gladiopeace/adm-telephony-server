@@ -16,6 +16,7 @@ import com.admtel.telephonyserver.core.Switch;
 import com.admtel.telephonyserver.events.AcdQueueFailedEvent;
 import com.admtel.telephonyserver.events.AcdQueueJoinedEvent;
 import com.admtel.telephonyserver.events.AlertingEvent;
+import com.admtel.telephonyserver.events.ConferenceDeafenedEvent;
 import com.admtel.telephonyserver.events.ConnectedEvent;
 import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
@@ -41,6 +42,7 @@ import com.admtel.telephonyserver.events.QueueFailedEvent;
 import com.admtel.telephonyserver.events.QueueJoinedEvent;
 import com.admtel.telephonyserver.events.UnlinkedEvent;
 import com.admtel.telephonyserver.freeswitch.commands.FSDialCommand;
+import com.admtel.telephonyserver.freeswitch.commands.FSMemberDeafCommand;
 import com.admtel.telephonyserver.freeswitch.commands.FSMemberMuteCommand;
 import com.admtel.telephonyserver.freeswitch.commands.FSQueueCommand;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelAnsweredEvent;
@@ -54,6 +56,7 @@ import com.admtel.telephonyserver.freeswitch.events.FSChannelHangupEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelOriginateEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelStateEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelUnbridgeEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSConferenceDeafEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSOriginateDisposition;
 import com.admtel.telephonyserver.freeswitch.events.FSCommandReplyEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSConferenceJoinedEvent;
@@ -140,10 +143,10 @@ public class FSChannel extends Channel {
 				internalState = new ConnectedState();
 				FSChannel.this.onEvent(new ConnectedEvent(FSChannel.this));
 				break;
-			case ChannelState:
-			{
+			case ChannelState: {
 				FSChannelStateEvent cse = (FSChannelStateEvent) fsEvent;
-				if (cse.getChannelState() == ChannelState.CS_CONSUME_MEDIA && cse.getCallState() == FSChannelStateEvent.CallState.RINGING){
+				if (cse.getChannelState() == ChannelState.CS_CONSUME_MEDIA
+						&& cse.getCallState() == FSChannelStateEvent.CallState.RINGING) {
 					FSChannel.this.onEvent(new AlertingEvent(FSChannel.this));
 				}
 			}
@@ -170,6 +173,7 @@ public class FSChannel extends Channel {
 				String admArgs = cde.getValue("variable_adm_args");
 				getChannelData().addDelimitedVars(admArgs, "&");
 				String sipReqParams = cde.getValue("variable_sip_req_params");
+				getChannelData().setAccountCode(cde.getValue("variable_accountcode"));
 				getChannelData().addDelimitedVars(
 						CodecsUtils.urlDecode(sipReqParams), ";");
 
@@ -564,6 +568,13 @@ public class FSChannel extends Channel {
 								.isMuted()));
 			}
 				break;
+			case ConferenceDeaf: {
+				FSConferenceDeafEvent cde = (FSConferenceDeafEvent) fsEvent;
+				FSChannel.this.onEvent(new ConferenceDeafenedEvent(
+						FSChannel.this, cde.getConferenceName(), cde
+								.getMemberId(), cde.isDeafened()));
+			}
+				break;
 			}
 
 		}
@@ -780,49 +791,50 @@ public class FSChannel extends Channel {
 				internalState.processEvent(fsEvent);
 			}
 			switch (fsEvent.getEventType()) {
-			
-/*			case ChannelState:
-				FSChannelStateEvent cse = (FSChannelStateEvent) fsEvent;
-				if (cse.getChannelState() == ChannelState.CS_REPORTING && cse.getCallState() == FSChannelStateEvent.CallState.HANGUP){
-					onEvent(new DisconnectedEvent(this, DisconnectCode.None)); //TODO
-				}
-				break;
-*/			case ChannelHangup:
-			{
+
+			/*
+			 * case ChannelState: FSChannelStateEvent cse =
+			 * (FSChannelStateEvent) fsEvent; if (cse.getChannelState() ==
+			 * ChannelState.CS_REPORTING && cse.getCallState() ==
+			 * FSChannelStateEvent.CallState.HANGUP){ onEvent(new
+			 * DisconnectedEvent(this, DisconnectCode.None)); //TODO } break;
+			 */case ChannelHangup: {
 				FSChannelHangupEvent che = (FSChannelHangupEvent) fsEvent;
-				onEvent(new DisconnectedEvent(this, DisconnectCode.get(che.getHangupCause().toInteger())));
+				onEvent(new DisconnectedEvent(this, DisconnectCode.get(che
+						.getHangupCause().toInteger())));
 			}
-			break;
-			case ChannelDestroy:{
+				break;
+			case ChannelDestroy: {
 				onEvent(new DestroyEvent(this));
 			}
 				break;
-			case ChannelState:{
+			case ChannelState: {
 				FSChannelStateEvent sse = (FSChannelStateEvent) fsEvent;
-				if (sse.getChannelState() == ChannelState.CS_DESTROY){
+				if (sse.getChannelState() == ChannelState.CS_DESTROY) {
 					onEvent(new DestroyEvent(this));
 				}
 			}
-			break;
+				break;
 			case ChannelOriginate: {
 				FSChannelOriginateEvent coe = (FSChannelOriginateEvent) fsEvent;
 				FSChannel otherChannel = (FSChannel) getSwitch().getChannel(
 						coe.getPeerChannel());
 
-				onEvent(new DialStartedEvent(this,
-						otherChannel));
+				onEvent(new DialStartedEvent(this, otherChannel));
 
 			}
 				break;
 			case ChannelBridge: {
 				FSChannelBridgeEvent cbe = (FSChannelBridgeEvent) fsEvent;
-				FSChannel otherChannel = (FSChannel) getSwitch().getChannel(cbe.getPeerChannel());
+				FSChannel otherChannel = (FSChannel) getSwitch().getChannel(
+						cbe.getPeerChannel());
 				onEvent(new LinkedEvent(this, otherChannel));
 			}
 				break;
 			case ChannelUnbridge: {
 				FSChannelUnbridgeEvent cube = (FSChannelUnbridgeEvent) fsEvent;
-				FSChannel otherChannel = (FSChannel) getSwitch().getChannel(cube.getPeerChannel());
+				FSChannel otherChannel = (FSChannel) getSwitch().getChannel(
+						cube.getPeerChannel());
 				onEvent(new UnlinkedEvent(this, otherChannel));
 
 			}
@@ -869,5 +881,15 @@ public class FSChannel extends Channel {
 
 			break;
 		}
+	}
+
+	@Override
+	public Result internalConferenceDeaf(String conferenceId, String memberId,
+			boolean deaf) {
+		FSMemberDeafCommand cmd = new FSMemberDeafCommand(this, conferenceId,
+				memberId, deaf);
+		fsChannelLog.trace(String.format("%s, on channel %s", cmd, this));
+		session.write(cmd);
+		return Result.Ok;
 	}
 }

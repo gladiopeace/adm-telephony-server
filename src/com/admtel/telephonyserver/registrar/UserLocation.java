@@ -4,17 +4,15 @@ import com.admtel.telephonyserver.core.SigProtocol;
 import com.admtel.telephonyserver.core.Switch;
 
 public class UserLocation {
-	String registrationId;
 	String username;
 	SigProtocol protocol;
 	String switchId;
 	
-	public UserLocation(String registrationId, String switchId, SigProtocol protocol, String username) {
+	public UserLocation(String switchId, SigProtocol protocol, String username) {
 		super();
 		this.username = username;
 		this.protocol = protocol;
 		this.switchId = switchId;
-		this.registrationId = registrationId;
 	}
 	@Override
 	public String toString() {
@@ -28,12 +26,6 @@ public class UserLocation {
 		this.username = user;
 	}
 	
-	public String getRegistrationId() {
-		return registrationId;
-	}
-	public void setRegistrationId(String registrationId) {
-		this.registrationId = registrationId;
-	}
 	public SigProtocol getProtocol() {
 		return protocol;
 	}

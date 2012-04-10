@@ -37,10 +37,11 @@ import com.admtel.telephonyserver.radius.RadiusServers;
 import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.requests.AnswerRequest;
 import com.admtel.telephonyserver.requests.ChannelRequest;
+import com.admtel.telephonyserver.requests.ConferenceDeafRequest;
 import com.admtel.telephonyserver.requests.DialRequest;
 import com.admtel.telephonyserver.requests.HangupRequest;
 import com.admtel.telephonyserver.requests.JoinConferenceRequest;
-import com.admtel.telephonyserver.requests.ParticipantMuteRequest;
+import com.admtel.telephonyserver.requests.ConferenceMuteRequest;
 import com.admtel.telephonyserver.requests.Request;
 import com.admtel.telephonyserver.utils.AdmUtils;
 import com.admtel.telephonyserver.utils.PromptsUtils;
@@ -506,6 +507,22 @@ public abstract class Channel implements TimerNotifiable {
 
 		return lastResult;
 	}
+	
+	public abstract Result internalConferenceDeaf(String conferenceId,
+			String memberId, boolean deaf);
+
+	final public Result conferenceDeaf(boolean deaf) {
+		log.trace(String.format("[%s] conferenceDeaf(%b)", this, deaf));
+		if (getCallState() != CallState.Conferenced) {
+			log.warn(String.format("Channel (%s), invalid state", this));
+			lastResult = Result.ChannelInvalidCallState;
+			return lastResult;
+		}
+		lastResult = internalConferenceDeaf(conferenceId, memberId, deaf);
+
+		return lastResult;
+	}
+
 
 	final public Result dial(String address, long timeout) {
 
@@ -787,11 +804,16 @@ public abstract class Channel implements TimerNotifiable {
 			answer();
 		}
 			break;
-		case ParticipantMuteRequest: {
-			ParticipantMuteRequest pmr = (ParticipantMuteRequest) request;
+		case ConferenceMuteRequest: {
+			ConferenceMuteRequest pmr = (ConferenceMuteRequest) request;
 			conferenceMute(pmr.isMute());
 		}
 			break;
+		case ConferenceDeafRequest:{
+			ConferenceDeafRequest cdr = (ConferenceDeafRequest)request;
+			conferenceDeaf(cdr.isDeaf());
+		}
+		break;
 		case DialRequest: {
 			DialRequest dialRequest = (DialRequest) request;
 			dial(dialRequest.getDestination(), dialRequest.getTimeout());

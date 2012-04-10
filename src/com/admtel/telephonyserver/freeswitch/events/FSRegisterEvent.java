@@ -28,13 +28,17 @@ public class FSRegisterEvent extends FSEvent {
 		this.registered = registered;
 	}
 	public String getUser(){
-		return values.get("username");
+		return values.get("from-user");
 	}
 	public String getRealm(){
 		return values.get("realm");
 	}
-	public String getRegistrationId() {
-		return values.get("from-user")+"@"+values.get("from-host");
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("FSRegisterEvent [registered=").append(registered)
+				.append(", protocol=").append(protocol).append("]");
+		return builder.toString();
 	}
 
 }

@@ -89,6 +89,10 @@ public class FSEvent {
 						if (action.equals("mute-member") || action.equals("unmute-member")){
 							return new FSConferenceMuteEvent(switchId, map);
 						}
+						else
+						if (action.equals("deaf-member")||action.equals("undeaf-member")){
+							return new FSConferenceDeafEvent(switchId, map);
+						}
 					}
 					else if (eventSubclass.equals("fifo::info")){
 						return new FSQueueEvent (switchId, map);
@@ -129,7 +133,7 @@ public class FSEvent {
 
 	public enum EventType {
 		AuthRequest, CommandReply, HeartBeat, ChannelExecute, ChannelExecuteComplete, ChannelData, SessionDisconnect, ChannelDestroy, DTMF, ChannelHangup, ChannelBridge, ChannelAnswered, ChannelCreate, ChannelOutgoing, ChannelState, ChannelOriginate,
-		FsRegister, ConferenceJoined, ConferenceRemoved, Queue, ConferenceTalking, ConferenceMute, ChannelUnbridge
+		FsRegister, ConferenceJoined, ConferenceRemoved, Queue, ConferenceTalking, ConferenceMute, ChannelUnbridge, ConferenceDeaf
 	}
 
 	EventType eventType;

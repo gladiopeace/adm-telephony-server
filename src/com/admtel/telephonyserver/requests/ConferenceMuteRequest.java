@@ -1,10 +1,10 @@
 package com.admtel.telephonyserver.requests;
 
-public class ParticipantMuteRequest extends ChannelRequest {
+public class ConferenceMuteRequest extends ChannelRequest {
 	private boolean mute;
 
-	public ParticipantMuteRequest(String channelId, boolean mute){
-		super(RequestType.ParticipantMuteRequest, channelId);
+	public ConferenceMuteRequest(String channelId, boolean mute){
+		super(RequestType.ConferenceMuteRequest, channelId);
 		this.mute = mute;		
 	}
 
