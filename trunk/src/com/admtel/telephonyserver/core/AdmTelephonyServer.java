@@ -81,7 +81,8 @@ public class AdmTelephonyServer {
 				// log.debug("Server running...");
 			}
 		} catch (Exception e) {
-			log.error("Failed to start server ... : "+e.getMessage()); 
+			log.error(e); 
+			System.exit(1);
 		}
 	}
 
@@ -114,7 +115,7 @@ public class AdmTelephonyServer {
 
 		// static listeners, order is important as conferencemanager might
 		// removed objects needed by RadiusServers
-
+		log.trace("AdmTelephonyServer.start ****************");
 		EventsManager.getInstance().addEventListener(
 				RadiusServers.getInstance().toString(),
 				RadiusServers.getInstance());
@@ -136,8 +137,11 @@ public class AdmTelephonyServer {
 		sysConfig.addDefinitionChangeListener(HttpServers.getInstance());
 		sysConfig.addDefinitionChangeListener(PromptBuilderFactory
 				.getInstance());
+		
+		log.trace("################################################");
 		sysConfig.addDefinitionChangeListener(BeansManager.getInstance());
 		SystemConfig.getInstance().load();
+		log.trace("loaded system config ***************");
 		definition = sysConfig.serverDefinition;
 		BeansManager.getInstance().init();
 	}

@@ -4,8 +4,10 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.log4j.Logger;
 
 public class ConfigUtils {
+	static Logger log = Logger.getLogger(ConfigUtils.class);
 	static public Map<String, String> loadParameters(HierarchicalConfiguration section) {
 		Map<String, String> result = new Hashtable<String, String>();
 
@@ -21,7 +23,7 @@ public class ConfigUtils {
 				counter++;
 			}
 		} catch (Exception e) {
-
+			log.error(e.getMessage());
 		}
 		return result;
 

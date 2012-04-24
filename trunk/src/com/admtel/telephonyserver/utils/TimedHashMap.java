@@ -54,9 +54,7 @@ public class TimedHashMap<K,V> implements Map<K,V> {
 	private Timer tableTimer = new Timer();
 	private HashMap<K, TimedEntry<K,V>> baseMap = new  HashMap<K, TimedEntry<K,V>>();
 
-	/** crée une table de timedEntry qui se supprime si elle n'ont pas été modifiée au bout de timout secondes
-	 * @param timeout temps au bout duquels les entrées non modifiées sont supprimées
-	 */
+
 	public TimedHashMap(int timeout) {
 		super();
 		this.timeout = timeout;
@@ -84,7 +82,6 @@ public class TimedHashMap<K,V> implements Map<K,V> {
 		return baseMap.containsKey(key);
 	}
 
-	/**attention, ne doit pas être utilisée car n'a pas de sens !	 */
 	@Override
 	public boolean containsValue(Object value) {
 		throw new RuntimeException( "!!! NOT IMPLEMENTED !!!");
@@ -109,7 +106,6 @@ public class TimedHashMap<K,V> implements Map<K,V> {
 		return baseMap.keySet();
 	}
 
-	/** pour ajouter une entrée avec un timer, possibilité de commenter les ajouts	 */
 	@Override
 	public V put(K key, V value) {
 		V oldVal = null;

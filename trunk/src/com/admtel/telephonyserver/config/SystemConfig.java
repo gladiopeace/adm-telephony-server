@@ -381,6 +381,7 @@ public class SystemConfig {
 	}
 	
 	public void loadBeans() {
+		log.trace("SystemConfig.loadBeans");
 		int counter = 0;
 		SubnodeConfiguration subnode;
 		while (true) {
@@ -391,7 +392,7 @@ public class SystemConfig {
 					BeanDefinition definition = new BeanDefinition();
 					definition.setClassName(subnode.getString(CLASS));
 					definition.setId(subnode.getString(ID));
-					
+					log.trace(definition);
 					try{
 						HierarchicalConfiguration parametersConfig = config
 								.configurationAt(String.format(BEANS_BEAN_D_PARAMETERS,
@@ -441,7 +442,7 @@ public class SystemConfig {
 	}
 
 	public void load() {
-		log.debug("Loading System configuration ...");
+		log.trace("Loading System configuration ...");
 		futureDefinitions.clear();
 		loadServerDefinition();
 		loadSwitchListenersDefinition();
@@ -455,27 +456,33 @@ public class SystemConfig {
 		loadHTTPServerDefinition();
 		loadPromptBuildersDefinition();
 		loadBeans();
-		// Dump the loaded configurations
-
-		for (DefinitionInterface definition : futureDefinitions.values()) {
-			log.trace(String.format(definition.toString()));
-		}
-
 		// Compare the 2 lists of definitions
 		// Check what was added
+		log.trace("Starting definition notification");
 		Map<String, DefinitionInterface> addedDefinitions = new Hashtable<String, DefinitionInterface>(
 				futureDefinitions);
 		addedDefinitions.keySet().removeAll(currentDefinitions.keySet());
-		for (DefinitionInterface definition : addedDefinitions.values()) {
-			this.notifyListenersAddedDefinition(definition);
+		for (DefinitionInterface definition : addedDefinitions.values()) {			
+			try{
+				log.trace("emit notifyListenerAddedDefinition for ("+definition+")");
+				this.notifyListenersAddedDefinition(definition);
+			}
+			catch (Exception e){
+				log.error("emit notifyListenerAddedDefinition for ("+definition+")"+ "-- FAILED ("+ e+")");
+			}
 		}
-
 		// Check for what was removed
 		Map<String, DefinitionInterface> removedDefinitions = new Hashtable<String, DefinitionInterface>(
 				currentDefinitions);
 		removedDefinitions.keySet().removeAll(futureDefinitions.keySet());
 		for (DefinitionInterface definition : removedDefinitions.values()) {
-			this.notifyListenersDeletedDefinition(definition);
+			try{
+				log.trace("emit notifyListenerDeletedDefinition for ("+definition+")");
+				this.notifyListenersDeletedDefinition(definition);
+			}
+			catch (Exception e){
+				log.error("emit notifyListenerDeletedDefinition for ("+definition+")"+ "-- FAILED ("+ e+")");
+			}
 		}
 
 		// Check for what was changed
@@ -488,18 +495,20 @@ public class SystemConfig {
 			DefinitionInterface newDefinition = futureDefinitions
 					.get(definitionId);
 			if (!oldDefinition.equals(newDefinition)) {
-				this.notifyListenersModifiedDefinition(oldDefinition,
-						newDefinition);
+				try{
+					log.trace("emit notifyListenersModifiedDefinition for ("+newDefinition+")");
+					this.notifyListenersModifiedDefinition(oldDefinition,
+							newDefinition);
+				}
+				catch (Exception e){
+					log.trace("emit notifyListenersModifiedDefinition for ("+newDefinition+") -- FAILED : "+e);
+				}
 			}
 		}
 		// After sending all the notifications, set the current definitions to
 		// the future definitions
 		currentDefinitions = new Hashtable<String, DefinitionInterface>(
 				futureDefinitions);
-		for (DefinitionInterface definition : currentDefinitions.values()) {
-			log.trace("Current definitions "
-					+ String.format(definition.toString()));
-		}		
 		log.debug("Loaded System Configuration ...");
 	}
 

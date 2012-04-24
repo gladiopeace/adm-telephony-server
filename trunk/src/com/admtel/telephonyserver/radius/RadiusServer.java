@@ -66,10 +66,10 @@ public class RadiusServer implements Authorizer {
 		InputStream s = new SequenceInputStream(s1, s2);
 		try {
 			dictionary = DictionaryParser.parseDictionary(s);
-		} catch (IOException e) {
-			log.fatal("Failed to instanciate RadiusServer", e);
+		} catch (Exception e) {
+			log.fatal("Failed to instantiate RadiusServer", e);
 		}
-		if (definition.isLog()) {
+		if (definition.isLog()) {//TODO log location
 			try {
 				fos = new FileOutputStream(new File("radius.log"));
 				bos = new BufferedOutputStream(fos);
