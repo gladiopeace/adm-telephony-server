@@ -35,6 +35,7 @@ public class BeansManager implements DefinitionChangeListener {
 
 	public Object getBean(String id) {
 		Object result = beans.get(id);
+		log.trace(String.format("Looking for bean (%s) -- result = (%s)", id, result));
 		return result;
 	}
 
@@ -46,7 +47,13 @@ public class BeansManager implements DefinitionChangeListener {
 			log.trace(String.format("Loading bean (%s) using class(%s)",
 					beanDefinition.getId(), beanDefinition.getClassName()));
 			if (obj != null) {
+				log.trace(String.format("Loaded bean (%s) using class(%s)",
+						beanDefinition.getId(), beanDefinition.getClassName()));
 				beans.put(beanDefinition.getId(), obj);
+			}
+			else{
+				log.error(String.format("Failed to load bean (%s) using class(%s)",
+						beanDefinition.getId(), beanDefinition.getClassName()));
 			}
 		}
 		for (BeanDefinition beanDefinition : beanDefinitions.values()) {
