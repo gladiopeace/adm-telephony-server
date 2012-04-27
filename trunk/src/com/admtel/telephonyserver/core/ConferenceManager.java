@@ -11,8 +11,10 @@ import org.apache.log4j.Logger;
 import com.admtel.telephonyserver.events.ConferenceDeafenedEvent;
 import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
+import com.admtel.telephonyserver.events.ConferenceLockedEvent;
 import com.admtel.telephonyserver.events.ConferenceMutedEvent;
 import com.admtel.telephonyserver.events.ConferenceTalkEvent;
+import com.admtel.telephonyserver.events.ConferenceUnlockedEvent;
 import com.admtel.telephonyserver.events.DisconnectCode;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.Event.EventType;
@@ -119,6 +121,22 @@ public class ConferenceManager implements TimerNotifiable, EventListener{
 			}			
 		}
 			break;
+		case ConferenceLocked:{
+			ConferenceLockedEvent cle = (ConferenceLockedEvent) event;
+			Conference c = conferences.get(cle.conferenceId);
+			if (c!=null){
+				c.lock();
+			}
+		}
+		break;
+		case ConferenceUnlocked:{
+			ConferenceUnlockedEvent cule = (ConferenceUnlockedEvent) event;
+			Conference c = conferences.get(cule.conferenceId);
+			if (c!=null){
+				c.unlock();
+			}
+		}
+		break;		
 		}
 		return false;
 	}
@@ -135,8 +153,23 @@ public class ConferenceManager implements TimerNotifiable, EventListener{
 		}
 		return participant.getChannel().hangup(DisconnectCode.Normal);
 	}
-	public Result muteParticipant(String conferenceId, String participantId){
-	
+	public Result lockConference(String conferenceId){
+		Conference conference=conferences.get(conferenceId);
+		if (conference == null){
+			Conference c = new Conference(conferenceId);
+			synchronizedConferences.put(conferenceId, c);
+		}
+		EventsManager.getInstance().onEvent(new ConferenceLockedEvent(conferenceId));
 		return Result.Ok;
 	}
+	public Result unlockConference(String conferenceId){
+		Conference conference=conferences.get(conferenceId);
+		if (conference == null){
+			Conference c = new Conference(conferenceId);
+			synchronizedConferences.put(conferenceId, c);
+		}
+		EventsManager.getInstance().onEvent(new ConferenceUnlockedEvent(conferenceId));
+		return Result.Ok;
+	}
+
 }
