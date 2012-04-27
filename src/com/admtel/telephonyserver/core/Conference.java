@@ -18,8 +18,11 @@ import com.admtel.telephonyserver.events.ConferenceTalkEvent;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 
 public class Conference implements TimerNotifiable {
-	String id;
-	DateTime createTime;
+	
+	enum ConferenceState { Enabled, Locked};
+	public String id;
+	public DateTime createTime;
+	public ConferenceState state = ConferenceState.Enabled;
 
 	Map<String, Participant> participants = new HashMap<String, Participant>();
 	Map<String, Participant> synchronizedParticipants = Collections
@@ -125,4 +128,14 @@ public class Conference implements TimerNotifiable {
 		}
 	}
 
+	public void lock() {
+		this.state = ConferenceState.Locked;
+		
+	}
+	public void unlock(){
+		this.state = ConferenceState.Enabled;
+	}
+	public boolean islocked(){
+		return state == ConferenceState.Locked;
+	}
 }

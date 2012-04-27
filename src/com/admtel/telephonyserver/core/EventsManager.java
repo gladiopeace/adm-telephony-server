@@ -14,6 +14,19 @@ import com.admtel.telephonyserver.interfaces.EventListener;
 public class EventsManager implements EventListener, DefinitionChangeListener{
 	
 	CopyOnWriteMap<String, EventListener> listeners = new CopyOnWriteMap<String, EventListener>();
+	
+	MessageHandler messageHandler = new QueuedMessageHandler(){
+
+		@Override
+		public void onMessage(Object message) {
+			Iterator<EventListener> it = listeners.values().iterator();
+			while (it.hasNext()){
+				it.next().onEvent((Event)message);
+			}			
+		}
+		
+	};
+	
 	private static class SingletonHolder{
 		private static final EventsManager instance = new EventsManager();
 	}
@@ -31,10 +44,7 @@ public class EventsManager implements EventListener, DefinitionChangeListener{
 
 	@Override
 	public boolean onEvent(Event event) {
-		Iterator<EventListener> it = listeners.values().iterator();
-		while (it.hasNext()){
-			it.next().onEvent(event);
-		}
+		messageHandler.putMessage(event);
 		return true;
 	}
 

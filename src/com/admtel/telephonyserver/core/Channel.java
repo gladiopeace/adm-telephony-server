@@ -16,6 +16,7 @@ import org.joda.time.Duration;
 
 import com.admtel.telephonyserver.acd.AcdManager;
 import com.admtel.telephonyserver.config.SystemConfig;
+import com.admtel.telephonyserver.core.Conference.ConferenceState;
 import com.admtel.telephonyserver.core.Timers.Timer;
 import com.admtel.telephonyserver.eventlisteners.SimpleEventListener;
 import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
@@ -478,6 +479,7 @@ public abstract class Channel implements TimerNotifiable {
 			boolean startMuted, boolean startDeaf) { // TODO add more parameters
 
 		log.trace(String.format("[%s] - joinConference (%s, %s, %s, %s)",this, conferenceId, moderator, startMuted, startDeaf));
+	
 		if (getCallState() == CallState.Connected || getCallState() == CallState.Linked) {
 			lastResult = internalJoinConference(conferenceId, moderator,startMuted, startDeaf);
 		} else {
@@ -486,7 +488,7 @@ public abstract class Channel implements TimerNotifiable {
 		}
 		if (lastResult == Result.Ok) {
 			setCallState(CallState.Conferenced);
-		}
+		}		
 		return lastResult;
 	}
 

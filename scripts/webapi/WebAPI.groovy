@@ -36,16 +36,38 @@ class WebAPI extends AdmServlet {
 		Switches.getInstance().processRequest(hangupRequest)
 		"Channel hangup request " + request.getParameters('channel')
 	}	
+	
 	def conference_action(request){
+		
+		String action = request.getParameter('subAction')
+		if (!action){
+			return "invalid action"
+		}
+		if (action =="lock"){
+			Result result = ConferenceManager.getInstance().lockConference(request.getParameter('conference'))
+			return "{status:${result}}"
+		}
+		if (action =="unlock"){
+			Result result = ConferenceManager.getInstance().unlockConference(request.getParameter('conference'))
+			return "{status:${result}}"
+		}
+		""
+	}
+	//////////////////////////////////////////////////////////////////////////////////////////////
+	def conference_participant_action(request){
 		Conference c = ConferenceManager.getInstance().getConferenceById(request.getParameter('conference'))
 		if (c == null){
 			return "conference not found"
 		}
+		String action = request.getParameter('subAction')
+		if (!action){
+			return "invalid action"
+		}		
 		Participant p = c.getParticipant(request.getParameter('participant'))
 		if (p == null){
 			return "Participant not found"
 		}
-		String action = request.getParameter('subAction')
+		
 		switch(action){
 			case 'mute': 
 			Switches.getInstance().processRequest(new ConferenceMuteRequest(p.getChannel().getUniqueId(), true ))
