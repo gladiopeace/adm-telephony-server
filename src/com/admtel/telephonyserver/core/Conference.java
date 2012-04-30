@@ -79,6 +79,14 @@ public class Conference implements TimerNotifiable {
 		this.createTime = createTime;
 	}
 
+	public ConferenceState getState() {
+		return state;
+	}
+
+	public void setState(ConferenceState state) {
+		this.state = state;
+	}
+
 	@Override
 	public String toString() {
 		final int maxLen = 8;
