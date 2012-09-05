@@ -307,6 +307,36 @@ class WebAPI extends AdmServlet {
 			}.toString()
 		}
 	}
+	///////////////////////////////////////////////////
+	//Returns the switch that is hosting the given conference, if confernece is not found, return a random switch
+	def get_conference_switch(request){
+		Conference c = ConferenceManager.getConferenceById(request.getParameter('conference'))
+		if (c){
+			if (c.getSwitchId()){
+				Switch _switch = Switches.getInstance().getById(c.getSwitchId())
+				if (_switch){
+					def jsonObject = _switch.getDefinition().getParameters() as JSONObject
+					jsonObject.put("requestId", "1234")
+					jsonObject.put("message", "")
+					jsonObject.put("id", _switch.getDefinition().getId())
+					jsonObject.put("address", _switch.getDefinition().getAddress())
+					return jsonObject.toString()
+				}
+				else{
+					return get_random_switch(request)
+				}
+			}
+		}
+		else{
+			return get_random_switch(request)
+		}
+		return new JsonGroovyBuilder().json{
+			requestId=1234
+			message="Switch not found"
+			status=-1
+		}.toString()
+		
+	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){

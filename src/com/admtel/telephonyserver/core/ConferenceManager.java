@@ -44,6 +44,13 @@ public class ConferenceManager implements TimerNotifiable, EventListener{
 		return conferences.get(id);
 	}
 
+	public Switch getConferenceSwitch(String id){
+		Conference c = getConferenceById(id);
+		if (c != null){
+			return Switches.getInstance().getById(c.getSwitchId());
+		}
+		return null;
+	}
 	@Override
 	public boolean onTimer(Object data) {
 		return true;
@@ -68,9 +75,10 @@ public class ConferenceManager implements TimerNotifiable, EventListener{
 			Conference c = conferences.get(cje.getConferenceId());
 						
 			if (c == null){
-				c = new Conference (cje.getConferenceId());
+				c = new Conference (cje.getChannel().getSwitch().getSwitchId(), cje.getConferenceId());
 				synchronizedConferences.put(cje.getConferenceId(), c);
 			}
+			c.setSwitchId(cje.getChannel().getSwitch().getSwitchId());
 			c.onConferenceJoined (cje);
 
 			RadiusServers.getInstance().accountingStart(cje.getChannel(), c, c.getParticipant(cje.getParticipantId()));
@@ -156,7 +164,7 @@ public class ConferenceManager implements TimerNotifiable, EventListener{
 	public Result lockConference(String conferenceId){
 		Conference conference=conferences.get(conferenceId);
 		if (conference == null){
-			Conference c = new Conference(conferenceId);
+			Conference c = new Conference(null, conferenceId);
 			synchronizedConferences.put(conferenceId, c);
 		}
 		EventsManager.getInstance().onEvent(new ConferenceLockedEvent(conferenceId));
@@ -165,7 +173,7 @@ public class ConferenceManager implements TimerNotifiable, EventListener{
 	public Result unlockConference(String conferenceId){
 		Conference conference=conferences.get(conferenceId);
 		if (conference == null){
-			Conference c = new Conference(conferenceId);
+			Conference c = new Conference(null, conferenceId);
 			synchronizedConferences.put(conferenceId, c);
 		}
 		EventsManager.getInstance().onEvent(new ConferenceUnlockedEvent(conferenceId));

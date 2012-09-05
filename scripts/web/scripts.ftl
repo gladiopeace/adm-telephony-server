@@ -1,7 +1,6 @@
 <#import "common.ftl" as com>
 <#escape x as x?html>
-
-<@com.page title="Channels">
+<@com.page title="Scripts">
   <#if scripts?size = 0>
     <p>No scripts.</p>
   <#else>

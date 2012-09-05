@@ -28,8 +28,10 @@ public class Conference implements TimerNotifiable {
 	Map<String, Participant> synchronizedParticipants = Collections
 			.synchronizedMap(participants);
 
-	public Conference(String id) {
+	String switchId;
+	public Conference(String switchId, String id) {
 		this.id = id;
+		this.switchId = switchId;
 		createTime = new DateTime();
 		Timers.getInstance().startTimer(this, 10000, true, null);
 	}
@@ -134,6 +136,14 @@ public class Conference implements TimerNotifiable {
 		if (p != null){
 			p.setDeaf(cde.isDeafened());
 		}
+	}
+
+	public String getSwitchId() {
+		return switchId;
+	}
+
+	public void setSwitchId(String switchId) {
+		this.switchId = switchId;
 	}
 
 	public void lock() {

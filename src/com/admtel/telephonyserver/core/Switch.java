@@ -61,6 +61,9 @@ public abstract class Switch {
 		return definition;
 	}
 
+	public String getParameter(String key){
+		return definition.getParameters().get(key);
+	}
 	public String getSwitchId() {
 		return definition.getId();
 	}
