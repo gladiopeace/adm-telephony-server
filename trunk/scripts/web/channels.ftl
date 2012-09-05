@@ -7,7 +7,8 @@
   <#else>    
     <table border=0 cellspacing=2 cellpadding=2 width="100%">
       <tr align=center valign=top>
-        <th bgcolor="#C0C0C0">Id</th>        
+        <th bgcolor="#C0C0C0">Id</th>  
+        <th bgcolor="#C0C0C0">Switch</th>       
         <th bgcolor="#C0C0C0">Calling Station Id</th>      
         <th bgcolor="#C0C0C0">Called Station Id</th>  
         <th bgcolor="#C0C0C0">Direction</th>
@@ -19,6 +20,7 @@
       <#list channels as c>
         <tr align=left valign=top>          
           <td bgcolor="#A0A0A0">${c.uniqueId}</td>
+          <td bgcolor="#A0A0A0">${c._switch.definition.address}</td>
           <td bgcolor="#A0A0A0">${c.callingStationId?default("")}</td>
           <td bgcolor="#A0A0A0">${c.calledStationId?default("")}</td>
           <td bgcolor="#A0A0A0">${c.callOrigin}</td>
