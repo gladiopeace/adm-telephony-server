@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.commons.lang.LocaleUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -164,6 +165,9 @@ public abstract class Channel implements TimerNotifiable {
 
 	public void setLanguage(Locale language) {
 		this.language = language;
+	}
+	public void setLanguage(String language){
+		this.language = LocaleUtils.toLocale(language);
 	}
 
 	public void setHangupAfter(long msTimeout) {

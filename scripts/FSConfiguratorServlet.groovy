@@ -25,7 +25,7 @@ class FSConfiguratorServlet extends AdmServlet {
 		def mRealm = request.getParameter("sip_auth_realm")
 		
 		User u = userDAO.getUser(mUser)
-		log.trace("Looking up user ${mUser} in ${mRealm} - result ${u}")
+		log.trace("Looking up user ${mUser} in realm : ${mRealm}  for domain :${mDomain} result ${u}")
 		def writer = new StringWriter()
 		def xml = new MarkupBuilder(writer)
 		
