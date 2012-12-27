@@ -37,6 +37,7 @@ import com.admtel.telephonyserver.events.ConferenceJoinedEvent;
 import com.admtel.telephonyserver.events.ConferenceLeftEvent;
 import com.admtel.telephonyserver.events.ConferenceMutedEvent;
 import com.admtel.telephonyserver.events.ConferenceTalkEvent;
+import com.admtel.telephonyserver.events.DestroyEvent;
 import com.admtel.telephonyserver.events.DialFailedEvent;
 import com.admtel.telephonyserver.events.DialStartedEvent;
 import com.admtel.telephonyserver.events.DialStatus;
@@ -829,6 +830,7 @@ public class ASTChannel extends Channel {
 						DisconnectCode.get(asthe.getCause()));
 
 				ASTChannel.this.onEvent(he);
+				ASTChannel.this.onEvent(new DestroyEvent(this));
 			}
 				break;
 			case Dial: {

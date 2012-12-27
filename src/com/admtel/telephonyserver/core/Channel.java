@@ -352,12 +352,6 @@ public abstract class Channel implements TimerNotifiable {
 	final public Result playAndGetDigits(int max, String prompt, long timeout,String terminators) {
 		log.trace(String.format("[%s] - playAndGetDigits(%d,%s,%d,%s)", this,	max, prompt, timeout, terminators));
 		
-		if (!isConnected()) {
-			log.warn(String.format("[%s], playAndGetDigits, invalid call state", this));
-			lastResult = Result.ChannelInvalidCallState;
-			return lastResult;
-		}
-
 		if (isMediaActive()) {
 			log.warn(String.format("[%s], playAndGetDigits, invalid media state", this));
 			lastResult = Result.ChannelInvalidMediaState;
@@ -377,12 +371,6 @@ public abstract class Channel implements TimerNotifiable {
 	final public Result playAndGetDigits(int max, String[] prompt,long timeout, String terminators) {
 		log.trace(String.format("[%s] - playAndGetDigits(%d,%s,%d,%s)", this,	max, prompt, timeout, terminators));
 		
-		if (!isConnected()) {
-			log.warn(String.format("[%s], playAndGetDigits, invalid call state", this));
-			lastResult = Result.ChannelInvalidCallState;
-			return lastResult;
-		}
-
 		if (isMediaActive()) {
 			log.warn(String.format("[%s], playAndGetDigits, invalid media state", this));
 			lastResult = Result.ChannelInvalidMediaState;
@@ -420,11 +408,6 @@ public abstract class Channel implements TimerNotifiable {
 
 	final public Result playback(String[] prompt, String terminators) {
 		log.trace(String.format("[%s] - playback(%s,%s)", this, prompt,	terminators));
-		if (!isConnected()) {
-			log.warn(String.format("[%s], playback, invalid call state", this));
-			lastResult = Result.ChannelInvalidCallState;
-			return lastResult;
-		}
 
 		if (isMediaActive()) {
 			log.warn(String.format("[%s], playback, invalid media state", this));
@@ -443,11 +426,6 @@ public abstract class Channel implements TimerNotifiable {
 
 	final public Result playback(String prompt, String terminators) {
 		log.trace(String.format("[%s] - playback(%s,%s)", this, prompt,terminators));
-		if (!isConnected()) {
-			log.warn(String.format("[%s], playback, invalid call state", this));
-			lastResult = Result.ChannelInvalidCallState;
-			return lastResult;
-		}
 
 		if (isMediaActive()) {
 			log.warn(String.format("[%s], playback, invalid media state", this));
