@@ -134,7 +134,6 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	@Override
 	public void start() {
-		log.trace("*************************************start asterisk **************************************");
 		super.start();
 		reconnectTimer = Timers.getInstance().startTimer(this, RECONNECT_AFTER,
 				false, null);
@@ -142,7 +141,6 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	@Override
 	public void stop() {
-		log.trace("*************************************stop asterisk **************************************");
 		super.stop();		
 	}
 
@@ -162,7 +160,7 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 					.getAddress(), getDefinition().getPort()));
 			return true;
 		} catch (Exception e) {
-			log.warn(e.getMessage(), e);
+			log.warn(e.getMessage());
 			if (session != null)
 				session.close(true);
 			state = State.Disconnected;
@@ -182,7 +180,6 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 	}
 
 	private boolean isConnected() {
-		log.trace("**********************************isConnected*****************************************");
 		return (session != null && session.isConnected());
 	}
 
@@ -203,6 +200,10 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	@Override
 	public void processBasicIoMessage(BasicIoMessage message) {
+		
+		log.debug(String.format("Switch (%s) : \n%s",
+				ASTSwitch.this.getSwitchId(), message.getMessage()));
+
 		switch (state) {
 		case LoggingIn: {
 			if (message != null) {
@@ -222,14 +223,10 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 			break;
 		case LoggedIn: {
 			if (message != null) {
-//
-//				log.debug(String.format("Switch (%s) : \n%s",
-//						ASTSwitch.this.getSwitchId(), message.getMessage()));
-
 				ASTEvent event = ASTEvent.buildEvent(
 						ASTSwitch.this.getSwitchId(), message.getMessage());
 				if (event == null) {
-					log.debug("Didn't create Event for message ...");
+					//log.debug(String.format("Switch (%s) : Didn't create an AST message"));
 					return;
 				}
 				if (event instanceof ASTChannelEvent) {
