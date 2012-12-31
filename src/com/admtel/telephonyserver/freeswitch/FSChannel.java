@@ -130,6 +130,9 @@ public class FSChannel extends Channel {
 
 	private class AlertingState extends State {
 
+		public AlertingState(){
+			setCallOrigin(CallOrigin.Outbound);
+		}
 		@Override
 		public boolean onTimer(Object data) {
 			// TODO Auto-generated method stub
@@ -143,14 +146,6 @@ public class FSChannel extends Channel {
 				internalState = new ConnectedState();
 				FSChannel.this.onEvent(new ConnectedEvent(FSChannel.this));
 				break;
-			case ChannelState: {
-				FSChannelStateEvent cse = (FSChannelStateEvent) fsEvent;
-				if (cse.getChannelState() == ChannelState.CS_CONSUME_MEDIA
-						&& cse.getCallState() == FSChannelStateEvent.CallState.RINGING) {
-					FSChannel.this.onEvent(new AlertingEvent(FSChannel.this));
-				}
-			}
-				break;
 			}
 		}
 
@@ -163,25 +158,12 @@ public class FSChannel extends Channel {
 	private class OfferedState extends State {
 
 		public OfferedState() {
+			setCallOrigin(CallOrigin.Inbound);
 		}
 
 		@Override
 		public void processEvent(FSEvent fsEvent) {
 			switch (fsEvent.getEventType()) {
-			case ChannelData: {
-				FSChannelDataEvent cde = (FSChannelDataEvent) fsEvent;
-				String admArgs = cde.getValue("variable_adm_args");
-				getChannelData().addDelimitedVars(admArgs, "&");
-				String sipReqParams = cde.getValue("variable_sip_req_params");
-				getChannelData().setAccountCode(cde.getValue("variable_accountcode"));
-				getChannelData().addDelimitedVars(
-						CodecsUtils.urlDecode(sipReqParams), ";");
-
-				// Create script
-				ScriptManager.getInstance().createScript(FSChannel.this);
-				FSChannel.this.onEvent(new OfferedEvent(FSChannel.this));
-			}
-				break;
 			case ChannelAnswered:
 				internalState = new ConnectedState();
 				FSChannel.this.onEvent(new ConnectedEvent(FSChannel.this));
@@ -257,11 +239,26 @@ public class FSChannel extends Channel {
 			Event result = null;
 
 			switch (fsEvent.getEventType()) {
+			case ChannelData: {
+				FSChannelDataEvent cde = (FSChannelDataEvent) fsEvent;
+				String admArgs = cde.getValue("variable_adm_args");
+				getChannelData().addDelimitedVars(admArgs, "&");
+				String sipReqParams = cde.getValue("variable_sip_req_params");
+				getChannelData().setAccountCode(cde.getValue("variable_accountcode"));
+				getChannelData().addDelimitedVars(
+						CodecsUtils.urlDecode(sipReqParams), ";");
+			}
+				break;
+				
 			case ChannelCreate: {
 				FSChannelCreateEvent cce = (FSChannelCreateEvent) fsEvent;
 				if (FSChannel.this.getAcctUniqueSessionId() == null) {
 					FSChannel.this.setAcctUniqueSessionId(UUID.randomUUID()
 							.toString());
+				}
+				FSChannel masterChannel = (FSChannel) FSChannel.this.get_switch().getChannel(cce.getPeerChannel());
+				if (masterChannel != null && masterChannel.getScript() != null){
+					masterChannel.getScript().addChannel(FSChannel.this);
 				}
 			}
 				break;
@@ -278,10 +275,14 @@ public class FSChannel extends Channel {
 					getChannelData().setServiceNumber(cse.getCalledIdNum());
 					switch (cse.getDirection()) {
 					case Inbound:
+						// Create script
+						ScriptManager.getInstance().createScript(FSChannel.this);
 						internalState = new OfferedState();
+						FSChannel.this.onEvent(new OfferedEvent(FSChannel.this));
 						break;
 					case Outbound:
 						internalState = new AlertingState();
+						FSChannel.this.onEvent(new AlertingEvent(FSChannel.this));						
 						break;
 					}
 				}
@@ -781,7 +782,9 @@ public class FSChannel extends Channel {
 	}
 
 	@Override
-	synchronized protected void processNativeEvent(Object event) {
+	protected void processNativeEvent(Object event) {
+		//eventsQueue.add(event);
+		
 		if (event instanceof FSEvent) {
 			FSEvent fsEvent = (FSEvent) event;
 			if (fsEvent.getEventType() == EventType.ChannelExecuteComplete) {
