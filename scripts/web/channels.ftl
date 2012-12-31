@@ -19,7 +19,7 @@
         <th bgcolor="#C0C0C0">Account</th>
       <#list channels as c>
         <tr align=left valign=top>          
-          <td bgcolor="#A0A0A0">${c.uniqueId}</td>
+          <td bgcolor="#A0A0A0"><a href="?action=channel&id=${c.uniqueId}">${c.uniqueId}<a></td>
           <td bgcolor="#A0A0A0">${c._switch.definition.address}</td>
           <td bgcolor="#A0A0A0">${c.callingStationId?default("")}</td>
           <td bgcolor="#A0A0A0">${c.calledStationId?default("")}</td>
