@@ -571,8 +571,10 @@ public abstract class Channel implements TimerNotifiable {
 	public boolean onEvent(Event e) {
 		if (e == null)
 			return true;
-		log.trace(String.format("START : %s", e));
+		log.trace(String.format("onEvent: %s", e));
+		
 		eventsQueue.add(e);
+		
 		switch (e.getEventType()) {
 		case DTMF: {
 			DtmfEvent event = (DtmfEvent) e;
