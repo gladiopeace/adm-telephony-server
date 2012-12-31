@@ -22,4 +22,8 @@ public class FSChannelOutgoingEvent extends FSChannelEvent {
 		
 		return CodecsUtils.urlDecode(values.get("Caller-Destination-Number"));
 	}
+	public String getPeerChannel(){
+		return values.get("Other-Leg-Unique-ID");
+	}
+
 }
