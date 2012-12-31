@@ -286,21 +286,33 @@ public class ASTChannel extends Channel {
 			switch (astEvent.getEventType()) {
 			case Dial: {
 				ASTDialEvent dialEvent = (ASTDialEvent) astEvent;
-				Channel masterChannel = ASTChannel.this.getSwitch().getChannel(
-						dialEvent.getChannelId());
-				if (masterChannel != null) {
-					ASTChannel.this.setAcctUniqueSessionId(masterChannel
-							.getAcctUniqueSessionId());
-					ASTChannel.this.acctUniqueSessionId = masterChannel
-							.getAcctUniqueSessionId();
-					ASTChannel.this.setUserName(masterChannel.getUserName());
-					ASTChannel.this.setServiceNumber(masterChannel
-							.getServiceNumber());
-					ASTChannel.this.getChannelData().setDestinationNumberIn(
-							masterChannel.getChannelData().getCalledNumber());
-					ASTChannel.this.getChannelData().setRemoteIP(
-							masterChannel.getChannelData().getLoginIP());
+				if (dialEvent.getDestinationChannel().equals(
+						ASTChannel.this.getId())) { // This is the outbound
+													// channel
+					Channel masterChannel = ASTChannel.this.getSwitch()
+							.getChannel(dialEvent.getChannelId());
+					if (masterChannel != null) {
+						if (masterChannel.getScript() != null){
+							masterChannel.getScript().addChannel(ASTChannel.this);
+						}
+						ASTChannel.this.setAcctUniqueSessionId(masterChannel
+								.getAcctUniqueSessionId());
+						ASTChannel.this.acctUniqueSessionId = masterChannel
+								.getAcctUniqueSessionId();
+						ASTChannel.this
+								.setUserName(masterChannel.getUserName());
+						ASTChannel.this.setServiceNumber(masterChannel
+								.getServiceNumber());
+						ASTChannel.this.getChannelData()
+								.setDestinationNumberIn(
+										masterChannel.getChannelData()
+												.getCalledNumber());
+						ASTChannel.this.getChannelData().setRemoteIP(
+								masterChannel.getChannelData().getLoginIP());
 
+					}
+					internalState = new AlertingState();
+					ASTChannel.this.onEvent(new AlertingEvent(ASTChannel.this));
 				}
 
 			}
@@ -427,7 +439,7 @@ public class ASTChannel extends Channel {
 				case Answer:
 					internalState = new IdleState();
 					ASTChannel.this
-							.onEvent(new ConnectedEvent(ASTChannel.this));					
+							.onEvent(new ConnectedEvent(ASTChannel.this));
 					break;
 				}
 
@@ -815,7 +827,8 @@ public class ASTChannel extends Channel {
 
 	protected SigProtocol channelProtocol = SigProtocol.Unknown;
 
-	synchronized protected void processNativeEvent(Object event) {
+	protected void processNativeEvent(Object event) {
+		//eventsQueue.add(event);
 		if (event instanceof ASTEvent) {
 			ASTEvent astEvent = (ASTEvent) event;
 			log.debug(String
@@ -867,7 +880,6 @@ public class ASTChannel extends Channel {
 	public ASTChannel(Switch _switch, String id, IoSession session) {
 		super(_switch, id);
 		this.session = session;
-		log.trace("*************************************ASTChannel asterisk **************************************");
 		if (id.toLowerCase().startsWith("sip")) {
 			channelProtocol = SigProtocol.SIP;
 		} else if (id.toLowerCase().startsWith("iax2")) {
@@ -921,8 +933,7 @@ public class ASTChannel extends Channel {
 		if (address != null && address.length() > 0) {
 			ASTDialCommand dialCmd = new ASTDialCommand(ASTChannel.this,
 					address, timeout);
-			log.trace(String.format("Channel (%s) dialCmd %s", this,
-					dialCmd));
+			log.trace(String.format("Channel (%s) dialCmd %s", this, dialCmd));
 			session.write(dialCmd);
 		} else {
 			log.warn(String.format("%s, invalid dial string %s", this.getId(),
@@ -1022,4 +1033,14 @@ public class ASTChannel extends Channel {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public String toString() {
+		return "ASTChannel ["
+				+ (internalState != null ? "internalState=" + internalState
+						+ ", " : "")
+				+ (super.toString() != null ? "toString()=" + super.toString()
+						: "") + "]";
+	}
+
 }
