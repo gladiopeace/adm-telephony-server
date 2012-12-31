@@ -15,4 +15,7 @@ public class FSChannelCreateEvent extends FSChannelEvent {
 	public String getChannelId() {		
 		return values.get("Unique-ID");
 	}
+	public String getPeerChannel(){
+		return values.get("Other-Leg-Unique-ID");
+	}
 }
