@@ -7,6 +7,7 @@ import com.admtel.telephonyserver.core.Script;
 import com.admtel.telephonyserver.events.DisconnectCode;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.AlertingEvent;
+import com.admtel.telephonyserver.events.OfferedEvent;
 import com.admtel.telephonyserver.events.PlayAndGetDigitsEndedEvent;
 import com.admtel.telephonyserver.events.PlaybackEndedEvent;
 import com.admtel.telephonyserver.events.PlaybackStartedEvent;
@@ -63,8 +64,8 @@ public class SimpleTestScript extends Script {
 
 	private void processNullState(Event event) {
 		switch (event.getEventType()){
-		case Alerting:{
-			AlertingEvent ie = (AlertingEvent) event;
+		case Offered:{
+			OfferedEvent ie = (OfferedEvent) event;
 			a = ie.getChannel();
 			if (a == null){
 				log.fatal(this +", couldn't find the channel");
