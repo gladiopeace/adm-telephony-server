@@ -61,7 +61,7 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			}
 		}
 	}
-	private void remove(Switch _switch){
+	public void remove(Switch _switch){
 		if (_switch != null){
 			synchronized (this){
 				idMap.remove(_switch.getDefinition().getId());
@@ -96,11 +96,8 @@ public class Switches implements DefinitionChangeListener, EventListener {
 	}
 
 	public List<Channel> getAllChannels() {
-		Collection<Switch> switches = idMap.values();
 		List<Channel> result = new ArrayList<Channel>();
-		for (Switch _switch : switches) {
-			result.addAll(_switch.getAllChannels());
-		}
+		result.addAll(channels.values());
 		return result;
 	}
 
@@ -327,6 +324,9 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			result += _switch.toReadableString();
 		}
 		return result;
+	}
+	public Map<String, Channel>getChannels(){
+		return channels;
 	}
 }
  
