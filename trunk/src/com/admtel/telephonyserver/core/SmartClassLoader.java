@@ -19,7 +19,7 @@ public class SmartClassLoader {
 
 			String[] roots = SystemConfig.getInstance().serverDefinition.getScriptPath().split(";");
 			
-			groovyScriptEngine = new GroovyScriptEngine(roots);
+			groovyScriptEngine = new GroovyScriptEngine(roots, classLoader);
 			log.trace("Starting GroovyScriptEngine with root = ");
 			for (int i=0;i<roots.length;i++){
 				log.trace("root["+i+"]="+roots[i]);
