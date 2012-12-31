@@ -37,7 +37,6 @@ public abstract class Switch {
 
 		@Override
 		public void onMessage(Object message) {			
-			Switch.log.trace(message);
 			if (message instanceof BasicIoMessage) {
 				Switch.this.processBasicIoMessage((BasicIoMessage) message);
 			} else if (message instanceof Request) {
@@ -76,7 +75,7 @@ public abstract class Switch {
 		if (channel != null) {
 			synchronizedChannels.put(channel.getId(), channel);
 			log.debug(String.format("Switch (%s) : Added channel %s",
-					getDefinition().getId(), channel.getId()));
+					getDefinition().getId(), channel));
 		}
 	}
 
