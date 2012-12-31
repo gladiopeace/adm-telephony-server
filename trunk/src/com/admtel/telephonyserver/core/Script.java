@@ -9,9 +9,11 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.mortbay.log.Log;
 
 import com.admtel.telephonyserver.core.Channel.CallState;
 import com.admtel.telephonyserver.events.DialStartedEvent;
+import com.admtel.telephonyserver.events.DisconnectCode;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.DisconnectedEvent;
 import com.admtel.telephonyserver.events.AlertingEvent;
@@ -21,7 +23,7 @@ import com.admtel.telephonyserver.interfaces.Authorizer;
 import com.admtel.telephonyserver.radius.AuthorizeResult;
 import com.admtel.telephonyserver.registrar.UserLocation;
 
-public abstract class Script implements EventListener{
+public abstract class Script implements EventListener {
 
 	private static Logger gLog = Logger.getLogger(Script.class);
 
@@ -30,32 +32,35 @@ public abstract class Script implements EventListener{
 	};
 
 	String id;
-	
+
 	ScriptState scriptState = ScriptState.Running;
 
 	Map<String, String> parameters;
-	
+
 	List<Channel> channels = new ArrayList<Channel>();
-	
-	public Map<String, String> getParameters(){
+
+	public Map<String, String> getParameters() {
 		return parameters;
 	}
-	public String getParameter(String key){
-		if (parameters != null){
+
+	public String getParameter(String key) {
+		if (parameters != null) {
 			return parameters.get(key);
 		}
 		return null;
 	}
 
-	public String getParameter(String key, String defaultValue){
-		if (parameters==null || parameters.get(key) == null){
+	public String getParameter(String key, String defaultValue) {
+		if (parameters == null || parameters.get(key) == null) {
 			return defaultValue;
 		}
 		return parameters.get(key);
 	}
-	public void setParameters (Map<String, String> parameters){
+
+	public void setParameters(Map<String, String> parameters) {
 		this.parameters = parameters;
 	}
+
 	public ScriptState getState() {
 		return scriptState;
 	}
@@ -64,77 +69,56 @@ public abstract class Script implements EventListener{
 		id = UUID.randomUUID().toString();
 	}
 
-	private String toString(Collection<?> collection, int maxLen) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("[");
-		int i = 0;
-		for (Iterator<?> iterator = collection.iterator(); iterator.hasNext()
-				&& i < maxLen; i++) {
-			if (i > 0)
-				builder.append(", ");
-			builder.append(iterator.next());
-		}
-		builder.append("]");
-		return builder.toString();
-	}
-	public String getId(){
+	public String getId() {
 		return id;
 	}
+
 	public String dump() {
 		return dump(0);
 	}
 
 	public String dump(int level) {
 		String result = this.getClass().getSimpleName()
-				+ String.format(":State(%s)", scriptState);
+				+ String.format(":State(%s)-Channels(%d)", scriptState,
+						channels.size());
 		return result;
 	}
 
+	synchronized final public boolean onEvent(Event event) {
 
-	final public boolean onEvent(Event event) {
-		
-		try{
-		gLog.trace(this + ", got event " + event);		
-		switch (event.getEventType()) {
-		case Alerting: {
-			AlertingEvent ie = (AlertingEvent) event;
-		}
-			break;
-		
-		case DialStarted: {
-			DialStartedEvent dse = (DialStartedEvent) event;
-			// Add the dialed channel to the list of channels, and add us to the
-			// listeners
-			gLog.debug(this+", Dial Started ....");
-			if (dse.getDialedChannel() != null) {				
-				dse.getDialedChannel().addEventListener(this);
-				addChannel(dse.getDialedChannel());
+		try {
+			gLog.trace(this + ", got event " + event);
+
+			try {
+				processEvent(event);
+			} catch (Exception e) {
+				Log.warn(e.toString());
 			}
-		}
-			break;
-		}
 
-		processEvent(event);
-		
-		if (event.getEventType() == Event.EventType.Disconnected){
-			DisconnectedEvent he = (DisconnectedEvent) event;
-			removeChannel(he.getChannel());
-		}
-		if (channels.size() == 0){
-			onStop();
-			ScriptManager.getInstance().deleteScript(this);
-		}
-		}
-		catch (Exception e){
-			gLog.fatal(this+", " + e.getMessage(), e);
+			if (event.getEventType() == Event.EventType.Disconnected) {
+				DisconnectedEvent he = (DisconnectedEvent) event;
+				removeChannel(he.getChannel());
+			}
+			if (channels.size() == 0) {
+				stop();
+			}
+		} catch (Exception e) {
+			gLog.fatal(this + ", " + e.getMessage(), e);
 		}
 		return true;
 	}
-	//Registrar functions
-	public UserLocation find(String user){
+
+	// Registrar functions
+	public UserLocation find(String user) {
 		return Registrar.getInstance().find(user);
 	}
-	
+
+	private void stop() {
+		onStop();
+		ScriptManager.getInstance().deleteScript(this);
+		scriptState = ScriptState.Stopped;
+	}
+
 	public abstract String getDisplayStr();
 
 	protected abstract void processEvent(Event event);
@@ -142,44 +126,57 @@ public abstract class Script implements EventListener{
 	protected abstract void onTimer();
 
 	protected abstract void onStop();
-	
+
 	public abstract void onStart();
-	
-	public void addChannel(Channel channel) {
-		if (channel == null) return;
+
+	synchronized public void addChannel(Channel channel) {
+		if (channel == null)
+			return;
+		if (channels.contains(channel))
+			return;
 		channels.add(channel);
 		channel.addEventListener(this);
+		channel.setScript(this);
 	}
-	public void removeChannel(Channel channel){
-		if (channel == null) return;
+
+	public void removeChannel(Channel channel) {
+		if (channel == null)
+			return;
 		channel.removeEventListener(this);
 		channels.remove(channel);
 	}
-	public Channel getIncomingChannel(){
+
+	public Channel getIncomingChannel() {
 		return getChannel(CallOrigin.Inbound);
 	}
-	
-	public Channel getChannel(CallOrigin callOrigin){
-		for (Channel c: channels){
-			if (c.getCallOrigin() == callOrigin){
+
+	public Channel getChannel(CallOrigin callOrigin) {
+		for (Channel c : channels) {
+			if (c.getCallOrigin() == callOrigin) {
 				return c;
 			}
 		}
 		return null;
-		
+
 	}
-	
-	public Channel getChannel(CallOrigin callOrigin, CallState state){
-		for (Channel c:channels){
-			if (c.getCallOrigin() == callOrigin && c.getCallState() == state){
+
+	public Channel getChannel(CallOrigin callOrigin, CallState state) {
+		for (Channel c : channels) {
+			if (c.getCallOrigin() == callOrigin && c.getCallState() == state) {
 				return c;
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	public List<Channel> getChannels() {
 		return channels;
+	}
+
+	public void hangupAll() {
+		for (Channel c : channels) {
+			c.hangup(DisconnectCode.Normal);
+		}
 	}
 }
