@@ -100,17 +100,72 @@ public class FSEvent {
 				}
 
 			} else {
-				Constructor ctor = EVENTS_MAP.get(eventName);
-				if (ctor == null) {
-					return null;
+//				Constructor ctor = EVENTS_MAP.get(eventName);
+//				if (ctor == null) {
+//					return null;
+//				}
+//
+//				if (ctor != null) {
+//					try {
+//						return (FSEvent) ctor.newInstance(switchId, map);
+//					} catch (Exception ex) {
+//						log.fatal(ex.toString(), ex);
+//					}
+//				}
+				if (eventName.equals("HEARTBEAT")){
+					return (FSEvent) new FSHeartBeatEvent(switchId, map);
 				}
-
-				if (ctor != null) {
-					try {
-						return (FSEvent) ctor.newInstance(switchId, map);
-					} catch (Exception ex) {
-						log.fatal(ex.toString(), ex);
-					}
+				else
+				if (eventName.equals("DTMF")){
+					return (FSEvent) new FSDtmfEvent(switchId, map);
+				}
+				else
+				if (eventName.equals("CHANNEL_HANGUP")){
+					return (FSEvent) new FSChannelHangupEvent(switchId, map);
+				}
+				else
+				if (eventName.equals("CHANNEL_DATA")){
+					return (FSEvent) new FSChannelDataEvent(switchId, map);
+				}
+				else
+				if (eventName.equals("CHANNEL_ANSWER")){
+					return (FSEvent) new FSChannelAnsweredEvent(switchId, map);
+				}
+				else
+				if (eventName.equals("CHANNEL_EXECUTE")){
+					return (FSEvent) new FSChannelExecuteEvent(switchId, map);
+				}
+				else
+				if (eventName.equals("CHANNEL_EXECUTE_COMPLETE")){
+					return (FSEvent) new FSChannelExecuteCompleteEvent(switchId, map);
+				}
+				else
+				if (eventName.equals("CHANNEL_DESTROY")){
+					return (FSEvent) new FSChannelDestroyEvent(switchId, map);
+				}
+				else
+				if (eventName.equals("CHANNEL_CREATE")){
+					return (FSEvent) new FSChannelCreateEvent(switchId, map);
+				}
+				else
+				if (eventName.equals("CHANNEL_OUTGOING")){
+					return (FSEvent) new FSChannelOutgoingEvent(switchId, map);					
+				}
+				else
+				if (eventName.equals("CHANNEL_ORIGINATE")){
+					return (FSEvent) new FSChannelOriginateEvent(switchId, map);
+				}
+				else
+				if (eventName.equals("CHANNEL_BRIDGE")){
+					return (FSEvent) new FSChannelBridgeEvent(switchId, map);
+				}
+				else
+				if (eventName.equals("CHANNEL_UNBRIDGE")){
+					return (FSEvent) new FSChannelUnbridgeEvent(switchId, map);
+				}
+				else
+				if (eventName.equals("CHANNEL_STATE")){
+					return (FSEvent) new FSChannelStateEvent(switchId, map);
 				}
 			}
 		} else {
@@ -132,7 +187,9 @@ public class FSEvent {
 	protected Map<String, String> values = new HashMap<String, String>();
 
 	public enum EventType {
-		AuthRequest, CommandReply, HeartBeat, ChannelExecute, ChannelExecuteComplete, ChannelData, SessionDisconnect, ChannelDestroy, DTMF, ChannelHangup, ChannelBridge, ChannelAnswered, ChannelCreate, ChannelOutgoing, ChannelState, ChannelOriginate,
+		AuthRequest, CommandReply, HeartBeat, ChannelExecute, ChannelExecuteComplete, ChannelData, SessionDisconnect, ChannelDestroy, DTMF, ChannelHangup, ChannelBridge, ChannelAnswered, ChannelCreate, 
+		ChannelOutgoing,
+		ChannelState, ChannelOriginate,
 		FsRegister, ConferenceJoined, ConferenceRemoved, Queue, ConferenceTalking, ConferenceMute, ChannelUnbridge, ConferenceDeaf
 	}
 
