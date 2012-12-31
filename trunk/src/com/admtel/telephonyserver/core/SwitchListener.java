@@ -62,7 +62,7 @@ public abstract class SwitchListener implements IoHandler{
 		
 		acceptor = new NioSocketAcceptor();
 		acceptor.setReuseAddress(true);
-		acceptor.getFilterChain().addLast("logger", new LoggingFilter());
+		//acceptor.getFilterChain().addLast("logger", new LoggingFilter());
 		TextLineCodecFactory textLineCodecFactory = new TextLineCodecFactory(Charset
 				.forName("UTF-8"), encodingDelimiter, decodingDelimiter);
 		textLineCodecFactory.setDecoderMaxLineLength(8192);
@@ -78,7 +78,7 @@ public abstract class SwitchListener implements IoHandler{
 		try {
 			acceptor.bind(new InetSocketAddress(definition.getAddress(), definition.getPort()));
 		} catch (IOException e) {
-			log.fatal(AdmUtils.getStackTrace(e));
+			log.fatal(e.getMessage());
 			return false;
 		}
 		status = Status.Listening;
@@ -89,7 +89,6 @@ public abstract class SwitchListener implements IoHandler{
 	public void exceptionCaught(IoSession session, Throwable exception)
 			throws Exception {
 		// TODO Auto-generated method stub
-		
 	}
 	@Override
 	public void messageSent(IoSession session, Object message) throws Exception {
@@ -107,8 +106,7 @@ public abstract class SwitchListener implements IoHandler{
 	}
 	@Override
 	public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub		
 	}
 	@Override
 	public void sessionOpened(IoSession session) throws Exception {
@@ -116,7 +114,6 @@ public abstract class SwitchListener implements IoHandler{
 		
 	}
 	protected Switch getSwitch(IoSession session) {
-		log.trace("********************Switch get switch************************");
 		InetSocketAddress address = (InetSocketAddress) session.getRemoteAddress();
 		String ip = address.getAddress().toString();
 		if (ip.startsWith("/")){
