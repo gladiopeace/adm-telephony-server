@@ -783,7 +783,8 @@ public class FSChannel extends Channel {
 
 	@Override
 	protected void processNativeEvent(Object event) {
-		//eventsQueue.add(event);
+		
+		eventsQueue.add(event);
 		
 		if (event instanceof FSEvent) {
 			FSEvent fsEvent = (FSEvent) event;
