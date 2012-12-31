@@ -828,7 +828,9 @@ public class ASTChannel extends Channel {
 	protected SigProtocol channelProtocol = SigProtocol.Unknown;
 
 	protected void processNativeEvent(Object event) {
-		//eventsQueue.add(event);
+		
+		eventsQueue.add(event);
+		
 		if (event instanceof ASTEvent) {
 			ASTEvent astEvent = (ASTEvent) event;
 			log.debug(String
