@@ -47,7 +47,9 @@ public class ScriptManager implements DefinitionChangeListener, Loadable{
 		log.trace(String.format("Channel (%s) : no script", channel.getUniqueId()));
 		return null;
 	}
-	
+	public Script getScript(String scriptId){
+		return scripts.get(scriptId);
+	}
 	public void deleteScript(Script script){
 		if (script == null) return;
 		scripts.remove(script.id);
