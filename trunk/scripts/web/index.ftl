@@ -3,7 +3,7 @@
 <#escape x as x?html>
   
 <@com.page title="Main">	
- <h1>${message}</h1>
+	${message}
 </@com.page>
   
 </#escape>

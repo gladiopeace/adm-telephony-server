@@ -36,21 +36,27 @@ class WebConfServlet extends AdmServlet {
 	public init(){
 		
 	}
-	def index(request, response){
-		
-		[message:"welcome"]
-	}
 	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	def index(request, response){
+		int cc = Switches.getInstance().channels.size()
+		int sc = ScriptManager.getInstance().scripts.size()
+		[message:"Channels($cc), Scripts($sc)"]
+	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def hangup(request, response){
 		HangupRequest hangupRequest = new HangupRequest(request.getParameter('channel'), DisconnectCode.Normal) 
 		Switches.getInstance().processRequest(hangupRequest)
 		[m:'']
 	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def conferences(request, response){
 		def c = ConferenceManager.getInstance().getAll()
 		['conferences':c]
 	}
 	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def login(request, response){
 		def userName = request.getParameter('username')
 		def userPassword =request.getParameter('password')
@@ -64,6 +70,8 @@ class WebConfServlet extends AdmServlet {
 		}
 		['page':'login.ftl']
 	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def users(request, response){
 		def params = request.getParameterMap()
 		log.trace("Users with request params : " + params)
@@ -71,25 +79,35 @@ class WebConfServlet extends AdmServlet {
 		if (!params.offset) params.offset = 0
 		['page':'users.ftl', users:Registrar.getInstance().get(params.offset, params.max)]
 	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def channels(request, response){
 		List<Channel> channels =  Switches.getInstance().getAllChannels();
 		def root =["channels":channels]
 		println request.getParameter("action")
 		return root
 	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def scripts(request, response){
 		def s = ScriptManager.getInstance().getScripts();
 		['scripts':s]
 	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def queues(request, response){
 		AcdQueue[] q = AcdManager.getInstance().getQueues();
 		['queues':q]
 	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def queue_calls(request, response){
 		String queue = request.getParameter('queue')
 		AcdCall[] c = AcdManager.getInstance().getQueueCalls(queue)
 		['queue_calls':c]
 	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def dial(request, response){
 		String destination = URLDecoder.decode(request.getParameter('destination'))
 		String channel = request.getParameter('channel')
@@ -98,6 +116,21 @@ class WebConfServlet extends AdmServlet {
 		Switches.getInstance().processRequest(dialRequest)
 		return [m:"Dial ${request.getParameter('destination')}"]
 	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	def channel(request, response){
+		String channelId=request.getParameter('id')
+		Channel c = Switches.getInstance().getChannelById(channelId)
+		return [channel:c]
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	def script(request, response){
+		String scriptId = request.getParameter('id')
+		Script s = ScriptManager.getInstance().getScript(scriptId)
+		[script:s]
+	}
+	
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
 		def sessionId = request.getParameter("session")
