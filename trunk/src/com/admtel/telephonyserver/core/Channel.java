@@ -46,23 +46,11 @@ import com.admtel.telephonyserver.requests.JoinConferenceRequest;
 import com.admtel.telephonyserver.requests.ConferenceMuteRequest;
 import com.admtel.telephonyserver.requests.Request;
 import com.admtel.telephonyserver.utils.AdmUtils;
+import com.admtel.telephonyserver.utils.LimitedQueue;
 import com.admtel.telephonyserver.utils.PromptsUtils;
 
 public abstract class Channel implements TimerNotifiable {
 
-	private String toString(Collection<?> collection, int maxLen) {
-		StringBuilder builder = new StringBuilder();
-		builder.append("[");
-		int i = 0;
-		for (Iterator<?> iterator = collection.iterator(); iterator.hasNext()
-				&& i < maxLen; i++) {
-			if (i > 0)
-				builder.append(", ");
-			builder.append(iterator.next());
-		}
-		builder.append("]");
-		return builder.toString();
-	}
 	public static Logger log = Logger.getLogger(Channel.class);
 	
 	public enum CallState {
@@ -94,7 +82,7 @@ public abstract class Channel implements TimerNotifiable {
 	private Map<String, String> userData = new HashMap<String, String>();
 
 	protected DateTime createdTime = new DateTime();
-	protected CallOrigin callOrigin = CallOrigin.Inbound;
+	protected CallOrigin callOrigin = CallOrigin.Unknown;
 	// Radius needed attributes
 	protected DateTime setupTime;
 	protected DateTime hangupTime;
@@ -110,6 +98,16 @@ public abstract class Channel implements TimerNotifiable {
 	protected Locale language;
 
 	private String conferenceId;
+	
+	protected LimitedQueue eventsQueue = new LimitedQueue(20);
+	protected Script script;
+	
+	public Script getScript(){
+		return script;
+	}
+	public void setScript(Script script){
+		this.script = script;
+	}
 	public String getMemberId() {
 		return memberId;
 	}
@@ -345,13 +343,20 @@ public abstract class Channel implements TimerNotifiable {
 		return getCallState() == CallState.Connected;
 	}
 
+	private boolean isOffered(){
+		return getCallState() == CallState.Offered;
+	}
 	private boolean isMediaActive() {
 		return mediaState != MediaState.Idle;
 	}
 
 	final public Result playAndGetDigits(int max, String prompt, long timeout,String terminators) {
 		log.trace(String.format("[%s] - playAndGetDigits(%d,%s,%d,%s)", this,	max, prompt, timeout, terminators));
-		
+		if (!(isConnected() || isOffered())) {
+			log.warn(String.format("[%s], playAndGetDigits, invalid call state", this));
+			lastResult = Result.ChannelInvalidCallState;
+			return lastResult;
+		}
 		if (isMediaActive()) {
 			log.warn(String.format("[%s], playAndGetDigits, invalid media state", this));
 			lastResult = Result.ChannelInvalidMediaState;
@@ -370,7 +375,11 @@ public abstract class Channel implements TimerNotifiable {
 
 	final public Result playAndGetDigits(int max, String[] prompt,long timeout, String terminators) {
 		log.trace(String.format("[%s] - playAndGetDigits(%d,%s,%d,%s)", this,	max, prompt, timeout, terminators));
-		
+		if (!(isConnected() || isOffered())) {
+			log.warn(String.format("[%s], playAndGetDigits, invalid call state", this));
+			lastResult = Result.ChannelInvalidCallState;
+			return lastResult;
+		}	
 		if (isMediaActive()) {
 			log.warn(String.format("[%s], playAndGetDigits, invalid media state", this));
 			lastResult = Result.ChannelInvalidMediaState;
@@ -408,7 +417,11 @@ public abstract class Channel implements TimerNotifiable {
 
 	final public Result playback(String[] prompt, String terminators) {
 		log.trace(String.format("[%s] - playback(%s,%s)", this, prompt,	terminators));
-
+		if (!(isConnected() || isOffered())) {
+			log.warn(String.format("[%s], playAndGetDigits, invalid call state", this));
+			lastResult = Result.ChannelInvalidCallState;
+			return lastResult;
+		}
 		if (isMediaActive()) {
 			log.warn(String.format("[%s], playback, invalid media state", this));
 			lastResult = Result.ChannelInvalidMediaState;
@@ -426,7 +439,11 @@ public abstract class Channel implements TimerNotifiable {
 
 	final public Result playback(String prompt, String terminators) {
 		log.trace(String.format("[%s] - playback(%s,%s)", this, prompt,terminators));
-
+		if (!(isConnected() || isOffered())) {
+			log.warn(String.format("[%s], playAndGetDigits, invalid call state", this));
+			lastResult = Result.ChannelInvalidCallState;
+			return lastResult;
+		}
 		if (isMediaActive()) {
 			log.warn(String.format("[%s], playback, invalid media state", this));
 			lastResult = Result.ChannelInvalidMediaState;
@@ -555,6 +572,7 @@ public abstract class Channel implements TimerNotifiable {
 		if (e == null)
 			return true;
 		log.trace(String.format("START : %s", e));
+		eventsQueue.add(e);
 		switch (e.getEventType()) {
 		case DTMF: {
 			DtmfEvent event = (DtmfEvent) e;
@@ -662,7 +680,6 @@ public abstract class Channel implements TimerNotifiable {
 			removeAllEventListeners();
 			_switch.removeChannel(this);
 		}
-		log.trace(String.format("END : %s", e));
 		return false;
 	}
 
@@ -696,23 +713,46 @@ public abstract class Channel implements TimerNotifiable {
 		this.answerTime = answerTime;
 	}
 
+
 	@Override
 	public String toString() {
+		return "Channel [" + (id != null ? "id=" + id + ", " : "")
+				+ (uniqueId != null ? "uniqueId=" + uniqueId : "") + "]";
+	}
+
+	public String getDetailedDump() {
+		final int maxLen = 20;
+		return "Channel ["
+				+ (callState != null ? "callState=" + callState + ", " : "")
+				+ (mediaState != null ? "mediaState=" + mediaState + ", " : "")
+				+ (id != null ? "id=" + id + ", " : "")
+				+ (uniqueId != null ? "uniqueId=" + uniqueId + ", " : "")
+				+ (channelData != null ? "channelData=" + channelData + ", "
+						: "")
+				+ (userData != null ? "userData="
+						+ toString(userData.entrySet(), maxLen) + ", " : "")
+				+ (createdTime != null ? "createdTime=" + createdTime + ", "
+						: "")
+				+ (callOrigin != null ? "callOrigin=" + callOrigin + ", " : "")
+				+ (setupTime != null ? "setupTime=" + setupTime + ", " : "")
+				+ (answerTime != null ? "answerTime=" + answerTime + ", " : "")
+				+ (eventsQueue != null ? "eventsQueue=" + eventsQueue + ", "
+						: "")
+				+ (otherChannel != null ? "otherChannel=" + otherChannel : "")
+				+ "]";
+	}
+
+	private String toString(Collection<?> collection, int maxLen) {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Channel [callState=").append(callState)
-				.append(", mediaState=").append(mediaState).append(", id=")
-				.append(id).append(", _switch=").append(_switch)
-				.append(", uniqueId=").append(uniqueId)
-				.append(", channelData=").append(channelData)
-				.append(", userData=").append(userData)
-				.append(", createdTime=").append(createdTime)
-				.append(", callOrigin=").append(callOrigin)
-				.append(", setupTime=").append(setupTime)
-				.append(", hangupTime=").append(hangupTime)
-				.append(", answerTime=").append(answerTime)
-				.append(", acctUniqueSessionId=").append(acctUniqueSessionId)
-				.append(", h323DisconnectCause=").append(h323DisconnectCause)
-				.append("]");
+		builder.append("[");
+		int i = 0;
+		for (Iterator<?> iterator = collection.iterator(); iterator.hasNext()
+				&& i < maxLen; i++) {
+			if (i > 0)
+				builder.append("\n ");
+			builder.append(iterator.next().getClass());
+		}
+		builder.append("]");
 		return builder.toString();
 	}
 
