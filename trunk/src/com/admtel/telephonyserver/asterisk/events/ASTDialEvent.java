@@ -50,4 +50,16 @@ public class ASTDialEvent extends ASTChannelEvent {
 		}
 		return result;
 	}
+	@Override
+	public String toString() {
+		return "ASTDialEvent ["
+				+ (getDestinationChannel() != null ? "getDestinationChannel()="
+						+ getDestinationChannel() + ", " : "")
+				+ "isBegin()="
+				+ isBegin()
+				+ ", "
+				+ (getDialStatus() != null ? "getDialStatus()="
+						+ getDialStatus() : "") + "]";
+	}
+	
 }
