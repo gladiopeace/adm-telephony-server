@@ -17,5 +17,17 @@ public class FSChannelDataEvent extends FSChannelEvent {
 	}
 	public CallState getCallState(){
 		return callState;
+	}	public String getCallerIdNum(){
+		return values.get("Caller-Caller-ID-Number");
 	}
+	public String getCalledIdNum(){
+		return values.get("Caller-Destination-Number");
+	}
+	public String getUserName(){
+		return values.get("Caller-Username");
+	}
+	public String getChannelAddress(){
+		return values.get("Caller-Network-Addr");
+	}
+
 }
