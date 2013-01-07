@@ -14,7 +14,9 @@ public class FSEvent {
 	static Logger log = Logger.getLogger(FSEvent.class);
 
 	static Map<String, Constructor> EVENTS_MAP = new HashMap<String, Constructor>();
-
+	public static String EVENTS_REPORT="HEARTBEAT DTMF CHANNEL_HANGUP CHANNEL_DATA " +
+			"CHANNEL_ANSWER CHANNEL_EXECUTE CHANNEL_EXECUTE_COMPLETE CHANNEL_DESTROY CHANNEL_CREATE " +
+			"CHANNEL_OUTGOING CHANNEL_ORIGINATE CHANNEL_BRIDGE CHANNEL_UNBRIDGE CHANNEL_STATE CUSTOM";
 	static {
 		try {
 			EVENTS_MAP.put("HEARTBEAT", FSHeartBeatEvent.class

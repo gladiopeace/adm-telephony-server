@@ -42,6 +42,13 @@ class WebConfServlet extends AdmServlet {
 		int cc = Switches.getInstance().channels.size()
 		int sc = ScriptManager.getInstance().scripts.size()
 		[message:"Channels($cc), Scripts($sc)"]
+		//['scriptsCount':sc, 'channelsCount':cc]
+	}
+	def reload(request, response){
+		BeansManager.getInstance().reload();
+		ScriptManager.getInstance().reload();
+		
+		['page':'index.ftl','message':'Reload completed ...']
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def hangup(request, response){
@@ -157,8 +164,8 @@ class WebConfServlet extends AdmServlet {
 			response.appendBody(writer.toString())
 		}	
 		catch (Exception e){
-			log.fatal(e.getMessage(), e)
-			response.appendBody(e.getMessage())
+			log.fatal(e.getMessage())
+			response.appendBody("Error processing request")
 		}
 					
 	}
