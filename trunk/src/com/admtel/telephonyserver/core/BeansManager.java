@@ -13,8 +13,9 @@ import org.apache.log4j.Logger;
 import com.admtel.telephonyserver.config.BeanDefinition;
 import com.admtel.telephonyserver.config.DefinitionChangeListener;
 import com.admtel.telephonyserver.config.DefinitionInterface;
+import com.admtel.telephonyserver.interfaces.Loadable;
 
-public class BeansManager implements DefinitionChangeListener {
+public class BeansManager implements DefinitionChangeListener, Loadable{
 
 	static Logger log = Logger.getLogger(BeansManager.class);
 
@@ -41,6 +42,38 @@ public class BeansManager implements DefinitionChangeListener {
 
 	public void init() {
 		log.trace ("Initializing bean manager");
+		load();
+	}
+
+	@Override
+	public void definitionAdded(DefinitionInterface definition) {
+		if (definition != null && definition instanceof BeanDefinition) {
+			BeanDefinition beanDefinition = (BeanDefinition) definition;
+			beanDefinitions.put(definition.getId(), beanDefinition);
+		}
+
+	}
+
+	@Override
+	public void definitionRemoved(DefinitionInterface definition) {
+		beanDefinitions.remove(definition.getId());
+	}
+
+	@Override
+	public void defnitionChanged(DefinitionInterface oldDefinition,
+			DefinitionInterface newDefinition) {
+		definitionRemoved(oldDefinition);
+		definitionAdded(newDefinition);
+
+	}
+
+	@Override
+	public void reload() {
+		load();		
+	}
+
+	@Override
+	public void load() {
 		for (BeanDefinition beanDefinition : beanDefinitions.values()) {
 			Object obj = SmartClassLoader.createInstance(Object.class,
 					beanDefinition.getClassName());
@@ -105,28 +138,7 @@ public class BeansManager implements DefinitionChangeListener {
 
 			}
 		}
-	}
-
-	@Override
-	public void definitionAdded(DefinitionInterface definition) {
-		if (definition != null && definition instanceof BeanDefinition) {
-			BeanDefinition beanDefinition = (BeanDefinition) definition;
-			beanDefinitions.put(definition.getId(), beanDefinition);
-		}
-
-	}
-
-	@Override
-	public void definitionRemoved(DefinitionInterface definition) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void defnitionChanged(DefinitionInterface oldDefinition,
-			DefinitionInterface newDefinition) {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 }
