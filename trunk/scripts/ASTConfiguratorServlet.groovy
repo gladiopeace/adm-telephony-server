@@ -1,11 +1,15 @@
+import org.apache.log4j.Logger;
+
 import com.admtel.telephonyserver.httpserver.HttpRequestMessage;
 import com.admtel.telephonyserver.httpserver.HttpResponseMessage;
 import com.admtel.telephonyserver.directory.*;
 import com.admtel.telephonyserver.httpserver.AdmServlet;
 
 class ASTConfiguratorServlet extends AdmServlet{
+	
 	public UserDAO userDAO;
 	
+	static Logger log = Logger.getLogger(ASTConfiguratorServlet.class)
 	public void init(){
 	}
 	
@@ -13,13 +17,13 @@ class ASTConfiguratorServlet extends AdmServlet{
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
 		String name = request.getParameter("name")
 		String domain = request.getParameter("URI")
-		println "Got ${name}:${domain}"
-		User u = userDAO.getUser(name, domain)
-		if (u){
-			response.appendBody("user=${name}&username=${name}&secret=${u.getPassword()}&context=adm&host=dynamic&insecure=very&type=friend&fromuser=${name}\n\n")
+		log.trace("Got ${name}:${domain}")
+		User u = userDAO.getUser(name)
+		if (u){			
+			response.appendBody("username=${name}&secret=${u.password}&context=ats&host=dynamic&insecure=port&type=friend&accountcode=${u.account}&callerid=${u.callerId}\n\n")
 		}
 		else{
-			response.appeendBody("error")
+			response.appendBody("error")
 		}
 	}
 } 

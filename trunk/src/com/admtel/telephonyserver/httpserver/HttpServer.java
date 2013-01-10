@@ -18,6 +18,7 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import com.admtel.telephonyserver.config.AdmServletDefinition;
 import com.admtel.telephonyserver.config.HttpServerDefinition;
 import com.admtel.telephonyserver.core.AdmThreadExecutor;
+import com.admtel.telephonyserver.core.QueuedMessageHandler;
 import com.admtel.telephonyserver.core.SmartClassLoader;
 import com.admtel.telephonyserver.core.SwitchListener.Status;
 import com.admtel.telephonyserver.utils.AdmUtils;
@@ -36,6 +37,58 @@ public class HttpServer implements IoHandler {
 
 	static Logger log = Logger.getLogger(HttpServer.class);
 	
+	private class HttpServerMessageObject{
+		private IoSession session;
+		private Object message;
+		
+		public HttpServerMessageObject(IoSession session, Object message){
+			this.session = session;
+			this.message = message;
+		}
+		public IoSession getIoSession(){
+			return session;
+		}
+		public Object getMessage(){
+			return message;
+		}
+	}
+	
+	private class HttpMessageHandler extends QueuedMessageHandler{
+
+		@Override
+		public void onMessage(Object message) {
+			HttpServerMessageObject msg = (HttpServerMessageObject) message;
+			log.trace(msg.getMessage());
+			HttpRequestMessage request = (HttpRequestMessage) msg.getMessage();
+
+			HttpResponseMessage response = new HttpResponseMessage();
+			response.setContentType("text/html");
+			response.setResponseCode(HttpResponseMessage.HTTP_STATUS_SUCCESS);
+
+
+			try {
+				AdmServletDefinition servletDefinition = definition.getServletDefinition(request.getContext());
+				AdmServlet servlet = null;
+				if (servletDefinition != null){
+					servlet = SmartClassLoader.createInstance(AdmServlet.class, servletDefinition.getClassName());
+					log.trace(servlet);				
+				}
+				
+				if (servlet == null){
+					servlet = admServlet;
+				}
+				servlet.internalProcess(request, response);
+			} catch (Exception e) {
+				log.error(e.getMessage(), e);
+			}
+			msg.getIoSession().write(response);
+
+		}
+		
+	}
+	
+	private HttpMessageHandler messageHandler = new HttpMessageHandler();
+	
 	public HttpServer(HttpServerDefinition definition) {
 		this.definition = definition;
 
@@ -52,31 +105,8 @@ public class HttpServer implements IoHandler {
 			throws Exception {
 		// Check that we can service the request context
 		// response.appendBody("<html><body>");
-
-		log.trace(message);
-		HttpRequestMessage request = (HttpRequestMessage) message;
-
-		HttpResponseMessage response = new HttpResponseMessage();
-		response.setContentType("text/html");
-		response.setResponseCode(HttpResponseMessage.HTTP_STATUS_SUCCESS);
-
-
-		try {
-			AdmServletDefinition servletDefinition = definition.getServletDefinition(request.getContext());
-			AdmServlet servlet = null;
-			if (servletDefinition != null){
-				servlet = SmartClassLoader.createInstance(AdmServlet.class, servletDefinition.getClassName());
-				log.trace(servlet);				
-			}
-			
-			if (servlet == null){
-				servlet = admServlet;
-			}
-			servlet.internalProcess(request, response);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
-		session.write(response);
+		messageHandler.putMessage(new HttpServerMessageObject(session, message));
+		
 	}
 
 	@Override

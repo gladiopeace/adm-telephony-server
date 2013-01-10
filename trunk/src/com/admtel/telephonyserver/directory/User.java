@@ -3,7 +3,8 @@ package com.admtel.telephonyserver.directory;
 public class User {
 	String name;
 	String password;
-	String account;
+	String account="";
+	String callerId="";
 	
 	public String getName() {
 		return name;
@@ -23,4 +24,11 @@ public class User {
 	public void setAccount(String account) {
 		this.account = account;
 	}
+	public String getCallerId() {
+		return callerId;
+	}
+	public void setCallerId(String callerId) {
+		this.callerId = callerId;
+	}
+	
 }
