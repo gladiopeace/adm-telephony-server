@@ -421,7 +421,6 @@ public class ASTChannel extends Channel {
 					// Create script
 					ScriptManager.getInstance().createScript(ASTChannel.this);
 
-					// Send inbound alerting event
 					if (ASTChannel.this.getAcctUniqueSessionId() == null) {
 						ASTChannel.this.setAcctUniqueSessionId(UUID
 								.randomUUID().toString());
