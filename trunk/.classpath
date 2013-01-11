@@ -21,7 +21,6 @@
 	<classpathentry kind="lib" path="lib/dp.lib-dto.GeDA-1.0.0-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/jopt-simple-3.2.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.14.jar"/>
-	<classpathentry kind="lib" path="lib/postgresql-8.3-604.jdbc3.jar"/>
 	<classpathentry kind="lib" path="lib/http-builder-0.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/httpclient-4.1.jar"/>
 	<classpathentry kind="lib" path="lib/httpcore-4.1.jar"/>
@@ -31,7 +30,8 @@
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="lib/ezmorph-1.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/mina-core-2.0.7.jar"/>
-	<classpathentry kind="lib" path="lib/groovy-all-2.0.6.jar"/>
 	<classpathentry exported="true" kind="con" path="GROOVY_DSL_SUPPORT"/>
+	<classpathentry kind="lib" path="lib/postgresql-9.2-1002.jdbc3.jar"/>
+	<classpathentry kind="lib" path="lib/groovy-all-1.8.8.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

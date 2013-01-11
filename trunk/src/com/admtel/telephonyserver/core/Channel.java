@@ -625,15 +625,20 @@ public abstract class Channel implements TimerNotifiable {
 			break;
 		case DialStarted: {
 			DialStartedEvent dse = (DialStartedEvent) e;
-			if (dse.getDialedChannel() != null&& dse.getDialedChannel().getCallOrigin() == CallOrigin.Outbound) {
+			if (dse.getDialedChannel() != null) {
 				// TODO
 				/*
 				 * dse.getDialedChannel().getChannelData().setLoginIP(
 				 * getChannelAddress());
-				 */dse.getDialedChannel().setAcctUniqueSessionId(getAcctUniqueSessionId());
+				 * 
+				 */
+				dse.getDialedChannel().setCalledStationId(getCalledStationId());
+				dse.getDialedChannel().setCallingStationId(getCallingStationId());
+				dse.getDialedChannel().setAcctUniqueSessionId(getAcctUniqueSessionId());
 				dse.getDialedChannel().setUserName(getUserName());
 				dse.getDialedChannel().getChannelData()	.setDestinationNumberIn(getChannelData().getCalledNumber());
 				dse.getDialedChannel().getChannelData()	.setRemoteIP(getLoginIP());
+				dse.getDialedChannel().getChannelData().setAccountCode(getChannelData().getAccountCode());
 				dse.getDialedChannel().setOtherChannel(this);
 			}
 		}
@@ -685,6 +690,14 @@ public abstract class Channel implements TimerNotifiable {
 		return false;
 	}
 
+	public void setCallingStationId(String callingStationId) {
+		channelData.setCallerIdNumber(callingStationId);
+		
+	}
+	public void setCalledStationId(String calledStationId) {
+		channelData.setCalledNumber(calledStationId);
+		
+	}
 	public MediaState getMediaState() {
 		return mediaState;
 	}
@@ -869,4 +882,12 @@ public abstract class Channel implements TimerNotifiable {
 	public String getConferenceId() {
 		return conferenceId;
 	}
+	public String getData(String key){
+		return getChannelData().get(key);
+	}
+	public void setData(String key, String value){
+		getChannelData().put(key, value);
+	}
+	
 }
+
