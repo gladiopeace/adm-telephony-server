@@ -15,7 +15,7 @@ public class ASTSetVariableCommand extends ASTCommand {
 	public String toString(){
 		return String.format(
 				"ACTION: SetVar\nChannel: %s\nVariable: %s\nValue: %s\nActionID: %s",
-						channel.getId(), variableName, variableValue, channel.getId() + "___GetVar");
+						channel.getId(), variableName, variableValue, channel.getId() + "___SetVar");
 						
 	}
 }
