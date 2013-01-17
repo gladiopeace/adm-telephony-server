@@ -14,6 +14,7 @@ import com.admtel.telephonyserver.asterisk.commands.ASTDialCommand;
 import com.admtel.telephonyserver.asterisk.commands.ASTMeetmeMuteCommand;
 import com.admtel.telephonyserver.asterisk.commands.ASTMeetmeUnmuteCommand;
 import com.admtel.telephonyserver.asterisk.commands.ASTQueueCommand;
+import com.admtel.telephonyserver.asterisk.commands.ASTSetVariableCommand;
 import com.admtel.telephonyserver.asterisk.events.ASTAgiExecEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTAsyncAgiEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTChannelState;
@@ -902,6 +903,13 @@ public class ASTChannel extends Channel {
 		return result;
 	}
 
+	@Override
+	public void setCallingStationId(String callingStationId){
+		super.setCallingStationId(callingStationId);
+		ASTSetVariableCommand cmd = new ASTSetVariableCommand(this, "CALLERID(num)", callingStationId);
+		session.write(cmd.toString());
+	}
+	
 	@Override
 	public Result internalAnswer() {
 		ASTChannel.this.session

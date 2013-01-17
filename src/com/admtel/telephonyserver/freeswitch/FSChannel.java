@@ -45,6 +45,7 @@ import com.admtel.telephonyserver.freeswitch.commands.FSDialCommand;
 import com.admtel.telephonyserver.freeswitch.commands.FSMemberDeafCommand;
 import com.admtel.telephonyserver.freeswitch.commands.FSMemberMuteCommand;
 import com.admtel.telephonyserver.freeswitch.commands.FSQueueCommand;
+import com.admtel.telephonyserver.freeswitch.commands.FSSetVariableCommand;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelAnsweredEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelBridgeEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelCreateEvent;
@@ -781,6 +782,12 @@ public class FSChannel extends Channel {
 		return internalState.getResult();
 	}
 
+	@Override
+	public void setCallingStationId(String callingStationId){
+		super.setCallingStationId(callingStationId);
+		FSSetVariableCommand cmd = new FSSetVariableCommand(this, "effective_caller_id_number", callingStationId);
+		session.write(cmd.toString());
+	}
 	@Override
 	protected void processNativeEvent(Object event) {
 		
