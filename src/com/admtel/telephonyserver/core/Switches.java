@@ -101,6 +101,15 @@ public class Switches implements DefinitionChangeListener, EventListener {
 		return result;
 	}
 
+	public List<Channel> getWithOffsetAndCount(int offset, int count){
+		List<Channel> result = new ArrayList<Channel>(count);
+		ArrayList<Channel>tChannels = new ArrayList<Channel>();
+		tChannels.addAll(channels.values());
+		for (int i=0;i<count;i++){
+			result.add(tChannels.get(i+offset));
+		}
+		return result;
+	}
 	public Switch getByAddress(String address) {
 		if (address == null)
 			return null;

@@ -287,37 +287,29 @@ public class ASTChannel extends Channel {
 			switch (astEvent.getEventType()) {
 			case Dial: {
 				ASTDialEvent dialEvent = (ASTDialEvent) astEvent;
-				if (dialEvent.getDestinationChannel().equals(
-						ASTChannel.this.getId())) { // This is the outbound
-													// channel
-					Channel masterChannel = ASTChannel.this.getSwitch()
-							.getChannel(dialEvent.getChannelId());
-					if (masterChannel != null) {
-						if (masterChannel.getScript() != null){
-							masterChannel.getScript().addChannel(ASTChannel.this);
-						}
-						ASTChannel.this.setAcctUniqueSessionId(masterChannel
-								.getAcctUniqueSessionId());
-						ASTChannel.this.acctUniqueSessionId = masterChannel
-								.getAcctUniqueSessionId();
-						ASTChannel.this
-								.setUserName(masterChannel.getUserName());
-						ASTChannel.this.setServiceNumber(masterChannel
-								.getServiceNumber());
-						ASTChannel.this.getChannelData()
-								.setDestinationNumberIn(
-										masterChannel.getChannelData()
-												.getCalledNumber());
-						ASTChannel.this.getChannelData().setRemoteIP(
-								masterChannel.getChannelData().getLoginIP());
-
+				if (dialEvent.isBegin()) {
+					
+					Channel peerChannel = ASTChannel.this.getSwitch()
+							.getChannel(dialEvent.getPeerChannel());
+					if (peerChannel != null && peerChannel.getScript() != null){
+						peerChannel.getScript().addChannel(ASTChannel.this);
 					}
+					
 					internalState = new AlertingState();
-					ASTChannel.this.onEvent(new AlertingEvent(ASTChannel.this));
-				}
+					onEvent(new DialStartedEvent(peerChannel, ASTChannel.this));
+					onEvent(new AlertingEvent(ASTChannel.this));
+					
 
+				} else {
+					if (dialEvent.getDialStatus() != DialStatus.Answer) {
+						onEvent(new DialFailedEvent(ASTChannel.this,
+								dialEvent.getDialStatus()));
+					}
+				}
+		
 			}
 				break;
+
 			case NewChannel: {
 				ASTNewChannelEvent nce = (ASTNewChannelEvent) astEvent;
 				getChannelData().setCalledNumber(nce.getCalledNum());
@@ -355,7 +347,7 @@ public class ASTChannel extends Channel {
 					internalState = new IdleState();
 					break;
 				}
-
+		
 			}
 				break;
 			}
@@ -456,8 +448,8 @@ public class ASTChannel extends Channel {
 
 		public AlertingState() {
 			ASTChannel.this.setCallOrigin(CallOrigin.Outbound);
-			variableFetcher.fetch("adm_args", "CHANNEL(peerip)",
-					"DIALEDPEERNUMBER");
+//			variableFetcher.fetch("adm_args", "CHANNEL(peerip)",
+//					"DIALEDPEERNUMBER");
 		}
 
 		@Override
@@ -519,6 +511,7 @@ public class ASTChannel extends Channel {
 
 			}
 			switch (astEvent.getEventType()) {
+
 			case NewState: {
 				ASTNewStateEvent nse = (ASTNewStateEvent) astEvent;
 				switch (nse.getChannelState()) {
@@ -827,16 +820,16 @@ public class ASTChannel extends Channel {
 
 	protected SigProtocol channelProtocol = SigProtocol.Unknown;
 
-	protected void processNativeEvent(Object event) {
+	synchronized protected void processNativeEvent(Object event) {
 		
 		eventsQueue.add(event);
-		
+		log.debug(String
+				.format("Channel(%s)\nEvent (%s)\n CallState (%s)\n InternalState(%s)", this,
+						event, getCallState(), internalState.getClass()
+								.getSimpleName()));
 		if (event instanceof ASTEvent) {
 			ASTEvent astEvent = (ASTEvent) event;
-			log.debug(String
-					.format("START processing event (%s) state (%s), internalState(%s)",
-							astEvent, getCallState(), internalState.getClass()
-									.getSimpleName()));
+
 
 			switch (astEvent.getEventType()) {
 			case Hangup: {
@@ -848,34 +841,10 @@ public class ASTChannel extends Channel {
 				ASTChannel.this.onEvent(new DestroyEvent(this));
 			}
 				break;
-			case Dial: {
-				ASTDialEvent dialEvent = (ASTDialEvent) astEvent;
-				if (dialEvent.isBegin()) {
-					log.debug(String.format(
-							"DialedEvent form channel %s ---> %s",
-							dialEvent.getChannelId(),
-							dialEvent.getDestinationChannel()));
-					Channel dialedChannel = ASTChannel.this.getSwitch()
-							.getChannel(dialEvent.getDestinationChannel());
-					onEvent(new DialStartedEvent(ASTChannel.this, dialedChannel));
-				} else {
-					if (dialEvent.getDialStatus() != DialStatus.Answer) {
-						onEvent(new DialFailedEvent(ASTChannel.this,
-								dialEvent.getDialStatus()));
-					}
-				}
-
-			}
-				break;
 			}
 			if (internalState != null) {
 				internalState.processEvent(astEvent);
 			}
-
-			log.debug(String.format(
-					"END processing event (%s) state (%s), internalState(%s)",
-					astEvent, getCallState(), internalState.getClass()
-							.getSimpleName()));
 		}
 	}
 

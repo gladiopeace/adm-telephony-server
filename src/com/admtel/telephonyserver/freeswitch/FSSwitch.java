@@ -185,8 +185,8 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	@Override
 	public void processBasicIoMessage(BasicIoMessage message) {
-//		log.debug(String.format("Switch (%s) : \n%s",
-//				getSwitchId(), message.getMessage()));
+		log.debug(String.format("Switch (%s) : \n%s",
+				getSwitchId(), message.getMessage()));
 
 		switch (state) {
 		case LoggingIn:
@@ -199,9 +199,9 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 					FSCommandReplyEvent cre = (FSCommandReplyEvent) event;
 					if (cre.isSuccess()) {
 						FSSwitch.this.setStatus(SwitchStatus.Ready);
-						//session.write("event plain all"); // TODO, create new
+						session.write("event plain all"); // TODO, create new
 															// state to
-						session.write("event plain "+FSEvent.EVENTS_REPORT);
+						//session.write("event plain "+FSEvent.EVENTS_REPORT);
 						// check for return of event
 						// filter
 						state = State.LoggedIn;
