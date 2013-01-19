@@ -543,7 +543,13 @@ public abstract class Channel implements TimerNotifiable {
 					tAddress = location.getAddress(_switch);
 				}
 			}
-			String translatedAddress = _switch.getAddressTranslator().translate(AdmAddress.fromString(tAddress));
+			AdmAddress admAddress = AdmAddress.fromString(tAddress);
+			String translatedAddress = _switch.getAddressTranslator().translate(admAddress);
+			
+			getChannelData().setDialedNumber(admAddress.destination);
+			getChannelData().setDialedIP(admAddress.gateway);						
+			getChannelData().setDialedChannel(translatedAddress);
+			
 			if (translatedAddress == null) {
 				log.warn(String.format("Channel (%s) - invalid dial string (%s)", this,	address));
 				lastResult = Result.InvalidParameters;
@@ -601,6 +607,9 @@ public abstract class Channel implements TimerNotifiable {
 			break;
 		case Offered:
 			setupTime = new DateTime();
+			if (getAccountCode() == null){
+				getChannelData().setAccountCode(this.getUserName());
+			}
 			setCallState(CallState.Offered);
 			break;
 		case Linked:{
@@ -632,14 +641,24 @@ public abstract class Channel implements TimerNotifiable {
 				 * getChannelAddress());
 				 * 
 				 */
-				dse.getDialedChannel().setCalledStationId(getCalledStationId());
-				dse.getDialedChannel().setCallingStationId(getCallingStationId());
-				dse.getDialedChannel().setAcctUniqueSessionId(getAcctUniqueSessionId());
-				dse.getDialedChannel().setUserName(getUserName());
-				dse.getDialedChannel().getChannelData()	.setDestinationNumberIn(getChannelData().getCalledNumber());
-				dse.getDialedChannel().getChannelData()	.setRemoteIP(getLoginIP());
-				dse.getDialedChannel().getChannelData().setAccountCode(getChannelData().getAccountCode());
-				dse.getDialedChannel().setOtherChannel(this);
+				Channel dialingChannel = dse.getChannel();
+				Channel dialedChannel = dse.getDialedChannel();
+				if (dialingChannel.getChannelData().getDialedNumber() != null){
+					dialedChannel.setCalledStationId(dialingChannel.getChannelData().getDialedNumber());
+				}
+				else{
+					dialedChannel.setCalledStationId(dialingChannel.getCalledStationId());
+				}
+				dialedChannel.getChannelData().setDialedChannel(dialingChannel.getChannelData().getDialedChannel());
+				dialedChannel.getChannelData().setDialedIP(dialingChannel.getChannelData().getDialedIP());
+				dialedChannel.setCallingStationId(dialingChannel.getCallingStationId());
+				
+				dialedChannel.setAcctUniqueSessionId(dialingChannel.getAcctUniqueSessionId());
+				dialedChannel.setUserName(dialingChannel.getUserName());
+				dialedChannel.getChannelData().setDestinationNumberIn(dialingChannel.getChannelData().getCalledNumber());
+				dialedChannel.getChannelData().setRemoteIP(dialingChannel.getLoginIP());
+				dialedChannel.getChannelData().setAccountCode(dialingChannel.getChannelData().getAccountCode());
+				dialedChannel.setOtherChannel(dialingChannel);
 			}
 		}
 			break;
@@ -647,6 +666,9 @@ public abstract class Channel implements TimerNotifiable {
 			AlertingEvent ie = (AlertingEvent) e;
 			setCallState(CallState.Alerting);
 			setupTime = new DateTime();
+			if (getAccountCode() == null){
+				getChannelData().setAccountCode(this.getUserName());
+			}
 		}
 			break;
 		case Disconnected: {
@@ -732,7 +754,8 @@ public abstract class Channel implements TimerNotifiable {
 	@Override
 	public String toString() {
 		return "Channel [" + (id != null ? "id=" + id + ", " : "")
-				+ (uniqueId != null ? "uniqueId=" + uniqueId : "") + "]";
+				+ (uniqueId != null ? "uniqueId=" + uniqueId + ", " : "")
+				+ (callOrigin != null ? "callOrigin=" + callOrigin : "") + "]";
 	}
 
 	public String getDetailedDump() {

@@ -147,6 +147,13 @@ public class FSChannel extends Channel {
 				internalState = new ConnectedState();
 				FSChannel.this.onEvent(new ConnectedEvent(FSChannel.this));
 				break;
+			case ChannelState:
+				FSChannelStateEvent cse = (FSChannelStateEvent) fsEvent;
+				if (cse.getCallState() == FSChannelStateEvent.CallState.ACTIVE){
+					internalState = new ConnectedState();
+					FSChannel.this.onEvent(new ConnectedEvent(FSChannel.this));					
+				}
+				break;
 			}
 		}
 
@@ -169,6 +176,14 @@ public class FSChannel extends Channel {
 				internalState = new ConnectedState();
 				FSChannel.this.onEvent(new ConnectedEvent(FSChannel.this));
 				break;
+			case ChannelState:
+				FSChannelStateEvent cse = (FSChannelStateEvent) fsEvent;
+				if (cse.getCallState() == FSChannelStateEvent.CallState.ACTIVE){
+					internalState = new ConnectedState();
+					FSChannel.this.onEvent(new ConnectedEvent(FSChannel.this));					
+				}
+				break;
+				
 			}
 		}
 
@@ -245,7 +260,12 @@ public class FSChannel extends Channel {
 				String admArgs = cde.getValue("variable_adm_args");
 				getChannelData().addDelimitedVars(admArgs, "&");
 				String sipReqParams = cde.getValue("variable_sip_req_params");
-				getChannelData().setAccountCode(cde.getValue("variable_accountcode"));
+				
+				String accountCode = cde.getValue("variable_accountcode");
+				if (accountCode != null){
+					getChannelData().setAccountCode(accountCode);	
+				}
+				
 				getChannelData().addDelimitedVars(
 						CodecsUtils.urlDecode(sipReqParams), ";");
 			}
@@ -260,6 +280,7 @@ public class FSChannel extends Channel {
 				FSChannel masterChannel = (FSChannel) FSChannel.this.get_switch().getChannel(cce.getPeerChannel());
 				if (masterChannel != null && masterChannel.getScript() != null){
 					masterChannel.getScript().addChannel(FSChannel.this);
+					FSChannel.this.onEvent(new DialStartedEvent(masterChannel, FSChannel.this));
 				}
 			}
 				break;
@@ -789,7 +810,7 @@ public class FSChannel extends Channel {
 		session.write(cmd.toString());
 	}
 	@Override
-	protected void processNativeEvent(Object event) {
+	synchronized protected void processNativeEvent(Object event) {
 		
 		eventsQueue.add(event);
 		
@@ -824,17 +845,23 @@ public class FSChannel extends Channel {
 				if (sse.getChannelState() == ChannelState.CS_DESTROY) {
 					onEvent(new DestroyEvent(this));
 				}
+				else if (sse.getChannelState() == ChannelState.CS_HANGUP){
+					onEvent(new DisconnectedEvent(this, DisconnectCode.Normal));
+				}
 			}
 				break;
-			case ChannelOriginate: {
-				FSChannelOriginateEvent coe = (FSChannelOriginateEvent) fsEvent;
-				FSChannel otherChannel = (FSChannel) getSwitch().getChannel(
-						coe.getPeerChannel());
-
-				onEvent(new DialStartedEvent(this, otherChannel));
-
-			}
-				break;
+//			case ChannelOriginate: {
+//				FSChannelOriginateEvent coe = (FSChannelOriginateEvent) fsEvent;
+//				FSChannel otherChannel = (FSChannel) getSwitch().getChannel(
+//						coe.getPeerChannel());
+//				if (otherChannel == null){
+//					otherChannel = new FSChannel(this._switch,
+//							coe.getPeerChannel(), this.session);
+//				}
+//				onEvent(new DialStartedEvent(this, otherChannel));
+//
+//			}
+//				break;
 			case ChannelBridge: {
 				FSChannelBridgeEvent cbe = (FSChannelBridgeEvent) fsEvent;
 				FSChannel otherChannel = (FSChannel) getSwitch().getChannel(

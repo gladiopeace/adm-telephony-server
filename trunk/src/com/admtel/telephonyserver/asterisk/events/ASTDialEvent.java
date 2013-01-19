@@ -10,9 +10,15 @@ public class ASTDialEvent extends ASTChannelEvent {
 		super(switchId, values);
 		eventType = EventType.Dial;
 	}
-	public String getDestinationChannel(){
-		if (values.containsKey("Destination")){
-			return values.get("Destination");
+	public String getChannelId(){
+		String channelId = values.get("Destination");
+		if (channelId == null) return "";
+		return channelId;
+	}
+
+	public String getPeerChannel(){
+		if (values.containsKey("Channel")){
+			return values.get("Channel");
 		}
 		return "";
 	}
@@ -53,8 +59,8 @@ public class ASTDialEvent extends ASTChannelEvent {
 	@Override
 	public String toString() {
 		return "ASTDialEvent ["
-				+ (getDestinationChannel() != null ? "getDestinationChannel()="
-						+ getDestinationChannel() + ", " : "")
+				+ (getPeerChannel() != null ? "getPeerChannel()="
+						+ getPeerChannel() + ", " : "")
 				+ "isBegin()="
 				+ isBegin()
 				+ ", "

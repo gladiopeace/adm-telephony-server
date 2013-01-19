@@ -14,6 +14,29 @@ public class ChannelData extends VariableMap {
 	public final static String LOGIN_IP_HOST = "Login-IP-Host";
 	public final static String DESTINATION_NUMBER_IN="DESTINATION_NUMBER_IN";
 	private static final String ACCOUNT_CODE = "ACCOUNT_CODE";
+	private static final String DIALED_CHANNEL = "DIALED_CHANNEL";
+	private static final String DIALED_NUMBER = "DIALED_NUMBER";
+	private static final String DIALED_IP = "DIALED_IP";
+	
+	
+	public void setDialedChannel(String dialedChannel){
+		addVariable(DIALED_CHANNEL, dialedChannel);
+	}
+	public String getDialedChannel(){
+		return getVariable(DIALED_CHANNEL);
+	}
+	public void setDialedNumber(String dialedNumber){
+		addVariable(DIALED_NUMBER, dialedNumber);
+	}
+	public String getDialedNumber(){
+		return getVariable(DIALED_NUMBER);
+	}
+	public void setDialedIP(String dialedIP){
+		addVariable(DIALED_IP, dialedIP);
+	}
+	public String getDialedIP(){
+		return getVariable(DIALED_IP);
+	}
 	
 	public void setCallerIdName(String callerIdName){
 		addVariable(CALLER_ID_NAME, callerIdName);

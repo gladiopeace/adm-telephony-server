@@ -201,7 +201,7 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 	@Override
 	public void processBasicIoMessage(BasicIoMessage message) {
 		
-		log.debug(String.format("Switch (%s) : \n%s",
+		log.trace(String.format("Switch (%s) : \n%s",
 				ASTSwitch.this.getSwitchId(), message.getMessage()));
 
 		switch (state) {
@@ -251,19 +251,9 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 					}
 				}
 					break;
-				case Dial: {
-					ASTDialEvent dialEvent = (ASTDialEvent) event;
-					ASTChannel peerChannel = (ASTChannel) ASTSwitch.this
-							.getChannel(dialEvent.getDestinationChannel());
-					if (peerChannel != null) {
-						peerChannel.putMessage(event);
-					}
-
 				}
-					break;
-				}
+				
 				if (event instanceof ASTChannelEvent) {
-					log.debug(event);
 					ASTChannelEvent channelEvent = (ASTChannelEvent) event;
 					ASTChannel channel = (ASTChannel) ASTSwitch.this
 							.getChannel(channelEvent.getChannelId());
