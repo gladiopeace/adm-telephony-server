@@ -13,7 +13,6 @@ public class ChannelData extends VariableMap {
 	public final static String GW_ID="GW_ID";
 	public final static String LOGIN_IP_HOST = "Login-IP-Host";
 	public final static String DESTINATION_NUMBER_IN="DESTINATION_NUMBER_IN";
-	private static final String ACCOUNT_CODE = "ACCOUNT_CODE";
 	private static final String DIALED_CHANNEL = "DIALED_CHANNEL";
 	private static final String DIALED_NUMBER = "DIALED_NUMBER";
 	private static final String DIALED_IP = "DIALED_IP";
@@ -96,12 +95,5 @@ public class ChannelData extends VariableMap {
 	}
 	public String getDestinationNumberIn() {
 		return getVariable(DESTINATION_NUMBER_IN);
-	}
-	public void setAccountCode(String accountCode) {
-		addVariable(ACCOUNT_CODE, accountCode);
-		
-	}
-	public String getAccountCode() {
-		return getVariable(ACCOUNT_CODE);
 	}
 }

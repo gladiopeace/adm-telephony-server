@@ -92,6 +92,7 @@ public abstract class Channel implements TimerNotifiable {
 
 	protected String acctUniqueSessionId;
 	protected Integer h323DisconnectCause = 16;// normal call clearing
+	protected String accountCode;
 
 	protected String baseDirectory = SystemConfig.getInstance().serverDefinition.getBaseDirectory();
 
@@ -608,7 +609,7 @@ public abstract class Channel implements TimerNotifiable {
 		case Offered:
 			setupTime = new DateTime();
 			if (getAccountCode() == null){
-				getChannelData().setAccountCode(this.getUserName());
+				setAccountCode(this.getUserName());
 			}
 			setCallState(CallState.Offered);
 			break;
@@ -657,7 +658,7 @@ public abstract class Channel implements TimerNotifiable {
 				dialedChannel.setUserName(dialingChannel.getUserName());
 				dialedChannel.getChannelData().setDestinationNumberIn(dialingChannel.getChannelData().getCalledNumber());
 				dialedChannel.getChannelData().setRemoteIP(dialingChannel.getLoginIP());
-				dialedChannel.getChannelData().setAccountCode(dialingChannel.getChannelData().getAccountCode());
+				dialedChannel.setAccountCode(dialingChannel.getAccountCode());
 				dialedChannel.setOtherChannel(dialingChannel);
 			}
 		}
@@ -666,9 +667,6 @@ public abstract class Channel implements TimerNotifiable {
 			AlertingEvent ie = (AlertingEvent) e;
 			setCallState(CallState.Alerting);
 			setupTime = new DateTime();
-			if (getAccountCode() == null){
-				getChannelData().setAccountCode(this.getUserName());
-			}
 		}
 			break;
 		case Disconnected: {
@@ -839,7 +837,7 @@ public abstract class Channel implements TimerNotifiable {
 	}
 
 	public String getAccountCode() {
-		return getChannelData().getAccountCode();
+		return this.accountCode;
 	}
 
 	public void putMessage(Object message) {
@@ -911,6 +909,9 @@ public abstract class Channel implements TimerNotifiable {
 	public void setData(String key, String value){
 		getChannelData().put(key, value);
 	}
-	
+
+	public void setAccountCode(String accountCode){
+		this.accountCode = accountCode;
+	}
 }
 

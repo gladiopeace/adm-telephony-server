@@ -1,10 +1,19 @@
 <#import "common.ftl" as com>
 <#escape x as x?html>
-
+<#import "pagination.ftl" as pagination />
+<#setting url_escaping_charset='ISO-8859-1'>
 <@com.page title="Channels">
   <#if channels?size = 0>
     <p>No channels.</p>
   <#else>    
+  	<nav style="float:right;">
+        <@pagination.first />
+        <@pagination.previous />
+        <@pagination.numbers />
+        <@pagination.next />
+        <@pagination.last />
+    </nav>
+    <@pagination.counter />
     <table border=0 cellspacing=2 cellpadding=2 width="100%">
       <tr align=center valign=top>
         <th bgcolor="#C0C0C0">Id</th>  
@@ -28,12 +37,7 @@
           <td bgcolor="#A0A0A0">${c.mediaState}</td>
           <td bgcolor="#A0A0A0">${c.setupTime?default("")}</td>
           <td bgcolor="#A0A0A0">${c.answerTime?default("")}</td>
-           <td bgcolor="#A0A0A0">${c.getChannelData()['UserName']?default("")}</td>
-          <td bgcolor="#E0E0E0"><form action="webconf" method="get" enctype="application/x-www-form-urlencoded"><input name="destination" type="text" id="destination" />
-            <label>
-              <input type="text" name="timeout" id="timeout">
-            </label>
-            <input name="dial" type="submit" value="Dial" id="dial" /><input name="action" type="hidden" value="dial" id="action" /><input name="channel" type="hidden" value="${c.uniqueId}" id="channel" /></form><form action="webconf" method="get" enctype="application/x-www-form-urlencoded" name="hangup"><input name="channel" type="hidden" value="${c.uniqueId}" id="channel" /><input name="action" type="hidden" value="hangup" id="action" /><input name="Submit" type="submit" value="Hangup" /></form>
+          <td bgcolor="#A0A0A0">${c.accountCode?default("")}</td>
       </#list>
     </table>
   </#if>
