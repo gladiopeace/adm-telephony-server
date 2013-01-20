@@ -61,6 +61,7 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			}
 		}
 	}
+	/////////////////////////////////////////////////////////////////////////////////////////
 	public void remove(Switch _switch){
 		if (_switch != null){
 			synchronized (this){
@@ -69,7 +70,7 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			}
 		}
 	}
-	
+	/////////////////////////////////////////////////////////////////////////////////////////	
 	private void addToStopped(Switch _switch){
 		if (_switch != null){
 			synchronized(this){
@@ -77,6 +78,7 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			}
 		}
 	}
+	/////////////////////////////////////////////////////////////////////////////////////////	
 	private void removeFromStopped(Switch _switch){
 		if (_switch != null){
 			synchronized (this){
@@ -84,7 +86,7 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			}
 		}
 	}
-
+	/////////////////////////////////////////////////////////////////////////////////////////
 	public Collection<Switch> getAll() {
 		Collection<Switch> switches = new ArrayList<Switch>();
 		for (Switch _switch:idMap.values()){
@@ -94,22 +96,30 @@ public class Switches implements DefinitionChangeListener, EventListener {
 		}
 		return switches;
 	}
-
+	/////////////////////////////////////////////////////////////////////////////////////////
 	public List<Channel> getAllChannels() {
 		List<Channel> result = new ArrayList<Channel>();
 		result.addAll(channels.values());
 		return result;
 	}
-
+	/////////////////////////////////////////////////////////////////////////////////////////
 	public List<Channel> getWithOffsetAndCount(int offset, int count){
 		List<Channel> result = new ArrayList<Channel>(count);
 		ArrayList<Channel>tChannels = new ArrayList<Channel>();
 		tChannels.addAll(channels.values());
+		int size = channels.size();
+		
 		for (int i=0;i<count;i++){
+			if ((i+offset) >= size) break;
 			result.add(tChannels.get(i+offset));
 		}
 		return result;
 	}
+	/////////////////////////////////////////////////////////////////////////////////////////
+	public int getChannelCount(){
+		return channels.size();
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////	
 	public Switch getByAddress(String address) {
 		if (address == null)
 			return null;
@@ -117,7 +127,7 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			return addressMap.get(address);
 		}
 	}
-
+	/////////////////////////////////////////////////////////////////////////////////////////
 	public Switch getById(String id) {
 		if (id == null)
 			return null;
@@ -125,7 +135,7 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			return idMap.get(id);
 		}
 	}
-
+	/////////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	public void definitionAdded(DefinitionInterface definition) {
 		if (definition instanceof SwitchDefinition) {
@@ -190,7 +200,7 @@ public class Switches implements DefinitionChangeListener, EventListener {
 		}
 
 	}
-
+	/////////////////////////////////////////////////////////////////////////////////////////
 	public Switch getRandom() {
 		Collection<Switch> switches = getAll();
 		int index = rnd.nextInt(switches.size());
@@ -201,7 +211,7 @@ public class Switches implements DefinitionChangeListener, EventListener {
 		}
 		return null;
 	}
-	
+	/////////////////////////////////////////////////////////////////////////////////////////	
 	public Switch getLeastUsed() {
 		Switch leastUsed = null;
 		Collection<Switch> switches = getAll();
@@ -220,58 +230,11 @@ public class Switches implements DefinitionChangeListener, EventListener {
 		}
 		return leastUsed;
 	}
-	
-	public Switch getSwitchByStatus() {
-		Collection<Switch> switches = getAll();
-		int index = switches.size() -1;
-		for (Switch _switch : switches) {
-			if (index < 0){
-				return null;
-			}else{
-				if (_switch.getStatus() == SwitchStatus.Ready){
-					return _switch;	
-				}					
-			}
-			index--;
-		}
-		return null;
-	}
-	
-	public Switch getSwitchBySwitchDefinition() {
-		Collection<Switch> switches = getAll();
-		int index = switches.size() -1;
-		for (Switch _switch : switches) {
-			if (index < 0){
-				return null;
-			}else{
-				if (_switch.getDefinition().isEnabled()){
-					return _switch;	
-				}					
-			}
-			index--;
-		}
-		return null;
-	}
-	
-	public Switch getLoad() {
-		Collection<Switch> switches = getAll();
-		int index = switches.size() -1;
-		for (Switch _switch : switches) {
-			if (index < 0){
-				return null;
-			}else{
-				if (_switch.getAllChannels().size() == 0){
-				return _switch;	
-				}					
-			}
-			index--;
-		}
-		return null;
-	}
-
+	/////////////////////////////////////////////////////////////////////////////////////////
 	public Channel getChannelById(String id){
 		return channels.get(id);
 	}
+	/////////////////////////////////////////////////////////////////////////////////////////	
 	public void processRequest(Request request) {
 		if (request instanceof ChannelRequest) {
 			ChannelRequest channelRequest = (ChannelRequest) request;
@@ -293,21 +256,21 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			}
 		}
 	}
-
+	/////////////////////////////////////////////////////////////////////////////////////////
 	private void addChannel(Channel channel) {
 		if (channel != null) {
 			synchronizedChannels.put(channel.getUniqueId(), channel);
 			log.debug(String.format("Switches : Added channel %s", channel));
 		}
 	}
-
+	/////////////////////////////////////////////////////////////////////////////////////////
 	private void removeChannel(Channel channel) {
 		if (channel == null)
 			return;
 		synchronizedChannels.remove(channel.getUniqueId());
 		log.debug(String.format("Switches : Removed channel %s", channel));
 	}
-
+	/////////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	public boolean onEvent(Event event) {
 		switch (event.getEventType()) {

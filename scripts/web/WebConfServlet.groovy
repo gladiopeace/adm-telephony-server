@@ -89,9 +89,16 @@ class WebConfServlet extends AdmServlet {
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def channels(request, response){
-		List<Channel> channels =  Switches.getInstance().getAllChannels();
-		def root =["channels":channels]
-		println request.getParameter("action")
+		def page = request.getParameter("page")
+		if (!page) page = 0
+		else
+		 page = page as int
+		List<Channel> channels =  Switches.getInstance().getWithOffsetAndCount(page*10,10)
+		int totalChannels = Switches.getInstance().getChannelCount()
+		int pagesAvailable = totalChannels/10 + ((totalChannels%10)>0?1:0)
+		def root =["channels":channels, 
+			"paginationData":["pageNumber":1,"pageSize":10, "pagesAvailable":pagesAvailable, 
+				"sortDirection":"ascending", "sortField":"channels"]]		
 		return root
 	}
 	
@@ -147,6 +154,7 @@ class WebConfServlet extends AdmServlet {
 			def session = getSession(sessionId)
 			if(session){
 				action = request.getParameter("action")
+				if (!action) action = request.getParameter("field") //for pagination, we send the action in the field
 				if (!(action?.length()>0)){
 					action = 'index'
 				}		

@@ -221,7 +221,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 						message.getMessage());
 				
 				if (event != null) {
-					log.trace(event);
+					//log.trace(event);
 				}
 				else{
 					//log.warn("Event is null");

@@ -263,7 +263,7 @@ public class FSChannel extends Channel {
 				
 				String accountCode = cde.getValue("variable_accountcode");
 				if (accountCode != null){
-					getChannelData().setAccountCode(accountCode);	
+					setAccountCode(accountCode);	
 				}
 				
 				getChannelData().addDelimitedVars(
@@ -293,7 +293,7 @@ public class FSChannel extends Channel {
 					getChannelData().setCallerIdName(cse.getCallerIdNum());
 					getChannelData().setUserName(cse.getUserName());
 					getChannelData().setLoginIP(cse.getChannelAddress());
-					getChannelData().setAccountCode(cse.getAccountCode());
+					//setAccountCode(cse.getAccountCode());
 					getChannelData().setServiceNumber(cse.getCalledIdNum());
 					switch (cse.getDirection()) {
 					case Inbound:
