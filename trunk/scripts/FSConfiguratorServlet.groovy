@@ -34,7 +34,7 @@ class FSConfiguratorServlet extends AdmServlet {
 				section(name:"directory"){
 					domain(name:mDomain){
 						params{
-							param(name:"dial-string", value:'{presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(${dialed_user}@${dialed_domain})}')
+							param(name:"dial-string", value:'{presence_id=${mUser}@${mDomain}}${sofia_contact(${mUser}@${mDomain})}')
 						}
 						groups{
 							group(name:"default"){
@@ -45,6 +45,7 @@ class FSConfiguratorServlet extends AdmServlet {
 										}
 										variables{
 											variable(name:'accountcode', value:u.getAccount())
+											variable(name:'effective_caller_id_number', value:u.getCallerId())
 										}
 									}
 								}

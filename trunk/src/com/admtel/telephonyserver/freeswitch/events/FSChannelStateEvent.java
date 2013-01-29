@@ -13,7 +13,7 @@ public class FSChannelStateEvent extends FSChannelEvent {
 	}
 
 	public enum ChannelState{CS_NEW, CS_INIT, CS_ROUTING, CS_EXECUTE, CS_CONSUME_MEDIA, CS_HIBERNATE, CS_EXCHANGE_MEDIA, CS_HANGUP, CS_REPORTING, CS_DESTROY};
-	public enum CallState{DOWN, RINGING, ACTIVE, HANGUP};
+	public enum CallState{DOWN, RINGING, ACTIVE, HANGUP, EARLY};
 	
 	
 	ChannelState channelState;
