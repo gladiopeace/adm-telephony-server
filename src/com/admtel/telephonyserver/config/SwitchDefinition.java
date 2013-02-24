@@ -12,6 +12,8 @@ public class SwitchDefinition implements DefinitionInterface {
 	SwitchType switchType;
 	String addressTranslatorClass;
 	boolean enabled;
+	
+	private String id;
 
 	Map<String, String> features = new HashMap<String, String>();
 	Map<String, String> parameters = new HashMap<String, String>();
@@ -25,7 +27,10 @@ public class SwitchDefinition implements DefinitionInterface {
 
 	@Override
 	public String getId() {
-		return String.format("%s:%d", address, port);
+		if (id == null){
+			id = String.format("%s:%d", address, port);; 
+		}
+		return id;
 	}
 
 	public String getName() {
