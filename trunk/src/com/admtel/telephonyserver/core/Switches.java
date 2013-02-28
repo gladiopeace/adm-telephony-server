@@ -148,6 +148,10 @@ public class Switches implements DefinitionChangeListener, EventListener {
 						.getId()));
 				return;
 			}
+			if (getByAddress(((SwitchDefinition) definition).getAddress()) != null){
+				log.error(String.format("Failed to add switch (%s) because of duplicate IP (%s)", ((SwitchDefinition) definition).getName(), ((SwitchDefinition) definition).getAddress()));
+				return;
+			}
 			if (!switchDefinition.isEnabled()){
 				log.debug(String.format("Switch %s, not enabled", definition.getId()));
 				return;

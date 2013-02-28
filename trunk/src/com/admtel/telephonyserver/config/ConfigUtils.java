@@ -22,8 +22,12 @@ public class ConfigUtils {
 				result.put(key, value);
 				counter++;
 			}
-		} catch (Exception e) {
-			log.error(e.getMessage());
+		}
+		catch (IllegalArgumentException e1){
+			
+		}
+		catch (Exception e) {
+			log.error(e.getMessage());			
 		}
 		return result;
 
@@ -43,9 +47,13 @@ public class ConfigUtils {
 				result.put(key, value);
 				counter++;
 			}
-		} catch (Exception e) {
-
+		} catch (IllegalArgumentException e1){
+			
 		}
+		catch (Exception e) {
+			log.error(e.getMessage());			
+		}
+
 		return result;
 
 	}

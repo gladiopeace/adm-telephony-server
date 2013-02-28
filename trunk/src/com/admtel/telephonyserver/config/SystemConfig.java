@@ -12,6 +12,9 @@ import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.log4j.Logger;
 
+import com.admtel.telephonyserver.core.Switch;
+import com.admtel.telephonyserver.core.Switches;
+
 public class SystemConfig {
 
 	private static final String CONFIG_XML = "config.xml";
@@ -226,8 +229,9 @@ public class SystemConfig {
 							catch (Exception e){
 								log.warn(e.getMessage());
 							}
-					
-					futureDefinitions.put(definition.getId(), definition);
+					if (definition.isEnabled()){
+						futureDefinitions.put(definition.getId(), definition);
+					}
 				} else {
 					return;
 				}
