@@ -16,7 +16,12 @@ public class DefaultFSAddressTranslator implements AddressTranslator {
 			switch (address.getProtocol()){
 			case SIP:
 				if (address.getGateway() != null){
-					result = String.format("sofia/internal/%s@%s", address.getDestination(), address.getGateway());
+					if (address.getGateway().contains(".")){ //Address is a domain
+						result = String.format("sofia/internal/%s@%s", address.getDestination(), address.getGateway());
+					}
+					else{ //Address is the name of a gateway
+						result = String.format("sofia/gateway/%s/%s",address.getGateway(), address.getDestination());
+					}
 				}
 				else{
 					result = String.format("sofia/internal/%s", address.getDestination()+"%");
