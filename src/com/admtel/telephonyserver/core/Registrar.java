@@ -23,7 +23,7 @@ public class Registrar implements DefinitionChangeListener, RegistrarInterface,
 	Boolean enabled;
 
 	private Registrar() {
-
+        EventsManager.getInstance().addEventListener("Registrar", this);
 	}
 
 	private static class SingletonHolder {
@@ -65,7 +65,12 @@ public class Registrar implements DefinitionChangeListener, RegistrarInterface,
 		return null;
 	}
 
-	@Override
+    @Override
+    public Collection<UserLocation> get() {
+        return registrar.get();
+    }
+
+    @Override
 	public void register(UserLocation userLocation) {
 		if (registrar != null) {
 			log.trace(String.format("User (%s) registered", userLocation.getUsername()));
@@ -82,7 +87,7 @@ public class Registrar implements DefinitionChangeListener, RegistrarInterface,
 	}
 
 	@Override
-	public Collection<UserLocation> get(long start, long limit) {
+	public Collection<UserLocation> get(int start, int limit) {
 		return registrar.get(start, limit);
 	}
 

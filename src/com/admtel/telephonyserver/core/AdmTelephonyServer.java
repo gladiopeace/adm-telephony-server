@@ -123,8 +123,6 @@ public class AdmTelephonyServer {
 				"ConferenceManager_Singleton", ConferenceManager.getInstance());
 		EventsManager.getInstance().addEventListener("Switches_Singleton",
 				Switches.getInstance());
-		EventsManager.getInstance().addEventListener("Registrar_instance",
-				Registrar.getInstance());
 
 		sysConfig.addDefinitionChangeListener(Switches.getInstance());
 		sysConfig.addDefinitionChangeListener(SwitchListeners.getInstance());
