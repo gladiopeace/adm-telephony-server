@@ -99,7 +99,8 @@ public abstract class Channel implements TimerNotifiable {
 	protected Locale language;
 
 	private String conferenceId;
-	
+
+    //For debugging purposes, keep the events in a queue for later dump
 	protected LimitedQueue eventsQueue = new LimitedQueue(20);
 	protected Script script;
 	
@@ -579,7 +580,8 @@ public abstract class Channel implements TimerNotifiable {
 		if (e == null)
 			return true;
 		log.trace(String.format("onEvent: %s", e));
-		
+
+        //Add event for dump queue
 		eventsQueue.add(e);
 		
 		switch (e.getEventType()) {

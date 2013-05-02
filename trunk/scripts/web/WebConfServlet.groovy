@@ -84,6 +84,10 @@ class WebConfServlet extends AdmServlet {
 		log.trace("Users with request params : " + params)
 		if (!params.max) params.max = 25 
 		if (!params.offset) params.offset = 0
+        def result = Registrar.instance.get()
+        log.trace(result.size() +", content:" + result.each{
+            it
+        })
 		['page':'users.ftl', users:Registrar.getInstance().get(params.offset, params.max)]
 	}
 	

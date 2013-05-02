@@ -199,9 +199,9 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 					FSCommandReplyEvent cre = (FSCommandReplyEvent) event;
 					if (cre.isSuccess()) {
 						FSSwitch.this.setStatus(SwitchStatus.Ready);
-						//session.write("event plain all"); // TODO, create new
+						session.write("event plain all"); // TODO, create new
 															// state to
-						session.write("event plain "+FSEvent.EVENTS_REPORT);
+						//session.write("event plain "+FSEvent.EVENTS_REPORT);
 						// check for return of event
 						// filter
 						state = State.LoggedIn;
