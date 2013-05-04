@@ -8,12 +8,11 @@ import java.util.List;
 
 import com.admtel.telephonyserver.acd.AcdAgent;
 import com.admtel.telephonyserver.acd.AcdQueue;
-import com.admtel.telephonyserver.requests.DialRequest;
 
 public interface AcdService {
 	public boolean queueChannel(String queueName, String channelId, Date setupDate, int priority);	
 	
-	public List<DialRequest> getNextDial();
+	//public List<DialRequest> getNextDial();
 
 	public void callerDisconnected(String channelId);
 	public void agentDialStarted(String agentId, String channelId);

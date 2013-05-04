@@ -10,5 +10,5 @@ public enum Result {
 	InvalidConference, 
 	InvalidParticipant, 
 	UserNotFound, 
-	ChannelInvalidMediaState,
+	ChannelInvalidMediaState, InvalidResource, InvalidAddress,
 	}

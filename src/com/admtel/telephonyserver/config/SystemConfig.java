@@ -31,8 +31,6 @@ public class SystemConfig {
 
 	private static final String SCRIPTFACTORIES_SCRIPTFACTORY_D = "scriptfactories.scriptfactory(%d)";
 
-	private static final String CLI_LISTENERS_CLI_LISTENER_D = "cli-listeners.cli-listener(%d)";
-
 	private static final String PATH = "path";
 
 	private static final String CLASS = "class";
@@ -312,32 +310,6 @@ public class SystemConfig {
 		}
 	}
 
-	public void loadCLI_ListenersDefinition() {
-		int counter = 0;
-		SubnodeConfiguration subnode;
-		while (true) {
-			try {
-				subnode = config.configurationAt(String.format(
-						CLI_LISTENERS_CLI_LISTENER_D, counter));
-				if (subnode != null) {
-					CLI_ListenerDefinition definition = new CLI_ListenerDefinition();
-					definition.setAddress(subnode.getString(ADDRESS));
-					definition.setPort(subnode.getInt(PORT));
-					definition.setUsername(subnode.getString(USERNAME));
-					definition.setPassword(subnode.getString(PASSWORD));
-					futureDefinitions.put(definition.getId(), definition);
-				} else {
-					return;
-				}
-			} catch (Exception e) {
-				log.warn(e.getMessage());
-				return;
-			}
-			counter++;
-
-		}
-	}
-
 	public void loadScriptFactoriesDefinition() {
 		int counter = 0;
 		SubnodeConfiguration subnode;
@@ -450,7 +422,6 @@ public class SystemConfig {
 		futureDefinitions.clear();
 		loadServerDefinition();
 		loadSwitchListenersDefinition();
-		loadCLI_ListenersDefinition();
 		loadScriptFactoriesDefinition();
 		loadSwitchesDefinition();
 		loadScriptFactoriesDefinition();

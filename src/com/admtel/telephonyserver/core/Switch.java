@@ -13,9 +13,6 @@ import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.SwitchDefinition;
 import com.admtel.telephonyserver.events.DisconnectCode;
 import com.admtel.telephonyserver.interfaces.AddressTranslator;
-import com.admtel.telephonyserver.requests.ChannelRequest;
-import com.admtel.telephonyserver.requests.Request;
-import com.admtel.telephonyserver.requests.SwitchRequest;
 
 public abstract class Switch {
 
@@ -39,8 +36,6 @@ public abstract class Switch {
 		public void onMessage(Object message) {			
 			if (message instanceof BasicIoMessage) {
 				Switch.this.processBasicIoMessage((BasicIoMessage) message);
-			} else if (message instanceof Request) {
-				Switch.this.processRequest((Request) message);
 			}
 		}
 	};
@@ -157,15 +152,7 @@ public abstract class Switch {
 		return addressTranslator;
 	}
 
-	final public void processRequest(Request request) {
-	}
-
 	abstract public void processBasicIoMessage(BasicIoMessage message);
-
-	public void putMessage(SwitchRequest request) {
-		messageHandler.putMessage(request);
-
-	}
 
 	public boolean isAcceptingCalls() {
 		return definition.isEnabled() && status == SwitchStatus.Ready;

@@ -3,6 +3,9 @@ package com.admtel.telephonyserver.freeswitch;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 
+import com.admtel.telephonyserver.config.SwitchListenerDefinition;
+import com.admtel.telephonyserver.config.SwitchType;
+import com.admtel.telephonyserver.core.*;
 import org.apache.log4j.Logger;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoHandler;
@@ -17,15 +20,6 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import com.admtel.telephonyserver.asterisk.ASTSwitch;
 import com.admtel.telephonyserver.asterisk.events.ASTEvent.EventType;
 import com.admtel.telephonyserver.config.SwitchDefinition;
-import com.admtel.telephonyserver.core.BasicIoMessage;
-import com.admtel.telephonyserver.core.EventsManager;
-import com.admtel.telephonyserver.core.QueuedMessageHandler;
-import com.admtel.telephonyserver.core.Registrar;
-import com.admtel.telephonyserver.core.Result;
-import com.admtel.telephonyserver.core.SimpleMessageHandler;
-import com.admtel.telephonyserver.core.Switch;
-import com.admtel.telephonyserver.core.Timers;
-import com.admtel.telephonyserver.core.CallOrigin;
 import com.admtel.telephonyserver.core.Switch.SwitchStatus;
 import com.admtel.telephonyserver.core.Timers.Timer;
 import com.admtel.telephonyserver.events.RegisteredEvent;
@@ -41,9 +35,9 @@ import com.admtel.telephonyserver.freeswitch.events.FSEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSRegisterEvent;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.registrar.UserLocation;
-import com.admtel.telephonyserver.requests.Request;
 import com.admtel.telephonyserver.utils.AdmUtils;
 import com.admtel.telephonyserver.utils.CodecsUtils;
+import java.util.List;
 
 public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 
@@ -96,8 +90,21 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 	@Override
 	public Result originate(String destination, long timeout, String callerId,
 			String calledId, String script, String data) {
-		// TODO Auto-generated method stub
-		return null;
+        AdmAddress admAddress = AdmAddress.fromString(destination);
+        if (admAddress == null){
+        	return Result.InvalidAddress;
+        }
+        String dialStr = getAddressTranslator().translate(admAddress);
+        List<SwitchListener> listeners = SwitchListeners.getInstance().getBySwitchType(SwitchType.Freeswitch);
+        if (listeners.size() > 0){
+            SwitchListenerDefinition definition = listeners.get(0).getDefinition();//TODO, now we're taking the first one in the list
+            //TODO add more parameters
+            String switchCmdStr = String.format("bgapi originate %s &socket(%s:%d async full)\n", dialStr, definition.getAddress(), definition.getPort());
+            log.trace("Sending originate request : " + switchCmdStr);
+            session.write(switchCmdStr);
+
+        }
+		return Result.Ok;
 	}
 
 	@Override
