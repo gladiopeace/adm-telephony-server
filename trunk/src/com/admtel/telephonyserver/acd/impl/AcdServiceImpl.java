@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 import com.admtel.telephonyserver.acd.AcdCall;
 import com.admtel.telephonyserver.acd.AcdService;
 import com.admtel.telephonyserver.acd.AcdQueue;
-import com.admtel.telephonyserver.requests.DialRequest;
 import com.admtel.telephonyserver.acd.AcdAgent;
 
 public class AcdServiceImpl implements AcdService {
@@ -86,57 +85,57 @@ public class AcdServiceImpl implements AcdService {
 		return true;
 	}
 
-	@Override
-	synchronized public List<DialRequest> getNextDial() {
-		List<DialRequest> requests = new ArrayList<DialRequest>();		
-
-		Iterator<AcdCall> it = calls.iterator();
-		while (it.hasNext()) {
-			AcdCall call = it.next();
-			List<AcdAgent> agents = acdDataProvider
-					.getAvailableQueueAgents(call.getQueueId());
-			log.trace(String.format("getNextDial returned %d agents", agents.size()));
-			if (!agents.isEmpty()) {
-				AcdQueue queue = acdDataProvider.getQueueById(call.getQueueId());
-				if (queue != null) {
-					switch (queue.getAgentDequeuePolicy()) {
-					case LastUsed:
-						Collections.sort(agents, dateComparator);
-
-						break;
-					case Random:
-						Collections.sort(agents, randomComparator);
-
-						break;
-					case LeastUsed:
-						Collections.sort(agents, useComparator);
-
-						break;
-					// TODO
-					/*
-					 * case RoundRobin: Collections.rotate(rrAgents, 1); break;
-					 */
-					}
-				}
-				if (callsBM.get(call.getChannelId()) == null) {
-					it.remove();
-				} else if (call.getAgentId() == null) {
-					AcdAgent agent = agents.get(0);
-					agent.setCallChannelId(call.getChannelId());
-					agent.setLastUsedDate(new Date());
-					call.setAgentId(agent.getId());
-					acdDataProvider.updateAgent(agent);
-					DialRequest dr =new DialRequest(call.getChannelId(), agent
-							.getAddress(), queue.getTimeout());
-					dr.setUserData("dialed_agent", agent.getId());
-					dr.setUserData("queue", call.getQueueId());
-					requests.add(dr);
-				}
-			}
-		}
-
-		return requests;
-	}
+//	@Override
+//	synchronized public List<DialRequest> getNextDial() {
+//		List<DialRequest> requests = new ArrayList<DialRequest>();		
+//
+//		Iterator<AcdCall> it = calls.iterator();
+//		while (it.hasNext()) {
+//			AcdCall call = it.next();
+//			List<AcdAgent> agents = acdDataProvider
+//					.getAvailableQueueAgents(call.getQueueId());
+//			log.trace(String.format("getNextDial returned %d agents", agents.size()));
+//			if (!agents.isEmpty()) {
+//				AcdQueue queue = acdDataProvider.getQueueById(call.getQueueId());
+//				if (queue != null) {
+//					switch (queue.getAgentDequeuePolicy()) {
+//					case LastUsed:
+//						Collections.sort(agents, dateComparator);
+//
+//						break;
+//					case Random:
+//						Collections.sort(agents, randomComparator);
+//
+//						break;
+//					case LeastUsed:
+//						Collections.sort(agents, useComparator);
+//
+//						break;
+//					// TODO
+//					/*
+//					 * case RoundRobin: Collections.rotate(rrAgents, 1); break;
+//					 */
+//					}
+//				}
+//				if (callsBM.get(call.getChannelId()) == null) {
+//					it.remove();
+//				} else if (call.getAgentId() == null) {
+//					AcdAgent agent = agents.get(0);
+//					agent.setCallChannelId(call.getChannelId());
+//					agent.setLastUsedDate(new Date());
+//					call.setAgentId(agent.getId());
+//					acdDataProvider.updateAgent(agent);
+//					DialRequest dr =new DialRequest(call.getChannelId(), agent
+//							.getAddress(), queue.getTimeout());
+//					dr.setUserData("dialed_agent", agent.getId());
+//					dr.setUserData("queue", call.getQueueId());
+//					requests.add(dr);
+//				}
+//			}
+//		}
+//
+//		return requests;
+//	}
 
 	@Override
 	public void agentDialStarted(String agentId, String channelId) {

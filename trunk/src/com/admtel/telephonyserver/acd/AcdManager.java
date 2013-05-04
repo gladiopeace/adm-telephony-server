@@ -2,13 +2,9 @@ package com.admtel.telephonyserver.acd;
 
 import java.util.Date;
 import java.util.List;
+
+import com.admtel.telephonyserver.core.*;
 import org.apache.log4j.Logger;
-import com.admtel.telephonyserver.core.BeansManager;
-import com.admtel.telephonyserver.core.Channel;
-import com.admtel.telephonyserver.core.EventsManager;
-import com.admtel.telephonyserver.core.Result;
-import com.admtel.telephonyserver.core.Switches;
-import com.admtel.telephonyserver.core.Timers;
 import com.admtel.telephonyserver.events.ConnectedEvent;
 import com.admtel.telephonyserver.events.DialFailedEvent;
 import com.admtel.telephonyserver.events.DialStartedEvent;
@@ -16,7 +12,6 @@ import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.DisconnectedEvent;
 import com.admtel.telephonyserver.interfaces.EventListener;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
-import com.admtel.telephonyserver.requests.DialRequest;
 
 public class AcdManager implements EventListener, TimerNotifiable {
 
@@ -108,10 +103,11 @@ public class AcdManager implements EventListener, TimerNotifiable {
 
 	@Override
 	public boolean onTimer(Object data) {
-		List<DialRequest> dialRequests = acdService.getNextDial();
-		for (DialRequest dialRequest : dialRequests) {
-			Switches.getInstance().processRequest(dialRequest);
-		}
+        //TODO Dial request
+//		List<DialRequest> dialRequests = acdService.getNextDial();
+//		for (DialRequest dialRequest : dialRequests) {
+//            RequestManager.getInstance().put(dialRequest);
+//		}
 		return false;
 	}
 

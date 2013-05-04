@@ -20,10 +20,6 @@ import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.DisconnectedEvent;
 import com.admtel.telephonyserver.freeswitch.FSSwitch;
 import com.admtel.telephonyserver.interfaces.EventListener;
-import com.admtel.telephonyserver.requests.ChannelRequest;
-import com.admtel.telephonyserver.requests.Request;
-import com.admtel.telephonyserver.requests.ShowChannelsRequest;
-import com.admtel.telephonyserver.requests.SwitchRequest;
 
 public class Switches implements DefinitionChangeListener, EventListener {
 
@@ -237,28 +233,6 @@ public class Switches implements DefinitionChangeListener, EventListener {
 	/////////////////////////////////////////////////////////////////////////////////////////
 	public Channel getChannelById(String id){
 		return channels.get(id);
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////	
-	public void processRequest(Request request) {
-		if (request instanceof ChannelRequest) {
-			ChannelRequest channelRequest = (ChannelRequest) request;
-			Channel channel = synchronizedChannels.get(channelRequest.getChannelId());
-			log.trace(String.format("Request(%s) for channel (%s)", request, channel));
-			if (channel != null) {
-				channel.putMessage(request);
-			}
-		} else if (request instanceof SwitchRequest) {
-			SwitchRequest switchRequest = (SwitchRequest) request;
-			switch (switchRequest.getType()) {
-			case ShowChannelsRequest: {
-				ShowChannelsRequest scr = (ShowChannelsRequest) request;
-				if (scr.getSwitchId().equals("all")){
-					
-				}
-			}
-				break;
-			}
-		}
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////
 	private void addChannel(Channel channel) {

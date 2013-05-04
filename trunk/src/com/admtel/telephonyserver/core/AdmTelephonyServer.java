@@ -8,7 +8,6 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 
-import com.admtel.telephonyserver.cli.CLI_Connections;
 import com.admtel.telephonyserver.config.DefinitionChangeListener;
 import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.ServerDefinition;
@@ -16,11 +15,6 @@ import com.admtel.telephonyserver.config.SystemConfig;
 import com.admtel.telephonyserver.httpserver.HttpServers;
 import com.admtel.telephonyserver.prompts.PromptBuilderFactory;
 import com.admtel.telephonyserver.radius.RadiusServers;
-import com.admtel.telephonyserver.remote.EventDto;
-import com.admtel.telephonyserver.remote.SimpleMessageDto;
-import com.admtel.telephonyserver.requests.HangupRequest;
-import com.admtel.telephonyserver.requests.Request;
-import com.admtel.telephonyserver.requests.SwitchRequest;
 
 public class AdmTelephonyServer {
 
@@ -86,28 +80,6 @@ public class AdmTelephonyServer {
 		}
 	}
 
-	public EventDto processRequest(Request request) {
-		log.trace(String.format("Received request %s", request));
-		EventDto result = null;
-		switch (request.getType()) {
-		case ReloadRequest:
-			log.trace("Reloading configuration ...");
-			SystemConfig.getInstance().load();
-			ScriptManager.getInstance().reload();
-			break;
-		case ShowStatusRequest:
-			result = new SimpleMessageDto(AdmThreadExecutor.getInstance()
-					.getStatus());
-			break;
-		case ShowSwitchRequest:
-			result = new SimpleMessageDto(Switches.getInstance()
-					.toReadableString());
-			break;
-		}
-		// TODO better request processing
-		Switches.getInstance().processRequest(request);
-		return result;
-	}
 
 	private void start() {
 
@@ -128,7 +100,6 @@ public class AdmTelephonyServer {
 		sysConfig.addDefinitionChangeListener(SwitchListeners.getInstance());
 		sysConfig.addDefinitionChangeListener(ScriptManager.getInstance());
 
-		sysConfig.addDefinitionChangeListener(CLI_Connections.getInstance());
 		sysConfig.addDefinitionChangeListener(RadiusServers.getInstance());
 		sysConfig.addDefinitionChangeListener(Registrar.getInstance());
 		sysConfig.addDefinitionChangeListener(EventsManager.getInstance());

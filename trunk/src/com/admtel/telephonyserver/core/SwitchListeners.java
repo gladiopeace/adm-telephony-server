@@ -1,5 +1,6 @@
 package com.admtel.telephonyserver.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +9,9 @@ import com.admtel.telephonyserver.asterisk.ASTSwitchListener;
 import com.admtel.telephonyserver.config.DefinitionChangeListener;
 import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.SwitchListenerDefinition;
+import com.admtel.telephonyserver.config.SwitchType;
 import com.admtel.telephonyserver.freeswitch.FSSwitchListener;
+import java.util.List;
 
 public class SwitchListeners implements DefinitionChangeListener{
 	
@@ -25,6 +28,25 @@ public class SwitchListeners implements DefinitionChangeListener{
 		return SingletonHolder.instance;
 	}
 
+    public List<SwitchListener> getBySwitchType(SwitchType switchType){
+        List<SwitchListener> result = new ArrayList<SwitchListener>();
+        for (Map.Entry<String, SwitchListener> entry:switchListeners.entrySet()){
+            SwitchListener switchListener = entry.getValue();
+            switch (switchType){
+                case Asterisk:
+                    if (switchListener instanceof ASTSwitchListener){
+                        result.add(switchListener);
+                    }
+                    break;
+                case Freeswitch:
+                    if (switchListener instanceof FSSwitchListener){
+                        result.add(switchListener);
+                    }
+                    break;
+            }
+        }
+        return result;
+    }
 	@Override
 	public void definitionAdded(DefinitionInterface definition) {
 		if (definition instanceof SwitchListenerDefinition){

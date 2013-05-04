@@ -37,14 +37,6 @@ import com.admtel.telephonyserver.interfaces.EventListener;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.radius.RadiusServers;
 import com.admtel.telephonyserver.registrar.UserLocation;
-import com.admtel.telephonyserver.requests.AnswerRequest;
-import com.admtel.telephonyserver.requests.ChannelRequest;
-import com.admtel.telephonyserver.requests.ConferenceDeafRequest;
-import com.admtel.telephonyserver.requests.DialRequest;
-import com.admtel.telephonyserver.requests.HangupRequest;
-import com.admtel.telephonyserver.requests.JoinConferenceRequest;
-import com.admtel.telephonyserver.requests.ConferenceMuteRequest;
-import com.admtel.telephonyserver.requests.Request;
 import com.admtel.telephonyserver.utils.AdmUtils;
 import com.admtel.telephonyserver.utils.LimitedQueue;
 import com.admtel.telephonyserver.utils.PromptsUtils;
@@ -150,11 +142,7 @@ public abstract class Channel implements TimerNotifiable {
 
 		@Override
 		public void onMessage(Object message) {
-			if (message instanceof Request) {
-				Channel.this.processRequest((Request) message);
-			} else
-				Channel.this.processNativeEvent(message);
-
+		Channel.this.processNativeEvent(message);
 		}
 
 	};
@@ -847,47 +835,6 @@ public abstract class Channel implements TimerNotifiable {
 	}
 
 	abstract protected void processNativeEvent(Object event);
-
-	synchronized protected void processRequest(Request request) {
-		// TODO send response events
-
-		log.trace(String.format("processRequest{%s}", request));
-		if (request instanceof ChannelRequest){
-			ChannelRequest cr = (ChannelRequest) request;
-			appendUserData(cr.getUserData());
-		}
-		switch (request.getType()) {
-		case HangupRequest: {
-			HangupRequest hr = (HangupRequest) request;			
-			Result result = hangup(hr.getDisconnectCode());		
-		}
-			break;
-		case AnswerRequest: {
-			answer();
-		}
-			break;
-		case ConferenceMuteRequest: {
-			ConferenceMuteRequest pmr = (ConferenceMuteRequest) request;
-			conferenceMute(pmr.isMute());
-		}
-			break;
-		case ConferenceDeafRequest:{
-			ConferenceDeafRequest cdr = (ConferenceDeafRequest)request;
-			conferenceDeaf(cdr.isDeaf());
-		}
-		break;
-		case DialRequest: {
-			DialRequest dialRequest = (DialRequest) request;
-			dial(dialRequest.getDestination(), dialRequest.getTimeout());
-		}
-			break;
-		case JoinConferenceRequest:{
-			JoinConferenceRequest jcr = (JoinConferenceRequest) request;
-			joinConference(jcr.getConference(), jcr.isModerator(), jcr.isMuted(), jcr.isDeaf());
-		}
-		break;
-		}
-	}
 
 	private void appendUserData(Map<String, String> userData2) {
 		userData.putAll(userData2);
