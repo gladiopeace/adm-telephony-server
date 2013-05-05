@@ -209,6 +209,7 @@ a:hover {
 	    		</li>
 	  			<li class="has-sub"><a href="">Actions</a>
 	  				<ul>
+                        <li><a href="?action=originate">Originate</a></li>
 	  					<li><a href="?action=reload">Reload</a></li>
 	  				</ul>
 	  			</li>
