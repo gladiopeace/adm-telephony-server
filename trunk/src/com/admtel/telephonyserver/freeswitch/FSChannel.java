@@ -1,5 +1,6 @@
 package com.admtel.telephonyserver.freeswitch;
 
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -10,6 +11,7 @@ import com.admtel.telephonyserver.config.SwitchType;
 import com.admtel.telephonyserver.core.AdmAddress;
 import com.admtel.telephonyserver.core.CallOrigin;
 import com.admtel.telephonyserver.core.Channel;
+import com.admtel.telephonyserver.core.ChannelData;
 import com.admtel.telephonyserver.core.Result;
 import com.admtel.telephonyserver.core.ScriptManager;
 import com.admtel.telephonyserver.core.Switch;
@@ -257,8 +259,7 @@ public class FSChannel extends Channel {
 			switch (fsEvent.getEventType()) {
 			case ChannelData: {
 				FSChannelDataEvent cde = (FSChannelDataEvent) fsEvent;
-				String admArgs = cde.getValue("variable_adm_args");
-				getChannelData().addDelimitedVars(admArgs, "&");
+
 				String sipReqParams = cde.getValue("variable_sip_req_params");
 				
 				String accountCode = cde.getValue("variable_accountcode");
@@ -273,6 +274,9 @@ public class FSChannel extends Channel {
 				
 			case ChannelCreate: {
 				FSChannelCreateEvent cce = (FSChannelCreateEvent) fsEvent;
+				
+				addEventVariableToChannelData(cce);
+				
 				if (FSChannel.this.getAcctUniqueSessionId() == null) {
 					FSChannel.this.setAcctUniqueSessionId(UUID.randomUUID()
 							.toString());
@@ -302,7 +306,8 @@ public class FSChannel extends Channel {
 						internalState = new OfferedState();
 						FSChannel.this.onEvent(new OfferedEvent(FSChannel.this));
 						break;
-					case Outbound:
+					case Outbound:						
+						ScriptManager.getInstance().createScript(FSChannel.this);						
 						internalState = new AlertingState();
 						FSChannel.this.onEvent(new AlertingEvent(FSChannel.this));						
 						break;
@@ -929,5 +934,20 @@ public class FSChannel extends Channel {
 		fsChannelLog.trace(String.format("%s, on channel %s", cmd, this));
 		session.write(cmd);
 		return Result.Ok;
+	}
+	
+	
+	//
+	private void addEventVariableToChannelData(FSEvent event){
+		Map<String, String> values = event.getValues();
+		ChannelData channelData = getChannelData();
+		for (Map.Entry<String, String> entry : values.entrySet())
+		{
+		   String key = entry.getKey();
+		   if (key.startsWith("variable_")){
+			   String k = key.substring(9);
+			   channelData.addVariable(k, entry.getValue());
+		   }
+		}
 	}
 }

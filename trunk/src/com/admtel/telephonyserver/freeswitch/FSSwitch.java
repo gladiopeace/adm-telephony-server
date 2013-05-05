@@ -95,15 +95,18 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
         	return Result.InvalidAddress;
         }
         String dialStr = getAddressTranslator().translate(admAddress);
-        List<SwitchListener> listeners = SwitchListeners.getInstance().getBySwitchType(SwitchType.Freeswitch);
-        if (listeners.size() > 0){
-            SwitchListenerDefinition definition = listeners.get(0).getDefinition();//TODO, now we're taking the first one in the list
-            //TODO add more parameters
-            String switchCmdStr = String.format("bgapi originate %s &socket(%s:%d async full)\n", dialStr, definition.getAddress(), definition.getPort());
-            log.trace("Sending originate request : " + switchCmdStr);
-            session.write(switchCmdStr);
-
-        }
+        String switchCmdStr = String.format("bgapi originate {script=%s}%s 555555", script, dialStr);
+        log.trace("Sending originate request : " + switchCmdStr);
+        session.write(switchCmdStr);
+//        List<SwitchListener> listeners = SwitchListeners.getInstance().getBySwitchType(SwitchType.Freeswitch);
+//        if (listeners.size() > 0){
+//            SwitchListenerDefinition definition = listeners.get(0).getDefinition();//TODO, now we're taking the first one in the list
+//            //TODO add more parameters
+//            String switchCmdStr = String.format("bgapi originate %s &socket(%s:%d async full)\n", dialStr, definition.getAddress(), definition.getPort());
+//            log.trace("Sending originate request : " + switchCmdStr);
+//            session.write(switchCmdStr);
+//
+//        }
 		return Result.Ok;
 	}
 
@@ -192,8 +195,8 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	@Override
 	public void processBasicIoMessage(BasicIoMessage message) {
-		log.debug(String.format("Switch (%s) : \n%s",
-				getSwitchId(), message.getMessage()));
+//		log.debug(String.format("Switch (%s) : \n%s",
+//				getSwitchId(), message.getMessage()));
 
 		switch (state) {
 		case LoggingIn:
