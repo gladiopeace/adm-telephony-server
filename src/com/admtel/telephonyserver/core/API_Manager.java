@@ -18,14 +18,14 @@ public class API_Manager {
 		return SingletonHolder.instance;
 	}
 	
-	public Result originate (String destination, int timeout){
+	public Result originate (String destination, String script, int timeout){
 		Result result = Result.Ok;
 		Switch s = Switches.getInstance().getRandom(); //TODO a better way to get a switch based on the originate parameters
 		if (s==null){
 			log.warn("Couldn't allocate a switch for originate");
 			return Result.InvalidResource;
-		}
-		result = s.originate(destination, timeout, "", "", "", "");
+		}		
+		result = s.originate(destination, timeout, "", "", script, "");
 		return result;
 	}
 	public Result hangup (String channelId){
