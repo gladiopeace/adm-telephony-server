@@ -32,8 +32,7 @@ class WebAPI extends AdmServlet {
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def hangup(request){		
-		HangupRequest hangupRequest = new HangupRequest(request.getParameter('channel'), DisconnectCode.Normal) 
-		Switches.getInstance().processRequest(hangupRequest)
+		API_Manager.instance.hangup(request.getParameter('channel'))
 		"Channel hangup request " + request.getParameters('channel')
 	}	
 	
@@ -70,19 +69,19 @@ class WebAPI extends AdmServlet {
 		
 		switch(action){
 			case 'mute': 
-			Switches.getInstance().processRequest(new ConferenceMuteRequest(p.getChannel().getUniqueId(), true ))
+			API_Manager.instance.conferenceMute(p.getChannel().getUniqueId(), true)		
 			break;
 			case 'unmute': 
-			Switches.getInstance().processRequest(new ConferenceMuteRequest(p.getChannel().getUniqueId(), false ))
+			API_Manager.instance.conferenceMute(p.getChannel().getUniqueId(), false)
 			break;
 			case 'deaf':
-			Switches.getInstance().processRequest( new ConferenceDeafRequest(p.getChannel().getUniqueId(), true ))
+			API_Manager.instance.conferenceDeaf(p.getChannel().getUniqueId(), true)			
 			break;
 			case 'undeaf':
-			Switches.getInstance().processRequest( new ConferenceDeafRequest(p.getChannel().getUniqueId(), false ))
+			API_Manager.instance.conferenceDeaf(p.getChannel().getUniqueId(), false)
 			break;
 			case 'kick':
-			Switches.getInstance().processRequest(new HangupRequest(p.getChannel().getUniqueId(), DisconnectCode.Normal))
+			API_Manager.instance.hangup(p.getChannel().getUniqueId())
 			break;
 		}
 		""
@@ -120,9 +119,12 @@ class WebAPI extends AdmServlet {
 	def dial(request){
 		String destination = URLDecoder.decode(request.getParameter('destination'))
 		String channel = request.getParameter('channel')
-		int timeout = Integer.valueOf(request.getParameter('timeout'))
-		DialRequest dialRequest = new DialRequest( channel, destination, timeout)
-		Switches.getInstance().processRequest(dialRequest)
+		int timeout = 10000
+		if (request.getParameter('timeout')){
+			timeout = Integer.valueOf(request.getParameter('timeout'))
+		}
+		
+		API_Manager.instance.dial(channel, destination, timeout)
 		"${channel} -> Dialed -> ${destination}"
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,8 +135,7 @@ class WebAPI extends AdmServlet {
 			String conferenceNumber = request.getParameter('conferenceNumber')
 			if (!conferenceNumber)
 				conferenceNumber = c.getUserData("conferenceNumber")
-			JoinConferenceRequest jcr = new JoinConferenceRequest(channel, conferenceNumber, false, false, false)
-			Switches.getInstance().processRequest(jcr)
+			API_Manager.instance.conferenceJoin(channel, conferenceNumber, false, false, false)
 		}// TODO result code
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -175,8 +176,7 @@ class WebAPI extends AdmServlet {
 		AcdAgent tAgent = AcdManager.getInstance().getAgentById(agentId)
 		if (tAgent != null){
 			String channelId = tAgent.getChannelId()
-			HangupRequest hangupRequest = new HangupRequest(channelId, DisconnectCode.Normal)
-			Switches.getInstance().processRequest(hangupRequest)
+			API_Manager.instance.hangup(channelId)
 			return "Agent(${agentId}) hangup"
 		}
 		return "Agent ID ${agentId} not found"

@@ -9,7 +9,6 @@ import org.omg.Dynamic.Parameter;
 
 import com.admtel.telephonyserver.httpserver.HttpRequestMessage;
 import com.admtel.telephonyserver.httpserver.HttpResponseMessage;
-import com.admtel.telephonyserver.requests.*;
 import com.admtel.telephonyserver.httpserver.AdmServlet;
 import com.admtel.telephonyserver.acd.*;
 import com.admtel.telephonyserver.events.*;
@@ -52,8 +51,8 @@ class WebConfServlet extends AdmServlet {
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def hangup(request, response){
-		HangupRequest hangupRequest = new HangupRequest(request.getParameter('channel'), DisconnectCode.Normal) 
-		Switches.getInstance().processRequest(hangupRequest)
+		//TODO result in response
+		API_Manager.instance.hangup(request.getParameter('channel'))
 		[m:'']
 	}
 	
@@ -124,17 +123,47 @@ class WebConfServlet extends AdmServlet {
 		AcdCall[] c = AcdManager.getInstance().getQueueCalls(queue)
 		['queue_calls':c]
 	}
-	
+
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	def dial(request, response){
+    def dial(request, response){
+        ['page':'dial.ftl']
+    }
+	def dialSubmit(request, response){
+        log.trace("DialSubmit ****************")
 		String destination = URLDecoder.decode(request.getParameter('destination'))
 		String channel = request.getParameter('channel')
 		int timeout = Integer.valueOf(request.getParameter('timeout'))
-		DialRequest dialRequest = new DialRequest( channel, destination, timeout)
-		Switches.getInstance().processRequest(dialRequest)
-		return [m:"Dial ${request.getParameter('destination')}"]
+		
+		//TODO dial
+
+		return ['page':'dial.ftl', 'dialInstance':'dialed given number']
 	}
-	
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    def originate(request, response){
+        ['page':'originate.ftl']
+    }
+    def originateSubmit(request, response){
+        log.trace("OriginateSubmit ****************")
+
+        String destination = URLDecoder.decode(request.getParameter('destination'),"UTF-8")
+		String script = URLDecoder.decode(request.getParameter('script'), "UTF-8")
+        int timeout = 10000
+        if (request.getParameter('timeout')){
+            timeout = Integer.valueOf(request.getParameter('timeout'))
+        }
+        def message = "Originating to: ${destination}"
+        if (destination){
+			API_Manager.instance.originate(destination, script, timeout)
+        }
+        else{
+            message = "Failed to originate, invalid destination"
+        }
+        return ['page':'originate.ftl', 'message':message]
+    }
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def channel(request, response){
 		String channelId=request.getParameter('id')
