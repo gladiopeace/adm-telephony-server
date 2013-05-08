@@ -1,6 +1,6 @@
 This page describes the FreeSwitch related configuration.
 
- *  Download and Install FreeSwitch (www.freeswitch.org), currently supporting version 1.0.6 and 1.0.7.
+ *  Download and Install FreeSwitch (www.freeswitch.org), currently supporting versions 1.0.6 and 1.0.7.
  *  Modify event_socket.conf.xml and set the proper ATS login parameters.
  *  Enable mod_xml_curl in modules.conf.xml (retrieve the confuguration from xml_curl server).
  *  Modify xml_curl.conf.xml:
