@@ -187,6 +187,8 @@ a:hover {
 	#footer p {margin:0}
 	#footer a:link {color:#999}
 
+.field{ margin-top:10px;margin-bottom:10px;display:block}
+}
     </style>
     
   </head>

@@ -2,7 +2,7 @@ package com.admtel.telephonyserver.asterisk.events;
 
 import java.util.Map;
 
-import com.admtel.telephonyserver.core.VariableMap;
+import com.admtel.telephonyserver.misc.VariableMap;
 import com.admtel.telephonyserver.utils.CodecsUtils;
 
 public class ASTAsyncAgiEvent extends ASTChannelEvent {

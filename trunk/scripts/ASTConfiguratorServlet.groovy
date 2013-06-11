@@ -20,8 +20,8 @@ class ASTConfiguratorServlet extends AdmServlet{
 		log.trace("Got ${name}:${domain}")
 		User u = userDAO.getUser(name)
 		if (u){			
-			response.appendBody("username=${name}&secret=${u.password}&context=ats&host=dynamic&insecure=port"+
-				"&type=friend&accountcode=${u.account}&callerid=${u.callerId}&nat=yes\n\n")
+			response.appendBody("defaultuser=${name}&secret=${u.password}&context=default&host=dynamic&insecure=port"+
+				"&type=friend&accountcode=${u.account}&callerid=${u.callerId}&nat=force_rport\n\n")
 		}
 		else{
 			response.appendBody("error")

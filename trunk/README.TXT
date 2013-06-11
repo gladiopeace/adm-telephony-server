@@ -31,13 +31,13 @@ ATS provides connects to one or more FreeSwitches or Asterisk servers and provid
  2- enable mod_xml_curl in modules.conf.xml
  3. Modify xml_curl.conf.xml (get user directory):
 		<param name="gateway-url" value="http://<ATSIP>:8057/FSConfigurator" bindings="directory"/>
- 5- add to conf/dialplan/default.xml
+ 4- add to conf/dialplan/default.xml
 		<extension name="esl">
 		      <condition field="destination_number" expression=".*">
 		         <action application="socket" data=<ATSIP>:8084 full async"/>
 		      </condition>
 		</extension>
- 	 
+ 5- Disable mod_native_file in modules.conf.xml	 
  	
  
  

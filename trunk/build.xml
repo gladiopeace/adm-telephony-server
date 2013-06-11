@@ -27,48 +27,7 @@
 	  <copy file="src/com/admtel/telephonyserver/radius/adm_dictionary" todir="bin/com/admtel/telephonyserver/radius"/>
 	</target>
 
-	<target name="ats-console">
-		<delete file="dist/ats-console" />
-		<delete dir="dist/temp" />
-
-		<unzip dest="dist/temp">
-			<fileset dir="lib">
-				<include name="mina-core-2.0.7.jar" />
-				<include name="jline-0.9.94.jar" />
-				<include name="slf4j-api-1.5.0.jar" />
-				<include name="slf4j-log4j12-1.5.0.jar" />
-				<include name="log4j-1.2.14.jar" />
-				<include name="jopt-simple-3.2.jar" />
-				<include name="jackson-mapper-asl-1.6.0.jar" />
-				<include name="jackson-core-asl-1.6.0.jar" />
-			</fileset>
-		</unzip>
-
-		<!--  	
-	  	<copy todir="../../bin/temp">
-	  	 <fileset dir="./images"/>
-	  	</copy>
-	   -->
-
-		<jar destfile="dist/ats-console.jar" basedir="bin" includes="**/*ATSConsole.class,**/*.png, **/*DisconnectCode.class, 
-			com/admtel/telephonyserver/requests/*.class, 
-			com/admtel/telephonyserver/cli/*.class, com/admtel/telephonyserver/remote/*Dto.class" excludes="**/src/**,build.xml">
-		</jar>
-
-		<unzip src="dist/ats-console.jar" dest="dist/temp">
-		</unzip>
-		<delete file="dist/ats-console" />
-
-		<jar destfile="dist/ats-console.jar" basedir="dist/temp" includes="**/*">
-			<manifest>
-				<attribute name="Main-Class" value="com.admtel.telephonyserver.cli.ATSConsole" />
-			</manifest>
-		</jar>
-
-		<delete dir="dist/temp" />
-	</target>
-
-	<target name="release" depends="ats-console, simple">
+	<target name="release" depends="simple">
 		<delete file="dist/adm-telephony-server_snapshot.zip"/>
 		<zip destfile="dist/adm-telephony-server_snapshot.zip">
 			<zipfileset dir="lib" prefix="lib" />
