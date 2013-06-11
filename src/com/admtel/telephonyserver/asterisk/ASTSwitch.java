@@ -25,6 +25,7 @@ import com.admtel.telephonyserver.asterisk.events.ASTResponseEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTEvent.EventType;
 import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.SwitchDefinition;
+import com.admtel.telephonyserver.core.AdmAddress;
 import com.admtel.telephonyserver.core.BasicIoMessage;
 import com.admtel.telephonyserver.core.EventsManager;
 import com.admtel.telephonyserver.core.QueuedMessageHandler;
@@ -36,6 +37,7 @@ import com.admtel.telephonyserver.core.Timers;
 import com.admtel.telephonyserver.core.Switch.SwitchStatus;
 import com.admtel.telephonyserver.core.Timers.Timer;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
+import com.admtel.telephonyserver.misc.VariableMap;
 import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.utils.AdmUtils;
 
@@ -184,17 +186,27 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	@Override
 	public Result originate(String destination, long timeout, String callerId,
-			String calledId, String script, String data) {
+			String calledId, String script, VariableMap data) {
 
+        AdmAddress admAddress = AdmAddress.fromString(destination);
+        if (admAddress == null){
+        	return Result.InvalidAddress;
+        }
 		String uuid = UUID.randomUUID().toString();
 
-		String admArgs = "script=" + script + "&data=" + data;
-
-		session.write(String
-				.format("Action: Originate\nChannel: %s\nTimeout: %d\nApplication: AGI\nVariable: adm_args=%s\nData: agi:async\nAsync: 1\nActionId: %s",
-						destination, timeout, admArgs, uuid
-								+ "___Originate"));
-		return Result.Ok;
+        String dialStr = getAddressTranslator().translate(admAddress);
+        data.addVariable("script", script);
+        String variables=null;
+        if (data != null && data.size()>0){
+        	variables = data.getDelimitedVars("=", "|");
+        }
+        if (variables != null && variables.length() > 0){
+    		session.write(String
+    				.format("Action: Originate\nChannel: %s\nTimeout: %d\nContext: default\nApplication: AGI\nVariable: %s\nData: agi:async\nAsync: 1\nActionId: %s",
+    						dialStr, timeout, variables, uuid
+    								+ "___Originate"));
+        }
+		return Result.Ok;		
 	}
 
 	@Override

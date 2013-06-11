@@ -35,7 +35,7 @@ public class AdmAddress {
 				}
 			} else if (address.startsWith("local:")) {
 				result.protocol = SigProtocol.Local;
-				String addressItems = address.substring(5);
+				String addressItems = address.substring(6);
 				result.destination = addressItems;
 			}
 		} catch (Exception e) {

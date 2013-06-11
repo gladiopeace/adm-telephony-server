@@ -13,6 +13,7 @@ import com.admtel.telephonyserver.httpserver.AdmServlet;
 import com.admtel.telephonyserver.acd.*;
 import com.admtel.telephonyserver.events.*;
 import java.util.UUID;
+import com.admtel.telephonyserver.misc.*;
 
 import freemarker.template.*;
 
@@ -150,13 +151,21 @@ class WebConfServlet extends AdmServlet {
 
         String destination = URLDecoder.decode(request.getParameter('destination'),"UTF-8")
 		String script = URLDecoder.decode(request.getParameter('script'), "UTF-8")
+		String variables = URLDecoder.decode(request.getParameter('variables'), "UTF-8")
         int timeout = 10000
         if (request.getParameter('timeout')){
             timeout = Integer.valueOf(request.getParameter('timeout'))
         }
         def message = "Originating to: ${destination}"
         if (destination){
-			API_Manager.instance.originate(destination, script, timeout)
+			if (variables){
+				VariableMap vars = new VariableMap()
+				vars.addDelimitedVars(variables,"=",",")
+				API_Manager.instance.originate(destination, script,vars, timeout)
+			}
+			else{
+				API_Manager.instance.originate(destination, script,null, timeout)
+			}
         }
         else{
             message = "Failed to originate, invalid destination"

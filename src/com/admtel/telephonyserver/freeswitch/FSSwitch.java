@@ -34,6 +34,7 @@ import com.admtel.telephonyserver.freeswitch.events.FSCommandReplyEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSRegisterEvent;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
+import com.admtel.telephonyserver.misc.VariableMap;
 import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.utils.AdmUtils;
 import com.admtel.telephonyserver.utils.CodecsUtils;
@@ -89,15 +90,26 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 	@Override
 	public Result originate(String destination, long timeout, String callerId,
-			String calledId, String script, String data) {
+			String calledId, String script, VariableMap data) {
         AdmAddress admAddress = AdmAddress.fromString(destination);
         if (admAddress == null){
         	return Result.InvalidAddress;
         }
         String dialStr = getAddressTranslator().translate(admAddress);
-        String switchCmdStr = String.format("bgapi originate {script=%s}%s 555555", script, dialStr);
-        log.trace("Sending originate request : " + switchCmdStr);
-        session.write(switchCmdStr);
+        String variables=null;
+        if (data != null && data.size()>0){
+        	variables = data.getDelimitedVars("=", ",");
+        }
+        if (variables != null && variables.length() > 0){
+	        String switchCmdStr = String.format("bgapi originate {script=%s,%s}%s 555555", script, variables, dialStr);
+	        log.trace("Sending originate request : " + switchCmdStr);
+	        session.write(switchCmdStr);        	
+        }
+        else{
+	        String switchCmdStr = String.format("bgapi originate {script=%s}%s 555555", script, dialStr);
+	        log.trace("Sending originate request : " + switchCmdStr);
+	        session.write(switchCmdStr);
+        }
 //        List<SwitchListener> listeners = SwitchListeners.getInstance().getBySwitchType(SwitchType.Freeswitch);
 //        if (listeners.size() > 0){
 //            SwitchListenerDefinition definition = listeners.get(0).getDefinition();//TODO, now we're taking the first one in the list

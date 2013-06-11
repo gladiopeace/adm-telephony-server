@@ -274,9 +274,9 @@ public class FSChannel extends Channel {
 				
 			case ChannelCreate: {
 				FSChannelCreateEvent cce = (FSChannelCreateEvent) fsEvent;
-				
+				//Add variables from the events
 				addEventVariableToChannelData(cce);
-				
+				/////////////////////////////////
 				if (FSChannel.this.getAcctUniqueSessionId() == null) {
 					FSChannel.this.setAcctUniqueSessionId(UUID.randomUUID()
 							.toString());
@@ -306,8 +306,10 @@ public class FSChannel extends Channel {
 						internalState = new OfferedState();
 						FSChannel.this.onEvent(new OfferedEvent(FSChannel.this));
 						break;
-					case Outbound:						
-						ScriptManager.getInstance().createScript(FSChannel.this);						
+					case Outbound:			
+						if (FSChannel.this.getScript() == null){//Channel is part of a dial sequence not an originate
+							ScriptManager.getInstance().createScript(FSChannel.this);
+						}
 						internalState = new AlertingState();
 						FSChannel.this.onEvent(new AlertingEvent(FSChannel.this));						
 						break;

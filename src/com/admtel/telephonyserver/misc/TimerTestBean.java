@@ -1,8 +1,10 @@
 package com.admtel.telephonyserver.misc;
 
+import com.admtel.telephonyserver.core.API_Manager;
 import com.admtel.telephonyserver.core.Timers;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import org.apache.log4j.Logger;
+import com.admtel.telephonyserver.misc.VariableMap;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,7 +23,10 @@ public class TimerTestBean implements TimerNotifiable{
     }
     @Override
     public boolean onTimer(Object data) {
-        log.trace("Got timer, doing nothing");
+        log.trace("Got timer, Originating");
+        VariableMap variables = new VariableMap();
+        variables.addVariable("number", "1321");
+        API_Manager.getInstance().originate("sip:13106998711@asterisk_osx", "ClickToCall/ClickToCallScript.groovy", variables, 1000);
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

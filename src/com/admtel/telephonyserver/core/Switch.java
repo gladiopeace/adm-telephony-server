@@ -13,6 +13,7 @@ import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.SwitchDefinition;
 import com.admtel.telephonyserver.events.DisconnectCode;
 import com.admtel.telephonyserver.interfaces.AddressTranslator;
+import com.admtel.telephonyserver.misc.VariableMap;
 
 public abstract class Switch {
 
@@ -106,7 +107,7 @@ public abstract class Switch {
 	}
 
 	abstract public Result originate(String destination, long timeout,
-			String callerId, String calledId, String script, String data);
+			String callerId, String calledId, String script, VariableMap data);
 
 	@Override
 	public int hashCode() {

@@ -2,6 +2,8 @@ package com.admtel.telephonyserver.core;
 
 import java.util.Map.Entry;
 
+import com.admtel.telephonyserver.misc.VariableMap;
+
 public class ChannelData extends VariableMap {
 	
 	public final static String CALLER_ID_NAME = "CallerIdName";
