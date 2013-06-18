@@ -101,7 +101,7 @@ public class AdmTelephonyServer {
 		sysConfig.addDefinitionChangeListener(ScriptManager.getInstance());
 
 		sysConfig.addDefinitionChangeListener(RadiusServers.getInstance());
-		sysConfig.addDefinitionChangeListener(Registrar.getInstance());
+		
 		sysConfig.addDefinitionChangeListener(EventsManager.getInstance());
 		sysConfig.addDefinitionChangeListener(HttpServers.getInstance());
 		sysConfig.addDefinitionChangeListener(PromptBuilderFactory

@@ -77,12 +77,6 @@ public class SystemConfig {
 
 	private static final String SWITCH_LISTENERS_SWITCH_LISTENER_D = "switch-listeners.switch-listener(%d)";
 
-	private static final String REGISTRAR_ENABLED = "registrar.enabled";
-
-	private static final String DEFAULT_REGISTRAR = "com.admtel.telephonyserver.registrar.SimpleRegistrar";
-
-	private static final String REGISTRAR_CLASS = "registrar.class";
-
 	private static final String SERVER_RADIUS_INTERIM_UPDATE = "server.radius-interim-update";
 
 	private static final String SERVER_RADIUS_STOP_ACCOUNTING = "server.radius-stop-accounting";
@@ -150,15 +144,6 @@ public class SystemConfig {
 				.getInt(
 				SERVER_RADIUS_INTERIM_UPDATE, 0));
 		this.serverDefinition = serverDefinition;
-	}
-
-	public void loadRegistrarDefinition() {
-		RegistrarDefinition registrarDefinition = new RegistrarDefinition();
-		registrarDefinition.setClassName(config.getString(REGISTRAR_CLASS,
-				DEFAULT_REGISTRAR));
-		registrarDefinition.setEnabled(config.getBoolean(REGISTRAR_ENABLED,
-				true));
-		futureDefinitions.put(registrarDefinition.getId(), registrarDefinition);
 	}
 
 	public void loadSwitchListenersDefinition() {
@@ -426,7 +411,6 @@ public class SystemConfig {
 		loadSwitchesDefinition();
 		loadScriptFactoriesDefinition();
 		loadRadiusDefinition();
-		loadRegistrarDefinition();
 		loadEventListenersDefinition();
 		loadHTTPServerDefinition();
 		loadPromptBuildersDefinition();

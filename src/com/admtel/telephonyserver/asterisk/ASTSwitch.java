@@ -29,7 +29,6 @@ import com.admtel.telephonyserver.core.AdmAddress;
 import com.admtel.telephonyserver.core.BasicIoMessage;
 import com.admtel.telephonyserver.core.EventsManager;
 import com.admtel.telephonyserver.core.QueuedMessageHandler;
-import com.admtel.telephonyserver.core.Registrar;
 import com.admtel.telephonyserver.core.Result;
 import com.admtel.telephonyserver.core.SimpleMessageHandler;
 import com.admtel.telephonyserver.core.Switch;
