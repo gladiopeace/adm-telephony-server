@@ -34,6 +34,25 @@ public enum SigProtocol {
 		}
 	};
 
+	public static SigProtocol fromString (String protocol){
+		SigProtocol sigProtocol = Unknown;
+		if (protocol.equalsIgnoreCase("sip")){
+			sigProtocol = SIP;
+		}
+		else if (protocol.equalsIgnoreCase("iax2")){
+			sigProtocol = IAX2;
+		}
+		else if (protocol.equalsIgnoreCase("local")){
+			sigProtocol = Local;
+		}
+		else if (protocol.equalsIgnoreCase("h323")){
+			sigProtocol = H323;
+		}
+		else if (protocol.equalsIgnoreCase("isdn")){
+			sigProtocol = ISDN;
+		}
+		return sigProtocol;
+	}
 	public static SigProtocol fromString(String protocolStr,
 			SwitchType switchType) {
 		if (protocolStr == null)

@@ -108,11 +108,6 @@ public abstract class Script implements EventListener {
 		return true;
 	}
 
-	// Registrar functions
-	public UserLocation find(String user) {
-		return Registrar.getInstance().find(user);
-	}
-
 	private void stop() {
 		onStop();
 		ScriptManager.getInstance().deleteScript(this);

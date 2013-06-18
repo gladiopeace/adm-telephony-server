@@ -521,18 +521,6 @@ public abstract class Channel implements TimerNotifiable {
 
 		if (getCallState() == CallState.Connected|| getCallState() == CallState.Accepted|| getCallState() == CallState.Offered|| getCallState() == CallState.AcdQueued) {
 			String tAddress = address;
-			if (address.startsWith("user:")) {
-				tAddress = address.substring(5);
-				UserLocation location = Registrar.getInstance().find(tAddress);
-				if (location == null) {
-					log.warn(String.format("Channel(%s) - User (%s) not found",this, address));
-					lastResult = Result.UserNotFound;
-					onEvent (new DialFailedEvent(this, DialStatus.InvalidNumber));
-					return lastResult;
-				} else {
-					tAddress = location.getAddress(_switch);
-				}
-			}
 			AdmAddress admAddress = AdmAddress.fromString(tAddress);
 			String translatedAddress = _switch.getAddressTranslator().translate(admAddress);
 			
