@@ -291,6 +291,9 @@ public abstract class Channel implements TimerNotifiable {
 		this.dtmfBuffer = dtmfBuffer;
 	}
 
+	public String getSwitchId(){
+		return _switch.getSwitchId();
+	}
 	public String getId() {
 		return id;
 	}
