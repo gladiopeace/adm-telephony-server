@@ -44,6 +44,7 @@ import com.admtel.telephonyserver.events.QueueFailedEvent;
 import com.admtel.telephonyserver.events.QueueJoinedEvent;
 import com.admtel.telephonyserver.events.UnlinkedEvent;
 import com.admtel.telephonyserver.freeswitch.commands.FSDialCommand;
+import com.admtel.telephonyserver.freeswitch.commands.FSExportVariableCommand;
 import com.admtel.telephonyserver.freeswitch.commands.FSMemberDeafCommand;
 import com.admtel.telephonyserver.freeswitch.commands.FSMemberMuteCommand;
 import com.admtel.telephonyserver.freeswitch.commands.FSQueueCommand;
@@ -733,10 +734,10 @@ public class FSChannel extends Channel {
 	}
 
 	@Override
-	public Result internalDial(String address, long timeout) {
+	public Result internalDial(String address, long timeout, boolean secure) {
 		if (address != null && address.length() > 0) {
 			FSDialCommand cmd = new FSDialCommand(FSChannel.this, address,
-					timeout);
+					timeout, secure);
 			session.write(cmd);
 		} else {
 			fsChannelLog.warn(String.format("%s, invalid dial string %s",

@@ -907,7 +907,7 @@ public class ASTChannel extends Channel {
 	}
 
 	@Override
-	public Result internalDial(String address, long timeout) {
+	public Result internalDial(String address, long timeout, boolean secure) {
 		if (address != null && address.length() > 0) {
 			ASTDialCommand dialCmd = new ASTDialCommand(ASTChannel.this,
 					address, timeout);

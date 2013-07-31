@@ -314,7 +314,7 @@ public abstract class Channel implements TimerNotifiable {
 
 	public abstract Result internalPlayAndGetDigits(int max, String[] prompt,long timeout, String terminators, boolean interruptPlay);
 
-	public abstract Result internalDial(String address, long timeout);
+	public abstract Result internalDial(String address, long timeout, boolean secure);
 
 	public abstract Result internalQueue(String queueName, boolean agent);
 
@@ -518,7 +518,10 @@ public abstract class Channel implements TimerNotifiable {
 	}
 
 
-	final public Result dial(String address, long timeout) {
+	final public Result dial(String address, long timeout){
+		return dial(address, timeout, false);
+	}
+	final public Result dial(String address, long timeout, boolean secure) {
 
 		log.trace(String.format("Channel(%s) dialing %s", this, address));
 
@@ -538,7 +541,7 @@ public abstract class Channel implements TimerNotifiable {
 				return lastResult;
 			}
 
-			lastResult = internalDial(translatedAddress, timeout);
+			lastResult = internalDial(translatedAddress, timeout, secure);
 		} else {
 			log.warn(String.format("Channel (%s), invalid state", this));
 			lastResult = Result.ChannelInvalidCallState;

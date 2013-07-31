@@ -22,6 +22,7 @@ import com.admtel.telephonyserver.asterisk.events.ASTEvent.EventType;
 import com.admtel.telephonyserver.config.SwitchDefinition;
 import com.admtel.telephonyserver.core.Switch.SwitchStatus;
 import com.admtel.telephonyserver.core.Timers.Timer;
+import com.admtel.telephonyserver.events.RegisterExpireEvent;
 import com.admtel.telephonyserver.events.RegisteredEvent;
 import com.admtel.telephonyserver.events.UnregisteredEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSChannelBridgeEvent;
@@ -33,6 +34,7 @@ import com.admtel.telephonyserver.freeswitch.events.FSChannelOutgoingEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSCommandReplyEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSEvent;
 import com.admtel.telephonyserver.freeswitch.events.FSRegisterEvent;
+import com.admtel.telephonyserver.freeswitch.events.FSRegisterExpireEvent;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.misc.VariableMap;
 import com.admtel.telephonyserver.registrar.UserLocation;
@@ -263,6 +265,11 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 					}
 				}
 					break;
+				case FsRegisterExpire:{
+					FSRegisterExpireEvent registerExpireEvent = (FSRegisterExpireEvent) event;
+					EventsManager.getInstance().onEvent(new RegisterExpireEvent(registerExpireEvent.getUser()));
+				}
+				break;
 				case ChannelCreate:
 				case ChannelData:	//The order of these events are not guaranteed. (the can come on different threads too). need to synchronize
 				{

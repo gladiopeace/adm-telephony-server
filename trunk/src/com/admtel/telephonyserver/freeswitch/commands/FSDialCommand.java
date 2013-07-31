@@ -8,17 +8,19 @@ public class FSDialCommand extends FSCommand {
 
 	private String address;
 	private Long timeout;
+	private boolean secure;
 
-	public FSDialCommand(FSChannel channel,String address, Long timeout) {
+	public FSDialCommand(FSChannel channel,String address, Long timeout, boolean secure) {
 		super(channel);
 		this.address = address;
 		this.timeout = timeout;
+		this.secure = secure;
 	}
 	public String toString(){
 		return String
 		.format(
-				"SendMsg %s\ncall-command: %s\nexecute-app-name: %s\nexecute-app-arg: [leg_timeout=%d]%s\n",
-				channel.getId(), "execute", "bridge", timeout/1000, address); //TODO more parameters
+				"SendMsg %s\ncall-command: %s\nexecute-app-name: %s\nexecute-app-arg: [leg_timeout=%d,sip_secure_media=%b]%s\n",
+				channel.getId(), "execute", "bridge", timeout/1000, secure, address); //TODO more parameters
 	}
 
 }

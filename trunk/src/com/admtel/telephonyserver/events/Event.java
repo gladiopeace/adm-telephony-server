@@ -38,7 +38,7 @@ public abstract class Event {
 		DialFailed, 
 		Offered, 
 		Registered, 
-		Unregistered, Unlinked, Destroy, ConferenceLocked, ConferenceUnlocked,
+		Unregistered, Unlinked, Destroy, ConferenceLocked, ConferenceUnlocked, RegisterExpire,
 	}
 	
 	protected EventType eventType;	
