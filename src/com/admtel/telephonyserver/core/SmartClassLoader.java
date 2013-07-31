@@ -68,13 +68,19 @@ public class SmartClassLoader {
 			return (T)BeansManager.getInstance().getBean(className.substring(1));
 		}
 		Class c = getClassI(className);
-		if (c == null) return null;
+		if (c == null) {
+			log.fatal("Could not find class : " + className);
+			return null;
+		}
 		if (classType.isAssignableFrom(c)){
 			try {
 				return (T)c.newInstance();
 			} catch (Exception e) {
 				log.fatal(e.getMessage(), e);
 			}
+		}
+		else{
+			log.fatal("class : " + className +", is not assignable from "+classType);
 		}
 		return null;
 		

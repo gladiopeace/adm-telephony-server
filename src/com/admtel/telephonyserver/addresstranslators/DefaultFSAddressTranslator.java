@@ -17,7 +17,7 @@ public class DefaultFSAddressTranslator implements AddressTranslator {
 			case SIP:
 				if (address.getGateway() != null){
 					if (address.getGateway().contains(".")){ //Address is a domain
-						result = String.format("sofia/internal/%s@%s", address.getDestination(), address.getGateway());
+						result = String.format("sofia/external/%s@%s", address.getDestination(), address.getGateway());
 					}
 					else{ //Address is the name of a gateway
 						result = String.format("sofia/gateway/%s/%s",address.getGateway(), address.getDestination());
