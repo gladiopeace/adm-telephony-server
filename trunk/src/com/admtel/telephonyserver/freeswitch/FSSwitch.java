@@ -222,14 +222,14 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 				case CommandReply: {
 					FSCommandReplyEvent cre = (FSCommandReplyEvent) event;
 					if (cre.isSuccess()) {
-						FSSwitch.this.setStatus(SwitchStatus.Ready);
+						FSSwitch.this.setStatus(SwitchStatus.Started);
 						session.write("event plain all"); // TODO, create new
 															// state to
 						//session.write("event plain "+FSEvent.EVENTS_REPORT);
 						// check for return of event
 						// filter
 						state = State.LoggedIn;
-						setStatus(SwitchStatus.Ready);
+						setStatus(SwitchStatus.Started);
 					} else {
 						log.warn("Session failed to connect "
 								+ session.getRemoteAddress());

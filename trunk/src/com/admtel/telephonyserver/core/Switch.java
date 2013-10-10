@@ -20,7 +20,7 @@ public abstract class Switch {
 	private static Logger log = Logger.getLogger(Switch.class);
 
 	public enum SwitchStatus {
-		NotReady, Blocked, Ready, Starting, Stopping
+		NotReady, Stopped, Started, Starting, Stopping
 	};
 
 	private SwitchDefinition definition;
@@ -156,7 +156,7 @@ public abstract class Switch {
 	abstract public void processBasicIoMessage(BasicIoMessage message);
 
 	public boolean isAcceptingCalls() {
-		return definition.isEnabled() && status == SwitchStatus.Ready;
+		return definition.isEnabled() && status == SwitchStatus.Started;
 	}
 
 	public void setDefinition(SwitchDefinition def) {

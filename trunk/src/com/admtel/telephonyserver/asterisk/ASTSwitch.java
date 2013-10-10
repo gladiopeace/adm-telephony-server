@@ -223,9 +223,9 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 					ASTResponseEvent response = (ASTResponseEvent) event;
 					if (response.isSuccess()) {
 						log.debug(response.getMessage());
-						ASTSwitch.this.setStatus(SwitchStatus.Ready);
+						ASTSwitch.this.setStatus(SwitchStatus.Started);
 						state = State.LoggedIn;
-						setStatus(SwitchStatus.Ready);
+						setStatus(SwitchStatus.Started);
 					}
 				}
 			}
