@@ -206,7 +206,8 @@ a:hover {
 		    			<li><a href="?action=scripts">Scripts</a></li>
 		  				<li><a href="?action=queues">Queues</a></li>
 		  				<li><a href="?action=queue_calls">Queue Calls</a></li>	  					  			
-		  				<li><a href="?action=users">Users</a></li>	    			
+		  				<li><a href="?action=users">Users</a></li>
+		  				<li><a href="?action=switches">Switches</a></li>	    			
 	    			</ul>
 	    		</li>
 	  			<li class="has-sub"><a href="">Actions</a>

@@ -246,6 +246,7 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 				}
 				switch (event.getEventType()) {
 				case NewChannel: {
+					if (!isAcceptingCalls()) return;
 					ASTNewChannelEvent nce = (ASTNewChannelEvent) event;
 					ASTChannel channel = new ASTChannel(ASTSwitch.this,
 							nce.getChannelId(), message.getSession());

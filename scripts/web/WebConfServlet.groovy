@@ -112,6 +112,35 @@ class WebConfServlet extends AdmServlet {
 		['scripts':s]
 	}
 	
+	def switches(request, response){
+		def switches = Switches.getInstance().getAll();
+		['switches':switches]
+	}
+	def switchStop(request, response){
+		def _switch = Switches.getInstance().getById(request.getParameter("id"))
+		if (_switch){
+			_switch.setStatus(Switch.SwitchStatus.Stopped)
+		}
+		def switches = Switches.getInstance().getAll();
+		[page:'switches.ftl',switches:switches]
+	}
+	def switchStart(request, response){
+		def _switch = Switches.getInstance().getById(request.getParameter("id"))
+		if (_switch){
+			_switch.setStatus(Switch.SwitchStatus.Started)
+		}
+		def switches = Switches.getInstance().getAll();
+		[page:'switches.ftl',switches:switches]
+	}
+	def hangupAllChannels(request, response){
+		def _switch = Switches.getInstance().getById(request.getParameter("id"))
+		if (_switch){
+			_switch.hangupAllChannels()
+		}
+		def switches = Switches.getInstance().getAll();
+		[page:'switches.ftl',switches:switches]
+
+	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def queues(request, response){
 		AcdQueue[] q = AcdManager.getInstance().getQueues();
