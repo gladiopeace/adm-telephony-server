@@ -175,4 +175,21 @@ public abstract class Switch {
 	public String toReadableString(){
 		return String.format("%s|%s:%d|%s|%d\n", definition.getName(), definition.getAddress(), definition.getPort(), getStatus(), channels.size());
 	}
+	public String getName(){
+		return definition.getName();		
+	}
+	public String getAddress(){
+		return definition.getAddress();
+	}
+	public int getNumberOfChannels(){
+		return channels.size();
+	}
+	public String getId(){
+		return definition.getId();
+	}
+	public void hangupAllChannels(){
+		for (Channel c:channels.values()){
+			c.hangup(DisconnectCode.Normal);
+		}
+	}
 }

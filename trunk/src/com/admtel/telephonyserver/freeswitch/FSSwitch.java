@@ -273,6 +273,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 				case ChannelCreate:
 				case ChannelData:	//The order of these events are not guaranteed. (the can come on different threads too). need to synchronize
 				{
+					if (!isAcceptingCalls()) return;
 					FSChannelEvent ce = (FSChannelEvent) event;
 					synchronized (this){
 						FSChannel channel = (FSChannel) getChannel(ce.getChannelId());
