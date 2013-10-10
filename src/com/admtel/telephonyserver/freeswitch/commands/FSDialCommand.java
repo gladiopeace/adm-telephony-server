@@ -19,8 +19,8 @@ public class FSDialCommand extends FSCommand {
 	public String toString(){
 		return String
 		.format(
-				"SendMsg %s\ncall-command: %s\nexecute-app-name: %s\nexecute-app-arg: [leg_timeout=%d,sip_secure_media=%b]%s\n",
-				channel.getId(), "execute", "bridge", timeout/1000, secure, address); //TODO more parameters
+				"SendMsg %s\ncall-command: %s\nexecute-app-name: %s\nexecute-app-arg: [leg_timeout=%d,sip_secure_media=%b, sip_contact_user=%s]%s\n",
+				channel.getId(), "execute", "bridge", timeout/1000, secure, channel.getCallingStationId(), address); //TODO more parameters
 	}
 
 }

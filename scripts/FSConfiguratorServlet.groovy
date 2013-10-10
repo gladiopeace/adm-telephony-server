@@ -50,6 +50,7 @@ class FSConfiguratorServlet extends AdmServlet {
 											variables{
 												variable(name:'accountcode', value:u.getAccount())
 												variable(name:'effective_caller_id_number', value:u.getCallerId())
+												variable(name:'sip_contact_user', value:u.getCallerId())
 											}
 										}
 									}
