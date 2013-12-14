@@ -36,6 +36,7 @@ public class Timers extends Thread{
 			return duration;
 		}
 		public void setDuration(long duration) {
+			this.startTime = System.currentTimeMillis();
 			this.duration = duration;
 		}
 		public boolean isOneShot() {
