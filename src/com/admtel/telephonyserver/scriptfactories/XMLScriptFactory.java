@@ -15,6 +15,7 @@ import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.log4j.Logger;
 
 import com.admtel.telephonyserver.config.ConfigUtils;
+import com.admtel.telephonyserver.core.Channel;
 import com.admtel.telephonyserver.core.ChannelData;
 import com.admtel.telephonyserver.core.Script;
 import com.admtel.telephonyserver.core.SmartClassLoader;
@@ -32,23 +33,25 @@ public class XMLScriptFactory implements ScriptFactory, Loadable {
 	static class ScriptData {
 		public String name;
 		public String called;
+		public String context;
 		public String className;
 		public Map<String, String> parameters = new HashMap<String, String>();
 
 		// Pattern pattern;
 
-		public ScriptData(String name, String called, String className,
+		public ScriptData(String name, String called, String className, String context,
 				Map<String, String> parameters) {
 			super();
 			this.name = name;
 			this.called = called;
 			this.className = className;
 			this.parameters = parameters;
+			this.context = context;
 			// this.pattern = Pattern.compile(this.called);
 		}
 
 		public String toString() {
-			String result = name + ":" + called + ":" + className;
+			String result = name + ":" + called + ":" + className+":"+context;
 			for (String key : parameters.keySet()) {
 				result += "\t" + key+"="+ parameters.get(key);
 			}
@@ -67,19 +70,19 @@ public class XMLScriptFactory implements ScriptFactory, Loadable {
 	}
 
 	@Override
-	public Script createScript(ChannelData channelData) {
+	public Script createScript(Channel channel) {
 		Iterator<ScriptData> it = scripts.iterator();
 		while (it.hasNext()) {
 			ScriptData scriptData = it.next();
 			log.debug("CreateScript, checking scriptData {" + scriptData+"}" );
-			if (scriptData.matches(channelData.getCalledNumber())) {
+			if (scriptData.context.equals(channel.getContext()) && scriptData.matches(channel.getChannelData().getCalledNumber())) {
 				if (scriptData.className != null) {
 					try {
 						Script script = (Script) SmartClassLoader.createInstance(Script.class, scriptData.className);
 						if (script != null) {
 							log.debug(String.format(
 									"Created script for (%s) - script (%s)",
-									channelData.toString(), scriptData));
+									channel.getChannelData().toString(), scriptData));
 							script.setParameters(scriptData.parameters);
 						}
 						return script;
@@ -107,6 +110,7 @@ public class XMLScriptFactory implements ScriptFactory, Loadable {
 						"script(%d).called", counter));
 				String className = config.getString(String.format(
 						"script(%d).class", counter));
+				String context = config.getString(String.format("script(%d).context", counter), "internal");
 				Map<String, String> parameters = new HashMap<String, String>();
 				try{
 				HierarchicalConfiguration parametersConfig = config
@@ -117,7 +121,7 @@ public class XMLScriptFactory implements ScriptFactory, Loadable {
 				catch (Exception e){
 					log.warn(e.getMessage());
 				}
-				ScriptData sd = new ScriptData(name, called, className,
+				ScriptData sd = new ScriptData(name, called, className, context,
 						parameters);
 				scripts.add(sd);
 				counter++;

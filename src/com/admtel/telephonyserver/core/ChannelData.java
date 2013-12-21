@@ -19,7 +19,6 @@ public class ChannelData extends VariableMap {
 	private static final String DIALED_NUMBER = "DIALED_NUMBER";
 	private static final String DIALED_IP = "DIALED_IP";
 	
-	
 	public void setDialedChannel(String dialedChannel){
 		addVariable(DIALED_CHANNEL, dialedChannel);
 	}
