@@ -34,8 +34,9 @@ public class ScriptManager implements DefinitionChangeListener, Loadable{
 
 	public Script createScript(Channel channel) {		
 		Script script = null;
+		String context = channel.getContext();
 		for (ScriptFactory sf : scriptFactories.values()) {
-			script = sf.createScript(channel.getChannelData());
+			script = sf.createScript(channel);
 			if (script != null) {				
 				log.trace(String.format("Channel (%s) : Script(%s:%s)", channel.getUniqueId(), script.getId(), script.getDisplayStr()));
 				scripts.put(script.id, script);

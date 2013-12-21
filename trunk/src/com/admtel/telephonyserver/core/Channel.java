@@ -76,7 +76,7 @@ public abstract class Channel implements TimerNotifiable {
 	protected DateTime createdTime = new DateTime();
 	protected CallOrigin callOrigin = CallOrigin.Unknown;
 	// Radius needed attributes
-	protected DateTime setupTime;
+	protected DateTime setupTime = new DateTime();
 	protected DateTime hangupTime;
 	protected DateTime answerTime;
 
@@ -318,6 +318,7 @@ public abstract class Channel implements TimerNotifiable {
 
 	public abstract Result internalQueue(String queueName, boolean agent);
 
+	public abstract String getContext();
 	final public Result queue(String queueName, boolean agent) {
 		// TODO add more parameters
 		Result result = internalQueue(queueName, agent);

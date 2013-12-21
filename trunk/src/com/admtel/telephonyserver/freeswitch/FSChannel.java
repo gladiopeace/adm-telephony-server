@@ -722,6 +722,9 @@ public class FSChannel extends Channel {
 		internalState = new NullState();
 	}
 
+	public String getContext(){
+		return this.getChannelData().get("sofia_profile_name");
+	}
 	public void setIoSession(IoSession session) {
 		this.session = session;
 	}

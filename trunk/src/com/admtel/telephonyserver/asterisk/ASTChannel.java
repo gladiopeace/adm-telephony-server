@@ -973,6 +973,10 @@ public class ASTChannel extends Channel {
 		return null;
 	}
 
+	public String getContext(){
+		//TODO
+		return null;
+	}
 	@Override
 	public Result internalQueue(String queueName, boolean isAgent) {
 		internalState = new QueueState(queueName, isAgent);
