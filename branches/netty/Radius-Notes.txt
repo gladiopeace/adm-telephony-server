@@ -1,0 +1,7 @@
+Voice service
+acct-unique-id (contains the channel unique id)
+username (account id)
+
+Conference service
+acct-unique-id (contains the participant unique id)
+username (conference id)

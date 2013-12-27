@@ -1,0 +1,30 @@
+package com.admtel.telephonyserver.asterisk.events;
+
+import java.util.Map;
+
+public class ASTHangupEvent extends ASTChannelEvent {
+
+	@Override
+	public String toString() {
+		return "ASTHangupEvent [getCause()=" + getCause() + ", getCauseTxt()="
+				+ getCauseTxt() + "]";
+	}
+
+	public ASTHangupEvent(String switchId, Map<String, String> values) {
+		super(switchId, values);
+		eventType = EventType.Hangup;
+	}
+
+	public int getCause() {
+		try {
+			return Integer.parseInt(values.get("Cause"));
+		} catch (Exception e) {
+
+		}
+		return 0;
+	}
+
+	public String getCauseTxt() {
+		return values.get("Cause-txt");
+	}
+}

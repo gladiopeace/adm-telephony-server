@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scripts>
+
+
+	<script name="InboundTest">
+		<called>1</called>
+		<class>com.admtel.telephonyserver.scripts.InboundTestScript</class>
+	</script>
+
+	<script name="InboundTest2">
+		<called>2</called>
+		<class>com.admtel.telephonyserver.scripts.InboundTestScript2</class>
+	</script>
+	
+		<script name="voicemail">
+		<called>3</called>
+		<class>com.admtel.telephonyserver.scripts.SimpleTestScript</class>
+		<parameters>
+			<parameter name="language" value="english" />
+		</parameters>
+	</script>
+	
+	<script name="voicemail2">
+		<called>4</called>
+		<class>com.admtel.telephonyserver.scripts.SimpleTestScript</class>
+		<parameters>
+			<parameter name="language" value="arabic" />
+		</parameters>
+	</script>
+
+
+
+
+	<script name="PlayAndGetDigitsTest">
+		<called>801123</called>
+		<class>scripts/PlayAndGetDigitsTest.groovy</class>
+		<parameters>
+			<parameter name="language" value="english" />
+		</parameters>
+	</script>
+	
+	<script name="CompleteExample">
+		<called>801234</called>
+		<class>scripts/AdmCompleteExample.groovy</class>
+		<parameters>
+			<parameter name="language" value="english" />
+		</parameters>
+	</script>
+	
+	<script name="DialoutScript">
+		<called>801800</called>
+		<class>scripts/DialoutScript.groovy</class>
+		<parameters>
+			<parameter name="language" value="english" />
+		</parameters>
+	</script>
+	
+	<script name="Dialout">
+		<called>11111111</called>
+		<class>scripts/DialoutScript.groovy</class>
+	</script>
+	
+	
+	
+	
+	<script name="cc">
+		<called>801666</called>
+		<class>/home/user1/workspace/adm-telephony-scripts/src/callingcard/CallingCardScript.groovy
+		</class>
+		<parameters>
+			<!-- <parameter name="authorizer" value="com.admtel.telephonyserver.misc.SimpleAuthorizer"/> -->
+			<parameter name="authorizer"
+				value="com.admtel.telephonyserver.radius.RadiusAuthorizer" />
+		</parameters>
+	</script>
+
+	<script name="conference">
+		<called>801777</called>
+		<class>/home/user1/workspace/adm-telephony-scripts/src/conference/ConferenceScript.groovy
+		</class>
+		<parameters>
+			<!-- <parameter name="authorizer" value="com.admtel.telephonyserver.misc.SimpleAuthorizer"/> -->
+			<parameter name="authorizer"
+				value="com.admtel.telephonyserver.radius.RadiusAuthorizer" />
+		</parameters>
+	</script>
+
+	<script name="conferencetest">
+		<called>801711</called>
+		<class>/home/user1/workspace/adm-telephony-scripts/src/conference/ConferenceScript.groovy
+		</class>
+		<parameters>
+			<!-- <parameter name="authorizer" value="com.admtel.telephonyserver.misc.SimpleAuthorizer"/> -->
+			<parameter name="authorizer"
+				value="com.admtel.telephonyserver.radius.RadiusAuthorizer" />
+		</parameters>
+	</script>
+
+	<script name="contactcenter">
+		<called>801999</called>
+		<class>/home/user1/workspace/adm-telephony-scripts/src/ContactCenter/ContactCenterScript.groovy
+		</class>
+	</script>
+
+	<script name="TransitSwitch">
+		<called>[0-9]*</called>
+		<class>/home/user1/workspace/adm-telephony-scripts/src/transitswitch/TransitSwitchScript.groovy
+		</class>
+		<parameters>
+			<parameter name="language" value="english" />
+		</parameters>
+	</script>	
+</scripts>
