@@ -69,6 +69,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 		this.encodingDelimiter = "\n\n";
 		this.decodingDelimiter = "\n\n";
 		connector = new NioSocketConnector();		
+		
 		TextLineCodecFactory textLineCodecFactory = new TextLineCodecFactory(
 				Charset.forName("UTF-8"), encodingDelimiter, decodingDelimiter);
 		textLineCodecFactory.setDecoderMaxLineLength(16384);
