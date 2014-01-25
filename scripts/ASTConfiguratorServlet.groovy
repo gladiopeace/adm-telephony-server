@@ -14,13 +14,13 @@ class ASTConfiguratorServlet extends AdmServlet{
 	}
 	
 	@Override
-	public void process(HttpRequestMessage request, HttpResponseMessage response){
-		String name = request.getParameter("name")
-		String domain = request.getParameter("URI")
+	public void process(HttpRequestMessage request, HttpResponseMessage response){		
+		String name = URLDecoder.decode(request.getParameter("name"), 'UTF-8')
+		String domain = URLDecoder.decode(request.getParameter("URI"), 'UTF-8')
 		log.trace("Got ${name}:${domain}")
 		User u = userDAO.getUser(name)
 		if (u){			
-			response.appendBody("defaultuser=${name}&secret=${u.password}&context=default&host=dynamic&insecure=port"+
+			response.appendBody("defaultuser=${name}&secret=${u.password}&context=internal&host=dynamic&insecure=port"+
 				"&type=friend&accountcode=${u.account}&callerid=${u.callerId}&nat=force_rport\n\n")
 		}
 		else{

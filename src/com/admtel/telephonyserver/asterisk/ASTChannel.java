@@ -382,12 +382,11 @@ public class ASTChannel extends Channel {
 			case AsyncAgi: {
 				ASTAsyncAgiEvent agiEvent = (ASTAsyncAgiEvent) astEvent;
 				if (agiEvent.isStartAgi()) {
-					// ASTGetVariableCommand cmd = new
-					// ASTGetVariableCommand(ASTChannel.this, "adm_args");
-					// session.write(cmd);
 					variableFetcher.fetch("adm_args", "CHANNEL(peerip)");
 				}
+				ASTChannel.this.getChannelData().addVariable("context", agiEvent.getValue("agi_context"));
 			}
+			
 				break;
 
 			case Response: {
@@ -974,8 +973,7 @@ public class ASTChannel extends Channel {
 	}
 
 	public String getContext(){
-		//TODO
-		return null;
+		return this.getChannelData().get("context");
 	}
 	@Override
 	public Result internalQueue(String queueName, boolean isAgent) {
