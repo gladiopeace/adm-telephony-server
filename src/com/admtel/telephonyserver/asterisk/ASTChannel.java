@@ -424,6 +424,31 @@ public class ASTChannel extends Channel {
 
 			}
 				break;
+			case Dial: {
+				ASTDialEvent dialEvent = (ASTDialEvent) astEvent;
+				if (dialEvent.isBegin()) {
+					
+					Channel peerChannel = ASTChannel.this.getSwitch()
+							.getChannel(dialEvent.getPeerChannel());
+					if (peerChannel != null && peerChannel.getScript() != null){
+						peerChannel.getScript().addChannel(ASTChannel.this);
+					}
+					
+					internalState = new AlertingState();
+					onEvent(new DialStartedEvent(peerChannel, ASTChannel.this));
+					onEvent(new AlertingEvent(ASTChannel.this));
+					
+
+				} else {
+					if (dialEvent.getDialStatus() != DialStatus.Answer) {
+						onEvent(new DialFailedEvent(ASTChannel.this,
+								dialEvent.getDialStatus()));
+					}
+				}
+		
+			}
+				break;
+				
 			case NewState: {
 				ASTNewStateEvent nse = (ASTNewStateEvent) astEvent;
 				switch (nse.getChannelState()) {
