@@ -28,9 +28,11 @@ import com.admtel.telephonyserver.asterisk.events.ASTMeetmeJoinEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTMeetmeLeaveEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTMeetmeMuteEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTMeetmeTalkingEvent;
+import com.admtel.telephonyserver.asterisk.events.ASTNewCalleridEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTNewChannelEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTNewStateEvent;
 import com.admtel.telephonyserver.asterisk.events.ASTEvent.EventType;
+import com.admtel.telephonyserver.asterisk.events.ASTVarSetEvent;
 import com.admtel.telephonyserver.core.Timers.Timer;
 import com.admtel.telephonyserver.events.AcdQueueJoinedEvent;
 import com.admtel.telephonyserver.events.ConnectedEvent;
@@ -54,6 +56,8 @@ import com.admtel.telephonyserver.events.QueueJoinedEvent;
 import com.admtel.telephonyserver.events.QueueLeftEvent;
 import com.admtel.telephonyserver.freeswitch.FSChannel;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
+import com.admtel.telephonyserver.utils.SipParser;
+import com.admtel.telephonyserver.utils.UriRecord;
 import com.admtel.telephonyserver.core.CallOrigin;
 import com.admtel.telephonyserver.core.Channel;
 import com.admtel.telephonyserver.core.SigProtocol;
@@ -294,7 +298,8 @@ public class ASTChannel extends Channel {
 					if (peerChannel != null && peerChannel.getScript() != null){
 						peerChannel.getScript().addChannel(ASTChannel.this);
 					}
-					
+					UriRecord uriRecord = SipParser.parseDialString(dialEvent.getDialString());
+					ASTChannel.this.setCalledStationId(uriRecord.username);
 					internalState = new AlertingState();
 					onEvent(new DialStartedEvent(peerChannel, ASTChannel.this));
 					onEvent(new AlertingEvent(ASTChannel.this));
@@ -311,12 +316,12 @@ public class ASTChannel extends Channel {
 				break;
 
 			case NewChannel: {
-				ASTNewChannelEvent nce = (ASTNewChannelEvent) astEvent;
-				getChannelData().setCalledNumber(nce.getCalledNum());
+				ASTNewChannelEvent nce = (ASTNewChannelEvent) astEvent;				
 				getChannelData().setCallerIdNumber(nce.getCallerIdNum());
 				getChannelData().setUserName(nce.getUserName());
-				getChannelData().setServiceNumber(nce.getCalledNum());
+				getChannelData().setServiceNumber(nce.getExten());
 				setAccountCode(nce.getAccountCode());
+				getChannelData().setCalledNumber(nce.getExten());
 				switch (nce.getChannelState()) {
 				case Ring:
 					internalState = new OfferedState();
@@ -381,74 +386,21 @@ public class ASTChannel extends Channel {
 			switch (astEvent.getEventType()) {
 			case AsyncAgi: {
 				ASTAsyncAgiEvent agiEvent = (ASTAsyncAgiEvent) astEvent;
-				if (agiEvent.isStartAgi()) {
-					variableFetcher.fetch("adm_args", "CHANNEL(peerip)");
-				}
+				
 				ASTChannel.this.getChannelData().addVariable("context", agiEvent.getValue("agi_context"));
+				// Create script
+				ScriptManager.getInstance().createScript(ASTChannel.this);
+
+				if (ASTChannel.this.getAcctUniqueSessionId() == null) {
+					ASTChannel.this.setAcctUniqueSessionId(UUID
+							.randomUUID().toString());
+				}
+
+				ASTChannel.this.onEvent(new OfferedEvent(ASTChannel.this));
 			}
 			
 				break;
 
-			case Response: {
-				if (variableFetcher != null
-						&& variableFetcher.processASTEvent(astEvent)) { // We
-																		// got
-																		// all
-					// the
-					// needed
-					// variables
-					// for this
-					// channel
-					if (variableFetcher.getVariable("adm_args") != null) {
-						getChannelData().addDelimitedVars(
-								variableFetcher.getVariable("adm_args"), "&");
-					}
-					if (variableFetcher.getVariable("CHANNEL(peerip)") != null) {
-						getChannelData().setLoginIP(
-								variableFetcher.getVariable("CHANNEL(peerip)"));
-					}
-
-					log.trace(getChannelData());
-
-					// Create script
-					ScriptManager.getInstance().createScript(ASTChannel.this);
-
-					if (ASTChannel.this.getAcctUniqueSessionId() == null) {
-						ASTChannel.this.setAcctUniqueSessionId(UUID
-								.randomUUID().toString());
-					}
-
-					ASTChannel.this.onEvent(new OfferedEvent(ASTChannel.this));
-					variableFetcher = null;
-				}
-
-			}
-				break;
-			case Dial: {
-				ASTDialEvent dialEvent = (ASTDialEvent) astEvent;
-				if (dialEvent.isBegin()) {
-					
-					Channel peerChannel = ASTChannel.this.getSwitch()
-							.getChannel(dialEvent.getPeerChannel());
-					if (peerChannel != null && peerChannel.getScript() != null){
-						peerChannel.getScript().addChannel(ASTChannel.this);
-					}
-					
-					internalState = new AlertingState();
-					onEvent(new DialStartedEvent(peerChannel, ASTChannel.this));
-					onEvent(new AlertingEvent(ASTChannel.this));
-					
-
-				} else {
-					if (dialEvent.getDialStatus() != DialStatus.Answer) {
-						onEvent(new DialFailedEvent(ASTChannel.this,
-								dialEvent.getDialStatus()));
-					}
-				}
-		
-			}
-				break;
-				
 			case NewState: {
 				ASTNewStateEvent nse = (ASTNewStateEvent) astEvent;
 				switch (nse.getChannelState()) {
@@ -472,8 +424,6 @@ public class ASTChannel extends Channel {
 
 		public AlertingState() {
 			ASTChannel.this.setCallOrigin(CallOrigin.Outbound);
-//			variableFetcher.fetch("adm_args", "CHANNEL(peerip)",
-//					"DIALEDPEERNUMBER");
 		}
 
 		@Override
@@ -485,55 +435,6 @@ public class ASTChannel extends Channel {
 		@Override
 		public void processEvent(ASTEvent astEvent) {
 
-			if (variableFetcher.processASTEvent(astEvent)) { // We got all the
-				// needed
-				// variables for
-				// this channel
-				if (variableFetcher.getVariable("adm_args") != null) {
-					getChannelData().addDelimitedVars(
-							variableFetcher.getVariable("adm_args"), "&");
-				}
-				if (variableFetcher.getVariable("CHANNEL(peerip)") != null) {
-					getChannelData().setLoginIP(
-							variableFetcher.getVariable("CHANNEL(peerip)"));
-				}
-				if (variableFetcher.getVariable("DIALEDPEERNUMBER") != null) {
-					String dialedNumber = ASTChannel.this
-							.getDialedNumberFromDialedPeerNumber(variableFetcher
-									.getVariable("DIALEDPEERNUMBER"));
-					getChannelData().setCalledNumber(dialedNumber);
-				}
-				if (ASTChannel.this.getAcctUniqueSessionId() == null) { // This
-					// channel
-					// is
-					// not
-					// related
-					// to
-					// another
-					// channel
-					// (the
-					// first
-					// leg)
-					// Create script
-					ASTChannel.this.setAcctUniqueSessionId(UUID.randomUUID()
-							.toString());
-					ScriptManager.getInstance().createScript(ASTChannel.this);
-
-				} // Send outbound alerting event
-				AlertingEvent oa = new AlertingEvent(ASTChannel.this);
-				ASTChannel.this.onEvent(oa);
-
-				// In the case of asterisk, we know that we're here
-				// only because the channel was
-				// answered
-
-				/*
-				 * // TODO check the logic of this code AnsweredEvent ae = new
-				 * AnsweredEvent(ASTChannel.this); ASTChannel.this.currentState
-				 * = new IdleState(); ASTChannel.this.onEvent(ae);
-				 */
-
-			}
 			switch (astEvent.getEventType()) {
 
 			case NewState: {
@@ -548,6 +449,7 @@ public class ASTChannel extends Channel {
 
 			}
 				break;
+
 			}
 		}
 
@@ -865,6 +767,15 @@ public class ASTChannel extends Channel {
 				ASTChannel.this.onEvent(new DestroyEvent(this));
 			}
 				break;
+			case VarSet:{
+				ASTVarSetEvent vse = (ASTVarSetEvent) astEvent;
+				String variableName = vse.getName();
+				if (variableName.equals("SIPURI")){
+					UriRecord uriRecord = SipParser.parseUri(vse.getValue());
+					setLoginIP(uriRecord.host);
+				}
+			}
+			break;
 			}
 			if (internalState != null) {
 				internalState.processEvent(astEvent);
@@ -880,20 +791,6 @@ public class ASTChannel extends Channel {
 		} else if (id.toLowerCase().startsWith("iax2")) {
 			channelProtocol = SigProtocol.IAX2;
 		}
-	}
-
-	public String getDialedNumberFromDialedPeerNumber(String variable) {
-		String result = variable;
-		switch (channelProtocol) {
-		case SIP: {
-			int idx = variable.indexOf("@");
-			if (idx >= 0) {
-				result = variable.substring(0, idx);
-			}
-		}
-			break;
-		}
-		return result;
 	}
 
 	@Override

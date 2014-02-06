@@ -14,7 +14,7 @@ public class ASTNewChannelEvent extends ASTChannelEvent {
 	public String getCallerIdNum(){
 		return values.get("CallerIDNum");
 	}
-	public String getCalledNum(){
+	public String getExten(){
 		return values.get("Exten");
 	}
 	public String getUserName() {

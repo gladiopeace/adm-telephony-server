@@ -70,8 +70,7 @@ public class HttpServer implements IoHandler {
 				AdmServletDefinition servletDefinition = definition.getServletDefinition(request.getContext());
 				AdmServlet servlet = null;
 				if (servletDefinition != null){
-					servlet = SmartClassLoader.createInstance(AdmServlet.class, servletDefinition.getClassName());
-					log.trace(servlet);				
+					servlet = SmartClassLoader.createInstance(AdmServlet.class, servletDefinition.getClassName());						
 				}
 				
 				if (servlet == null){
@@ -150,7 +149,7 @@ public class HttpServer implements IoHandler {
 
 		ExecutorFilter executorFilter = new ExecutorFilter(executor);
 		acceptor.getFilterChain().addFirst("executor", executorFilter);
-		acceptor.getFilterChain().addLast("logger", new LoggingFilter());
+		//acceptor.getFilterChain().addLast("logger", new LoggingFilter());
 		acceptor.getFilterChain().addLast("codec",
 				new ProtocolCodecFilter(new HttpServerProtocolCodecFactory()));
 

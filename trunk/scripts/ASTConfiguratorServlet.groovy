@@ -9,6 +9,17 @@ class ASTConfiguratorServlet extends AdmServlet{
 	
 	public UserDAO userDAO;
 	
+	/*
+	 * Pull configuration for asterisk
+	 * To configure asterisk:
+	 * 	in extconfig.conf : sippeers=curl,http://<SERVER>//asterisk-curl
+	 * 
+	 * 
+	 * Don't forget to enable agi in manager.conf
+	 * read=system,call,agent,user,config,dtmf,reporting,cdr,dialplan,agi
+		write = system,call,agent,user,config,command,reporting,originate,agi
+	 * 
+	 * */
 	static Logger log = Logger.getLogger(ASTConfiguratorServlet.class)
 	public void init(){
 	}
@@ -16,8 +27,7 @@ class ASTConfiguratorServlet extends AdmServlet{
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){		
 		String name = URLDecoder.decode(request.getParameter("name"), 'UTF-8')
-		String domain = URLDecoder.decode(request.getParameter("URI"), 'UTF-8')
-		log.trace("Got ${name}:${domain}")
+		String domain = URLDecoder.decode(request.getParameter("URI"), 'UTF-8')		
 		User u = userDAO.getUser(name)
 		if (u){			
 			response.appendBody("defaultuser=${name}&secret=${u.password}&context=internal&host=dynamic&insecure=port"+

@@ -31,6 +31,7 @@ public class ASTEvent{
 			EVENTS_MAP.put("Join", ASTJoinEvent.class.getConstructor(String.class, Map.class));
 			EVENTS_MAP.put("MeetmeMute", ASTMeetmeMuteEvent.class.getConstructor(String.class, Map.class));
 			EVENTS_MAP.put("VarSet", ASTVarSetEvent.class.getConstructor(String.class, Map.class));
+			EVENTS_MAP.put("NewCallerid", ASTNewCalleridEvent.class.getConstructor(String.class, Map.class));
 		}
 		catch (Exception e) {
 			log.fatal(e.getMessage());
@@ -85,7 +86,7 @@ public class ASTEvent{
 	}
 	public enum EventType{
 		Response, AsyncAgi, NewChannel, NewState, Dtmf, Hangup, AgiExec, OriginateResponse, 
-		Dial, Bridge, MeetmeJoin, MeetmeTalking, MeetmeLeave, PeerStatus, Join, Leave, MeetmeMute, VarSet};
+		Dial, Bridge, MeetmeJoin, MeetmeTalking, MeetmeLeave, PeerStatus, Join, Leave, MeetmeMute, VarSet, NewCallerId};
 	
 	protected EventType eventType;
 	private String switchId;
