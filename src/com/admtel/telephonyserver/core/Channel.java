@@ -621,21 +621,10 @@ public abstract class Channel implements TimerNotifiable {
 		case DialStarted: {
 			DialStartedEvent dse = (DialStartedEvent) e;
 			if (dse.getDialedChannel() != null) {
-				// TODO
-				/*
-				 * dse.getDialedChannel().getChannelData().setLoginIP(
-				 * getChannelAddress());
-				 * 
-				 */
+
 				Channel dialingChannel = dse.getChannel();
 				Channel dialedChannel = dse.getDialedChannel();
-				if (dialingChannel.getChannelData().getDialedNumber() != null){
-					dialedChannel.setCalledStationId(dialingChannel.getChannelData().getDialedNumber());
-				}
-				else{
-					dialedChannel.setCalledStationId(dialingChannel.getCalledStationId());
-				}
-				dialedChannel.getChannelData().setDialedChannel(dialingChannel.getChannelData().getDialedChannel());
+
 				dialedChannel.getChannelData().setDialedIP(dialingChannel.getChannelData().getDialedIP());
 				dialedChannel.setCallingStationId(dialingChannel.getCallingStationId());
 				
@@ -644,6 +633,7 @@ public abstract class Channel implements TimerNotifiable {
 				dialedChannel.getChannelData().setDestinationNumberIn(dialingChannel.getChannelData().getCalledNumber());
 				dialedChannel.getChannelData().setRemoteIP(dialingChannel.getLoginIP());
 				dialedChannel.setAccountCode(dialingChannel.getAccountCode());
+				dialedChannel.setServiceNumber(dialingChannel.getServiceNumber());
 				dialedChannel.setOtherChannel(dialingChannel);
 			}
 		}
@@ -793,6 +783,9 @@ public abstract class Channel implements TimerNotifiable {
 		return getChannelData().getLoginIP();
 	}
 
+	public void setLoginIP(String ip){
+		getChannelData().setLoginIP(ip);
+	}
 	public void setChannelData(ChannelData channelData) {
 		this.channelData = channelData;
 	}

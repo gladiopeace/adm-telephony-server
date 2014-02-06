@@ -26,6 +26,12 @@ public class ASTDialEvent extends ASTChannelEvent {
 		String subEvent = values.get("SubEvent");
 		return subEvent != null && subEvent.equals("Begin");
 	}
+	public String getDialString(){
+		if (values.containsKey("Dialstring")){
+			return values.get("Dialstring");
+		}
+		return "";
+	}
 	public DialStatus getDialStatus(){
 		DialStatus result = DialStatus.Unknown;
 		String dialStatus = values.get("DialStatus");

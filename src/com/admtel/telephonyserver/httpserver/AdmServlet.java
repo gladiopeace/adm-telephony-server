@@ -58,7 +58,6 @@ abstract public class AdmServlet {
 			}
 		}
 		}
-        log.trace("Request Dump " + dump(request));
 
 		process(request, response);
 		String sessionId = request.getParameter("session");
