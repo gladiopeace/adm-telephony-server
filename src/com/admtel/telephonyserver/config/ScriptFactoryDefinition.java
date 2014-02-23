@@ -1,7 +1,12 @@
 package com.admtel.telephonyserver.config;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ScriptFactoryDefinition implements DefinitionInterface{
 	String className;
+	
+	Map<String, String>parameters = new HashMap<String, String>();
 	
 	@Override
 	public String getId() {
@@ -14,6 +19,14 @@ public class ScriptFactoryDefinition implements DefinitionInterface{
 
 	public void setClassName(String className) {
 		this.className = className;
+	}
+
+	public Map<String, String> getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(Map<String, String> parameters) {
+		this.parameters = parameters;
 	}
 
 	@Override

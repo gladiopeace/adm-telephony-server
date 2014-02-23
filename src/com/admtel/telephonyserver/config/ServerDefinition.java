@@ -5,9 +5,6 @@ public class ServerDefinition implements DefinitionInterface {
 	int maxThreads = 10;
 	String address = "127.0.0.1";
 	String baseDirectory = "/usr/local/adm";
-	Boolean startAccounting = true;
-	Boolean stopAccounting = true;
-	int interimUpdate =10;
 	String scriptPath=".;./scripts";
 	
 	public String getScriptPath() {
@@ -15,24 +12,6 @@ public class ServerDefinition implements DefinitionInterface {
 	}
 	public void setScriptPath(String scriptPath) {
 		this.scriptPath = scriptPath;
-	}
-	public Boolean getStartAccounting() {
-		return startAccounting;
-	}
-	public void setStartAccounting(Boolean startAccounting) {
-		this.startAccounting = startAccounting;
-	}
-	public Boolean getStopAccounting() {
-		return stopAccounting;
-	}
-	public void setStopAccounting(Boolean stopAccounting) {
-		this.stopAccounting = stopAccounting;
-	}
-	public int getInterimUpdate() {
-		return interimUpdate;
-	}
-	public void setInterimUpdate(int interimUpdate) {
-		this.interimUpdate = interimUpdate;
 	}
 	public String getAddress() {
 		return address;
@@ -61,16 +40,9 @@ public class ServerDefinition implements DefinitionInterface {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((address == null) ? 0 : address.hashCode());
-		result = prime * result
-				+ ((baseDirectory == null) ? 0 : baseDirectory.hashCode());
-		result = prime * result + interimUpdate;
+		result = prime * result + ((baseDirectory == null) ? 0 : baseDirectory.hashCode());
 		result = prime * result + maxThreads;
-		result = prime * result
-				+ ((scriptPath == null) ? 0 : scriptPath.hashCode());
-		result = prime * result
-				+ ((startAccounting == null) ? 0 : startAccounting.hashCode());
-		result = prime * result
-				+ ((stopAccounting == null) ? 0 : stopAccounting.hashCode());
+		result = prime * result + ((scriptPath == null) ? 0 : scriptPath.hashCode());
 		return result;
 	}
 	@Override
@@ -92,8 +64,6 @@ public class ServerDefinition implements DefinitionInterface {
 				return false;
 		} else if (!baseDirectory.equals(other.baseDirectory))
 			return false;
-		if (interimUpdate != other.interimUpdate)
-			return false;
 		if (maxThreads != other.maxThreads)
 			return false;
 		if (scriptPath == null) {
@@ -101,35 +71,15 @@ public class ServerDefinition implements DefinitionInterface {
 				return false;
 		} else if (!scriptPath.equals(other.scriptPath))
 			return false;
-		if (startAccounting == null) {
-			if (other.startAccounting != null)
-				return false;
-		} else if (!startAccounting.equals(other.startAccounting))
-			return false;
-		if (stopAccounting == null) {
-			if (other.stopAccounting != null)
-				return false;
-		} else if (!stopAccounting.equals(other.stopAccounting))
-			return false;
 		return true;
 	}
 	
 	@Override
 	public String toString() {
-		return "ServerDefinition ["
+		return "ServerDefinition [maxThreads=" + maxThreads + ", "
 				+ (address != null ? "address=" + address + ", " : "")
-				+ (baseDirectory != null ? "baseDirectory=" + baseDirectory
-						+ ", " : "")
-				+ "interimUpdate="
-				+ interimUpdate
-				+ ", maxThreads="
-				+ maxThreads
-				+ ", "
-				+ (scriptPath != null ? "scriptPath=" + scriptPath + ", " : "")
-				+ (startAccounting != null ? "startAccounting="
-						+ startAccounting + ", " : "")
-				+ (stopAccounting != null ? "stopAccounting=" + stopAccounting
-						: "") + "]";
+				+ (baseDirectory != null ? "baseDirectory=" + baseDirectory + ", " : "")
+				+ (scriptPath != null ? "scriptPath=" + scriptPath : "") + "]";
 	}
 	@Override
 	public boolean isCoreChange(DefinitionInterface definition) {

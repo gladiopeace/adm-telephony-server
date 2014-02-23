@@ -91,7 +91,10 @@ public abstract class Channel implements TimerNotifiable {
 	protected Locale language;
 
 	private String conferenceId;
-
+	private Integer interimUpdateInterval = 0;//Default disable, in seconds
+	private boolean sendAccountingStart = false; 
+	private boolean sendAccountingStop = false;
+	
     //For debugging purposes, keep the events in a queue for later dump
 	protected LimitedQueue eventsQueue = new LimitedQueue(20);
 	protected Script script;
@@ -172,6 +175,25 @@ public abstract class Channel implements TimerNotifiable {
 		return new Duration(answerTime, new DateTime()).getStandardSeconds();
 	}
 
+	public Integer getInterimUpdateInterval() {
+		return interimUpdateInterval;
+	}
+	public void setInterimUpdateInterval(Integer interimUpdateInterval) {
+		this.interimUpdateInterval = interimUpdateInterval;
+	}
+	
+	public boolean isSendAccountingStart() {
+		return sendAccountingStart;
+	}
+	public void setSendAccountingStart(boolean sendAccountingStart) {
+		this.sendAccountingStart = sendAccountingStart;
+	}
+	public boolean isSendAccountingStop() {
+		return sendAccountingStop;
+	}
+	public void setSendAccountingStop(boolean sendAccountingStop) {
+		this.sendAccountingStop = sendAccountingStop;
+	}
 	public String getServiceNumber() {
 		return getChannelData().getServiceNumber();
 	}
@@ -611,8 +633,10 @@ public abstract class Channel implements TimerNotifiable {
 		case Connected:
 			setCallState(CallState.Connected);
 			setAnswerTime(new DateTime());
-			sendInterimUpdate();
-			interimUpdateTimer = Timers.getInstance().startTimer(this,SystemConfig.getInstance().serverDefinition.getInterimUpdate() * 1000, false,TimersDefs.InterimUpdateTimer);
+			if (interimUpdateInterval > 0){
+				sendInterimUpdate();
+				interimUpdateTimer = Timers.getInstance().startTimer(this,interimUpdateInterval * 1000, false,TimersDefs.InterimUpdateTimer);
+			}
 
 			break;
 		case AcdQueueJoined:

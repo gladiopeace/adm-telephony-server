@@ -1,7 +1,6 @@
 package com.admtel.telephonyserver.config;
 
 import java.util.ArrayList;
-
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +15,8 @@ import com.admtel.telephonyserver.core.Switch;
 import com.admtel.telephonyserver.core.Switches;
 
 public class SystemConfig {
+
+	private static final String SCRIPTFACTORIES_SCRIPTFACTORY_D_PARAMETERS = "scriptfactories.scriptfactory(%d).parameters";
 
 	private static final String CONFIG_XML = "config.xml";
 
@@ -77,12 +78,6 @@ public class SystemConfig {
 
 	private static final String SWITCH_LISTENERS_SWITCH_LISTENER_D = "switch-listeners.switch-listener(%d)";
 
-	private static final String SERVER_RADIUS_INTERIM_UPDATE = "server.radius-interim-update";
-
-	private static final String SERVER_RADIUS_STOP_ACCOUNTING = "server.radius-stop-accounting";
-
-	private static final String SERVER_RADIUS_START_ACCOUNTING = "server.radius-start-accounting";
-
 	private static final String SERVER_SCRIPT_PATH = "server.script-path";
 
 	private static final String SERVER_BASE_DIRECTORY = "server.base-directory";
@@ -94,6 +89,8 @@ public class SystemConfig {
 	static Logger log = Logger.getLogger(SystemConfig.class);
 	
 	XMLConfiguration config;
+	String configPath="./";
+	
 	Map<String, DefinitionInterface> currentDefinitions = new Hashtable<String, DefinitionInterface>();
 	Map<String, DefinitionInterface> futureDefinitions = new Hashtable<String, DefinitionInterface>();
 
@@ -136,13 +133,6 @@ public class SystemConfig {
 		serverDefinition.setBaseDirectory(config
 				.getString(SERVER_BASE_DIRECTORY));
 		serverDefinition.setScriptPath(config.getString(SERVER_SCRIPT_PATH));
-		serverDefinition.setStartAccounting(config.getBoolean(
-				SERVER_RADIUS_START_ACCOUNTING, true));
-		serverDefinition.setStopAccounting(config.getBoolean(
-				SERVER_RADIUS_STOP_ACCOUNTING, true));
-		serverDefinition.setInterimUpdate(config
-				.getInt(
-				SERVER_RADIUS_INTERIM_UPDATE, 0));
 		this.serverDefinition = serverDefinition;
 	}
 
@@ -305,6 +295,17 @@ public class SystemConfig {
 				if (subnode != null) {
 					ScriptFactoryDefinition definition = new ScriptFactoryDefinition();
 					definition.setClassName(subnode.getString(CLASS));
+					try{
+						HierarchicalConfiguration parametersConfig = config
+								.configurationAt(String.format(SCRIPTFACTORIES_SCRIPTFACTORY_D_PARAMETERS,
+										counter));
+						 Map<String,String>parameters = ConfigUtils.loadParameters(parametersConfig);
+						 definition.setParameters(parameters);
+						}
+						catch (Exception e){
+							log.warn(e.getMessage());
+						}
+
 					futureDefinitions.put(definition.getId(), definition);
 				} else {
 					return;
@@ -473,7 +474,7 @@ public class SystemConfig {
 
 	private SystemConfig() {
 		try {
-			config = new XMLConfiguration(CONFIG_XML);
+			config = new XMLConfiguration(configPath+CONFIG_XML);
 			config.setReloadingStrategy(new FileChangedReloadingStrategy());
 			// config.setExpressionEngine(new XPathExpressionEngine());
 		} catch (Exception e) {
@@ -482,6 +483,9 @@ public class SystemConfig {
 		}
 	}
 
+	public void setConfigPath(String configPath){
+		this.configPath=configPath;
+	}
 	private static class SingletonHolder {
 		private final static SystemConfig instance = new SystemConfig();
 	}
