@@ -1,5 +1,7 @@
 package com.admtel.telephonyserver.scriptfactories;
 
+import java.util.Map;
+
 import com.admtel.telephonyserver.core.Channel;
 import com.admtel.telephonyserver.core.ChannelData;
 import com.admtel.telephonyserver.core.Script;
@@ -12,5 +14,11 @@ public class SimpleScriptFactory implements ScriptFactory {
 	public Script createScript (Channel channel){
 		// TODO Auto-generated method stub
 		return new SimpleTestScript();
+	}
+
+	@Override
+	public void setParameters(Map<String, String> parameters) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -80,8 +80,11 @@ public class AdmTelephonyServer {
 		}
 	}
 
+	void setConfigPath(String configPath){
+		SystemConfig.getInstance().setConfigPath(configPath);
+	}
 
-	private void start() {
+	public void start() {
 
 		SystemConfig sysConfig = SystemConfig.getInstance();
 

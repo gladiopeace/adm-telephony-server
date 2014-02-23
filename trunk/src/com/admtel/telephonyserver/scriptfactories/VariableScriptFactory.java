@@ -1,5 +1,7 @@
 package com.admtel.telephonyserver.scriptfactories;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 
 import com.admtel.telephonyserver.core.Channel;
@@ -31,6 +33,12 @@ public class VariableScriptFactory implements ScriptFactory {
 			} 
 		}
 		return null;
+	}
+
+	@Override
+	public void setParameters(Map<String, String> parameters) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

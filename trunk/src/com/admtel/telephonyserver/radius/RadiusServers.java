@@ -142,25 +142,25 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 	}
 
 	private void onAlerting(AlertingEvent event) {
-		accountingStart(event.getChannel());
+		if (event.getChannel().isSendAccountingStart()){
+			accountingStart(event.getChannel());
+		}
 	}
 
 	private void onOffered(OfferedEvent event) {
-		log.trace(event);
-		accountingStart(event.getChannel());
+		if (event.getChannel().isSendAccountingStart()){
+			accountingStart(event.getChannel());
+		}
 	}
 
 	private void onHangupEvent(DisconnectedEvent event) {
-		log.trace(event);
-		accountingStop(event.getChannel());
+		if (event.getChannel().isSendAccountingStop()){
+			accountingStop(event.getChannel());
+		}
 	}
 
 	public boolean accountingInterimUpdate(Channel channel) {
 		if (!isEnabled()) return false;
-		if (SystemConfig.getInstance().serverDefinition.getInterimUpdate() <= 0){
-			return false;
-		}
-		log.trace("**************************************accountingStart***************************************");
 		RadiusServer radiusServer = getAvailableServer();
 		if (radiusServer != null){
 			radiusServer.accountingInterimUpdate(channel);
@@ -170,10 +170,6 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 
 	public boolean accountingStart(Channel channel) {
 		if (!isEnabled()) return false;
-		if (!SystemConfig.getInstance().serverDefinition.getStartAccounting()){
-			return false;
-		}
-		log.trace("**************************************accountingStart***************************************");
 		RadiusServer radiusServer = getAvailableServer();
 		if (radiusServer != null){
 			radiusServer.accountingStart(channel);
@@ -183,10 +179,6 @@ public class RadiusServers implements DefinitionChangeListener, Authorizer,
 
 	public boolean accountingStop(Channel channel) {
 		if (!isEnabled()) return false;
-		if (!SystemConfig.getInstance().serverDefinition.getStopAccounting()){
-			return false;
-		}
-		log.trace("**************************************accountingStart***************************************");
 		RadiusServer radiusServer = getAvailableServer();
 		if (radiusServer != null){
 			radiusServer.accountingStop(channel);
