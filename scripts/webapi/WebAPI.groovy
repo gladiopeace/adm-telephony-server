@@ -22,12 +22,12 @@ class WebAPI extends AdmServlet {
 	static Logger log = Logger.getLogger(WebAPI.class)
 	
 	
-	public TokenSecurityProvider securityProvider;
+	String securityKey
+	
 	public init(){
 		
 	}
-	def index(request){
-		println "*********** index ${securityProvider}"
+	def index(request){		
 		"Welcome"
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -341,9 +341,7 @@ class WebAPI extends AdmServlet {
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
 				
-		if (securityProvider.getSecurityLevel(request.getParameter('token')) > 0){
-			
-			
+		if (securityKey == request.getParameter('key')){
 			def action = request.getParameter("action")
 			if (!(action?.length()>0)){
 				action = 'index'
