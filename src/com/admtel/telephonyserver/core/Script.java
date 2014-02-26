@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.mortbay.log.Log;
 
 import com.admtel.telephonyserver.core.Channel.CallState;
 import com.admtel.telephonyserver.events.DialStartedEvent;
@@ -92,7 +91,7 @@ public abstract class Script implements EventListener {
 			try {
 				processEvent(event);
 			} catch (Exception e) {
-				Log.warn(e.toString());
+				gLog.warn(e.toString());
 			}
 
 			if (event.getEventType() == Event.EventType.Disconnected) {

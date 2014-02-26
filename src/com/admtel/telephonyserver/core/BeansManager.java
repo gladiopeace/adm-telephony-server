@@ -112,7 +112,7 @@ public class BeansManager implements DefinitionChangeListener, Loadable{
 										Integer.parseInt(parameter.getValue()));
 							}
 						} else if (fieldType.isAssignableFrom(String.class)) {
-							field.set(obj, parameter.getValue());
+							field.set(obj, parameter.getValue().toString());
 						} else {
 							Object bean = getBean(parameter.getValue()); //must be an object
 							if (bean == null) {
