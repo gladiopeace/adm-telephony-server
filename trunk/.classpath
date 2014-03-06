@@ -24,7 +24,6 @@
 	<classpathentry kind="lib" path="lib/mina-core-2.0.7.jar" sourcepath="/Users/danny/Downloads/apache-mina-2.0.7-src(1)/apache-mina-2.0.7/src/mina-core/src/main/java"/>
 	<classpathentry kind="lib" path="lib/json-lib-2.4-jdk15.jar"/>
 	<classpathentry kind="lib" path="lib/groovy-all-2.0.6.jar"/>
-	<classpathentry exported="true" kind="con" path="GROOVY_DSL_SUPPORT"/>
 	<classpathentry kind="lib" path="lib/postgresql-9.2-1002.jdbc3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

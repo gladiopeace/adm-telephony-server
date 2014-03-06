@@ -27,7 +27,7 @@ class WebConfServlet extends AdmServlet {
 	static{
 		config = new Configuration()
 		try{
-			config.setDirectoryForTemplateLoading(new File("./scripts/web"))
+			config.setDirectoryForTemplateLoading(new File("./dynamic_beans/web"))
 		}
 		catch (Exception e){
 			log.fatal(e.getMessage(), e)
