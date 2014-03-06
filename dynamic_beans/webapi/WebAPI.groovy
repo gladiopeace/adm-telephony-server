@@ -5,15 +5,21 @@ import com.admtel.telephonyserver.core.*;
 import java.io.StringWriter;
 
 import org.apache.log4j.Logger;
+
 import com.admtel.telephonyserver.requests.*;
 import com.admtel.telephonyserver.httpserver.HttpRequestMessage;
 import com.admtel.telephonyserver.httpserver.HttpResponseMessage;
+
 import groovy.xml.MarkupBuilder;
+
 import com.admtel.telephonyserver.httpserver.AdmServlet;
 import com.admtel.telephonyserver.interfaces.TokenSecurityProvider;
 import com.admtel.telephonyserver.acd.*;
 import com.admtel.telephonyserver.events.DisconnectCode;
+
 import java.net.URLDecoder;
+import java.security.PublicKey;
+
 import net.sf.json.groovy.JsonGroovyBuilder;
 import net.sf.json.*;
 
@@ -22,7 +28,7 @@ class WebAPI extends AdmServlet {
 	static Logger log = Logger.getLogger(WebAPI.class)
 	
 	
-	String securityKey
+	public String securityKey
 	
 	public init(){
 		

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scripts>
+
+
+	<script name="InboundTest">
+		<called>1</called>
+		<context>internal</context>
+		<class>com.admtel.telephonyserver.scripts.InboundTestScript</class>
+	</script>
+
+	<script name="InboundTest2">
+		<called>2</called>
+		<context>internal</context>
+		<class>com.admtel.telephonyserver.scripts.InboundTestScript2</class>
+	</script>
+
+	<script name="PlayAndGetDigitsTest">
+		<called>3</called>
+		<context>internal</context>
+		<class>scripts/PlayAndGetDigitsTest.groovy</class>
+		<parameters>
+			<parameter name="language" value="english" />
+		</parameters>
+	</script>
+
+	<script name="voicemail">
+		<called>1234</called>
+		<context>internal</context>
+		<class>com.admtel.telephonyserver.scripts.SimpleTestScript</class>
+		<parameters>
+			<parameter name="language" value="arabic" />
+		</parameters>
+	</script>
+
+	<script name="voicemail2">
+		<called>801123</called>
+		<context>internal</context>
+		<class>com.admtel.telephonyserver.scripts.SimpleTestScript</class>
+		<parameters>
+			<parameter name="language" value="english" />
+		</parameters>
+	</script>
+
+	<script name="DialoutScript">
+		<called>801800</called>
+		<context>internal</context>
+		<class>scripts/DialoutScript.groovy</class>
+		<parameters>
+			<parameter name="language" value="english" />
+		</parameters>
+	</script>
+	<script name="CompleteExample">
+	    <context>internal</context>
+		<called>801234</called>
+		<class>scripts/AdmCompleteExample.groovy</class>
+		<parameters>
+			<parameter name="language" value="english" />
+		</parameters>
+	</script>
+	<script name="Dialout">
+	    <context>internal</context>
+		<called>11111111</called>
+		<class>scripts/DialoutScript.groovy</class>
+	</script>
+	<script name="cc">
+	    <context>internal</context>
+		<called>801666</called>
+		<class>/Users/danny/Admtel_Source/adm-telephony-scripts/src/callingcard/CallingCardScript.groovy
+		</class>
+		<parameters>
+			<!-- <parameter name="authorizer" value="com.admtel.telephonyserver.misc.SimpleAuthorizer"/> -->
+			<parameter name="authorizer"
+				value="com.admtel.telephonyserver.radius.RadiusAuthorizer" />
+		</parameters>
+	</script>
+
+	<script name="conference">
+	    <context>internal</context>
+		<called>801888</called>
+		<class>/Users/danny/Admtel_Source/adm-telephony-scripts/src/conference/ConferenceScript.groovy
+		</class>
+		<parameters>
+<!-- 			<parameter name="authorizer" value="com.admtel.telephonyserver.misc.SimpleAuthorizer"/> -->
+			<parameter name="authorizer"
+				value="com.admtel.telephonyserver.radius.RadiusAuthorizer" />
+				<parameter name="conference-server" value="http://localhost:8058/adm-conference-server"/>
+		</parameters>
+	</script>
+
+	<script name="contactcenter">
+	    <context>internal</context>
+		<called>801999</called>
+		<class>/Users/danny/Admtel_Source/adm-telephony-scripts/src/ContactCenter/ContactCenterScript.groovy
+		</class>
+	</script>
+
+	<script name="MCU">
+	    <context>internal</context>
+	    <called>801777</called>
+	    <class>/Users/danny/Admtel_Source/adm-telephony-scripts/src/mcu/McuScript.groovy</class>
+	    		<parameters>
+			<parameter name="authorizer"
+				value="com.admtel.telephonyserver.radius.RadiusAuthorizer" />
+				<parameter name="conference-server" value="http://localhost:8058/adm-conference-server"/>
+		</parameters>
+	    
+	</script>
+	<script name="test">
+	    <context>internal</context>
+	    <called>801567</called>
+	    <class>/Users/danny/Admtel_Source/adm-telephony-scripts/src/test/Test_Script.groovy</class>
+	</script>
+<!-- 	<script name="TransitSwitch">
+		<called>.*</called>
+		<class>/Users/danny/Admtel_Source/adm-telephony-scripts/src/transitswitch/TransitSwitchScript.groovy
+		</class>
+		<parameters>
+			<parameter name="language" value="english" />
+		</parameters>
+	</script>	 -->
+<!-- 	<script name="AdmPBX">
+		<called>.*</called>
+		<class>/Users/danny/Admtel_Source/adm-telephony-scripts/src/admpbx/AdmPbxScript.groovy
+		</class>
+		<parameters>
+			<parameter name="language" value="english" />
+		</parameters>		
+	</script>
+ -->
+<!--  	<script name="sbc">
+ 	    <called>.*</called>
+		<class>/Users/danny/Admtel_Source/adm-telephony-scripts/src/sbc/SBC_Script.groovy
+		</class>
+		<parameters>
+			<parameter name="language" value="english" />
+			<parameter name="rest_url" value="http://localhost:8090/adm-phonelist-manager/"/>
+			<parameter name="key" value="ac3e3a40-408a-11e2-a25f-0800200c9a66"/>
+			<parameter name="db_connection" value="jdbc:postgresql://localhost:5432/adm_phone_list"/>
+			<parameter name="db_user" value="postgres"/>
+			<parameter name="db_password" value="voicelynx1201"/>
+			<parameter name="db_driver" value="org.postgresql.Driver"/>
+		</parameters>		 	   	   
+ 	</script> -->
+ 	<script name="did">
+  	    <context>external</context>
+ 	    <called>.*</called>
+		<class>/Users/danny/Admtel_Source/adm-telephony-scripts/src/rss/DidScript.groovy
+		</class>
+		<parameters>
+			<parameter name="language" value="english" />
+			<parameter name="db_connection" value="jdbc:postgresql://localhost:5432/adm_rbs"/>
+			<parameter name="db_user" value="postgres"/>
+			<parameter name="db_password" value="voicelynx1201"/>
+			<parameter name="db_driver" value="org.postgresql.Driver"/>
+			<parameter name="registrar" value="#rss-registrar"/>
+		</parameters>		 	   	   	    
+ 	</script>
+  	<script name="rss">
+  	    <context>internal</context>
+ 	    <called>.*</called>
+		<class>/Users/danny/Admtel_Source/adm-telephony-scripts/src/rss/RssScript.groovy
+		</class>
+		<parameters>
+			<parameter name="language" value="english" />
+			<parameter name="db_connection" value="jdbc:postgresql://localhost:5432/adm_rbs"/>
+			<parameter name="db_user" value="postgres"/>
+			<parameter name="db_password" value="voicelynx1201"/>
+			<parameter name="db_driver" value="org.postgresql.Driver"/>
+			<parameter name="registrar" value="#rss-registrar"/>
+		</parameters>		 	   	   
+ 	</script>
+ 	
+ </scripts> 

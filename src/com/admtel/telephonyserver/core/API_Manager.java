@@ -33,6 +33,7 @@ public class API_Manager {
 		Result result = Result.Ok;
 		Channel c = Switches.getInstance().getChannelById(channelId);
 		if (c==null){
+			log.warn(String.format("hangup : %s, channel not found", channelId));
 			return Result.ChannelInvalid;
 		}
 		c.hangup(DisconnectCode.Normal);
