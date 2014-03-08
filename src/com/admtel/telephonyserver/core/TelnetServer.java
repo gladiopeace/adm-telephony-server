@@ -40,7 +40,7 @@ public class TelnetServer extends IoHandlerAdapter{
         acceptor.getSessionConfig().setReadBufferSize( 2048 );
         acceptor.getSessionConfig().setIdleTime( IdleStatus.BOTH_IDLE, 10 );
         try {
-			acceptor.bind( new InetSocketAddress("localhost", 7778) );
+			acceptor.bind( new InetSocketAddress("localhost", 7001) );
 		} catch (IOException e) {
 			log.fatal(e);
 		}
@@ -80,9 +80,11 @@ public class TelnetServer extends IoHandlerAdapter{
 			cs.add(new Command("status", "Show server status", new CommandStatusExecutor(session)));
 			cs.add(new Command("gc", "Garbage Collect", new CommandGarbageCollectExecutor(session)));
 			cs.add(new Command("bye", "Close this connection", new CommandByeExecutor(session)));
-		
-//			Command helpCommand = new Command("help", "Show this help", new CommandHelpExecutor(session, cs));
-	//		cs.add(helpCommand);
+			cs.add(new Command("show switches", "Show switches", new CommandShowSwitchesExecutor(session)));
+			cs.add(new Command("start", "Start", new CommandStartExecutor(session)));
+			cs.add(new Command("stop [<now:string>]", "Stop [now]", new CommandStopExecutor(session)));
+			Command helpCommand = new Command("help", "Show this help", new CommandHelpExecutor(session, cs));
+			cs.add(helpCommand);
 		} catch (InvalidSyntaxException e) {
 			log.warn(e, e);
 			return null;

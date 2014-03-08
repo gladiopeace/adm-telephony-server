@@ -28,8 +28,6 @@ public class Switches implements DefinitionChangeListener, EventListener {
 	Map<String, Switch> idMap = new HashMap<String, Switch>();
 	Map<String, Switch> addressMap = new HashMap<String, Switch>();
 	
-	Map<String, Switch> stoppedSwitches = new HashMap<String,Switch>();
-
 	private Map<String, Channel> channels = new HashMap<String, Channel>();
 	private Map<String, Channel> synchronizedChannels = Collections
 			.synchronizedMap(channels);
@@ -63,14 +61,6 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			synchronized (this){
 				idMap.remove(_switch.getDefinition().getId());
 				addressMap.remove(_switch.getDefinition().getAddress());
-			}
-		}
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////	
-	private void addToStopped(Switch _switch){
-		if (_switch != null){
-			synchronized(this){
-				stoppedSwitches.put(_switch.getDefinition().getId(), _switch);
 			}
 		}
 	}
@@ -169,7 +159,6 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			log.trace("Definition removed - " + definition);
 			if (_switch != null){				
 				remove(_switch);
-				addToStopped(_switch);
 			}
 		}
 	}
@@ -268,6 +257,22 @@ public class Switches implements DefinitionChangeListener, EventListener {
 	}
 	public Map<String, Channel>getChannels(){
 		return channels;
+	}
+	
+	public void start() {
+		for (Switch _switch:idMap.values()) {
+			_switch.start();
+		}
+	}
+	public void stop(boolean forceStop) {
+		for (Switch _switch:idMap.values()) {
+			_switch.stop(forceStop);
+		}
+	}
+	public void restart(boolean forceStop) {
+		for (Switch _switch:idMap.values()) {
+			_switch.restart(forceStop);
+		}
 	}
 }
  
