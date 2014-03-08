@@ -28,7 +28,7 @@ public class CommandStatusExecutor implements ICommandExecutor{
 	    long freeMemory = runtime.freeMemory();
 
 		sb.append("\n>\n");
-		sb.append("channels : " +Switches.getInstance().getChannelCount());
+		sb.append("channels : " +Switches.getInstance().getChannelCount()+"\n");
 	    sb.append("free memory: " + format.format(freeMemory / 1024) + "\n");
 	    sb.append("allocated memory: " + format.format(allocatedMemory / 1024) + "\n");
 	    sb.append("max memory: " + format.format(maxMemory / 1024) + "\n");

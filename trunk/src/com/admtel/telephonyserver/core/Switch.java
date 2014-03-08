@@ -187,7 +187,8 @@ public abstract class Switch {
 
 	}
 	public String toReadableString(){
-		return String.format("%s|%s:%d|%s|%d\n", definition.getName(), definition.getAddress(), definition.getPort(), getStatus(), channels.size());
+		return String.format("Name(%s) : Address(%s:%d) : Status(%s) : Channels(%d)\n", 
+				definition.getName(), definition.getAddress(), definition.getPort(), getStatus(), channels.size());
 	}
 	public String getName(){
 		return definition.getName();		
