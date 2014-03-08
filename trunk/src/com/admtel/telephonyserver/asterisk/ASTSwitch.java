@@ -139,11 +139,6 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 				false, null);
 	}
 
-	@Override
-	public void stop() {
-		super.stop();		
-	}
-
 	private boolean connect() {
 		log.debug(String.format("Trying to connect to %s:%d", getDefinition()
 				.getAddress(), getDefinition().getPort()));
@@ -246,7 +241,10 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 				}
 				switch (event.getEventType()) {
 				case NewChannel: {
-					if (!isAcceptingCalls()) return;
+					if (!isAcceptingCalls()) {
+						log.warn(String.format("Switch %s not accepting calls", this.getId()));
+						return;
+					}
 					ASTNewChannelEvent nce = (ASTNewChannelEvent) event;
 					ASTChannel channel = new ASTChannel(ASTSwitch.this,
 							nce.getChannelId(), message.getSession());

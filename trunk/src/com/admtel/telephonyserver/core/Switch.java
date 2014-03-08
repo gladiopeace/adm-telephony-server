@@ -1,8 +1,10 @@
 package com.admtel.telephonyserver.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -26,6 +28,7 @@ public abstract class Switch {
 	private SwitchDefinition definition;
 	private SwitchStatus status;
 	private AddressTranslator addressTranslator;
+	private boolean restart = false;
 
 	private Map<String, Channel> channels = new HashMap<String, Channel>();
 	private Map<String, Channel> synchronizedChannels = Collections
@@ -79,6 +82,12 @@ public abstract class Switch {
 		if (channel == null)
 			return;
 		synchronizedChannels.remove(channel.getId());
+		if (channels.size() == 0 && status == SwitchStatus.Stopping) {
+			status = SwitchStatus.Stopped;
+			if (restart) {
+				start();
+			}
+		}
 		log.debug(String.format("Switch (%s) : Removed channel %s",
 				getDefinition().getId(), channel.getId()));
 	}
@@ -92,16 +101,21 @@ public abstract class Switch {
 	}
 
 	public void start() {
-		status = SwitchStatus.Starting;
+		restart = false;
+		status = SwitchStatus.Started;
 	}
 
-	public void stop() {
-		for (Channel channel: channels.values()){
-			channel.hangup(DisconnectCode.Normal);
-		}
+	public void stop(boolean forceStop) {		
 		status = SwitchStatus.Stopping;
+		if (forceStop) {
+			this.hangupAllChannels();
+		}
 	}
 
+	public void restart(boolean forceStop) {
+		restart = true;
+		stop(forceStop);
+	}
 	public SwitchStatus getStatus() {
 		return status;
 	}
@@ -188,7 +202,8 @@ public abstract class Switch {
 		return definition.getId();
 	}
 	public void hangupAllChannels(){
-		for (Channel c:channels.values()){
+		List<Channel> chs = new ArrayList<Channel>(channels.values());
+		for (Channel c:chs){
 			c.hangup(DisconnectCode.Normal);
 		}
 	}

@@ -25,5 +25,6 @@
 	<classpathentry kind="lib" path="lib/json-lib-2.4-jdk15.jar"/>
 	<classpathentry kind="lib" path="lib/groovy-all-2.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/postgresql-9.2-1002.jdbc3.jar"/>
+	<classpathentry kind="lib" path="lib/naturalcli-1.2.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

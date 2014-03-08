@@ -74,14 +74,6 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			}
 		}
 	}
-	/////////////////////////////////////////////////////////////////////////////////////////	
-	private void removeFromStopped(Switch _switch){
-		if (_switch != null){
-			synchronized (this){
-				stoppedSwitches.remove(_switch.getDefinition().getId());
-			}
-		}
-	}
 	/////////////////////////////////////////////////////////////////////////////////////////
 	public Collection<Switch> getAll() {
 		Collection<Switch> switches = new ArrayList<Switch>();
@@ -176,7 +168,6 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			Switch _switch = this.getById(definition.getId());
 			log.trace("Definition removed - " + definition);
 			if (_switch != null){				
-				_switch.stop();
 				remove(_switch);
 				addToStopped(_switch);
 			}

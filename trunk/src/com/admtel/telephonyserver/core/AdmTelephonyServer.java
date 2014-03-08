@@ -22,8 +22,6 @@ public class AdmTelephonyServer {
 
 	static Logger log = Logger.getLogger(AdmTelephonyServer.class);
 
-	private ServerDefinition definition;
-
 	private static class SingletonHolder {
 		private static AdmTelephonyServer instance = new AdmTelephonyServer();
 	}
@@ -91,14 +89,15 @@ public class AdmTelephonyServer {
 		// static listeners, order is important as conferencemanager might
 		// removed objects needed by RadiusServers
 		log.trace("AdmTelephonyServer.start ****************");
-		EventsManager.getInstance().addEventListener(
-				RadiusServers.getInstance().toString(),
+		EventsManager.getInstance().addEventListener("RadiusService_Singleton",
 				RadiusServers.getInstance());
 		EventsManager.getInstance().addEventListener(
 				"ConferenceManager_Singleton", ConferenceManager.getInstance());
 		EventsManager.getInstance().addEventListener("Switches_Singleton",
 				Switches.getInstance());
 
+		TelnetServer.getInstance();
+		
 		sysConfig.addDefinitionChangeListener(Switches.getInstance());
 		sysConfig.addDefinitionChangeListener(SwitchListeners.getInstance());
 		sysConfig.addDefinitionChangeListener(ScriptManager.getInstance());
@@ -114,7 +113,7 @@ public class AdmTelephonyServer {
 		sysConfig.addDefinitionChangeListener(BeansManager.getInstance());
 		SystemConfig.getInstance().load();
 		log.trace("loaded system config ***************");
-		definition = sysConfig.serverDefinition;
+		
 		BeansManager.getInstance().init();
 	}
 }

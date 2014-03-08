@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import com.admtel.telephonyserver.config.SwitchListenerDefinition;
 import com.admtel.telephonyserver.config.SwitchType;
 import com.admtel.telephonyserver.core.*;
+
 import org.apache.log4j.Logger;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoHandler;
@@ -40,6 +41,7 @@ import com.admtel.telephonyserver.misc.VariableMap;
 import com.admtel.telephonyserver.registrar.UserLocation;
 import com.admtel.telephonyserver.utils.AdmUtils;
 import com.admtel.telephonyserver.utils.CodecsUtils;
+
 import java.util.List;
 
 public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
@@ -84,11 +86,6 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 		super.start();
 		reconnectTimer = Timers.getInstance().startTimer(this, RECONNECT_AFTER,
 				false, null);
-	}
-
-	@Override
-	public void stop() {
-		super.stop();
 	}
 
 	@Override
@@ -274,7 +271,10 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 				case ChannelCreate:
 				case ChannelData:	//The order of these events are not guaranteed. (the can come on different threads too). need to synchronize
 				{
-					if (!isAcceptingCalls()) return;
+					if (!isAcceptingCalls()) {
+						log.warn(String.format("Switch %s not accepting calls", this.getId()));
+						return;
+					}
 					FSChannelEvent ce = (FSChannelEvent) event;
 					synchronized (this){
 						FSChannel channel = (FSChannel) getChannel(ce.getChannelId());
