@@ -1,17 +1,39 @@
 package com.admtel.telephonyserver.core;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.apache.log4j.Logger;
+
 import com.admtel.telephonyserver.config.SystemConfig;
+import com.admtel.telephonyserver.misc.AdmGroovyScriptEngine;
+
+import groovy.lang.GroovyClassLoader;
 import groovy.util.GroovyScriptEngine;
 
 public class SmartClassLoader {
 	
 	static Logger log = Logger.getLogger(SmartClassLoader.class);
 	
-	GroovyScriptEngine groovyScriptEngine;
+	AdmGroovyScriptEngine groovyScriptEngine;
 	ClassLoader classLoader;
+	GroovyClassLoader groovyClassLoader;
+	
+	
+	private static URL[] createRoots(String[] urls) throws MalformedURLException {
+        if (urls == null) return null;
+        URL[] roots = new URL[urls.length];
+        for (int i = 0; i < roots.length; i++) {
+            if (urls[i].indexOf("://") != -1) {
+                roots[i] = new URL(urls[i]);
+            } else {
+                roots[i] = new File(urls[i]).toURI().toURL();
+            }
+        }
+        return roots;
+    }
 	
 	private SmartClassLoader(){
 		classLoader = SmartClassLoader.class.getClassLoader(); 
@@ -19,7 +41,13 @@ public class SmartClassLoader {
 
 			String[] roots = SystemConfig.getInstance().serverDefinition.getScriptPath().split(";");
 			
-			groovyScriptEngine = new GroovyScriptEngine(roots, classLoader);
+			groovyScriptEngine = new AdmGroovyScriptEngine(roots, classLoader);
+			groovyClassLoader = new GroovyClassLoader(classLoader);
+			URL[] urls = createRoots(roots);
+			for (URL url:urls) {
+				log.trace("*********** " + url);
+				groovyClassLoader.addURL(url);
+			}
 			log.trace("Starting GroovyScriptEngine with root = ");
 			for (int i=0;i<roots.length;i++){
 				log.trace("root["+i+"]="+roots[i]);
