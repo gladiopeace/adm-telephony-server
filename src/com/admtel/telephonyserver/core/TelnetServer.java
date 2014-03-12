@@ -83,6 +83,7 @@ public class TelnetServer extends IoHandlerAdapter{
 			cs.add(new Command("show switches", "Show switches", new CommandShowSwitchesExecutor(session)));
 			cs.add(new Command("start", "Start", new CommandStartExecutor(session)));
 			cs.add(new Command("stop [<now:string>]", "Stop [now]", new CommandStopExecutor(session)));
+			cs.add(new Command("config reload","Reload system configuration", new CommandConfigReloadExecutor(session)));
 			Command helpCommand = new Command("help", "Show this help", new CommandHelpExecutor(session, cs));
 			cs.add(helpCommand);
 		} catch (InvalidSyntaxException e) {

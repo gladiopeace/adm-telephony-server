@@ -121,20 +121,6 @@ public class Switches implements DefinitionChangeListener, EventListener {
 
 			log.debug(String.format("Loading switch %s", definition.getId()));
 
-			if (getById(definition.getId()) != null) {
-				log.debug(String.format("Switch %s, already loaded", definition
-						.getId()));
-				return;
-			}
-			if (getByAddress(((SwitchDefinition) definition).getAddress()) != null){
-				log.error(String.format("Failed to add switch (%s) because of duplicate IP (%s)", ((SwitchDefinition) definition).getName(), ((SwitchDefinition) definition).getAddress()));
-				return;
-			}
-			if (!switchDefinition.isEnabled()){
-				log.debug(String.format("Switch %s, not enabled", definition.getId()));
-				return;
-			}
-
 			switch (switchDefinition.getSwitchType()) {
 			case Asterisk: {
 				ASTSwitch _switch = new ASTSwitch(switchDefinition);
@@ -158,7 +144,7 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			Switch _switch = this.getById(definition.getId());
 			log.trace("Definition removed - " + definition);
 			if (_switch != null){				
-				remove(_switch);
+				_switch.scheduleRemove();
 			}
 		}
 	}

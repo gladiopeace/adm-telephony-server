@@ -2,6 +2,7 @@ package com.admtel.telephonyserver.config;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import com.admtel.telephonyserver.httpserver.AdmServlet;
 
 public class HttpServerDefinition implements DefinitionInterface {
@@ -33,8 +34,6 @@ public class HttpServerDefinition implements DefinitionInterface {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((address == null) ? 0 : address.hashCode());
-		result = prime * result
-				+ ((admServlets == null) ? 0 : admServlets.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + port;
 		return result;
@@ -53,11 +52,6 @@ public class HttpServerDefinition implements DefinitionInterface {
 			if (other.address != null)
 				return false;
 		} else if (!address.equals(other.address))
-			return false;
-		if (admServlets == null) {
-			if (other.admServlets != null)
-				return false;
-		} else if (!admServlets.equals(other.admServlets))
 			return false;
 		if (id == null) {
 			if (other.id != null)

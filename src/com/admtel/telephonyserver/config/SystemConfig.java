@@ -405,6 +405,14 @@ public class SystemConfig {
 
 	public void load() {
 		log.trace("Loading System configuration ...");
+		try {
+			config = new XMLConfiguration(configPath+CONFIG_XML);
+			//config.setReloadingStrategy(new FileChangedReloadingStrategy());
+			// config.setExpressionEngine(new XPathExpressionEngine());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		futureDefinitions.clear();
 		loadServerDefinition();
 		loadSwitchListenersDefinition();
@@ -422,6 +430,12 @@ public class SystemConfig {
 		Map<String, DefinitionInterface> addedDefinitions = new Hashtable<String, DefinitionInterface>(
 				futureDefinitions);
 		addedDefinitions.keySet().removeAll(currentDefinitions.keySet());
+		
+		log.trace("Future definitions for : ");
+		for (DefinitionInterface definition : futureDefinitions.values()) {
+			log.trace(definition);
+		}
+		
 		for (DefinitionInterface definition : addedDefinitions.values()) {			
 			try{
 				log.trace("emit notifyListenerAddedDefinition for ("+definition+")");
@@ -473,14 +487,7 @@ public class SystemConfig {
 	}
 
 	private SystemConfig() {
-		try {
-			config = new XMLConfiguration(configPath+CONFIG_XML);
-			config.setReloadingStrategy(new FileChangedReloadingStrategy());
-			// config.setExpressionEngine(new XPathExpressionEngine());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 	}
 
 	public void setConfigPath(String configPath){
