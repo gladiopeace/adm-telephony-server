@@ -28,16 +28,16 @@ public abstract class Switch {
 	private SwitchDefinition definition;
 	private SwitchStatus status;
 	private AddressTranslator addressTranslator;
-	private boolean restart = false;
+	private boolean bRestart = false;
+	private boolean bPendingRemove = false;
 
 	private Map<String, Channel> channels = new HashMap<String, Channel>();
-	private Map<String, Channel> synchronizedChannels = Collections
-			.synchronizedMap(channels);
+	private Map<String, Channel> synchronizedChannels = Collections.synchronizedMap(channels);
 
 	protected MessageHandler messageHandler = new QueuedMessageHandler() {
 
 		@Override
-		public void onMessage(Object message) {			
+		public void onMessage(Object message) {
 			if (message instanceof BasicIoMessage) {
 				Switch.this.processBasicIoMessage((BasicIoMessage) message);
 			}
@@ -47,9 +47,8 @@ public abstract class Switch {
 	public Switch(SwitchDefinition definition) {
 		this.definition = definition;
 		setStatus(SwitchStatus.NotReady);
-		setAddressTranslator(SmartClassLoader
-				.createInstance(AddressTranslator.class,
-						definition.getAddressTranslatorClass()));
+		setAddressTranslator(SmartClassLoader.createInstance(AddressTranslator.class,
+				definition.getAddressTranslatorClass()));
 		if (getAddressTranslator() == null) {
 			setAddressTranslator(new DefaultASTAddressTranslator());
 		}
@@ -59,9 +58,10 @@ public abstract class Switch {
 		return definition;
 	}
 
-	public String getParameter(String key){
+	public String getParameter(String key) {
 		return definition.getParameters().get(key);
 	}
+
 	public String getSwitchId() {
 		return definition.getId();
 	}
@@ -73,8 +73,7 @@ public abstract class Switch {
 	public void addChannel(Channel channel) {
 		if (channel != null) {
 			synchronizedChannels.put(channel.getId(), channel);
-			log.debug(String.format("Switch (%s) : Added channel %s",
-					getDefinition().getId(), channel));
+			log.debug(String.format("Switch (%s) : Added channel %s", getDefinition().getId(), channel));
 		}
 	}
 
@@ -82,14 +81,19 @@ public abstract class Switch {
 		if (channel == null)
 			return;
 		synchronizedChannels.remove(channel.getId());
-		if (channels.size() == 0 && status == SwitchStatus.Stopping) {
-			status = SwitchStatus.Stopped;
-			if (restart) {
-				start();
+		if (channels.size() == 0) {
+			if (bPendingRemove) {
+				Switches.getInstance().remove(this);
+				return;
 			}
+			if (status == SwitchStatus.Stopping) {
+				status = SwitchStatus.Stopped;
+				if (bRestart) {
+					start();
+				}
+			}			
 		}
-		log.debug(String.format("Switch (%s) : Removed channel %s",
-				getDefinition().getId(), channel.getId()));
+		log.debug(String.format("Switch (%s) : Removed channel %s", getDefinition().getId(), channel.getId()));
 	}
 
 	public Channel getChannel(String channelId) {
@@ -101,11 +105,11 @@ public abstract class Switch {
 	}
 
 	public void start() {
-		restart = false;
+		bRestart = false;
 		status = SwitchStatus.Started;
 	}
 
-	public void stop(boolean forceStop) {		
+	public void stop(boolean forceStop) {
 		status = SwitchStatus.Stopping;
 		if (forceStop) {
 			this.hangupAllChannels();
@@ -113,22 +117,22 @@ public abstract class Switch {
 	}
 
 	public void restart(boolean forceStop) {
-		restart = true;
+		bRestart = true;
 		stop(forceStop);
 	}
+
 	public SwitchStatus getStatus() {
 		return status;
 	}
 
-	abstract public Result originate(String destination, long timeout,
-			String callerId, String calledId, String script, VariableMap data);
+	abstract public Result originate(String destination, long timeout, String callerId, String calledId, String script,
+			VariableMap data);
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((definition == null) ? 0 : definition.hashCode());
+		result = prime * result + ((definition == null) ? 0 : definition.hashCode());
 		return result;
 	}
 
@@ -158,8 +162,7 @@ public abstract class Switch {
 		this.status = status;
 	}
 
-	synchronized public void setAddressTranslator(
-			AddressTranslator addressTranslator) {
+	synchronized public void setAddressTranslator(AddressTranslator addressTranslator) {
 		this.addressTranslator = addressTranslator;
 	}
 
@@ -170,15 +173,14 @@ public abstract class Switch {
 	abstract public void processBasicIoMessage(BasicIoMessage message);
 
 	public boolean isAcceptingCalls() {
-		return definition.isEnabled() && status == SwitchStatus.Started;
+		return definition.isEnabled() && status == SwitchStatus.Started && !bPendingRemove;
 	}
 
 	public void setDefinition(SwitchDefinition def) {
-		if (!def.getAddressTranslatorClass().equals(
-				definition.getAddressTranslatorClass())) {
+		if (!def.getAddressTranslatorClass().equals(definition.getAddressTranslatorClass())) {
 
-			setAddressTranslator(SmartClassLoader.createInstance(
-					AddressTranslator.class, def.getAddressTranslatorClass()));
+			setAddressTranslator(SmartClassLoader.createInstance(AddressTranslator.class,
+					def.getAddressTranslatorClass()));
 			if (getAddressTranslator() == null) {
 				setAddressTranslator(new DefaultASTAddressTranslator());
 			}
@@ -186,26 +188,37 @@ public abstract class Switch {
 		definition = def;
 
 	}
-	public String toReadableString(){
-		return String.format("Name(%s) : Address(%s:%d) : Status(%s) : Channels(%d)\n", 
-				definition.getName(), definition.getAddress(), definition.getPort(), getStatus(), channels.size());
+
+	public String toReadableString() {
+		return String.format("Name(%s) : Address(%s:%d) : Status(%s) : Channels(%d) : Pending remove(%s)\n",
+				definition.getName(), definition.getAddress(), definition.getPort(), getStatus(), channels.size(),
+				bPendingRemove);
 	}
-	public String getName(){
-		return definition.getName();		
+
+	public String getName() {
+		return definition.getName();
 	}
-	public String getAddress(){
+
+	public String getAddress() {
 		return definition.getAddress();
 	}
-	public int getNumberOfChannels(){
+
+	public int getNumberOfChannels() {
 		return channels.size();
 	}
-	public String getId(){
+
+	public String getId() {
 		return definition.getId();
 	}
-	public void hangupAllChannels(){
+
+	public void hangupAllChannels() {
 		List<Channel> chs = new ArrayList<Channel>(channels.values());
-		for (Channel c:chs){
+		for (Channel c : chs) {
 			c.hangup(DisconnectCode.Normal);
 		}
+	}
+
+	public void scheduleRemove() {
+		bPendingRemove = true;
 	}
 }

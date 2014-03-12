@@ -120,23 +120,14 @@ public class SwitchDefinition implements DefinitionInterface {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((address == null) ? 0 : address.hashCode());
-		result = prime
-				* result
-				+ ((addressTranslatorClass == null) ? 0
-						: addressTranslatorClass.hashCode());
+		result = prime * result + ((addressTranslatorClass == null) ? 0 : addressTranslatorClass.hashCode());
 		result = prime * result + (enabled ? 1231 : 1237);
-		result = prime * result
-				+ ((features == null) ? 0 : features.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result
-				+ ((parameters == null) ? 0 : parameters.hashCode());
-		result = prime * result
-				+ ((password == null) ? 0 : password.hashCode());
+		result = prime * result + ((password == null) ? 0 : password.hashCode());
 		result = prime * result + port;
-		result = prime * result
-				+ ((switchType == null) ? 0 : switchType.hashCode());
-		result = prime * result
-				+ ((username == null) ? 0 : username.hashCode());
+		result = prime * result + ((switchType == null) ? 0 : switchType.hashCode());
+		result = prime * result + ((username == null) ? 0 : username.hashCode());
 		return result;
 	}
 
@@ -161,20 +152,15 @@ public class SwitchDefinition implements DefinitionInterface {
 			return false;
 		if (enabled != other.enabled)
 			return false;
-		if (features == null) {
-			if (other.features != null)
+		if (id == null) {
+			if (other.id != null)
 				return false;
-		} else if (!features.equals(other.features))
+		} else if (!id.equals(other.id))
 			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
-			return false;
-		if (parameters == null) {
-			if (other.parameters != null)
-				return false;
-		} else if (!parameters.equals(other.parameters))
 			return false;
 		if (password == null) {
 			if (other.password != null)
