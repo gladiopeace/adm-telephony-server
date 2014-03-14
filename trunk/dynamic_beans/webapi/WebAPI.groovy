@@ -22,28 +22,28 @@ import java.security.PublicKey;
 
 import net.sf.json.groovy.JsonGroovyBuilder;
 import net.sf.json.*;
+import groovy.json.*;
 
 class WebAPI extends AdmServlet {
-	
+
 	static Logger log = Logger.getLogger(WebAPI.class)
-	
-	
+
+
 	public String securityKey
-	
+
 	public init(){
-		
 	}
-	def index(request){		
+	def index(request){
 		"Welcome"
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	def hangup(request){		
+	def hangup(request){
 		API_Manager.instance.hangup(request.getParameter('channel'))
 		"Channel hangup request " + request.getParameters('channel')
-	}	
-	
+	}
+
 	def conference_action(request){
-		
+
 		String action = request.getParameter('subAction')
 		if (!action){
 			return "invalid action"
@@ -67,28 +67,28 @@ class WebAPI extends AdmServlet {
 		String action = request.getParameter('subAction')
 		if (!action){
 			return "invalid action"
-		}		
+		}
 		Participant p = c.getParticipant(request.getParameter('participant'))
 		if (p == null){
 			return "Participant not found"
 		}
-		
+
 		switch(action){
-			case 'mute': 
-			API_Manager.instance.conferenceMute(p.getChannel().getUniqueId(), true)		
-			break;
-			case 'unmute': 
-			API_Manager.instance.conferenceMute(p.getChannel().getUniqueId(), false)
-			break;
+			case 'mute':
+				API_Manager.instance.conferenceMute(p.getChannel().getUniqueId(), true)
+				break;
+			case 'unmute':
+				API_Manager.instance.conferenceMute(p.getChannel().getUniqueId(), false)
+				break;
 			case 'deaf':
-			API_Manager.instance.conferenceDeaf(p.getChannel().getUniqueId(), true)			
-			break;
+				API_Manager.instance.conferenceDeaf(p.getChannel().getUniqueId(), true)
+				break;
 			case 'undeaf':
-			API_Manager.instance.conferenceDeaf(p.getChannel().getUniqueId(), false)
-			break;
+				API_Manager.instance.conferenceDeaf(p.getChannel().getUniqueId(), false)
+				break;
 			case 'kick':
-			API_Manager.instance.hangup(p.getChannel().getUniqueId())
-			break;
+				API_Manager.instance.hangup(p.getChannel().getUniqueId())
+				break;
 		}
 		""
 	}
@@ -97,22 +97,22 @@ class WebAPI extends AdmServlet {
 		Conference c = ConferenceManager.getInstance().getConferenceById(request.getParameter('conference'))
 		def writer = new StringWriter()
 		if (c != null){
-			List<Participant> p = c.getParticipants()						
+			List<Participant> p = c.getParticipants()
 			def xml = new MarkupBuilder(writer)
-			
+
 			xml.'document'(type: "conference/xml") {
 				conference(id:c.id){
 					participants(){
 						p.each{
 							Channel channel = it.getChannel()
 							participant(
-									id:uniqueId, 
-									time:it.joinTime, 
-									caller:channel?.getCallingStationId(), 
-									memberId:it.memberId, 
-									talking:it.isTalking(), 
-									deaf:it.isDeaf(), 
-									moderator:it.isModerator(), 
+									id:uniqueId,
+									time:it.joinTime,
+									caller:channel?.getCallingStationId(),
+									memberId:it.memberId,
+									talking:it.isTalking(),
+									deaf:it.isDeaf(),
+									moderator:it.isModerator(),
 									muted:it.isMuted())
 						}
 					}
@@ -129,7 +129,7 @@ class WebAPI extends AdmServlet {
 		if (request.getParameter('timeout')){
 			timeout = Integer.valueOf(request.getParameter('timeout'))
 		}
-		
+
 		API_Manager.instance.dial(channel, destination, timeout)
 		"${channel} -> Dialed -> ${destination}"
 	}
@@ -137,7 +137,7 @@ class WebAPI extends AdmServlet {
 	def join_conference(request){
 		String channel = request.getParameter('channel')
 		Channel c = Switches.getInstance().getChannelById(channel)
-		if (c){		
+		if (c){
 			String conferenceNumber = request.getParameter('conferenceNumber')
 			if (!conferenceNumber)
 				conferenceNumber = c.getUserData("conferenceNumber")
@@ -148,7 +148,7 @@ class WebAPI extends AdmServlet {
 	def get_channel_data(request){
 		String channelId = request.getParameter('channel')
 		String keyId = request.getParameter('key')
-		Channel channel = Switches.getInstance().getChannelById(channelId) 
+		Channel channel = Switches.getInstance().getChannelById(channelId)
 		def result = new JsonGroovyBuilder().json{
 			key = keyId
 			value = channel?.getUserData(keyId)
@@ -168,7 +168,7 @@ class WebAPI extends AdmServlet {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def get_agent_channel(request){
 		String agentId = request.getParameter('agent')
-		AcdAgent tAgent= AcdManager.getInstance().getAgentById(agentId)	
+		AcdAgent tAgent= AcdManager.getInstance().getAgentById(agentId)
 		def result = new JsonGroovyBuilder().json{
 			agent = tAgent.getId()
 			channel = tAgent.getChannelId()
@@ -198,12 +198,12 @@ class WebAPI extends AdmServlet {
 			tAgent = AcdManager.getInstance().getAgentById(agentId)
 		else if (agentName)
 			tAgent = AcdManager.getInstance().getAgentByName(agentName)
-			
+
 		log.trace(tAgent.getCallChannelId())
 		String t_message = "No Error"
 		if (tAgent!=null){
 			Channel channel = Switches.getInstance().getChannelById(tAgent.getCallChannelId())
-			
+
 			if (channel != null){
 				if (channel.getUserData(dataKey) != null){
 					def result = new JsonGroovyBuilder().json{
@@ -245,7 +245,7 @@ class WebAPI extends AdmServlet {
 		String t_message = "No Error"
 		if (tAgent!=null){
 			Channel channel = Switches.getInstance().getChannelById(tAgent.getCallChannelId())
-			
+
 			if (channel){
 				channel.setUserData(dataKey, dataValue)
 				t_message = "value set"
@@ -267,22 +267,22 @@ class WebAPI extends AdmServlet {
 		Switch _switch = Switches.getInstance().getRandom();
 		String tMessage = "Invalid"
 		if (agent != null){
-		 if (agent.getPassword().equals(request.getParameter('password'))){
-			def result = new JsonGroovyBuilder().json{
-				requestId=1234
-				message=""
-				status=0
-				sipProxy= _switch.getDefinition().getSignallingIp();
-				sipUsername = agent.getName()
-				sipPassword = agent.getPassword()
-				sipSecure = false
-			}.toString()
-			
-			return result;
-		 }
-		 else{
-			 tMessage = "Agent ${agentName} Wrong password, entered ${request.getParameter('password')}, got ${agent.getPassword()}"
-		 }
+			if (agent.getPassword().equals(request.getParameter('password'))){
+				def result = new JsonGroovyBuilder().json{
+					requestId=1234
+					message=""
+					status=0
+					sipProxy= _switch.getDefinition().getSignallingIp();
+					sipUsername = agent.getName()
+					sipPassword = agent.getPassword()
+					sipSecure = false
+				}.toString()
+
+				return result;
+			}
+			else{
+				tMessage = "Agent ${agentName} Wrong password, entered ${request.getParameter('password')}, got ${agent.getPassword()}"
+			}
 		}
 		else{
 			tMessage = "agent ${agentName} not found"
@@ -297,7 +297,7 @@ class WebAPI extends AdmServlet {
 	def get_random_switch(request){
 		Switch _switch = Switches.getInstance().getRandom()
 		if (_switch){
-						
+
 			def jsonObject = _switch.getDefinition().getParameters() as JSONObject
 			jsonObject.put("requestId", "1234")
 			jsonObject.put("message", "")
@@ -341,24 +341,52 @@ class WebAPI extends AdmServlet {
 			message="Switch not found"
 			status=-1
 		}.toString()
+
+	}
+	def get_switches(request) {
+		Collection<Switch> switches = Switches.getInstance().getAll()
 		
+		def data = switches.collect{Switch s->
+				[id:s.id, name:s.definition.name, address:s.definition.address, 
+					type:s.definition.switchType, enabled:s.definition.enabled]
+		}
+		def builder = new JsonBuilder(data)
+		builder.toString()
+	}
+	def get_channels(request) {
+		Integer offset = 0
+		Integer limit = 200
+		if (request.getParameter("offset")) {
+			offset = request.getParameter("offset").toInteger()
+		}
+		if (request.getParameter("limit")) {
+			limit = request.getParameter("limit").toInteger()
+		}
+		List<Channel> channels = Switches.getInstance().getChannelsWithOffsetAndCount(offset, limit)
+		def data = channels.collect{Channel c->
+			[id:c.uniqueId, callingStationId:c.callingStationId, calledStationId:c.calledStationId,
+				callOrigin:c.callOrigin, callState:c.callState, mediaState:c.mediaState, setupTime:c.setupTime?.toString(),
+				answerTime:c.answerTime?.toString(), account:c.accountCode, script:c.script.toString()]
+		}
+		def builder = new JsonBuilder(data)
+		builder.toString()
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
-				
+
 		if (securityKey == request.getParameter('key')){
 			def action = request.getParameter("action")
 			if (!(action?.length()>0)){
 				action = 'index'
 			}
-			try{			
+			try{
 				log.trace("WebAPI received {"+request+"}");
 				def model = "${action}"(request)
 				println "model = ${model}"
 				response.appendBody(model)
 				response.setResponseCode(HttpStatus.ORDINAL_200_OK)
-			}	
+			}
 			catch (Exception e){
 				println e
 				log.fatal(e.getMessage(), e)

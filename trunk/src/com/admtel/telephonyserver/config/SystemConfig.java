@@ -202,9 +202,9 @@ public class SystemConfig {
 							catch (Exception e){
 								log.warn(e.getMessage());
 							}
-					if (definition.isEnabled()){
-						futureDefinitions.put(definition.getId(), definition);
-					}
+					
+							futureDefinitions.put(definition.getId(), definition);
+				
 				} else {
 					return;
 				}
