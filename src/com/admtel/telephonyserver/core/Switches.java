@@ -65,55 +65,6 @@ public class Switches implements DefinitionChangeListener, EventListener {
 		}
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////
-	public Collection<Switch> getAll() {
-		Collection<Switch> switches = new ArrayList<Switch>();
-		for (Switch _switch:idMap.values()){
-			if (_switch.getDefinition().isEnabled()){
-				switches.add(_switch);
-			}
-		}
-		return switches;
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////
-	public List<Channel> getAllChannels() {
-		List<Channel> result = new ArrayList<Channel>();
-		result.addAll(channels.values());
-		return result;
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////
-	public List<Channel> getWithOffsetAndCount(int offset, int count){
-		List<Channel> result = new ArrayList<Channel>(count);
-		ArrayList<Channel>tChannels = new ArrayList<Channel>();
-		tChannels.addAll(channels.values());
-		int size = channels.size();
-		
-		for (int i=0;i<count;i++){
-			if ((i+offset) >= size) break;
-			result.add(tChannels.get(i+offset));
-		}
-		return result;
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////
-	public int getChannelCount(){
-		return channels.size();
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////	
-	public Switch getByAddress(String address) {
-		if (address == null)
-			return null;
-		synchronized (this) {
-			return addressMap.get(address);
-		}
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////
-	public Switch getById(String id) {
-		if (id == null)
-			return null;
-		synchronized (this) {
-			return idMap.get(id);
-		}
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	public void definitionAdded(DefinitionInterface definition) {
 		if (definition instanceof SwitchDefinition) {
@@ -125,13 +76,17 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			case Asterisk: {
 				ASTSwitch _switch = new ASTSwitch(switchDefinition);
 				put(_switch);
-				_switch.start();
+				if (_switch.getDefinition().isEnabled()) {
+					_switch.start();
+				}
 			}
 				break;
 			case Freeswitch: {
 				Switch _switch = new FSSwitch(switchDefinition);
 				put(_switch);
-				_switch.start();
+				if (_switch.getDefinition().isEnabled()) {
+					_switch.start();
+				}
 			}
 				break;
 			}
@@ -166,40 +121,7 @@ public class Switches implements DefinitionChangeListener, EventListener {
 		}
 
 	}
-	/////////////////////////////////////////////////////////////////////////////////////////
-	public Switch getRandom() {
-		Collection<Switch> switches = getAll();
-		int index = rnd.nextInt(switches.size());
-		for (Switch _switch : switches) {
-			if (index == 0)
-				return _switch;
-			index--;
-		}
-		return null;
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////	
-	public Switch getLeastUsed() {
-		Switch leastUsed = null;
-		Collection<Switch> switches = getAll();
-		int index = switches.size() -1;
-		for (Switch _switch : switches) {
-			if (index == switches.size() - 1){
-				leastUsed = _switch;
-			}else if (index < 0){
-				return leastUsed;
-			}else{
-				if (leastUsed.getAllChannels().size() > _switch.getAllChannels().size()){
-				leastUsed = _switch;	
-				}					
-			}
-			index--;
-		}
-		return leastUsed;
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////
-	public Channel getChannelById(String id){
-		return channels.get(id);
-	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////
 	private void addChannel(Channel channel) {
 		if (channel != null) {
@@ -241,9 +163,6 @@ public class Switches implements DefinitionChangeListener, EventListener {
 		}
 		return result;
 	}
-	public Map<String, Channel>getChannels(){
-		return channels;
-	}
 	
 	public void start() {
 		for (Switch _switch:idMap.values()) {
@@ -259,6 +178,92 @@ public class Switches implements DefinitionChangeListener, EventListener {
 		for (Switch _switch:idMap.values()) {
 			_switch.restart(forceStop);
 		}
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////
+	public Collection<Switch> getAll() {
+		Collection<Switch> switches = new ArrayList<Switch>();
+		for (Switch _switch:idMap.values()){
+				switches.add(_switch);
+		}
+		return switches;
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////
+	public List<Channel> getAllChannels() {
+		List<Channel> result = new ArrayList<Channel>();
+		result.addAll(channels.values());
+		return result;
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////
+	public List<Channel> getChannelsWithOffsetAndCount(int offset, int count){
+		List<Channel> result = new ArrayList<Channel>(count);
+		ArrayList<Channel>tChannels = new ArrayList<Channel>();
+		tChannels.addAll(channels.values());
+		int size = channels.size();
+		
+		for (int i=0;i<count;i++){
+			if ((i+offset) >= size) break;
+			result.add(tChannels.get(i+offset));
+		}
+		log.trace("GetChannelsWithOffsetAndCount : " + result.size());
+		return result;
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////
+	public int getChannelCount(){
+		return channels.size();
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////
+	public Channel getChannelById(String id){
+		return channels.get(id);
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////	
+	public Switch getByAddress(String address) {
+		if (address == null)
+			return null;
+		synchronized (this) {
+			return addressMap.get(address);
+		}
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////
+	public Switch getById(String id) {
+		if (id == null)
+			return null;
+		synchronized (this) {
+			return idMap.get(id);
+		}
+	}
+	public Map<String, Channel>getChannels(){
+		return channels;
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////
+	public Switch getRandom() {
+		Collection<Switch> switches = getAll();
+		int index = rnd.nextInt(switches.size());
+		for (Switch _switch : switches) {
+			if (index == 0)
+				return _switch;
+			index--;
+		}
+		return null;
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////	
+	public Switch getLeastUsed() {
+		Switch leastUsed = null;
+		Collection<Switch> switches = getAll();
+		int index = switches.size() -1;
+		for (Switch _switch : switches) {
+			if (index == switches.size() - 1){
+				leastUsed = _switch;
+			}else if (index < 0){
+				return leastUsed;
+			}else{
+				if (leastUsed.getAllChannels().size() > _switch.getAllChannels().size()){
+				leastUsed = _switch;	
+				}					
+			}
+			index--;
+		}
+		return leastUsed;
 	}
 }
  
