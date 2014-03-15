@@ -3,6 +3,7 @@ package com.admtel.telephonyserver.core;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -198,6 +199,18 @@ public class Switches implements DefinitionChangeListener, EventListener {
 		List<Channel> result = new ArrayList<Channel>(count);
 		ArrayList<Channel>tChannels = new ArrayList<Channel>();
 		tChannels.addAll(channels.values());
+		
+		Collections.sort(tChannels, new Comparator<Channel>() {
+
+			@Override
+			public int compare(Channel o1, Channel o2) {
+				if (o2.setupTime == null || o1.setupTime == null) return 0;
+				
+				return o1.setupTime.compareTo(o1.setupTime);
+			}
+			
+		});
+		
 		int size = channels.size();
 		
 		for (int i=0;i<count;i++){

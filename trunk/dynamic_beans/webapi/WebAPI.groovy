@@ -362,13 +362,14 @@ class WebAPI extends AdmServlet {
 		if (request.getParameter("limit")) {
 			limit = request.getParameter("limit").toInteger()
 		}
-		List<Channel> channels = Switches.getInstance().getChannelsWithOffsetAndCount(offset, limit)
-		def data = channels.collect{Channel c->
+		List<Channel> tChannels = Switches.getInstance().getChannelsWithOffsetAndCount(offset, limit)
+		def data = tChannels.collect{Channel c->
 			[id:c.uniqueId, callingStationId:c.callingStationId, calledStationId:c.calledStationId,
 				callOrigin:c.callOrigin, callState:c.callState, mediaState:c.mediaState, setupTime:c.setupTime?.toString(),
 				answerTime:c.answerTime?.toString(), account:c.accountCode, script:c.script.toString()]
 		}
-		def builder = new JsonBuilder(data)
+		def t = [channels:data, count:Switches.getInstance().getChannelCount()]
+		def builder = new JsonBuilder(t)
 		builder.toString()
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
