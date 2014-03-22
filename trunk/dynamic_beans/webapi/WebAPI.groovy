@@ -1,5 +1,6 @@
 import org.mortbay.jetty.HttpStatus;
 
+import com.admtel.telephonyserver.config.SystemConfig;
 import com.admtel.telephonyserver.core.*;
 
 import java.io.StringWriter;
@@ -343,6 +344,13 @@ class WebAPI extends AdmServlet {
 		}.toString()
 
 	}
+	
+	
+	/*
+	 * url format : webapi?action=get_switches
+	 * 
+	 *  return : json array of switch data
+	 * */
 	def get_switches(request) {
 		Collection<Switch> switches = Switches.getInstance().getAll()
 		
@@ -353,6 +361,13 @@ class WebAPI extends AdmServlet {
 		def builder = new JsonBuilder(data)
 		builder.toString()
 	}
+	
+	/*
+	 * url format : webapi?action=get_channels&offset=<offset>&limit=<limit>
+	 * 
+	 * returns : json array of channel data and a count of total channels in the system
+	 * */
+	
 	def get_channels(request) {
 		Integer offset = 0
 		Integer limit = 200
@@ -371,6 +386,42 @@ class WebAPI extends AdmServlet {
 		def t = [channels:data, count:Switches.getInstance().getChannelCount()]
 		def builder = new JsonBuilder(t)
 		builder.toString()
+	}
+	
+	
+	/*
+	 * Issues a stop request on the server
+	 * optional parameter force = true, will hangup all existing calls
+	 * 
+	 * url format : webapi?action=cmd_stop&force=<true|false>
+	 * 
+	 * */
+	
+	def cmd_stop(request) {
+		String force = request.getParameter("force")
+		if (force && force=="true") {
+			Switches.getInstance().stop(true)
+		}
+		else {
+			Switches.getInstance().stop(false)
+		}
+	}
+	
+	/*
+	 * Starts the server
+	 * 
+	 * url format : webapi?action=cmd_start
+	 * */
+	def cmd_start(request) {
+		Switches.getInstance().start()
+	}
+	/*
+	 * Reloads config file
+	 * 
+	 * url format : webapi?action=cmd_config_reload
+	 * */
+	def cmd_config_reload(request) {
+		SystemConfig.getInstance().load();
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Override
