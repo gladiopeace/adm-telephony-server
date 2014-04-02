@@ -34,7 +34,7 @@
 			<zipfileset dir="dist" prefix="" />
 			<zipfileset dir="." includes="config.xml.sample, scripts.xml.sample, run.sh"/>
 			<zipfileset dir="src" prefix="" includes="log4j.properties"/>
-			<zipfileset dir="scripts" prefix="scripts"/>
+			<zipfileset dir="dynamic_beans" prefix="dynamic_beans"/>
 		</zip>
 	</target>
 
