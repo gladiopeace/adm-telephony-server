@@ -81,7 +81,7 @@ public class HttpServer implements IoHandler {
 				log.error(e.getMessage(), e);
 			}
 			msg.getIoSession().write(response);
-
+			msg.getIoSession().close(true);
 		}
 		
 	}
