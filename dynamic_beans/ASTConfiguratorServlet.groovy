@@ -31,7 +31,7 @@ class ASTConfiguratorServlet extends AdmServlet{
 		User u = userDAO.getUser(name)
 		if (u){			
 			response.appendBody("defaultuser=${name}&secret=${u.password}&context=internal&host=dynamic&insecure=port"+
-				"&type=friend&accountcode=${u.account}&callerid=${u.callerId}&nat=force_rport\n\n")
+				"&type=friend&accountcode=${u.account}&callerid=${u.callerId}&nat=auto_comedia\n\n")
 		}
 		else{
 			response.appendBody("error")
