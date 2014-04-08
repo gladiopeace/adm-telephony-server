@@ -41,6 +41,7 @@ public class ASTEvent{
 	static public ASTEvent buildEvent(String switchId, String eventStr){
 		Map<String, String> map = new HashMap<String, String>();
 		
+		try {
 		ASTEvent result = null;
 		String[] items = eventStr.split("\r\n"); 
 	
@@ -61,6 +62,11 @@ public class ASTEvent{
 				result = new ASTResponseEvent(switchId, map);
 		}
 		return result;
+		}
+		catch (Exception e) {
+			log.fatal(e.getMessage(), e);
+		}
+		return null;
 	}
 	static ASTEvent createFromConstructor(String switchId, String eventName, Map<String, String> map){
 		if (eventName != null) {
