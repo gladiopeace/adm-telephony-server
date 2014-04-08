@@ -25,5 +25,6 @@
 	<classpathentry kind="lib" path="lib/http-builder-0.7.jar"/>
 	<classpathentry kind="lib" path="lib/httpclient-4.3.3.jar"/>
 	<classpathentry kind="lib" path="lib/httpcore-4.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/nekohtml.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
