@@ -752,7 +752,8 @@ public abstract class Channel implements TimerNotifiable {
 	public String toString() {
 		return "Channel [" + (id != null ? "id=" + id + ", " : "")
 				+ (uniqueId != null ? "uniqueId=" + uniqueId + ", " : "")
-				+ (callOrigin != null ? "callOrigin=" + callOrigin : "") + "]";
+				+ (callOrigin != null ? "callOrigin=" + callOrigin + ", " : "")
+				+ (script != null ? "script=" + script : "") + "]";
 	}
 
 	public String getDetailedDump() {

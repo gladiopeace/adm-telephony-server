@@ -190,6 +190,7 @@ public class Switches implements DefinitionChangeListener, EventListener {
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////
 	public List<Channel> getAllChannels() {
+		log.trace(String.format("************** Get All Channels count %d", channels.size()));
 		List<Channel> result = new ArrayList<Channel>();
 		result.addAll(channels.values());
 		return result;

@@ -73,7 +73,7 @@ public abstract class Switch {
 	public void addChannel(Channel channel) {
 		if (channel != null) {
 			synchronizedChannels.put(channel.getId(), channel);
-			log.debug(String.format("Switch (%s) : Added channel %s", getDefinition().getId(), channel));
+			log.debug(String.format("Switch (%s) : Added channel %s, channels count (%d)", getDefinition().getId(), channel, channels.size()));
 		}
 	}
 

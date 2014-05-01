@@ -89,7 +89,7 @@ public class AdmTelephonyServer {
 
 		// static listeners, order is important as conferencemanager might
 		// removed objects needed by RadiusServers
-		MonitorService.getInstance().start();
+//		MonitorService.getInstance().start();
 		
 		log.trace("AdmTelephonyServer.start ****************");
 		EventsManager.getInstance().addEventListener("RadiusService_Singleton",
