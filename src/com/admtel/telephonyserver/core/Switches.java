@@ -1,9 +1,11 @@
 package com.admtel.telephonyserver.core;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,11 +18,14 @@ import com.admtel.telephonyserver.config.DefinitionChangeListener;
 import com.admtel.telephonyserver.config.DefinitionInterface;
 import com.admtel.telephonyserver.config.SwitchDefinition;
 import com.admtel.telephonyserver.core.Switch.SwitchStatus;
+import com.admtel.telephonyserver.core.Timers.Timer;
 import com.admtel.telephonyserver.events.ChannelEvent;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.events.DisconnectedEvent;
 import com.admtel.telephonyserver.freeswitch.FSSwitch;
 import com.admtel.telephonyserver.interfaces.EventListener;
+import com.admtel.telephonyserver.interfaces.TimerNotifiable;
+import com.admtel.telephonyserver.utils.LimitedQueue;
 
 public class Switches implements DefinitionChangeListener, EventListener {
 
@@ -28,15 +33,14 @@ public class Switches implements DefinitionChangeListener, EventListener {
 
 	Map<String, Switch> idMap = new HashMap<String, Switch>();
 	Map<String, Switch> addressMap = new HashMap<String, Switch>();
-	
+
 	private Map<String, Channel> channels = new HashMap<String, Channel>();
-	private Map<String, Channel> synchronizedChannels = Collections
-			.synchronizedMap(channels);
+	private Map<String, Channel> synchronizedChannels = Collections.synchronizedMap(channels);
 
 	Random rnd = new Random(System.currentTimeMillis());
 
 	private Switches() {
-
+		
 	}
 
 	private static class SingletonHolder {
@@ -56,16 +60,18 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			}
 		}
 	}
-	/////////////////////////////////////////////////////////////////////////////////////////
-	public void remove(Switch _switch){
-		if (_switch != null){
-			synchronized (this){
+
+	// ///////////////////////////////////////////////////////////////////////////////////////
+	public void remove(Switch _switch) {
+		if (_switch != null) {
+			synchronized (this) {
 				idMap.remove(_switch.getDefinition().getId());
 				addressMap.remove(_switch.getDefinition().getAddress());
 			}
 		}
 	}
-	/////////////////////////////////////////////////////////////////////////////////////////
+
+	// ///////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	public void definitionAdded(DefinitionInterface definition) {
 		if (definition instanceof SwitchDefinition) {
@@ -99,45 +105,45 @@ public class Switches implements DefinitionChangeListener, EventListener {
 		if (definition instanceof SwitchDefinition) {
 			Switch _switch = this.getById(definition.getId());
 			log.trace("Definition removed - " + definition);
-			if (_switch != null){				
+			if (_switch != null) {
 				_switch.scheduleRemove();
 			}
 		}
 	}
 
 	@Override
-	public void defnitionChanged(DefinitionInterface oldDefinition,
-			DefinitionInterface newDefinition) {
+	public void defnitionChanged(DefinitionInterface oldDefinition, DefinitionInterface newDefinition) {
 		log.trace(String.format("Definition changed from {%s} to {%s}", oldDefinition, newDefinition));
-		if (newDefinition.isCoreChange(oldDefinition)){
+		if (newDefinition.isCoreChange(oldDefinition)) {
 			definitionRemoved(oldDefinition);
 			definitionAdded(newDefinition);
-		}
-		else{
+		} else {
 			SwitchDefinition def = (SwitchDefinition) newDefinition;
 			Switch _switch = this.getById(def.getId());
-			if (_switch != null){
+			if (_switch != null) {
 				_switch.setDefinition(def);
 			}
 		}
 
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////
+	// ///////////////////////////////////////////////////////////////////////////////////////
 	private void addChannel(Channel channel) {
 		if (channel != null) {
 			synchronizedChannels.put(channel.getUniqueId(), channel);
 			log.debug(String.format("Switches : Added channel %s", channel));
 		}
 	}
-	/////////////////////////////////////////////////////////////////////////////////////////
+
+	// ///////////////////////////////////////////////////////////////////////////////////////
 	private void removeChannel(Channel channel) {
 		if (channel == null)
 			return;
 		synchronizedChannels.remove(channel.getUniqueId());
 		log.debug(String.format("Switches : Removed channel %s", channel));
 	}
-	/////////////////////////////////////////////////////////////////////////////////////////
+
+	// ///////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	public boolean onEvent(Event event) {
 		switch (event.getEventType()) {
@@ -158,79 +164,88 @@ public class Switches implements DefinitionChangeListener, EventListener {
 	}
 
 	public String toReadableString() {
-		String result ="";
-		for (Switch _switch:idMap.values()){
+		String result = "";
+		for (Switch _switch : idMap.values()) {
 			result += _switch.toReadableString();
 		}
 		return result;
 	}
-	
+
 	public void start() {
-		for (Switch _switch:idMap.values()) {
+		for (Switch _switch : idMap.values()) {
 			_switch.start();
 		}
 	}
+
 	public void stop(boolean forceStop) {
-		for (Switch _switch:idMap.values()) {
+		for (Switch _switch : idMap.values()) {
 			_switch.stop(forceStop);
 		}
 	}
+
 	public void restart(boolean forceStop) {
-		for (Switch _switch:idMap.values()) {
+		for (Switch _switch : idMap.values()) {
 			_switch.restart(forceStop);
 		}
 	}
-	/////////////////////////////////////////////////////////////////////////////////////////
+
+	// ///////////////////////////////////////////////////////////////////////////////////////
 	public Collection<Switch> getAll() {
 		Collection<Switch> switches = new ArrayList<Switch>();
-		for (Switch _switch:idMap.values()){
-				switches.add(_switch);
+		for (Switch _switch : idMap.values()) {
+			switches.add(_switch);
 		}
 		return switches;
 	}
-	/////////////////////////////////////////////////////////////////////////////////////////
+
+	// ///////////////////////////////////////////////////////////////////////////////////////
 	public List<Channel> getAllChannels() {
 		log.trace(String.format("************** Get All Channels count %d", channels.size()));
 		List<Channel> result = new ArrayList<Channel>();
 		result.addAll(channels.values());
 		return result;
 	}
-	/////////////////////////////////////////////////////////////////////////////////////////
-	public List<Channel> getChannelsWithOffsetAndCount(int offset, int count){
+
+	// ///////////////////////////////////////////////////////////////////////////////////////
+	public List<Channel> getChannelsWithOffsetAndCount(int offset, int count) {
 		List<Channel> result = new ArrayList<Channel>(count);
-		ArrayList<Channel>tChannels = new ArrayList<Channel>();
+		ArrayList<Channel> tChannels = new ArrayList<Channel>();
 		tChannels.addAll(channels.values());
-		
+
 		Collections.sort(tChannels, new Comparator<Channel>() {
 
 			@Override
 			public int compare(Channel o1, Channel o2) {
-				if (o2.setupTime == null || o1.setupTime == null) return 0;
-				
+				if (o2.setupTime == null || o1.setupTime == null)
+					return 0;
+
 				return o1.setupTime.compareTo(o1.setupTime);
 			}
-			
+
 		});
-		
+
 		int size = channels.size();
-		
-		for (int i=0;i<count;i++){
-			if ((i+offset) >= size) break;
-			result.add(tChannels.get(i+offset));
+
+		for (int i = 0; i < count; i++) {
+			if ((i + offset) >= size)
+				break;
+			result.add(tChannels.get(i + offset));
 		}
 		log.trace("GetChannelsWithOffsetAndCount : " + result.size());
 		return result;
 	}
-	/////////////////////////////////////////////////////////////////////////////////////////
-	public int getChannelCount(){
+
+	// ///////////////////////////////////////////////////////////////////////////////////////
+	public int getChannelCount() {
 		return channels.size();
 	}
-	/////////////////////////////////////////////////////////////////////////////////////////
-	public Channel getChannelById(String id){
+
+	// ///////////////////////////////////////////////////////////////////////////////////////
+	public Channel getChannelById(String id) {
 		return channels.get(id);
 	}
 
-	/////////////////////////////////////////////////////////////////////////////////////////	
+	// ///////////////////////////////////////////////////////////////////////////////////////
 	public Switch getByAddress(String address) {
 		if (address == null)
 			return null;
@@ -238,7 +253,8 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			return addressMap.get(address);
 		}
 	}
-	/////////////////////////////////////////////////////////////////////////////////////////
+
+	// ///////////////////////////////////////////////////////////////////////////////////////
 	public Switch getById(String id) {
 		if (id == null)
 			return null;
@@ -246,10 +262,12 @@ public class Switches implements DefinitionChangeListener, EventListener {
 			return idMap.get(id);
 		}
 	}
-	public Map<String, Channel>getChannels(){
+
+	public Map<String, Channel> getChannels() {
 		return channels;
 	}
-	/////////////////////////////////////////////////////////////////////////////////////////
+
+	// ///////////////////////////////////////////////////////////////////////////////////////
 	public Switch getRandom() {
 		Collection<Switch> switches = getAll();
 		int index = rnd.nextInt(switches.size());
@@ -260,24 +278,24 @@ public class Switches implements DefinitionChangeListener, EventListener {
 		}
 		return null;
 	}
-	/////////////////////////////////////////////////////////////////////////////////////////	
+
+	// ///////////////////////////////////////////////////////////////////////////////////////
 	public Switch getLeastUsed() {
 		Switch leastUsed = null;
 		Collection<Switch> switches = getAll();
-		int index = switches.size() -1;
+		int index = switches.size() - 1;
 		for (Switch _switch : switches) {
-			if (index == switches.size() - 1){
+			if (index == switches.size() - 1) {
 				leastUsed = _switch;
-			}else if (index < 0){
+			} else if (index < 0) {
 				return leastUsed;
-			}else{
-				if (leastUsed.getAllChannels().size() > _switch.getAllChannels().size()){
-				leastUsed = _switch;	
-				}					
+			} else {
+				if (leastUsed.getAllChannels().size() > _switch.getAllChannels().size()) {
+					leastUsed = _switch;
+				}
 			}
 			index--;
 		}
 		return leastUsed;
 	}
 }
- 

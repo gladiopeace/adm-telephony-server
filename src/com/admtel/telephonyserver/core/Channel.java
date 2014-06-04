@@ -95,8 +95,6 @@ public abstract class Channel implements TimerNotifiable {
 	private boolean sendAccountingStart = false; 
 	private boolean sendAccountingStop = false;
 	
-    //For debugging purposes, keep the events in a queue for later dump
-	protected LimitedQueue eventsQueue = new LimitedQueue(20);
 	protected Script script;
 	
 	public Script getScript(){
@@ -587,8 +585,6 @@ public abstract class Channel implements TimerNotifiable {
 		log.trace(String.format("onEvent: %s", e));
 
         //Add event for dump queue
-		eventsQueue.add(e);
-		
 		switch (e.getEventType()) {
 		case DTMF: {
 			DtmfEvent event = (DtmfEvent) e;
@@ -772,8 +768,7 @@ public abstract class Channel implements TimerNotifiable {
 				+ (callOrigin != null ? "callOrigin=" + callOrigin + ", " : "")
 				+ (setupTime != null ? "setupTime=" + setupTime + ", " : "")
 				+ (answerTime != null ? "answerTime=" + answerTime + ", " : "")
-				+ (eventsQueue != null ? "eventsQueue=" + eventsQueue + ", "
-						: "")
+
 				+ (otherChannel != null ? "otherChannel=" + otherChannel : "")
 				+ "]";
 	}

@@ -69,7 +69,7 @@ public class TelnetServer extends IoHandlerAdapter{
     @Override
     public void sessionIdle( IoSession session, IdleStatus status ) throws Exception
     {
-        System.out.println( "IDLE " + session.getIdleCount( status ));
+    	//TODO, disconnect when session is idle ??
     }	
     
     static private NaturalCLI buildNaturalCLI(IoSession session) {

@@ -35,21 +35,21 @@ public class AdmTelephonyServer {
 	 */
 	static private boolean isOnlyInstance(){
 		
-		ServerSocket socket = null;
-		try{
-			socket = new ServerSocket(PORT, 0, InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }));
-		}
-		catch (Exception e){
-			return false;
-		}
-		if (socket != null){
-			try {
-				socket.close();
-			} catch (IOException e) {
-				log.warn(e);
-			}
-			socket = null;
-		}
+//		ServerSocket socket = null;
+//		try{
+//			socket = new ServerSocket(PORT, 0, InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }));
+//		}
+//		catch (Exception e){
+//			return false;
+//		}
+//		if (socket != null){
+//			try {
+//				socket.close();
+//			} catch (IOException e) {
+//				log.warn(e);
+//			}
+//			socket = null;
+//		}
 		return true;
 	}
 	
@@ -89,7 +89,10 @@ public class AdmTelephonyServer {
 
 		// static listeners, order is important as conferencemanager might
 		// removed objects needed by RadiusServers
+
 //		MonitorService.getInstance().start();
+		
+		StatsManager.getInstance();
 		
 		log.trace("AdmTelephonyServer.start ****************");
 		EventsManager.getInstance().addEventListener("RadiusService_Singleton",

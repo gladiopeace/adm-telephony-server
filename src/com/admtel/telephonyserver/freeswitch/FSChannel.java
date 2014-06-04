@@ -823,8 +823,6 @@ public class FSChannel extends Channel {
 	@Override
 	synchronized protected void processNativeEvent(Object event) {
 		
-		eventsQueue.add(event);
-		
 		if (event instanceof FSEvent) {
 			FSEvent fsEvent = (FSEvent) event;
 			if (fsEvent.getEventType() == EventType.ChannelExecuteComplete) {
