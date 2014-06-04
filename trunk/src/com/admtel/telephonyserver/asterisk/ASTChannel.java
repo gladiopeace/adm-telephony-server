@@ -748,7 +748,6 @@ public class ASTChannel extends Channel {
 
 	synchronized protected void processNativeEvent(Object event) {
 		
-		eventsQueue.add(event);
 		log.debug(String
 				.format("Channel(%s)\nEvent (%s)\n CallState (%s)\n InternalState(%s)", this,
 						event, getCallState(), internalState.getClass()
