@@ -423,6 +423,11 @@ class WebAPI extends AdmServlet {
 	def cmd_config_reload(request) {
 		SystemConfig.getInstance().load();
 	}
+	def get_cps(request) {
+		List<Double> result = StatsManager.getInstance().getCPS()
+		def builder = new JsonBuilder(result)
+		builder.toString()
+	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	@Override
 	public void process(HttpRequestMessage request, HttpResponseMessage response){
