@@ -15,20 +15,18 @@ import com.admtel.telephonyserver.utils.LimitedQueue;
 
 public class StatsManager implements EventListener, TimerNotifiable {
 
-	private static final long UPDATE_INTERVAL = 60000L; // one minute
+	private static final long UPDATE_INTERVAL = 60000L; // in ms
+	private static final int MAX_CALLS_FOR_CALCULATOR = 6000;
 	private static final int MAX_CPS_RESULTS = 3;
 
-	LimitedQueue<Date> channelsEventTime = new LimitedQueue(2000);
-	LimitedQueue<Double> cps = new LimitedQueue(MAX_CPS_RESULTS);
+	LimitedQueue<Date> channelsEventTime = new LimitedQueue<Date>(MAX_CALLS_FOR_CALCULATOR);
+	LimitedQueue<Double> cps = new LimitedQueue<Double>(MAX_CPS_RESULTS);
 
 	Timer cpsCalculatorTimer;
 
 	private StatsManager() {
 		EventsManager.getInstance().addEventListener("STATS_MANAGER", this);
-		cpsCalculatorTimer = Timers.getInstance().startTimer(this, 60000 /*
-																		 * 1
-																		 * minute
-																		 */, false, null);
+		cpsCalculatorTimer = Timers.getInstance().startTimer(this, UPDATE_INTERVAL , false, null);
 	}
 
 	private static class SingletonHolder {
@@ -70,10 +68,14 @@ public class StatsManager implements EventListener, TimerNotifiable {
 				if (firstEvent != null) {
 					long diff = (now.getTime() - firstEvent.getTime()) / 1000;
 
-					result = new BigDecimal(channelsEventTime.size() / (double) diff);
+					if (diff != 0) {
+						result = new BigDecimal(channelsEventTime.size() / (double) diff);
+						result = result.setScale(2, BigDecimal.ROUND_HALF_UP);
+					}
 				}
 			}
-			return result.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+			
+			return result.doubleValue();
 		}
 	}
 
