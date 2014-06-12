@@ -20,7 +20,7 @@ abstract public class AdmServlet {
 		}
 	}
 
-    private String dump(HttpRequestMessage request){
+    protected String dump(HttpRequestMessage request){
         Map<String, String[]> headers = request.getHeaders();
         Iterator<Map.Entry<String, String[]>> it = headers.entrySet().iterator();
         StringBuffer sb = new StringBuffer();

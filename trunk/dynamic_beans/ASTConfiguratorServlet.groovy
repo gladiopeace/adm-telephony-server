@@ -4,10 +4,12 @@ import com.admtel.telephonyserver.httpserver.HttpRequestMessage;
 import com.admtel.telephonyserver.httpserver.HttpResponseMessage;
 import com.admtel.telephonyserver.directory.*;
 import com.admtel.telephonyserver.httpserver.AdmServlet;
+import com.admtel.telephonyserver.interfaces.*;
 
 class ASTConfiguratorServlet extends AdmServlet{
 	
 	public UserDAO userDAO;
+	public GatewayDAO gatewayDAO;
 	
 	/*
 	 * Pull configuration for asterisk
@@ -25,7 +27,8 @@ class ASTConfiguratorServlet extends AdmServlet{
 	}
 	
 	@Override
-	public void process(HttpRequestMessage request, HttpResponseMessage response){		
+	public void process(HttpRequestMessage request, HttpResponseMessage response){	
+		
 		String name = URLDecoder.decode(request.getParameter("name"), 'UTF-8')
 		String domain = URLDecoder.decode(request.getParameter("URI"), 'UTF-8')		
 		User u = userDAO.getUser(name)
@@ -34,7 +37,14 @@ class ASTConfiguratorServlet extends AdmServlet{
 				"&type=friend&accountcode=${u.account}&callerid=${u.callerId}&nat=auto_comedia\n\n")
 		}
 		else{
-			response.appendBody("error")
+			Gateway gateway = gatewayDAO.findById(name)
+			if (gateway) {
+				response.appendBody("username=${gateway.username}&defaultuser=${gateway.username}&fromuser=${gateway.username}"+
+					"&secret=${gateway.password}&host=${gateway.address}&port=${gateway.port}&type=friend\n\n")
+			}
+			else {
+				response.appendBody("error")
+			}
 		}
 	}
 } 
