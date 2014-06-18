@@ -34,7 +34,7 @@ class ASTConfiguratorServlet extends AdmServlet{
 		User u = userDAO.getUser(name)
 		if (u){			
 			response.appendBody("defaultuser=${name}&secret=${u.password}&context=internal&host=dynamic&insecure=port"+
-				"&type=friend&accountcode=${u.account}&callerid=${u.callerId}&nat=auto_comedia\n\n")
+				"&type=friend&accountcode=${u.account}&callerid=${u.callerId}&nat=auto_comedia&transport=tcp,udp\n\n")
 		}
 		else{
 			Gateway gateway = gatewayDAO.findById(name)
