@@ -746,7 +746,8 @@ public abstract class Channel implements TimerNotifiable {
 
 	@Override
 	public String toString() {
-		return "Channel [" + (id != null ? "id=" + id + ", " : "")
+		return "Channel [" + (callState != null ? "callState=" + callState + ", " : "")
+				+ (mediaState != null ? "mediaState=" + mediaState + ", " : "") + (id != null ? "id=" + id + ", " : "")
 				+ (uniqueId != null ? "uniqueId=" + uniqueId + ", " : "")
 				+ (callOrigin != null ? "callOrigin=" + callOrigin + ", " : "")
 				+ (script != null ? "script=" + script : "") + "]";

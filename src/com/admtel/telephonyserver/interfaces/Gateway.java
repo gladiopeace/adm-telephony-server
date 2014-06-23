@@ -7,4 +7,5 @@ public class Gateway {
 	public String password;
 	public Integer port;
 	public Boolean register;
+	public String codecs;
 }
