@@ -100,11 +100,9 @@ public class ASTChannel extends Channel {
 			}
 
 			String actionId = getId() + "___StreamFile";
-			ASTChannel.this.session
-					.write(String
-							.format("Action: AGI\nChannel: %s\nCommand: STREAM FILE %s %s\nActionId: %s\nCommandID: %s",
-									getId(), prompts.get(playedPromptCount),
-									terminators, actionId, actionId));
+			ASTChannel.this.session.write(String.format(
+					"Action: AGI\nChannel: %s\nCommand: STREAM FILE %s %s\nActionId: %s\nCommandID: %s", getId(),
+					prompts.get(playedPromptCount), terminators, actionId, actionId));
 			return Result.Ok;
 		}
 
@@ -127,30 +125,23 @@ public class ASTChannel extends Channel {
 				if (aee.isStart()) { // At this state, we only get the AgiExec
 					// for the stream file command
 					if (playedPromptCount == 0) {
-						ASTChannel.this.onEvent(new PlaybackStartedEvent(
-								ASTChannel.this));
+						ASTChannel.this.onEvent(new PlaybackStartedEvent(ASTChannel.this));
 					}
 				} else {
 					// playback ended
 					playedPromptCount++;
-					if (playedPromptCount == prompts.size()
-							|| !interruptingDigit.isEmpty()) {
+					if (playedPromptCount == prompts.size() || !interruptingDigit.isEmpty()) {
 						if (interruptingDigit.isEmpty()) {
-							ASTChannel.this.onEvent(new PlaybackEndedEvent(
-									ASTChannel.this, interruptingDigit, ""));
+							ASTChannel.this.onEvent(new PlaybackEndedEvent(ASTChannel.this, interruptingDigit, ""));
 						} else {
-							ASTChannel.this.onEvent(new PlaybackEndedEvent(
-									ASTChannel.this, interruptingDigit, prompts
-											.get(playedPromptCount - 1)));
+							ASTChannel.this.onEvent(new PlaybackEndedEvent(ASTChannel.this, interruptingDigit, prompts
+									.get(playedPromptCount - 1)));
 						}
 					} else {
 						String actionId = getId() + "___StreamFile";
-						ASTChannel.this.session
-								.write(String
-										.format("Action: AGI\nChannel: %s\nCommand: STREAM FILE %s %s\nActionId: %s\nCommandID: %s",
-												getId(),
-												prompts.get(playedPromptCount),
-												terminators, actionId, actionId));
+						ASTChannel.this.session.write(String.format(
+								"Action: AGI\nChannel: %s\nCommand: STREAM FILE %s %s\nActionId: %s\nCommandID: %s",
+								getId(), prompts.get(playedPromptCount), terminators, actionId, actionId));
 					}
 				}
 			}
@@ -213,8 +204,7 @@ public class ASTChannel extends Channel {
 		boolean muted;
 		boolean deaf;
 
-		public JoinConferenceState(String conferenceId, boolean moderator,
-				boolean muted, boolean deaf) {
+		public JoinConferenceState(String conferenceId, boolean moderator, boolean muted, boolean deaf) {
 
 			this.conferenceId = conferenceId;
 			this.moderator = moderator;
@@ -235,10 +225,9 @@ public class ASTChannel extends Channel {
 			String command = String.format("%s,%s,", conferenceId, parameters);
 			String actionId = getId() + "___MeetMe";
 
-			ASTChannel.this.session
-					.write(String
-							.format("Action: AGI\nChannel: %s\nCommand: EXEC MeetMe %s\nActionId: %s\nCommandID: %s",
-									getId(), command, actionId, actionId));
+			ASTChannel.this.session.write(String.format(
+					"Action: AGI\nChannel: %s\nCommand: EXEC MeetMe %s\nActionId: %s\nCommandID: %s", getId(), command,
+					actionId, actionId));
 
 		}
 
@@ -253,29 +242,25 @@ public class ASTChannel extends Channel {
 			switch (astEvent.getEventType()) {
 			case MeetmeJoin: {
 				ASTMeetmeJoinEvent je = (ASTMeetmeJoinEvent) astEvent;
-				ASTChannel.this.onEvent(new ConferenceJoinedEvent(
-						ASTChannel.this, je.getMeetme(), je.getUsernum(),
+				ASTChannel.this.onEvent(new ConferenceJoinedEvent(ASTChannel.this, je.getMeetme(), je.getUsernum(),
 						moderator, muted, deaf));
 			}
 				break;
 			case MeetmeLeave: {
 				ASTMeetmeLeaveEvent mle = (ASTMeetmeLeaveEvent) astEvent;
-				ASTChannel.this.onEvent(new ConferenceLeftEvent(
-						ASTChannel.this, mle.getMeetme(), mle.getUsernum()));
+				ASTChannel.this.onEvent(new ConferenceLeftEvent(ASTChannel.this, mle.getMeetme(), mle.getUsernum()));
 			}
 				break;
 			case MeetmeTalking: {
 				ASTMeetmeTalkingEvent mte = (ASTMeetmeTalkingEvent) astEvent;
-				ASTChannel.this.onEvent(new ConferenceTalkEvent(
-						ASTChannel.this, mte.getMeetme(), mte.getUsernum(), mte
-								.isOn()));
+				ASTChannel.this.onEvent(new ConferenceTalkEvent(ASTChannel.this, mte.getMeetme(), mte.getUsernum(), mte
+						.isOn()));
 			}
 				break;
 			case MeetmeMute: {
 				ASTMeetmeMuteEvent mme = (ASTMeetmeMuteEvent) astEvent;
-				ASTChannel.this.onEvent(new ConferenceMutedEvent(
-						ASTChannel.this, mme.getMeetme(), mme.getUsernum(), mme
-								.isMuted()));
+				ASTChannel.this.onEvent(new ConferenceMutedEvent(ASTChannel.this, mme.getMeetme(), mme.getUsernum(),
+						mme.isMuted()));
 			}
 				break;
 			}
@@ -292,10 +277,9 @@ public class ASTChannel extends Channel {
 			case Dial: {
 				ASTDialEvent dialEvent = (ASTDialEvent) astEvent;
 				if (dialEvent.isBegin()) {
-					
-					Channel peerChannel = ASTChannel.this.getSwitch()
-							.getChannel(dialEvent.getPeerChannel());
-					if (peerChannel != null && peerChannel.getScript() != null){
+
+					Channel peerChannel = ASTChannel.this.getSwitch().getChannel(dialEvent.getPeerChannel());
+					if (peerChannel != null && peerChannel.getScript() != null) {
 						peerChannel.getScript().addChannel(ASTChannel.this);
 					}
 					UriRecord uriRecord = SipParser.parseDialString(dialEvent.getDialString());
@@ -303,20 +287,18 @@ public class ASTChannel extends Channel {
 					internalState = new AlertingState();
 					onEvent(new DialStartedEvent(peerChannel, ASTChannel.this));
 					onEvent(new AlertingEvent(ASTChannel.this));
-					
 
 				} else {
 					if (dialEvent.getDialStatus() != DialStatus.Answer) {
-						onEvent(new DialFailedEvent(ASTChannel.this,
-								dialEvent.getDialStatus()));
+						onEvent(new DialFailedEvent(ASTChannel.this, dialEvent.getDialStatus()));
 					}
 				}
-		
+
 			}
 				break;
 
 			case NewChannel: {
-				ASTNewChannelEvent nce = (ASTNewChannelEvent) astEvent;				
+				ASTNewChannelEvent nce = (ASTNewChannelEvent) astEvent;
 				getChannelData().setCallerIdNumber(nce.getCallerIdNum());
 				getChannelData().setUserName(nce.getUserName());
 				getChannelData().setServiceNumber(nce.getExten());
@@ -330,8 +312,7 @@ public class ASTChannel extends Channel {
 					internalState = new AlertingState();
 					break;
 				case Answer:
-					ASTChannel.this
-							.onEvent(new ConnectedEvent(ASTChannel.this));
+					ASTChannel.this.onEvent(new ConnectedEvent(ASTChannel.this));
 					internalState = new IdleState();
 					break;
 				}
@@ -347,12 +328,11 @@ public class ASTChannel extends Channel {
 					internalState = new AlertingState();
 					break;
 				case Answer:
-					ASTChannel.this
-							.onEvent(new ConnectedEvent(ASTChannel.this));
+					ASTChannel.this.onEvent(new ConnectedEvent(ASTChannel.this));
 					internalState = new IdleState();
 					break;
 				}
-		
+
 			}
 				break;
 			}
@@ -368,8 +348,7 @@ public class ASTChannel extends Channel {
 
 	private class OfferedState extends State {
 
-		ASTVariableFetcher variableFetcher = new ASTVariableFetcher(
-				ASTChannel.this);
+		ASTVariableFetcher variableFetcher = new ASTVariableFetcher(ASTChannel.this);
 
 		public OfferedState() {
 			ASTChannel.this.setCallOrigin(CallOrigin.Inbound);
@@ -386,19 +365,22 @@ public class ASTChannel extends Channel {
 			switch (astEvent.getEventType()) {
 			case AsyncAgi: {
 				ASTAsyncAgiEvent agiEvent = (ASTAsyncAgiEvent) astEvent;
-				
-				ASTChannel.this.getChannelData().addVariable("context", agiEvent.getValue("agi_context"));
-				// Create script
-				ScriptManager.getInstance().createScript(ASTChannel.this);
+				if (agiEvent.isStartAgi()) {
+					ASTChannel.this.getChannelData().addVariable("context", agiEvent.getValue("agi_context"));
+					// Create script
+					if (ScriptManager.getInstance().createScript(ASTChannel.this) != null) {
 
-				if (ASTChannel.this.getAcctUniqueSessionId() == null) {
-					ASTChannel.this.setAcctUniqueSessionId(UUID
-							.randomUUID().toString());
+						if (ASTChannel.this.getAcctUniqueSessionId() == null) {
+							ASTChannel.this.setAcctUniqueSessionId(UUID.randomUUID().toString());
+						}
+
+						ASTChannel.this.onEvent(new OfferedEvent(ASTChannel.this));
+					} else {
+						ASTChannel.this.hangup(DisconnectCode.Normal);
+					}
 				}
-
-				ASTChannel.this.onEvent(new OfferedEvent(ASTChannel.this));
 			}
-			
+
 				break;
 
 			case NewState: {
@@ -406,8 +388,7 @@ public class ASTChannel extends Channel {
 				switch (nse.getChannelState()) {
 				case Answer:
 					internalState = new IdleState();
-					ASTChannel.this
-							.onEvent(new ConnectedEvent(ASTChannel.this));
+					ASTChannel.this.onEvent(new ConnectedEvent(ASTChannel.this));
 					break;
 				}
 
@@ -419,8 +400,7 @@ public class ASTChannel extends Channel {
 
 	private class AlertingState extends State {
 
-		ASTVariableFetcher variableFetcher = new ASTVariableFetcher(
-				ASTChannel.this);
+		ASTVariableFetcher variableFetcher = new ASTVariableFetcher(ASTChannel.this);
 
 		public AlertingState() {
 			ASTChannel.this.setCallOrigin(CallOrigin.Outbound);
@@ -442,8 +422,7 @@ public class ASTChannel extends Channel {
 				switch (nse.getChannelState()) {
 				case Answer:
 					internalState = new IdleState();
-					ASTChannel.this
-							.onEvent(new ConnectedEvent(ASTChannel.this));
+					ASTChannel.this.onEvent(new ConnectedEvent(ASTChannel.this));
 					break;
 				}
 
@@ -475,8 +454,8 @@ public class ASTChannel extends Channel {
 		Timer maxDtmfTimer = null;
 		String digits = "";
 
-		public PlayingAndGettingDigitsState(int max, String prompt,
-				long timeout, String terminators, boolean interruptPlay) {
+		public PlayingAndGettingDigitsState(int max, String prompt, long timeout, String terminators,
+				boolean interruptPlay) {
 			this.prompts.add(prompt);
 			this.max = max;
 			this.timeout = timeout;
@@ -486,8 +465,8 @@ public class ASTChannel extends Channel {
 			execute(); // TODO check return result
 		}
 
-		public PlayingAndGettingDigitsState(int max, String[] prompts,
-				long timeout, String terminators, boolean interruptPlay) {
+		public PlayingAndGettingDigitsState(int max, String[] prompts, long timeout, String terminators,
+				boolean interruptPlay) {
 			if (prompts != null && prompts.length > 0) {
 				for (int i = 0; i < prompts.length; i++) {
 					this.prompts.add(prompts[i]);
@@ -520,12 +499,10 @@ public class ASTChannel extends Channel {
 								}
 								PlayAndGetDigitsEndedEvent pe = null;
 
-								pe = new PlayAndGetDigitsEndedEvent(
-										ASTChannel.this, this.digits);
+								pe = new PlayAndGetDigitsEndedEvent(ASTChannel.this, this.digits);
 								pe.setTerminatingDigit(termChar);
 								if (this.playedPromptCount < prompts.size()) {
-									pe.setInterruptedFile(prompts
-											.get(this.playedPromptCount));
+									pe.setInterruptedFile(prompts.get(this.playedPromptCount));
 								}
 
 								substate = ENDED;
@@ -539,12 +516,10 @@ public class ASTChannel extends Channel {
 									this.digits = "";
 									PlayAndGetDigitsEndedEvent pe = null;
 
-									pe = new PlayAndGetDigitsEndedEvent(
-											ASTChannel.this, this.digits);
+									pe = new PlayAndGetDigitsEndedEvent(ASTChannel.this, this.digits);
 									pe.setTerminatingDigit(termChar);
 									if (this.playedPromptCount < prompts.size()) {
-										pe.setInterruptedFile(prompts
-												.get(this.playedPromptCount));
+										pe.setInterruptedFile(prompts.get(this.playedPromptCount));
 									}
 									substate = ENDED;
 									ASTChannel.this.internalState = new IdleState();
@@ -552,9 +527,8 @@ public class ASTChannel extends Channel {
 
 								} else {
 									substate = GETTING_DIGITS;
-									this.maxDtmfTimer = Timers.getInstance()
-											.startTimer(ASTChannel.this,
-													timeout, true, this);
+									this.maxDtmfTimer = Timers.getInstance().startTimer(ASTChannel.this, timeout, true,
+											this);
 								}
 
 							}
@@ -568,14 +542,11 @@ public class ASTChannel extends Channel {
 						} else {
 							this.digits += dtmfEvent.getDigit();
 						}
-						if (termChar.length() > 0
-								|| this.digits.length() == this.max) {
-							PlayAndGetDigitsEndedEvent pe = new PlayAndGetDigitsEndedEvent(
-									ASTChannel.this, this.digits);
+						if (termChar.length() > 0 || this.digits.length() == this.max) {
+							PlayAndGetDigitsEndedEvent pe = new PlayAndGetDigitsEndedEvent(ASTChannel.this, this.digits);
 							pe.setTerminatingDigit(termChar);
 							if (this.playedPromptCount < prompts.size()) {
-								pe.setInterruptedFile(prompts
-										.get(this.playedPromptCount));
+								pe.setInterruptedFile(prompts.get(this.playedPromptCount));
 							}
 
 							substate = ENDED;
@@ -598,9 +569,7 @@ public class ASTChannel extends Channel {
 				if (aee.isStart()) { // At this state, we only get the AgiExec
 					// for the stream file command
 					if (playedPromptCount == 0) {
-						ASTChannel.this
-								.onEvent(new PlayAndGetDigitsStartedEvent(
-										ASTChannel.this));
+						ASTChannel.this.onEvent(new PlayAndGetDigitsStartedEvent(ASTChannel.this));
 						return;
 					}
 				} else { // end event
@@ -615,16 +584,12 @@ public class ASTChannel extends Channel {
 							ASTChannel.this.session
 									.write(String
 											.format("Action: AGI\nChannel: %s\nCommand: STREAM FILE %s %s\nActionId: %s\nCommandID: %s",
-													getId(),
-													prompts.get(playedPromptCount),
-													interruptDigits, actionId,
+													getId(), prompts.get(playedPromptCount), interruptDigits, actionId,
 													actionId));
 
 						} else {// that was the last prompt to play
 							substate = GETTING_DIGITS;
-							this.maxDtmfTimer = Timers.getInstance()
-									.startTimer(ASTChannel.this, timeout, true,
-											this);
+							this.maxDtmfTimer = Timers.getInstance().startTimer(ASTChannel.this, timeout, true, this);
 						}
 					}
 				}
@@ -644,22 +609,17 @@ public class ASTChannel extends Channel {
 			}
 			if (prompts.size() > 0) {
 				String actionId = getId() + "___StreamFile";
-				ASTChannel.this.session
-						.write(String
-								.format("Action: AGI\nChannel: %s\nCommand: STREAM FILE %s %s\nActionId: %s\nCommandID: %s",
-										getId(),
-										prompts.get(playedPromptCount),
-										interruptDigits, actionId, actionId));
+				ASTChannel.this.session.write(String.format(
+						"Action: AGI\nChannel: %s\nCommand: STREAM FILE %s %s\nActionId: %s\nCommandID: %s", getId(),
+						prompts.get(playedPromptCount), interruptDigits, actionId, actionId));
 				substate = PLAYING;
 
 			} else {
 				// Send started event
-				ASTChannel.this.onEvent(new PlayAndGetDigitsStartedEvent(
-						ASTChannel.this));
+				ASTChannel.this.onEvent(new PlayAndGetDigitsStartedEvent(ASTChannel.this));
 				// Start the timer
 				substate = GETTING_DIGITS;
-				this.maxDtmfTimer = Timers.getInstance().startTimer(
-						ASTChannel.this, timeout, true, this);
+				this.maxDtmfTimer = Timers.getInstance().startTimer(ASTChannel.this, timeout, true, this);
 			}
 
 			return Result.Ok;
@@ -669,8 +629,7 @@ public class ASTChannel extends Channel {
 		public boolean onTimer(Object data) {
 			if (data == this) {// it is our own timer
 				if (substate == GETTING_DIGITS) {
-					PlayAndGetDigitsEndedEvent pe = new PlayAndGetDigitsEndedEvent(
-							ASTChannel.this, this.digits);
+					PlayAndGetDigitsEndedEvent pe = new PlayAndGetDigitsEndedEvent(ASTChannel.this, this.digits);
 					substate = ENDED;
 					ASTChannel.this.internalState = new IdleState();
 					ASTChannel.this.onEvent(pe);
@@ -689,8 +648,7 @@ public class ASTChannel extends Channel {
 		public QueueState(String queueName, boolean isAgent) {
 			this.queueName = queueName;
 			this.isAgent = isAgent;
-			ASTQueueCommand queueCmd = new ASTQueueCommand(ASTChannel.this,
-					queueName);
+			ASTQueueCommand queueCmd = new ASTQueueCommand(ASTChannel.this, queueName);
 			session.write(queueCmd);
 			result = Result.Ok;
 		}
@@ -706,14 +664,12 @@ public class ASTChannel extends Channel {
 			switch (astEvent.getEventType()) {
 			case Join: {
 				ASTJoinEvent je = (ASTJoinEvent) astEvent;
-				ASTChannel.this.onEvent(new QueueJoinedEvent(ASTChannel.this,
-						je.getQueue(), isAgent));
+				ASTChannel.this.onEvent(new QueueJoinedEvent(ASTChannel.this, je.getQueue(), isAgent));
 			}
 				break;
 			case Leave: {
 				ASTLeaveEvent le = (ASTLeaveEvent) astEvent;
-				ASTChannel.this.onEvent(new QueueLeftEvent(ASTChannel.this, le
-						.getQueue(), isAgent, "Uknown"));
+				ASTChannel.this.onEvent(new QueueLeftEvent(ASTChannel.this, le.getQueue(), isAgent, "Uknown"));
 			}
 				break;
 			}
@@ -747,34 +703,30 @@ public class ASTChannel extends Channel {
 	protected SigProtocol channelProtocol = SigProtocol.Unknown;
 
 	synchronized protected void processNativeEvent(Object event) {
-		
-		log.debug(String
-				.format("Channel(%s)\nEvent (%s)\n CallState (%s)\n InternalState(%s)", this,
-						event, getCallState(), internalState.getClass()
-								.getSimpleName()));
+
+		log.debug(String.format("Channel(%s)\nEvent (%s)\n CallState (%s)\n InternalState(%s)", this, event,
+				getCallState(), internalState.getClass().getSimpleName()));
 		if (event instanceof ASTEvent) {
 			ASTEvent astEvent = (ASTEvent) event;
-
 
 			switch (astEvent.getEventType()) {
 			case Hangup: {
 				ASTHangupEvent asthe = (ASTHangupEvent) astEvent;
-				DisconnectedEvent he = new DisconnectedEvent(ASTChannel.this,
-						DisconnectCode.get(asthe.getCause()));
+				DisconnectedEvent he = new DisconnectedEvent(ASTChannel.this, DisconnectCode.get(asthe.getCause()));
 
 				ASTChannel.this.onEvent(he);
 				ASTChannel.this.onEvent(new DestroyEvent(this));
 			}
 				break;
-			case VarSet:{
+			case VarSet: {
 				ASTVarSetEvent vse = (ASTVarSetEvent) astEvent;
 				String variableName = vse.getName();
-				if (variableName.equals("SIPURI")){
+				if (variableName.equals("SIPURI")) {
 					UriRecord uriRecord = SipParser.parseUri(vse.getValue());
 					setLoginIP(uriRecord.host);
 				}
 			}
-			break;
+				break;
 			}
 			if (internalState != null) {
 				internalState.processEvent(astEvent);
@@ -793,19 +745,17 @@ public class ASTChannel extends Channel {
 	}
 
 	@Override
-	public void setCallingStationId(String callingStationId){
+	public void setCallingStationId(String callingStationId) {
 		super.setCallingStationId(callingStationId);
 		ASTSetVariableCommand cmd = new ASTSetVariableCommand(this, "CALLERID(num)", callingStationId);
 		session.write(cmd.toString());
 	}
-	
+
 	@Override
 	public Result internalAnswer() {
-		ASTChannel.this.session
-				.write(String
-						.format("Action: AGI\nChannel: %s\nCommand: Answer\nActionId: %s\nCommandId: %s",
-								getId(), getId() + "___Answer", getId()
-										+ "___Answer"));
+		ASTChannel.this.session.write(String.format(
+				"Action: AGI\nChannel: %s\nCommand: Answer\nActionId: %s\nCommandId: %s", getId(), getId()
+						+ "___Answer", getId() + "___Answer"));
 		return Result.Ok;
 	}
 
@@ -814,8 +764,7 @@ public class ASTChannel extends Channel {
 
 		// TODO Hangup cause for asterisk is not working
 
-		ASTChannel.this.session.write(String.format(
-				"Action: Hangup\nChannel: %s\nCause: %d", getId(), cause));
+		ASTChannel.this.session.write(String.format("Action: Hangup\nChannel: %s\nCause: %d", getId(), cause));
 
 		/*
 		 * String actionId = getId() + "___Hangup"; ASTChannel.this.session
@@ -829,13 +778,11 @@ public class ASTChannel extends Channel {
 	@Override
 	public Result internalDial(String address, long timeout, boolean secure) {
 		if (address != null && address.length() > 0) {
-			ASTDialCommand dialCmd = new ASTDialCommand(ASTChannel.this,
-					address, timeout);
+			ASTDialCommand dialCmd = new ASTDialCommand(ASTChannel.this, address, timeout);
 			log.trace(String.format("Channel (%s) dialCmd %s", this, dialCmd));
 			session.write(dialCmd);
 		} else {
-			log.warn(String.format("%s, invalid dial string %s", this.getId(),
-					address));
+			log.warn(String.format("%s, invalid dial string %s", this.getId(), address));
 			return Result.InvalidParameters;
 		}
 		return Result.Ok;
@@ -843,18 +790,16 @@ public class ASTChannel extends Channel {
 	}
 
 	@Override
-	public Result internalPlayAndGetDigits(int max, String prompt,
-			long timeout, String terminators, boolean interruptPlay) {
-		internalState = new PlayingAndGettingDigitsState(max, prompt, timeout,
-				terminators, interruptPlay);
+	public Result internalPlayAndGetDigits(int max, String prompt, long timeout, String terminators,
+			boolean interruptPlay) {
+		internalState = new PlayingAndGettingDigitsState(max, prompt, timeout, terminators, interruptPlay);
 		return Result.Ok;
 	}
 
 	@Override
-	public Result internalPlayAndGetDigits(int max, String[] prompt,
-			long timeout, String terminators, boolean interruptPlay) {
-		internalState = new PlayingAndGettingDigitsState(max, prompt, timeout,
-				terminators, interruptPlay);
+	public Result internalPlayAndGetDigits(int max, String[] prompt, long timeout, String terminators,
+			boolean interruptPlay) {
+		internalState = new PlayingAndGettingDigitsState(max, prompt, timeout, terminators, interruptPlay);
 		return Result.Ok;
 	}
 
@@ -882,10 +827,10 @@ public class ASTChannel extends Channel {
 	}
 
 	@Override
-	public Result internalJoinConference(String conferenceId,
-			boolean moderator, boolean startMuted, boolean startDeaf) {
-		internalState = new JoinConferenceState(conferenceId, moderator,
-				startMuted, startDeaf);// TODO check state
+	public Result internalJoinConference(String conferenceId, boolean moderator, boolean startMuted, boolean startDeaf) {
+		internalState = new JoinConferenceState(conferenceId, moderator, startMuted, startDeaf);// TODO
+																								// check
+																								// state
 		return Result.Ok;
 	}
 
@@ -893,9 +838,10 @@ public class ASTChannel extends Channel {
 		return null;
 	}
 
-	public String getContext(){
+	public String getContext() {
 		return this.getChannelData().get("context");
 	}
+
 	@Override
 	public Result internalQueue(String queueName, boolean isAgent) {
 		internalState = new QueueState(queueName, isAgent);
@@ -903,8 +849,7 @@ public class ASTChannel extends Channel {
 	}
 
 	@Override
-	public Result internalConferenceMute(String conferenceId, String memberId,
-			boolean mute) {
+	public Result internalConferenceMute(String conferenceId, String memberId, boolean mute) {
 		ASTCommand cmd = null;
 		if (mute) {
 			cmd = new ASTMeetmeMuteCommand(this, conferenceId, memberId);
@@ -917,8 +862,7 @@ public class ASTChannel extends Channel {
 
 	@Override
 	public Result internalAcdQueue(String queueName) {
-		Result result = AcdManager.getInstance().queueChannel(queueName,
-				ASTChannel.this.getUniqueId(),
+		Result result = AcdManager.getInstance().queueChannel(queueName, ASTChannel.this.getUniqueId(),
 				ASTChannel.this.getSetupTime().toDate(), 0);
 		if (result == Result.Ok) {// TODO,
 			// priority
@@ -929,19 +873,15 @@ public class ASTChannel extends Channel {
 	}
 
 	@Override
-	public Result internalConferenceDeaf(String conferenceId, String memberId,
-			boolean deaf) {
+	public Result internalConferenceDeaf(String conferenceId, String memberId, boolean deaf) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String toString() {
-		return "ASTChannel ["
-				+ (internalState != null ? "internalState=" + internalState
-						+ ", " : "")
-				+ (super.toString() != null ? "toString()=" + super.toString()
-						: "") + "]";
+		return "ASTChannel [" + (internalState != null ? "internalState=" + internalState + ", " : "")
+				+ (super.toString() != null ? "toString()=" + super.toString() : "") + "]";
 	}
 
 }
