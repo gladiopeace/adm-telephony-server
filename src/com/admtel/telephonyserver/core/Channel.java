@@ -43,6 +43,7 @@ import com.admtel.telephonyserver.utils.PromptsUtils;
 
 public abstract class Channel implements TimerNotifiable {
 
+	private static long MAX_CONNECT_TIME_MS = 86400000L;
 	public static Logger log = Logger.getLogger(Channel.class);
 	
 	public enum CallState {
@@ -160,7 +161,11 @@ public abstract class Channel implements TimerNotifiable {
 	}
 
 	public void setHangupAfter(long msTimeout) {
-		hangupTimer = Timers.getInstance().startTimer(this, msTimeout, true,TimersDefs.HangupTimer);
+		long t = msTimeout;
+		if (msTimeout < 0 || msTimeout > MAX_CONNECT_TIME_MS) {
+			t = MAX_CONNECT_TIME_MS;
+		}
+		hangupTimer = Timers.getInstance().startTimer(this, t, true,TimersDefs.HangupTimer);
 	}
 
 	public long getSessionTime() {
