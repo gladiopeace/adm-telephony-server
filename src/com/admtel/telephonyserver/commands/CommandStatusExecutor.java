@@ -8,6 +8,7 @@ import org.naturalcli.ExecutionException;
 import org.naturalcli.ICommandExecutor;
 import org.naturalcli.ParseResult;
 
+import com.admtel.telephonyserver.core.ScriptManager;
 import com.admtel.telephonyserver.core.StatsManager;
 import com.admtel.telephonyserver.core.Switches;
 
@@ -30,8 +31,10 @@ public class CommandStatusExecutor implements ICommandExecutor{
 	    long freeMemory = runtime.freeMemory();
 	    List<Double> cps = StatsManager.getInstance().getCPS();
 
+	    
 		sb.append("\n>\n");
 		sb.append("channels : " +Switches.getInstance().getChannelCount()+"\n");
+		sb.append("Scripts : " + ScriptManager.getInstance().getScriptsCount()+"\n");
 	    sb.append("free memory: " + format.format(freeMemory / 1024) + "\n");
 	    sb.append("allocated memory: " + format.format(allocatedMemory / 1024) + "\n");
 	    sb.append("max memory: " + format.format(maxMemory / 1024) + "\n");

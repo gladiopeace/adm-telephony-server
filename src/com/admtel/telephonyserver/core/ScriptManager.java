@@ -114,7 +114,10 @@ public class ScriptManager implements DefinitionChangeListener, Loadable{
 		
 	}
 
-	Collection<Script> getScripts(){
+	public Collection<Script> getScripts(){
 		return scripts.values();
+	}
+	public Integer getScriptsCount() {
+		return scripts.size();
 	}
 }
