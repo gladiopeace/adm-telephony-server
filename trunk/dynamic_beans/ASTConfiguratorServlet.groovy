@@ -39,10 +39,15 @@ class ASTConfiguratorServlet extends AdmServlet{
 //		                           ; of where the SDP says to send it.
 //		   nat = auto_force_rport  ; Set the force_rport option if Asterisk detects NAT (default)
 //		   nat = auto_comedia      ; Set the comedia option if Asterisk detects NAT
-		   
+//		 The nat settings can be combined. For example, to set both force_rport and comedia
+//		 one would set nat=force_rport,comedia. If any of the comma-separated options is 'no',
+//		 Asterisk will ignore any other settings and set nat=no. If one of the "auto" settings
+//		 is used in conjunction with its non-auto counterpart (nat=comedia,auto_comedia), then
+//		 the non-auto option will be ignored.
+		
 		if (u){			
 			response.appendBody("defaultuser=${name}&secret=${u.password}&context=internal&host=dynamic&insecure=port"+
-				"&type=peer&accountcode=${u.account}&callerid=${u.callerId}&nat=yes&transport=tcp,udp\n\n")
+				"&type=peer&accountcode=${u.account}&callerid=${u.callerId}&nat=force_rport,comedia&transport=tcp,udp\n\n")
 		}
 		else{
 			Gateway gateway = gatewayDAO.findById(name)
