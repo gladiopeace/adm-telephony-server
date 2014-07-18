@@ -32,9 +32,17 @@ class ASTConfiguratorServlet extends AdmServlet{
 		String name = URLDecoder.decode(request.getParameter("name"), 'UTF-8')
 		String domain = URLDecoder.decode(request.getParameter("URI"), 'UTF-8')		
 		User u = userDAO.getUser(name)
+		
+//		   nat = no                ; Do no special NAT handling other than RFC3581
+//		   nat = force_rport       ; Pretend there was an rport parameter even if there wasn't
+//		   nat = comedia           ; Send media to the port Asterisk received it from regardless
+//		                           ; of where the SDP says to send it.
+//		   nat = auto_force_rport  ; Set the force_rport option if Asterisk detects NAT (default)
+//		   nat = auto_comedia      ; Set the comedia option if Asterisk detects NAT
+		   
 		if (u){			
 			response.appendBody("defaultuser=${name}&secret=${u.password}&context=internal&host=dynamic&insecure=port"+
-				"&type=friend&accountcode=${u.account}&callerid=${u.callerId}&nat=auto_comedia&transport=tcp,udp\n\n")
+				"&type=peer&accountcode=${u.account}&callerid=${u.callerId}&nat=yes&transport=tcp,udp\n\n")
 		}
 		else{
 			Gateway gateway = gatewayDAO.findById(name)
