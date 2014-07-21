@@ -1,4 +1,4 @@
-import org.apache.log4j.Logger;
+	import org.apache.log4j.Logger;
 
 import com.admtel.telephonyserver.httpserver.HttpRequestMessage;
 import com.admtel.telephonyserver.httpserver.HttpResponseMessage;
@@ -61,7 +61,6 @@ class ASTConfiguratorServlet extends AdmServlet{
 					}
 				}
 				response.appendBody("$resp\n\n")
-				log.trace("************** $resp")
 			}
 			else {
 				response.appendBody("error")
