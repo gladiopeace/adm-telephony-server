@@ -1,6 +1,9 @@
 package com.admtel.telephonyserver.asterisk.events;
 
+import java.util.HashMap;
 import java.util.Map;
+
+import com.admtel.telephonyserver.events.DisconnectCode;
 
 public class ASTHangupEvent extends ASTChannelEvent {
 
@@ -26,5 +29,11 @@ public class ASTHangupEvent extends ASTChannelEvent {
 
 	public String getCauseTxt() {
 		return values.get("Cause-txt");
+	}
+	public static ASTHangupEvent build(String switchId, String channel, DisconnectCode disconnectCode) {
+		Map<String, String> v = new HashMap<String,String>();
+		v.put("Cause", String.valueOf(disconnectCode.ordinal()));
+		v.put("Channel", channel);
+		return new ASTHangupEvent(switchId, v);
 	}
 }
