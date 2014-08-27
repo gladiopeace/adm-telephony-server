@@ -596,6 +596,9 @@ public class ASTChannel extends Channel {
 
 			}
 				break;
+			case Hangup:
+				Timers.getInstance().stopTimer(this.maxDtmfTimer);
+				break;
 			}
 		}
 
@@ -705,19 +708,11 @@ public class ASTChannel extends Channel {
 	synchronized protected void processNativeEvent(Object event) {
 
 		log.debug(String.format("Channel(%s)\nEvent (%s)\n CallState (%s)\n InternalState(%s)", this, event,
-				getCallState(), internalState.getClass().getSimpleName()));
+				getCallState(), internalState==null?"null":internalState.getClass().getSimpleName()));
 		if (event instanceof ASTEvent) {
 			ASTEvent astEvent = (ASTEvent) event;
 
 			switch (astEvent.getEventType()) {
-			case Hangup: {
-				ASTHangupEvent asthe = (ASTHangupEvent) astEvent;
-				DisconnectedEvent he = new DisconnectedEvent(ASTChannel.this, DisconnectCode.get(asthe.getCause()));
-
-				ASTChannel.this.onEvent(he);
-				ASTChannel.this.onEvent(new DestroyEvent(this));
-			}
-				break;
 			case VarSet: {
 				ASTVarSetEvent vse = (ASTVarSetEvent) astEvent;
 				String variableName = vse.getName();
@@ -728,8 +723,17 @@ public class ASTChannel extends Channel {
 			}
 				break;
 			}
+			
 			if (internalState != null) {
 				internalState.processEvent(astEvent);
+			}
+			
+			if (astEvent.getEventType() == ASTEvent.EventType.Hangup && internalState != null) {
+				ASTHangupEvent asthe = (ASTHangupEvent) astEvent;
+				DisconnectedEvent he = new DisconnectedEvent(ASTChannel.this, DisconnectCode.get(asthe.getCause()));
+				ASTChannel.this.onEvent(he);
+				ASTChannel.this.onEvent(new DestroyEvent(this));
+				internalState = null;
 			}
 		}
 	}

@@ -39,8 +39,7 @@ class WebAPI extends AdmServlet {
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def hangup(request){
-		API_Manager.instance.hangup(request.getParameter('channel'))
-		"Channel hangup request " + request.getParameters('channel')
+		return API_Manager.instance.hangup(request.getParameter('channel'))	
 	}
 
 	def conference_action(request){
@@ -454,5 +453,5 @@ class WebAPI extends AdmServlet {
 			response.appendBody("Unauthorized")
 			response.setResponseCode(HttpStatus.ORDINAL_401_Unauthorized);
 		}
-	}
+	}	
 }
