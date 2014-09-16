@@ -13,7 +13,12 @@ public class SipParser {
 		
 		int i = uri.indexOf("@");
 		if (i== -1){
-			result.username = uri;
+			if (AdmUtils.validateIP(uri)) {
+				result.host = uri;
+			}
+			else {
+				result.username = uri;
+			}
 			return result;
 		}
 		String username=uri.substring(0, i);
