@@ -55,8 +55,10 @@ class ASTConfiguratorServlet extends AdmServlet{
 		if (host && AdmUtils.validateIP(host)) {
 			if (ipListDAO) {
 				String accountCode = ipListDAO.accountCode(host)
-				response.appendBody("name=$host&&defaultuser=$host&&context=internal&host=$host&insecure=port"+
-					"&type=peer&accountcode=${accountCode}&transport=tcp,udp\n\n")
+				if (accountCode) {
+					response.appendBody("name=$host&&defaultuser=$host&&context=internal&host=$host&insecure=port"+
+						"&type=peer&accountcode=${accountCode}&transport=tcp,udp\n\n")
+				}
 			}
 		}
 		else {
