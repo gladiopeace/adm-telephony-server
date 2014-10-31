@@ -39,7 +39,8 @@ class WebAPI extends AdmServlet {
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def hangup(request){
-		return API_Manager.instance.hangup(request.getParameter('channel'))	
+		def result = API_Manager.instance.hangup(request.getParameter('channel'))		
+		return result.toString()	
 	}
 
 	def conference_action(request){
@@ -439,12 +440,11 @@ class WebAPI extends AdmServlet {
 			try{
 				log.trace("WebAPI received {"+request+"}");
 				def model = "${action}"(request)
-				println "model = ${model}"
+				log.trace("Return model is $model")
 				response.appendBody(model)
 				response.setResponseCode(HttpStatus.ORDINAL_200_OK)
 			}
 			catch (Exception e){
-				println e
 				log.fatal(e.getMessage(), e)
 				response.setResponseCode(HttpStatus.Not_Implemented)
 			}
