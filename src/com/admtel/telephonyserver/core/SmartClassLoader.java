@@ -17,10 +17,8 @@ public class SmartClassLoader {
 	
 	static Logger log = Logger.getLogger(SmartClassLoader.class);
 	
-	AdmGroovyScriptEngine groovyScriptEngine;
+	GroovyScriptEngine groovyScriptEngine;
 	ClassLoader classLoader;
-	GroovyClassLoader groovyClassLoader;
-	
 	
 	private static URL[] createRoots(String[] urls) throws MalformedURLException {
         if (urls == null) return null;
@@ -41,13 +39,8 @@ public class SmartClassLoader {
 
 			String[] roots = SystemConfig.getInstance().serverDefinition.getScriptPath().split(";");
 			
-			groovyScriptEngine = new AdmGroovyScriptEngine(roots, classLoader);
-			groovyClassLoader = new GroovyClassLoader(classLoader);
+			groovyScriptEngine = new GroovyScriptEngine(roots, classLoader);
 			URL[] urls = createRoots(roots);
-			for (URL url:urls) {
-				log.trace("*********** " + url);
-				groovyClassLoader.addURL(url);
-			}
 			log.trace("Starting GroovyScriptEngine with root = ");
 			for (int i=0;i<roots.length;i++){
 				log.trace("root["+i+"]="+roots[i]);

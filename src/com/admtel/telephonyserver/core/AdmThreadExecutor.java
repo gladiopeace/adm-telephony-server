@@ -24,6 +24,9 @@ public class AdmThreadExecutor {
 		executor.execute(task);
 	}
 
+	public void submit(Runnable task){
+		executor.submit(task);
+	}
 	public void shutdown() {
 		executor.shutdown();
 	}
