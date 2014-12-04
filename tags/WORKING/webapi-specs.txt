@@ -1,0 +1,31 @@
+REQUEST FORMAT
+--------------
+
+http://<address>:port//<destination>?key=<key>&action=<action>[<key>=<value>]*
+
+ACTIONS
+-------
+1) Hangup
+	action: hangup
+	parameters : channel=<channelId>
+	example
+	http://localhost:8057/webapi?key=898989826763&action=hangup&channel=4028819f2c838455012c83847f480001
+
+2) Conference Actions
+	action: conference_action
+	parameters : subAction (lock, unlock), conference (conference number)
+
+3) Conference Participant Action
+	action: conference_participant_action
+	parameters: subAction (mute, unmute, deaf, undeaf, kick), participant (participant id)
+	
+4) Conference Details
+	action: conference_details
+	parameters: conference (conference number)
+	Returns : an xml document with the conference details
+	
+5) Dial
+	action: dial
+	parameters: destination (destination uri), channel (dialing channel), timeout(in ms)
+	
+
