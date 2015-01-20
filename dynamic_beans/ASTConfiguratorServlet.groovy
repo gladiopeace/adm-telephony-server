@@ -57,7 +57,7 @@ class ASTConfiguratorServlet extends AdmServlet{
 				String accountCode = ipListDAO.accountCode(host)
 				if (accountCode) {
 					response.appendBody("name=$host&&defaultuser=$host&&context=internal&host=$host&insecure=port"+
-						"&type=peer&accountcode=${accountCode}&transport=tcp,udp\n\n")
+						"&type=peer&accountcode=${accountCode}&transport=tcp,udp&canreinvite=no\n\n")
 				}
 			}
 		}
@@ -65,13 +65,13 @@ class ASTConfiguratorServlet extends AdmServlet{
 			User u = userDAO.getUser(name)
 			if (u){
 				response.appendBody("defaultuser=${name}&secret=${u.password}&context=internal&host=dynamic&insecure=port"+
-						"&type=friend&accountcode=${u.account}&callerid=${u.callerId}&nat=force_rport,comedia&transport=tcp,udp\n\n")
+						"&type=friend&accountcode=${u.account}&callerid=${u.callerId}&nat=force_rport,comedia&transport=tcp,udp&canreinvite=no\n\n")
 			}
 			else{
 				Gateway gateway = gatewayDAO.findById(name)
 				if (gateway) {
 					def resp = "username=${gateway.username}&defaultuser=${gateway.username}&fromuser=${gateway.username}"+
-							"&secret=${gateway.password}&host=${gateway.address}&port=${gateway.port}&type=friend"
+							"&secret=${gateway.password}&host=${gateway.address}&port=${gateway.port}&type=friend&canreinvite=no"
 					if (gateway.codecs) {
 						resp +="&disallow=all"
 						gateway.codecs.split(",").each{ resp += "&allow=${it.trim()}" }
