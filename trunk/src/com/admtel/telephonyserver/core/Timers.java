@@ -119,8 +119,18 @@ public class Timers extends Thread {
 
 							@Override
 							public void run() {
-								if (timer.getNotifiable().onTimer(timer.data)) {
+								try {
+									if (timer.getNotifiable() != null) {
+										if (timer.getNotifiable().onTimer(
+												timer.data)) {
+											timer.remove = true;
+										}
+									} else {
+										timer.remove = true;
+									}
+								} catch (Exception e) {
 									timer.remove = true;
+									log.fatal(e.getMessage(), e);
 								}
 							}
 
