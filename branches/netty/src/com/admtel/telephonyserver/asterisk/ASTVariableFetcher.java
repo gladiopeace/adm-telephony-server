@@ -112,7 +112,7 @@ public class ASTVariableFetcher {
 	private void sendNextVar(String var) {
 		log.trace("Requesting variable " + var);
 		ASTGetVariableCommand cmd = new ASTGetVariableCommand(channel, var);
-		channel.session.write(cmd);// TODO make a generic session object
+		channel.session.write(cmd.toString());// TODO make a generic session object
 	}
 
 	public String getVariable(String varName) {

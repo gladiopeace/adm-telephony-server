@@ -21,7 +21,7 @@ public class ASTSwitchListener extends SwitchListener {
 		
 		ASTSwitch _switch = (ASTSwitch) session.getAttribute("Switch");
 		if (_switch != null){
-			_switch.messageReceived(session, message);
+			//_switch.messageReceived(session, message);
 		}
 	}
 
