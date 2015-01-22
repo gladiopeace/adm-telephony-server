@@ -132,7 +132,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 	public void messageReceived(IoSession session, Object message)
 			throws Exception {
 		messageHandler
-				.putMessage(new BasicIoMessage(session, (String) message));
+				.putMessage(new BasicIoMessage(new MinaSession(session), (String) message));
 
 	}
 
@@ -284,7 +284,7 @@ public class FSSwitch extends Switch implements IoHandler, TimerNotifiable {
 							addChannel(channel);
 						}
 						if (event.getEventType() == FSEvent.EventType.ChannelData){
-							channel.setIoSession(message.getSession());
+							channel.setSession(message.getSession());
 						}
 					}
 

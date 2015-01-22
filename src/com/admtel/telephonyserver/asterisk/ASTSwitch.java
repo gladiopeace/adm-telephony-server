@@ -1,5 +1,22 @@
 package com.admtel.telephonyserver.asterisk;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.Delimiters;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -36,8 +53,10 @@ import com.admtel.telephonyserver.core.AdmAddress;
 import com.admtel.telephonyserver.core.BasicIoMessage;
 import com.admtel.telephonyserver.core.Channel;
 import com.admtel.telephonyserver.core.EventsManager;
+import com.admtel.telephonyserver.core.NettySession;
 import com.admtel.telephonyserver.core.QueuedMessageHandler;
 import com.admtel.telephonyserver.core.Result;
+import com.admtel.telephonyserver.core.Session;
 import com.admtel.telephonyserver.core.SimpleMessageHandler;
 import com.admtel.telephonyserver.core.Switch;
 import com.admtel.telephonyserver.core.Timers;
@@ -51,23 +70,55 @@ import com.admtel.telephonyserver.events.DisconnectCode;
 import com.admtel.telephonyserver.events.RegisteredEvent;
 import com.admtel.telephonyserver.events.UnregisteredEvent;
 
-public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
+public class ASTSwitch extends Switch implements TimerNotifiable {
 
 	// /////////////////////////////////////////////////////
 	// State classes
 	//
+	static Bootstrap b = new Bootstrap();
+	static EventLoopGroup group = new NioEventLoopGroup();
+	private static final StringDecoder DECODER = new StringDecoder();
+	private static final StringEncoder ENCODER = new StringEncoder();
+	public static byte[] DELIMITERS = {13,10,13,10};
+	public static ByteBuf CHANNEL_DELIMITER = Unpooled.copiedBuffer(DELIMITERS);
+	
+	Session session;
+	
+	ChannelHandlerContext context;	
+	 class Handler extends ChannelInboundHandlerAdapter {
+		@Override
+		public void channelActive(ChannelHandlerContext ctx) {
+			session = new NettySession(ctx);
+			context = ctx;
+			log.trace("Sending login");
+			String username = ASTSwitch.this.getDefinition().getUsername();
+			String password = ASTSwitch.this.getDefinition().getPassword();
+			session.write("Action: login\nUsername: " + username + "\nSecret: " + password);
+			state = State.LoggingIn;
+
+		}
+
+		@Override
+		public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+			messageHandler.putMessage(new BasicIoMessage(new NettySession(context), (String) msg));
+		}
+
+		@Override
+		public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+			log.warn("Disconnected from switch " + getDefinition().getId());
+			state = State.Disconnected;
+			start();
+
+			super.channelInactive(ctx);
+		}
+		
+	}
+
 	private static Logger log = Logger.getLogger(ASTSwitch.class);
 
-	private IoSession session;
-
-	private static final int CONNECT_TIMEOUT = 1000;
 	private static final int RECONNECT_AFTER = 5000;
 	private static final long WATCHDOG_TIMER = 30000L;
 
-	private SocketConnector connector;
-
-	private String encodingDelimiter;
-	private String decodingDelimiter;
 
 	private Timer reconnectTimer = null;
 	private Watchdog watchdog = new Watchdog();
@@ -96,7 +147,7 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 			log.trace(String.format("Watchdog timer fired for switch : %s", ASTSwitch.this.getId()));
 			if (state == State.LoggedIn) {
 				// Get list of channels from switch
-				session.write("Action: CoreShowChannels");
+				context.write("Action: CoreShowChannels");
 			}
 			else {
 				start();
@@ -132,59 +183,17 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 	// /////////////////////////////////////////////////////
 	public ASTSwitch(SwitchDefinition definition) {
 		super(definition);
-		this.encodingDelimiter = "\r\n\r\n";
-		this.decodingDelimiter = "\r\n\r\n";
-		connector = new NioSocketConnector();
-		//connector.getFilterChain().addLast("logger", new LoggingFilter());
-		TextLineCodecFactory textLineCodecFactory = new TextLineCodecFactory(Charset.forName("UTF-8"),
-				encodingDelimiter, decodingDelimiter);
-		textLineCodecFactory.setDecoderMaxLineLength(8192);
-		textLineCodecFactory.setEncoderMaxLineLength(8192);
-		connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(textLineCodecFactory));
-		connector.setHandler(this);
-	}
+		b.group(group).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true)
+		.handler(new ChannelInitializer<SocketChannel>() {
+			@Override
+			public void initChannel(SocketChannel ch) throws Exception {
+				ch.pipeline().addLast(new DelimiterBasedFrameDecoder(8192, CHANNEL_DELIMITER));
+				ch.pipeline().addLast(DECODER);
+				ch.pipeline().addLast(ENCODER);
 
-	@Override
-	public void exceptionCaught(IoSession session, Throwable exception) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void messageReceived(IoSession session, Object message) throws Exception {
-		messageHandler.putMessage(new BasicIoMessage(session, (String) message));
-	}
-
-	@Override
-	public void messageSent(IoSession session, Object message) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sessionClosed(IoSession session) throws Exception {
-		log.warn("Disconnected from switch " + getDefinition().getId());
-		state = State.Disconnected;
-		start();
-	}
-
-	@Override
-	public void sessionCreated(IoSession session) throws Exception {
-	}
-
-	@Override
-	public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sessionOpened(IoSession session) throws Exception {
-		this.session = session;
-		String username = ASTSwitch.this.getDefinition().getUsername();
-		String password = ASTSwitch.this.getDefinition().getPassword();
-		session.write("Action: login\nUsername: " + username + "\nSecret: " + password);
-		state = State.LoggingIn;
+				ch.pipeline().addLast("handler", new Handler());
+			}
+		});
 	}
 
 	@Override
@@ -198,16 +207,12 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 
 		state = State.Connecting;
 		try {
-			ConnectFuture connectFuture = connector.connect(new InetSocketAddress(getDefinition().getAddress(),
-					getDefinition().getPort()));
-			connectFuture.awaitUninterruptibly(CONNECT_TIMEOUT);
-			session = connectFuture.getSession();
+			ChannelFuture cf = b.connect(getDefinition().getAddress(), getDefinition().getPort()).sync();
+						
 			log.debug(String.format("Connected to %s:%d", getDefinition().getAddress(), getDefinition().getPort()));
 			return true;
 		} catch (Exception e) {
-			log.warn(e.getMessage());
-			if (session != null)
-				session.close(true);
+			log.warn(e.getMessage(), e);
 			state = State.Disconnected;
 		}
 		return false;
@@ -225,7 +230,7 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 	}
 
 	private boolean isConnected() {
-		return (session != null && session.isConnected());
+		return (context != null && !context.isRemoved());
 	}
 
 	@Override

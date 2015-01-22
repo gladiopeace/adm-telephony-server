@@ -14,6 +14,7 @@ import com.admtel.telephonyserver.core.Channel;
 import com.admtel.telephonyserver.core.ChannelData;
 import com.admtel.telephonyserver.core.Result;
 import com.admtel.telephonyserver.core.ScriptManager;
+import com.admtel.telephonyserver.core.Session;
 import com.admtel.telephonyserver.core.Switch;
 import com.admtel.telephonyserver.events.AcdQueueFailedEvent;
 import com.admtel.telephonyserver.events.AcdQueueJoinedEvent;
@@ -84,7 +85,7 @@ public class FSChannel extends Channel {
 				+ (internalState != null ? "internalState=" + internalState : "") + "]";
 	}
 
-	private IoSession session;
+	private Session session;
 	private State internalState;
 
 	static Logger fsChannelLog = Logger.getLogger(FSChannel.class);
@@ -598,7 +599,7 @@ public class FSChannel extends Channel {
 
 			session.write(buildMessage(getId(), "execute", "set", "hangup_after_bridge=false"));
 			FSQueueCommand queueCmd = new FSQueueCommand(FSChannel.this, queueName, isAgent);
-			session.write(queueCmd);
+			session.write(queueCmd.toString());
 		}
 
 		@Override
@@ -676,9 +677,9 @@ public class FSChannel extends Channel {
 	 * 
 	 * } };
 	 */
-	public FSChannel(Switch _switch, String id, IoSession session) {
+	public FSChannel(Switch _switch, String id, Session session) {
 		super(_switch, id);
-		setIoSession(session);
+		setSession(session);
 		internalState = new NullState();
 	}
 
@@ -686,7 +687,7 @@ public class FSChannel extends Channel {
 		return this.getChannelData().get("sofia_profile_name");
 	}
 
-	public void setIoSession(IoSession session) {
+	public void setSession(Session session) {
 		this.session = session;
 	}
 
@@ -700,7 +701,7 @@ public class FSChannel extends Channel {
 	public Result internalDial(String address, long timeout, boolean secure) {
 		if (address != null && address.length() > 0) {
 			FSDialCommand cmd = new FSDialCommand(FSChannel.this, address, timeout, secure);
-			session.write(cmd);
+			session.write(cmd.toString());
 		} else {
 			fsChannelLog.warn(String.format("%s, invalid dial string %s", this.getId(), address));
 			return Result.InvalidParameters;
@@ -841,7 +842,7 @@ public class FSChannel extends Channel {
 	public Result internalConferenceMute(String conferenceId, String memberId, boolean mute) {
 		FSMemberMuteCommand cmd = new FSMemberMuteCommand(this, conferenceId, memberId, mute);
 		fsChannelLog.trace(String.format("%s, on channel %s", cmd, this));
-		session.write(cmd);
+		session.write(cmd.toString());
 		return Result.Ok;
 	}
 
@@ -875,7 +876,7 @@ public class FSChannel extends Channel {
 	public Result internalConferenceDeaf(String conferenceId, String memberId, boolean deaf) {
 		FSMemberDeafCommand cmd = new FSMemberDeafCommand(this, conferenceId, memberId, deaf);
 		fsChannelLog.trace(String.format("%s, on channel %s", cmd, this));
-		session.write(cmd);
+		session.write(cmd.toString());
 		return Result.Ok;
 	}
 

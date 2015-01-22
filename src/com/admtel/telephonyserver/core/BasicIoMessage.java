@@ -3,20 +3,20 @@ package com.admtel.telephonyserver.core;
 import org.apache.mina.core.session.IoSession;
 
 public class BasicIoMessage {
-	IoSession session;
+	Session session;
 	String message;
 	
-	public BasicIoMessage(IoSession session, String message) {
+	public BasicIoMessage(Session session, String message) {
 		super();
 		this.session = session;
 		this.message = message;
 	}
 
-	public IoSession getSession() {
+	public Session getSession() {
 		return session;
 	}
 
-	public void setSession(IoSession session) {
+	public void setSession(Session session) {
 		this.session = session;
 	}
 

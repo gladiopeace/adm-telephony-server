@@ -60,6 +60,7 @@ import com.admtel.telephonyserver.utils.SipParser;
 import com.admtel.telephonyserver.utils.UriRecord;
 import com.admtel.telephonyserver.core.CallOrigin;
 import com.admtel.telephonyserver.core.Channel;
+import com.admtel.telephonyserver.core.Session;
 import com.admtel.telephonyserver.core.SigProtocol;
 import com.admtel.telephonyserver.core.ConferenceManager;
 import com.admtel.telephonyserver.core.Result;
@@ -652,7 +653,7 @@ public class ASTChannel extends Channel {
 			this.queueName = queueName;
 			this.isAgent = isAgent;
 			ASTQueueCommand queueCmd = new ASTQueueCommand(ASTChannel.this, queueName);
-			session.write(queueCmd);
+			session.write(queueCmd.toString());
 			result = Result.Ok;
 		}
 
@@ -701,7 +702,7 @@ public class ASTChannel extends Channel {
 	// ////////////////////////////////////////////////////////////////////////////////////////
 
 	protected State internalState = new NullState();
-	protected IoSession session;
+	protected Session session;
 
 	protected SigProtocol channelProtocol = SigProtocol.Unknown;
 
@@ -738,7 +739,7 @@ public class ASTChannel extends Channel {
 		}
 	}
 
-	public ASTChannel(Switch _switch, String id, IoSession session) {
+	public ASTChannel(Switch _switch, String id, Session session) {
 		super(_switch, id);
 		this.session = session;
 		if (id.toLowerCase().startsWith("sip")) {
@@ -784,7 +785,7 @@ public class ASTChannel extends Channel {
 		if (address != null && address.length() > 0) {
 			ASTDialCommand dialCmd = new ASTDialCommand(ASTChannel.this, address, timeout);
 			log.trace(String.format("Channel (%s) dialCmd %s", this, dialCmd));
-			session.write(dialCmd);
+			session.write(dialCmd.toString());
 		} else {
 			log.warn(String.format("%s, invalid dial string %s", this.getId(), address));
 			return Result.InvalidParameters;
@@ -860,7 +861,7 @@ public class ASTChannel extends Channel {
 		} else {
 			cmd = new ASTMeetmeUnmuteCommand(this, conferenceId, memberId);
 		}
-		session.write(cmd);
+		session.write(cmd.toString());
 		return Result.Ok;
 	}
 
