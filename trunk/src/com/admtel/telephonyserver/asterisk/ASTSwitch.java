@@ -135,7 +135,7 @@ public class ASTSwitch extends Switch implements IoHandler, TimerNotifiable {
 		this.encodingDelimiter = "\r\n\r\n";
 		this.decodingDelimiter = "\r\n\r\n";
 		connector = new NioSocketConnector();
-		connector.getFilterChain().addLast("logger", new LoggingFilter());
+		//connector.getFilterChain().addLast("logger", new LoggingFilter());
 		TextLineCodecFactory textLineCodecFactory = new TextLineCodecFactory(Charset.forName("UTF-8"),
 				encodingDelimiter, decodingDelimiter);
 		textLineCodecFactory.setDecoderMaxLineLength(8192);

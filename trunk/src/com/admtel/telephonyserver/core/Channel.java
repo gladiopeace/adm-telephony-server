@@ -755,6 +755,7 @@ public abstract class Channel implements TimerNotifiable {
 				+ (mediaState != null ? "mediaState=" + mediaState + ", " : "") + (id != null ? "id=" + id + ", " : "")
 				+ (uniqueId != null ? "uniqueId=" + uniqueId + ", " : "")
 				+ (callOrigin != null ? "callOrigin=" + callOrigin + ", " : "")
+				+ (hangupTimer != null ? "hangupTimer=" + hangupTimer + ", " : "")
 				+ (script != null ? "script=" + script : "") + "]";
 	}
 
