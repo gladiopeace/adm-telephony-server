@@ -1,0 +1,41 @@
+<project>
+
+	<target name="simple" depends="clean, compile">
+		<delete file="dist/adm-telephony-server.jar" />
+		<jar destfile="dist/adm-telephony-server.jar" basedir="bin" includes="**/*.class,com/admtel/telephonyserver/radius/adm_dictionary" excludes="**/src/**,build.xml,**/*.xml,log4j.properties">
+
+		</jar>
+	</target>
+
+	<target name="clean">
+	  <delete includeemptydirs="true">
+	    <fileset dir="bin" includes="**/*"/>
+	  </delete>
+	</target>
+	
+	<target name="compile">
+	  <path id="master-classpath">
+	  <fileset dir="./lib">
+	    <include name="*.jar"/>
+	  </fileset>
+	 </path>
+	  <javac destdir="bin">
+	      	<!-- <compilerarg value="-Xlint:unchecked"/> -->	      
+	        <src path="src"/>
+	        <classpath refid="master-classpath"/>
+	  </javac>
+	  <copy file="src/com/admtel/telephonyserver/radius/adm_dictionary" todir="bin/com/admtel/telephonyserver/radius"/>
+	</target>
+
+	<target name="release" depends="simple">
+		<delete file="dist/adm-telephony-server_snapshot.zip"/>
+		<zip destfile="dist/adm-telephony-server_snapshot.zip">
+			<zipfileset dir="lib" prefix="lib" />
+			<zipfileset dir="dist" prefix="" />
+			<zipfileset dir="." includes="config.xml.sample, scripts.xml.sample, run.sh"/>
+			<zipfileset dir="src" prefix="" includes="log4j.properties"/>
+			<zipfileset dir="dynamic_beans" prefix="dynamic_beans"/>
+		</zip>
+	</target>
+
+</project>

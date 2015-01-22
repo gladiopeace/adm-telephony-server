@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<server>
+		<!-- Maximum number of threads spawned by the server -->
+		<maxthreads>15</maxthreads>
+		
+		<!-- Server address, used in instances where we need to identify ourselves
+			Example: the Nas-IP-Address send to the radius server
+		-->
+		<address>192.168.1.60</address> 
+		
+		<base-directory>/usr/local/adm</base-directory>
+		<!-- script path, added it to the JVM's class path -->
+		<script-path>.;./scripts;/home/user1/workspace/adm-telephony-scripts/src</script-path>
+		<!-- Send accounting start radius packets -->
+		<radius-start-accounting>true</radius-start-accounting>
+		<!-- Send accounting stop radius packets -->
+		<radius-stop-accounting>true</radius-stop-accounting>
+		<!-- Time interval in seconds between interim update radius packets -->
+		<radius-interim-update>30</radius-interim-update>
+		<!-- Enable logging -->
+		<log>true</log>
+		<!-- comma separated list of ip addresses allowed to interact with the system -->
+		<acl></acl>
+	</server>
+
+	<!-- Keeps track of the user registrations (switch the user is registered to)
+		The default registrar implementation uses hash table and might not be suitable for production
+		To implemenent your own registrar, you need to implement the following interface
+			public interface RegistrarInterface {
+				public void register (UserLocation userLocation);
+				public void unregister(String user);
+				public UserLocation find(String user);
+				public Collection<UserLocation> get(long start, long limit);
+				public long getCount();
+			}
+	--> 
+	<registrar>
+		<enabled>true</enabled>
+		<class>com.admtel.telephonyserver.registrar.SimpleRegistrar</class>
+	</registrar>
+
+	<!-- Radius server configuration -->
+	<radius>
+		<server>
+			<id>first radius server</id>
+			<address>192.168.1.60</address>
+			<auth-port>1812</auth-port>
+			<acct-port>1813</acct-port>
+			<secret>test</secret>
+			<retry-count>5</retry-count>
+			<socket-timeout>5000</socket-timeout>
+		</server>
+	</radius>
+
+	<!-- Starts lisitening for connections from each switch. 
+	To successfully connect, the switch must be defined in the switches section -->
+	<switch-listeners>
+		<switch-listener>
+			<address>192.168.1.60</address>
+			<port>8084</port>
+			<type>freeswitch</type>
+		</switch-listener>
+		<switch-listener>
+			<address>192.168.1.60</address>
+			<port>4573</port>
+			<type>asterisk</type>
+		</switch-listener>
+	</switch-listeners>
+
+	<!-- Creates the scripts based on call parameters, you can create your own factory by implementing the 
+		public interface ScriptFactory {
+			public Script createScript (ChannelData channelData);
+		}
+ 	-->
+	<scriptfactories>
+		<scriptfactory>
+			<!-- VariableScriptFactory uses the variable passed when the call is received to create the script, the variable contains the script's class -->
+			<class>com.admtel.telephonyserver.scriptfactories.VariableScriptFactory</class>
+		</scriptfactory>
+		<scriptfactory>
+			<!-- Loads the script based on the configuration file scripts.xml -->
+			<class>com.admtel.telephonyserver.scriptfactories.XMLScriptFactory 
+			</class>
+		</scriptfactory>
+	</scriptfactories>
+
+
+	<!-- Defines the list of switches the server will interact with -->
+	<switches>
+		<switch>
+			<name>MyFreeswitch</name>
+			<address>192.168.1.60</address>
+			<port>8021</port>
+			<username>admin</username>
+			<password>admin</password>
+			<type>freeswitch</type>
+			<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultFSAddressTranslator
+			</addresstranslator>
+			<enabled>true</enabled>
+			<!-- Extra parameters or properties of this switch, those properties can be queried by the REST API. -->
+			<parameters> 
+				<parameter name="udp_sip_address" value="77.42.246.148"/>
+				<parameter name="udp_sip_port" value="5080"/>
+				<parameter name="tcp_sip_address" value="77.42.246.148"/>
+				<parameter name="tcp_sip_port" value="5082"/>
+				<parameter name="tls_sip_address" value="77.42.246.148"/>
+				<parameter name="tls_sip_port" value="5081"/>	
+			</parameters>	
+		</switch>
+		<switch>
+			<name>Asterisk_1</name>
+			<address>192.168.1.60</address>
+			<port>5038</port>
+			<username>admin</username>
+			<password>password</password>
+			<type>asterisk</type>
+			<addresstranslator>com.admtel.telephonyserver.addresstranslators.DefaultASTAddressTranslator
+			</addresstranslator>
+			<enabled>false</enabled>
+			<parameters>			
+				<parameter name="udp_sip_address" value="77.42.246.148"/>
+				<parameter name="udp_sip_port" value="5080"/>
+				<parameter name="tcp_sip_address" value="77.42.246.148"/>
+				<parameter name="tcp_sip_port" value="5082"/>
+				<parameter name="tls_sip_address" value="77.42.246.148"/>
+				<parameter name="tls_sip_port" value="5081"/>	
+			</parameters>	
+		</switch>
+
+	</switches>
+	
+	<!-- Built-in webserver configuration -->
+	<!-- the path maps to one and only one AdmServlet, to create your own servlet you must implement the proper interface -->
+	<!-- class can be the full path of the class,  a relative path (combined with the root directory), or a named bean from the beans section -->
+	<http-servers>
+		<http-server>
+			<id>dot34</id>
+			<address>10.0.3.1</address>
+			<port>8057</port>
+			<adm-servlet>
+				<path>FSConfigurator</path>
+				<class>#FSConfiguratorServlet</class>
+			</adm-servlet>
+			<adm-servlet>
+				<path>asterisk-curl/single</path>
+				<class>#ASTConfiguratorServlet</class>
+			</adm-servlet>
+			<adm-servlet>
+				<path>test</path>
+				<class>scripts/TestAdmServlet.groovy</class>
+			</adm-servlet>
+			<adm-servlet>
+				<path>webconf</path>
+				<class>#webconf</class>
+			</adm-servlet>
+			<adm-servlet>
+				<path>webapi</path>
+				<class>#webapi</class>
+			</adm-servlet>			
+		</http-server>
+		<http-server>
+			<id>dot34</id>
+			<address>192.168.1.60</address>
+			<port>8057</port>
+			<adm-servlet>
+				<path>FSConfigurator</path>
+				<class>#FSConfiguratorServlet</class>
+			</adm-servlet>
+			<adm-servlet>
+				<path>asterisk-curl/single</path>
+				<class>#ASTConfiguratorServlet</class>
+			</adm-servlet>
+			<adm-servlet>
+				<path>test</path>
+				<class>scripts/TestAdmServlet.groovy</class>
+			</adm-servlet>
+			<adm-servlet>
+				<path>webconf</path>
+				<class>#webconf</class>
+			</adm-servlet>
+			<adm-servlet>
+				<path>webapi</path>
+				<class>#webapi</class>
+			</adm-servlet>			
+		</http-server>
+	</http-servers>
+
+	<!-- Event listeners are special classes that will receive the top level server events -->
+	<event-listeners>
+		<event-listener>
+			<class>com.admtel.telephonyserver.eventlisteners.SimpleEventListener</class>
+		</event-listener>
+		<event-listener>
+			<class>scripts/MyEventListener.groovy</class>
+		</event-listener>
+	</event-listeners>
+
+
+	<!-- prompt builders, use by the play api to play numbers and dates. Can be customized per language -->
+	<prompt-builders>
+		<prompt-builder>
+			<language>en</language>
+			<class>com.admtel.telephonyserver.prompts.EnglishPromptBuilder</class>
+		</prompt-builder>
+		<prompt-builder>
+			<language>ar</language>
+			<class>com.admtel.telephonyserver.prompts.ArabicPromptBuilder</class>
+		</prompt-builder>
+		<prompt-builder>
+			<language>fr</language>
+			<class>com.admtel.telephonyserver.prompts.FrenchPromptBuilder</class>
+		</prompt-builder>
+	</prompt-builders>
+
+	
+	<!-- Beans are a simple implementation of IOC, they can be used by name and can reference each other -->
+	<beans>
+<!--		<bean>-->
+<!--			<class>com.admtel.telephonyserver.remote.JSonSocketManagerBean-->
+<!--			</class>-->
+<!--			<id>json_api</id>-->
+<!--			<parameters>-->
+<!--				<parameter name="address" value="10.0.2.1"/>-->
+<!--				<parameter name="port" value="12341"/>-->
+<!--			</parameters>-->
+<!--		</bean>-->
+		
+		<bean>
+			<class>/Users/danny/Admtel_Source/adm-telephony-scripts/src/data/DB_AcdDataProvider.groovy</class>
+			<parameters>
+
+				<parameter name="dbUrl" value="jdbc:postgresql://10.0.3.1:5432/adm_appserver"/>
+				<parameter name="dbUser" value="tester"/>
+				<parameter name="dbPassword" value="tester1234"/>
+				<parameter name="dbDriver" value="org.postgresql.Driver"/>
+			</parameters>
+
+			<id>dbAcdDataProvider</id>
+		</bean>
+		
+		<bean>
+		 <class>com.admtel.telephonyserver.acd.impl.AcdServiceImpl</class>
+		 <id>acdService</id>
+		 <parameters>
+		 	<parameter name="acdDataProvider" value="dbAcdDataProvider"/>
+		 </parameters>
+		</bean>
+		
+		<bean>
+			<class>com.admtel.telephonyserver.acd.AcdManager</class>
+			<id>AcdManager</id>
+			<parameters>
+				<parameter name="acdService" value="acdService"/>
+				<parameter name="timeout" value="5000"/>
+			</parameters>
+		</bean>
+		
+		<bean>
+			<class>scripts/ManagerBean.groovy</class>
+			<id>manager</id>
+			<parameters>
+				<parameter name="address" value="192.168.1.60"/>
+				<parameter name="port" value="1234"/>
+			</parameters>
+		</bean>
+<!--		<bean>-->
+<!--			<class>/opt/admtel/adm-telephony-scripts/src/conference/DBConferenceHelperBean.groovy-->
+<!--			</class>-->
+<!--			<id>conferencer-helper</id>-->
+<!--			<parameters>-->
+<!--				<parameter name="dbUrl" value="jdbc:postgresql://10.0.2.1:5432/adm_appserver"/>-->
+<!--				<parameter name="dbUser" value="tester"/>-->
+<!--				<parameter name="dbPassword" value="tester1234"/>-->
+<!--				<parameter name="dbDriver" value="org.postgresql.Driver"/>-->
+<!--			</parameters>-->
+<!--		</bean>-->
+		<bean>
+			<class>/Users/danny/Admtel_Source/adm-telephony-scripts/src/conference/REST_ConferenceHelperBean.groovy
+			</class>
+			<id>conferencer-helper</id>
+			<parameters>
+				<parameter name="restURL" value="http://10.0.3.1:8058/adm-conference-server/"/>
+				<parameter name="authToken" value="123456"/>
+			</parameters>
+		</bean>
+
+
+		<bean>
+			<id>simple-security-provider</id>
+			<class>com.admtel.telephonyserver.misc.SimpleSecurityProvider</class>
+		</bean>
+		<bean>
+			<id>simple-user-dao</id>
+			<class>scripts/SimpleUserDAOImpl.groovy</class>
+		</bean>
+		<bean>
+			<id>db-user-dao</id>
+			<class>/Users/danny/Admtel_Source/adm-telephony-scripts/src/data/DB_UserDAO.groovy</class>
+			<parameters>
+				<parameter name="dbUrl" value="jdbc:postgresql://localhost:5432/adm_appserver"/>
+				<parameter name="dbUser" value="postgres"/>
+				<parameter name="dbPassword" value="password"/>
+				<parameter name="dbDriver" value="org.postgresql.Driver"/>
+			</parameters>
+		</bean>
+		<bean>
+			<id>FSConfiguratorServlet</id>
+			<class>scripts/FSConfiguratorServlet.groovy</class>
+			<parameters>
+				<parameter name="userDAO" value="db-user-dao"/>
+			</parameters>
+		</bean>
+		<bean>
+			<id> ASTConfiguratorServlet</id>
+			<class>scripts/ASTConfiguratorServlet.groovy</class>
+			<parameters>
+				<parameter name="userDAO" value="db-user-dao"/>
+			</parameters>
+		</bean>
+		<bean>
+			<id>webconf</id>
+			<class>scripts/web/WebConfServlet.groovy</class>
+			<parameters>
+				<parameter name="userAuthorizer" value="WebConfAuthorizer"/>
+			</parameters>
+		</bean>
+		<bean>
+			<id>webapi</id>
+			<class>scripts/webapi/WebAPI.groovy</class>
+			<parameters>
+				<parameter name="securityProvider" value="simple-security-provider"/>
+			</parameters>			
+		</bean>
+		<bean>
+			<id>WebConfAuthorizer</id>
+			<class>scripts/WebConfAuthBean.groovy</class>
+		</bean>
+	</beans>
+</config>
