@@ -68,10 +68,11 @@ class ASTConfiguratorServlet extends AdmServlet{
 						"&type=friend&accountcode=${u.account}&callerid=${u.callerId}&nat=force_rport,comedia&transport=tcp,udp&canreinvite=no\n\n")
 			}
 			else{
-				Gateway gateway = gatewayDAO.findById(name)
+				Gateway gateway = gatewayDAO.findById(name)				
 				if (gateway) {
 					def resp = "username=${gateway.username}&defaultuser=${gateway.username}&fromuser=${gateway.username}"+
 							"&secret=${gateway.password}&host=${gateway.address}&port=${gateway.port}&type=friend&canreinvite=no"
+					log.trace(resp)
 					if (gateway.codecs) {
 						resp +="&disallow=all"
 						gateway.codecs.split(",").each{ resp += "&allow=${it.trim()}" }

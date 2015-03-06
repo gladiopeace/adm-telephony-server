@@ -3,6 +3,7 @@ package com.admtel.telephonyserver.core;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 
@@ -76,7 +77,7 @@ public class Timers extends Thread {
 
 	}
 
-	List<Timer> listeners = new ArrayList<Timer>();
+	List<Timer> listeners = new CopyOnWriteArrayList<Timer>();
 	boolean running = true;
 	static public long PRECISION = 100; // 100 ms
 
@@ -137,7 +138,7 @@ public class Timers extends Thread {
 						});
 					}
 					if (timer.remove) {
-						it.remove();
+						listeners.remove(timer);
 					}
 				}
 

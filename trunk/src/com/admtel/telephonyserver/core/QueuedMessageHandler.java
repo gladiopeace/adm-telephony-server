@@ -32,8 +32,13 @@ public abstract class QueuedMessageHandler implements Runnable, MessageHandler {
 				if (message == null){
 					return;
 				}
-			}			
-			onMessage(message);
+			}	
+			try{
+				onMessage(message);
+			}
+			catch (Exception e){
+				log.fatal(e.getMessage(), e);
+			}
 			synchronized(messages){
 				messages.poll();
 				if (messages.isEmpty()){
