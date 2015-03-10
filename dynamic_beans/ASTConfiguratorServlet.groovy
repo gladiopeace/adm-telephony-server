@@ -77,6 +77,9 @@ class ASTConfiguratorServlet extends AdmServlet{
 						resp +="&disallow=all"
 						gateway.codecs.split(",").each{ resp += "&allow=${it.trim()}" }
 					}
+					else{
+						resp +="&disallow=all&allow=g729&allow=gsm"
+					}
 					response.appendBody("$resp\n\n")
 				}
 				else {
