@@ -70,8 +70,15 @@ class ASTConfiguratorServlet extends AdmServlet{
 			else{
 				Gateway gateway = gatewayDAO.findById(name)				
 				if (gateway) {
-					def resp = "username=${gateway.username}&defaultuser=${gateway.username}&fromuser=${gateway.username}"+
-							"&secret=${gateway.password}&host=${gateway.address}&port=${gateway.port}&type=friend&canreinvite=no"
+					def resp
+					if (gateway.address){
+						 resp = "username=${gateway.username}&defaultuser=${gateway.username}&fromuser=${gateway.username}"+
+								"&secret=${gateway.password}&host=${gateway.address}&port=${gateway.port}&type=friend&canreinvite=no"
+					}
+					else{
+						resp = "username=${gateway.username}&defaultuser=${gateway.username}&fromuser=${gateway.username}"+
+						"&secret=${gateway.password}&host=dynamic&type=friend&canreinvite=no"
+					}
 					log.trace(resp)
 					if (gateway.codecs) {
 						resp +="&disallow=all"
