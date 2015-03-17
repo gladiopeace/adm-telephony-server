@@ -877,5 +877,6 @@ public abstract class Channel implements TimerNotifiable {
 	public void setAccountCode(String accountCode){
 		this.accountCode = accountCode;
 	}
+	abstract public void setSIP_URI_Options(String sipUriOptions);
 }
 
