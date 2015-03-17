@@ -888,4 +888,10 @@ public class ASTChannel extends Channel {
 				+ (super.toString() != null ? "toString()=" + super.toString() : "") + "]";
 	}
 
+	@Override
+	public void setSIP_URI_Options(String sipUriOptions) {
+		ASTSetVariableCommand cmd = new ASTSetVariableCommand(this, "__SIP_URI_OPTIONS", sipUriOptions);
+		session.write(cmd.toString());		
+	}
+
 }

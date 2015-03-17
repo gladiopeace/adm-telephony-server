@@ -86,6 +86,7 @@ public class FSChannel extends Channel {
 
 	private IoSession session;
 	private State internalState;
+	private String sipUriOptions;
 
 	static Logger fsChannelLog = Logger.getLogger(FSChannel.class);
 
@@ -890,5 +891,11 @@ public class FSChannel extends Channel {
 				channelData.addVariable(k, entry.getValue());
 			}
 		}
+	}
+
+	@Override
+	public void setSIP_URI_Options(String sipUriOptions) {
+		this.sipUriOptions = sipUriOptions;
+		
 	}
 }
