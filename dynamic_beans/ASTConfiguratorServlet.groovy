@@ -77,7 +77,7 @@ class ASTConfiguratorServlet extends AdmServlet{
 					}
 					else{
 						resp = "username=${gateway.username}&defaultuser=${gateway.username}"+
-						"&secret=${gateway.password}&host=dynamic&type=friend&canreinvite=no"
+						"&secret=${gateway.password}&host=dynamic&type=friend&canreinvite=no&insecure=port"
 					}
 					log.trace(resp)
 					if (gateway.codecs) {

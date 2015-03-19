@@ -6,6 +6,5 @@ public class Gateway {
 	public String username;
 	public String password;
 	public Integer port;
-	public Boolean register;
 	public String codecs;
 }
