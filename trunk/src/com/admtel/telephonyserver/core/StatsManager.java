@@ -48,7 +48,7 @@ public class StatsManager implements EventListener, TimerNotifiable {
 	@Override
 	public boolean onEvent(Event event) {
 		switch (event.getEventType()) {
-		case Alerting:
+		//case Alerting:
 		case Offered:
 			ChannelEvent ce = (ChannelEvent) event;
 			addChannel(ce.getChannel());
