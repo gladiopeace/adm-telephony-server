@@ -168,9 +168,12 @@ public abstract class Script implements EventListener {
 		return channels;
 	}
 
-	public void hangupAll() {
+	public void hangupAll(DisconnectCode disconnectCode){
 		for (Channel c : channels) {
-			c.hangup(DisconnectCode.Normal);
-		}
+			c.hangup(disconnectCode);
+		}		
+	}
+	public void hangupAll() {
+		hangupAll(DisconnectCode.Normal);		
 	}
 }

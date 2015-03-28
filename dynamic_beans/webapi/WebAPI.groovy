@@ -93,6 +93,9 @@ class WebAPI extends AdmServlet {
 		}
 		""
 	}
+	def cps_get(request){
+		List<Double> cps = StatsManager.getInstance().getCPS()
+	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def conference_details(request){
 		Conference c = ConferenceManager.getInstance().getConferenceById(request.getParameter('conference'))
