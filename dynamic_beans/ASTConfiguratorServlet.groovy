@@ -72,21 +72,28 @@ class ASTConfiguratorServlet extends AdmServlet{
 				if (gateway) {
 					def resp
 					if (gateway.address){
-						 resp = "username=${gateway.username}&defaultuser=${gateway.username}"+
+						if (gateway.username){
+							resp = "username=${gateway.username}&defaultuser=${gateway.username}"+
 								"&secret=${gateway.password}&host=${gateway.address}&port=${gateway.port}&type=friend&canreinvite=no"
+						}
+						else{
+							resp = "host=${gateway.address}&port=${gateway.port}&type=friend&canreinvite=no"
+
+						}
 					}
 					else{
 						resp = "username=${gateway.username}&defaultuser=${gateway.username}"+
 						"&secret=${gateway.password}&host=dynamic&type=friend&canreinvite=no&insecure=port"
 					}
-					log.trace(resp)
+					
 					if (gateway.codecs) {
 						resp +="&disallow=all"
-						gateway.codecs.split(",").each{ resp += "&allow=${it.trim()}" }
+						gateway.codecs.split(",").each{ resp += it.trim()?"&allow=${it.trim()}":""}
 					}
 					else{
 						resp +="&disallow=all&allow=g729&allow=gsm"
 					}
+					log.trace(resp)
 					response.appendBody("$resp\n\n")
 				}
 				else {
