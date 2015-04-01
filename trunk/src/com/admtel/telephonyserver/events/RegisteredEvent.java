@@ -33,12 +33,14 @@ public class RegisteredEvent extends Event {
 	private String user;
 	private SigProtocol sigProtocol;
 	private String switchId;
+	private String address;
 
-	public RegisteredEvent(String switchId, SigProtocol sigProtocol, String user){
+	public RegisteredEvent(String switchId, SigProtocol sigProtocol, String user, String address){
 		eventType = EventType.Registered;
 		this.user = user;
 		this.sigProtocol = sigProtocol;
 		this.switchId = switchId;
+		this.address=address;
 	}
 
 	public String getUser() {
@@ -63,4 +65,13 @@ public class RegisteredEvent extends Event {
 	public void setSwitchId(String switchId) {
 		this.switchId = switchId;
 	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	
 }

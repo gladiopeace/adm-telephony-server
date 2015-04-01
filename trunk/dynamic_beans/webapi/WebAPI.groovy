@@ -21,8 +21,6 @@ import com.admtel.telephonyserver.events.DisconnectCode;
 import java.net.URLDecoder;
 import java.security.PublicKey;
 
-import net.sf.json.groovy.JsonGroovyBuilder;
-import net.sf.json.*;
 import groovy.json.*;
 
 class WebAPI extends AdmServlet {
@@ -95,6 +93,11 @@ class WebAPI extends AdmServlet {
 	}
 	def cps_get(request){
 		List<Double> cps = StatsManager.getInstance().getCPS()
+		if (cps.size() == 3){
+			def json = new JsonBuilder([t1:cps.get(0), t2:cps.get(1), t3:cps.get(2)])
+			return json.toString()
+		}
+		return ""
 	}
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def conference_details(request){
@@ -153,10 +156,8 @@ class WebAPI extends AdmServlet {
 		String channelId = request.getParameter('channel')
 		String keyId = request.getParameter('key')
 		Channel channel = Switches.getInstance().getChannelById(channelId)
-		def result = new JsonGroovyBuilder().json{
-			key = keyId
-			value = channel?.getUserData(keyId)
-		}.toString()
+		def jsonBuilder = JsonBuilder([key:keyId, value:channel?.getUserData(keyId)])
+		jsonBuilder.toString()
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def set_channel_data(request){
@@ -173,12 +174,8 @@ class WebAPI extends AdmServlet {
 	def get_agent_channel(request){
 		String agentId = request.getParameter('agent')
 		AcdAgent tAgent= AcdManager.getInstance().getAgentById(agentId)
-		def result = new JsonGroovyBuilder().json{
-			agent = tAgent.getId()
-			channel = tAgent.getChannelId()
-			callChannel = tAgent.getCallChannelId()
-		}.toString()
-		return result
+		def json = new JsonBuilder([agent:tAgent.getId(), channel:tAgent.getChannelId(), callChannel:tAgent.getCallChannelId()])
+		return json.toString()
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def hangup_agent(request){
@@ -210,14 +207,8 @@ class WebAPI extends AdmServlet {
 
 			if (channel != null){
 				if (channel.getUserData(dataKey) != null){
-					def result = new JsonGroovyBuilder().json{
-						request=requestId
-						message=""
-						status=0
-						key = dataKey
-						value = channel?.getUserData(dataKey)
-					}.toString()
-					return result
+					def json = new JsonBuilder([request:requestId, message:"", status:0, key:dataKey, value:channel?.getUserData(dataKey)])
+					return json.toString()
 				}
 				else{
 					t_message = "Key ${dataKey} not found in channel ${channel.getUniqueId()}"
@@ -227,11 +218,8 @@ class WebAPI extends AdmServlet {
 				t_message = "Channel not found"
 			}
 		}
-		return new JsonGroovyBuilder().json{
-			requestId=1234
-			message=t_message
-			status=-1 //TODO put proper status
-		}.toString()
+		def json = new JsonBuilder([requestId:1234, message:t_message, status:-1])
+		return json.toString()
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def set_agent_data(request){
@@ -258,11 +246,8 @@ class WebAPI extends AdmServlet {
 				t_message = "Channel not found"
 			}
 		}
-		return new JsonGroovyBuilder().json{
-			requestId=1234
-			message=t_message
-			status=-1 //TODO put proper status
-		}.toString()
+		def json = new JsonBuilder([requestId:1234, message:t_message, status:-1])
+		return json.toString()
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def agent_login(request){
@@ -271,18 +256,10 @@ class WebAPI extends AdmServlet {
 		Switch _switch = Switches.getInstance().getRandom();
 		String tMessage = "Invalid"
 		if (agent != null){
-			if (agent.getPassword().equals(request.getParameter('password'))){
-				def result = new JsonGroovyBuilder().json{
-					requestId=1234
-					message=""
-					status=0
-					sipProxy= _switch.getDefinition().getSignallingIp();
-					sipUsername = agent.getName()
-					sipPassword = agent.getPassword()
-					sipSecure = false
-				}.toString()
-
-				return result;
+			if (agent.getPassword().equals(request.getParameter('password'))){				
+				def json = new JsonBuilder([requestId:1234, message:"", status:0, sipProxy:_switch.getDefinition().getSignallingIp(),
+					sipUsername:agent.getName(), sipPassword:agent.getPassword(), sipSecure:false])
+				return json.toString()
 			}
 			else{
 				tMessage = "Agent ${agentName} Wrong password, entered ${request.getParameter('password')}, got ${agent.getPassword()}"
@@ -291,30 +268,26 @@ class WebAPI extends AdmServlet {
 		else{
 			tMessage = "agent ${agentName} not found"
 		}
-		return new JsonGroovyBuilder().json{
-			requestId=1234
-			message=tMessage
-			status=-1
-		}.toString()
+		def json = new JsonBuilder([requestId:1234, message:tMessage, status:-1])
+		return json.toString()
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	def get_random_switch(request){
 		Switch _switch = Switches.getInstance().getRandom()
 		if (_switch){
 
-			def jsonObject = _switch.getDefinition().getParameters() as JSONObject
-			jsonObject.put("requestId", "1234")
-			jsonObject.put("message", "")
-			jsonObject.put("id", _switch.getDefinition().getId())
-			jsonObject.put("address", _switch.getDefinition().getAddress())
-			return jsonObject.toString()
+			def params =  _switch.getDefinition().getParameters()
+			params.put("requestId", "1234")
+			params.put("message", "")
+			params.put("id", _switch.getDefinition().getId())
+			params.put("address", _switch.getDefinition().getAddress())
+
+			def json = new JsonBuilder(params)
+			return json.toString()
 		}
 		else{
-			return new JsonGroovyBuilder().json{
-				requestId=1234
-				message="Switch not found"
-				status=-1
-			}.toString()
+			def json = new JsonBuilder([requestId:1234, message:"Switch not found", status:-1])
+			return json.toString()
 		}
 	}
 	///////////////////////////////////////////////////
@@ -325,12 +298,8 @@ class WebAPI extends AdmServlet {
 			if (c.getSwitchId()){
 				Switch _switch = Switches.getInstance().getById(c.getSwitchId())
 				if (_switch){
-					def jsonObject = _switch.getDefinition().getParameters() as JSONObject
-					jsonObject.put("requestId", "1234")
-					jsonObject.put("message", "")
-					jsonObject.put("id", _switch.getDefinition().getId())
-					jsonObject.put("address", _switch.getDefinition().getAddress())
-					return jsonObject.toString()
+					def json = new JsonBuilder([requestId:1234, message:"", id:_switch.getDefinition().getId(), address:_switch.getDefinition().getAddress()])
+					return json.toString()
 				}
 				else{
 					return get_random_switch(request)
@@ -340,12 +309,8 @@ class WebAPI extends AdmServlet {
 		else{
 			return get_random_switch(request)
 		}
-		return new JsonGroovyBuilder().json{
-			requestId=1234
-			message="Switch not found"
-			status=-1
-		}.toString()
-
+			def json = new JsonBuilder([requestId:1234, message:"Switch not found", status:-1])
+			return json.toString()
 	}
 	
 	

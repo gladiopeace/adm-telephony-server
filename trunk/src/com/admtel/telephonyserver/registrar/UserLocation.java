@@ -7,17 +7,25 @@ public class UserLocation {
 	String username;
 	SigProtocol protocol;
 	String switchId;
+	String address;
 	
-	public UserLocation(String switchId, SigProtocol protocol, String username) {
+	public UserLocation(String switchId, SigProtocol protocol, String username, String address) {
 		super();
 		this.username = username;
 		this.protocol = protocol;
 		this.switchId = switchId;
+		this.address = address;
+	}
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
 	}
 	@Override
 	public String toString() {
-		return "UserLocation [protocol=" + protocol + ", switchId=" + switchId
-				+ ", user=" + username + "]";
+		return "UserLocation [username=" + username + ", protocol=" + protocol
+				+ ", switchId=" + switchId + ", address=" + address + "]";
 	}
 	public String getUsername() {
 		return username;
