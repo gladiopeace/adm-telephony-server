@@ -10,6 +10,7 @@ public class ASTPeerStatusEvent extends ASTEvent {
 	Boolean registered = null;
 	String user = null;
 	SigProtocol sigProtocol = SigProtocol.Unknown;
+	String address;
 	
 	public ASTPeerStatusEvent(String switchId, Map<String, String> values) {
 		super(switchId, values);
@@ -47,6 +48,9 @@ public class ASTPeerStatusEvent extends ASTEvent {
 	}
 	public SigProtocol getProtocol() {
 		return this.sigProtocol;
+	}
+	public String getAddress(){
+		return values.get("Address");
 	}
 	
 

@@ -17,14 +17,13 @@
 	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="lib/mina-core-2.0.7.jar" sourcepath="/Users/danny/Downloads/apache-mina-2.0.7-src(1)/apache-mina-2.0.7/src/mina-core/src/main/java"/>
-	<classpathentry kind="lib" path="lib/json-lib-2.4-jdk15.jar"/>
 	<classpathentry kind="lib" path="lib/postgresql-9.2-1002.jdbc3.jar"/>
 	<classpathentry kind="lib" path="lib/naturalcli-1.2.3.jar"/>
 	<classpathentry kind="lib" path="lib/http-builder-0.7.jar"/>
 	<classpathentry kind="lib" path="lib/httpclient-4.3.3.jar"/>
 	<classpathentry kind="lib" path="lib/httpcore-4.3.2.jar"/>
 	<classpathentry kind="lib" path="lib/nekohtml.jar"/>
-	<classpathentry kind="lib" path="lib/groovy-all-2.3.9-indy.jar"/>
+	<classpathentry kind="lib" path="lib/groovy-all-2.4.3-indy.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="con" path="GROOVY_DSL_SUPPORT"/>
 	<classpathentry kind="output" path="bin"/>
