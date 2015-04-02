@@ -382,7 +382,15 @@ public class ASTChannel extends Channel {
 			}
 
 				break;
-
+			case Dial:{
+				ASTDialEvent dialEvent = (ASTDialEvent) astEvent;
+				if (!dialEvent.isBegin()) {
+					if (dialEvent.getDialStatus() != DialStatus.Answer) {
+						onEvent(new DialFailedEvent(ASTChannel.this, dialEvent.getDialStatus()));
+					}
+				}				
+			}
+			break;
 			case NewState: {
 				ASTNewStateEvent nse = (ASTNewStateEvent) astEvent;
 				switch (nse.getChannelState()) {

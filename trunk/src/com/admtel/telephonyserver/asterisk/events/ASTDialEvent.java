@@ -8,11 +8,14 @@ public class ASTDialEvent extends ASTChannelEvent {
 
 	public ASTDialEvent(String switchId, Map<String, String> values) {
 		super(switchId, values);
-		eventType = EventType.Dial;
+		eventType = EventType.Dial;		
 	}
 	public String getChannelId(){
 		String channelId = values.get("Destination");
-		if (channelId == null) return "";
+		if (channelId == null){
+			channelId = values.get("Channel");
+			if (channelId == null) channelId = "";
+		}
 		return channelId;
 	}
 
