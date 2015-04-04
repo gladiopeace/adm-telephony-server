@@ -140,6 +140,7 @@ public class Switches implements DefinitionChangeListener, EventListener {
 		if (channel == null)
 			return;
 		synchronizedChannels.remove(channel.getUniqueId());
+		channel.onRemoved();
 		log.debug(String.format("Switches : Removed channel %s", channel));
 	}
 

@@ -878,5 +878,16 @@ public abstract class Channel implements TimerNotifiable {
 		this.accountCode = accountCode;
 	}
 	abstract public void setSIP_URI_Options(String sipUriOptions);
+	public void onRemoved() {
+		this.setScript(null);
+		if (this.hangupTimer != null){
+			Timers.getInstance().stopTimer(hangupTimer);
+			hangupTimer = null;
+		}
+		if (this.interimUpdateTimer != null){
+			Timers.getInstance().stopTimer(interimUpdateTimer);
+			this.interimUpdateTimer = null;
+		}		
+	}
 }
 

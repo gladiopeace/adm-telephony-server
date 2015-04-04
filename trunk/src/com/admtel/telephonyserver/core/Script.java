@@ -107,13 +107,9 @@ public abstract class Script implements EventListener {
 		return true;
 	}
 
-	synchronized private void stop() {
+	private void stop() {
 		onStop();
 		ScriptManager.getInstance().deleteScript(this);
-		for (Channel channel:channels){
-			channel.setScript(null);			
-		}
-		channels.clear();
 		scriptState = ScriptState.Stopped;
 	}
 
