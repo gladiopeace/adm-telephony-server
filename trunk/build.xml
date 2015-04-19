@@ -1,8 +1,9 @@
 <project>
-
+ 	<property file="build.properties"/>
+ 	
 	<target name="simple" depends="clean, compile">
-		<delete file="dist/adm-telephony-server.jar" />
-		<jar destfile="dist/adm-telephony-server.jar" basedir="bin" includes="**/*.class,com/admtel/telephonyserver/radius/adm_dictionary" excludes="**/src/**,build.xml,**/*.xml,log4j.properties">
+		<!-- <delete file="dist/adm-telephony-server.jar" /> -->
+		<jar destfile="dist/adm-telephony-server-${buildversion}.jar" basedir="bin" includes="**/*.class,com/admtel/telephonyserver/radius/adm_dictionary" excludes="**/src/**,build.xml,**/*.xml,log4j.properties">
 
 		</jar>
 	</target>
