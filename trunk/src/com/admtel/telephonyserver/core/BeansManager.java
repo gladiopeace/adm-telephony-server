@@ -55,8 +55,11 @@ public class BeansManager implements DefinitionChangeListener, Loadable{
 	}
 
 	@Override
-	public void definitionRemoved(DefinitionInterface definition) {
-		beanDefinitions.remove(definition.getId());
+	public void definitionRemoved(DefinitionInterface definition) {		
+		BeanDefinition beanDefinition = beanDefinitions.remove(definition.getId());
+		if (beanDefinition != null){
+			beanRemove(beanDefinition.getId());
+		}
 	}
 
 	@Override
@@ -72,6 +75,28 @@ public class BeansManager implements DefinitionChangeListener, Loadable{
 		load();		
 	}
 
+	private void beanDeinit(Object bean){
+		if (bean != null){
+		try {
+			Method m = bean.getClass().getMethod("deinit");
+			if (m != null) {
+				m.invoke(bean);
+			}
+
+		} catch (Exception e) {
+			log.warn(e.getMessage(), e);
+		}
+		}
+		
+	}
+	private void beanRemove(String id){
+		Object bean = beans.remove(id);
+		beanDeinit(bean);
+	}
+	private void beanAdd(String id, Object obj){
+		Object previousBean = beans.put(id, obj);
+		beanDeinit(previousBean);
+	}
 	@Override
 	public void load() {
 		for (BeanDefinition beanDefinition : beanDefinitions.values()) {
@@ -82,7 +107,7 @@ public class BeansManager implements DefinitionChangeListener, Loadable{
 			if (obj != null) {
 				log.trace(String.format("Loaded bean (%s) using class(%s)",
 						beanDefinition.getId(), beanDefinition.getClassName()));
-				beans.put(beanDefinition.getId(), obj);
+				beanAdd(beanDefinition.getId(), obj);
 			}
 			else{
 				log.error(String.format("Failed to load bean (%s) using class(%s)",
