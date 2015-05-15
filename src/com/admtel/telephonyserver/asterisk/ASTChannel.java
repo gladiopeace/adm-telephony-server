@@ -335,6 +335,15 @@ public class ASTChannel extends Channel {
 
 			}
 				break;
+			case VarSet:{
+				ASTVarSetEvent vse = (ASTVarSetEvent) astEvent;
+				if (vse.getName().equals("SIPURI")){
+					UriRecord uri = SipParser.parseUri(vse.getValue());
+					getChannelData().setSipIP(uri.host);
+					getChannelData().setSipPort(uri.port);
+				}
+			}
+			break;
 			}
 		}
 
