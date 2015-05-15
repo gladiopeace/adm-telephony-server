@@ -58,7 +58,7 @@ class ASTConfiguratorServlet extends AdmServlet{
 				String accountCode = ipListDAO.accountCode(host)
 				if (accountCode) {
 					response.appendBody("name=$host&&defaultuser=$host&&context=internal&host=$host&insecure=port"+
-						"&type=peer&accountcode=${accountCode}&transport=tcp,udp&canreinvite=no\n\n")
+						"&type=peer&accountcode=byip&transport=tcp,udp&canreinvite=no\n\n")
 				}
 			}
 		}

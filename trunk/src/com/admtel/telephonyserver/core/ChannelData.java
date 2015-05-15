@@ -18,6 +18,8 @@ public class ChannelData extends VariableMap {
 	private static final String DIALED_CHANNEL = "DIALED_CHANNEL";
 	private static final String DIALED_NUMBER = "DIALED_NUMBER";
 	private static final String DIALED_IP = "DIALED_IP";
+	private static final String SIP_IP = "SIP_IP";
+	private static final String SIP_PORT = "SIP_PORT";
 	
 	public void setDialedChannel(String dialedChannel){
 		addVariable(DIALED_CHANNEL, dialedChannel);
@@ -96,5 +98,26 @@ public class ChannelData extends VariableMap {
 	}
 	public String getDestinationNumberIn() {
 		return getVariable(DESTINATION_NUMBER_IN);
+	}
+	
+	public void setSipIP(String ip){
+		addVariable(SIP_IP, ip);
+	}
+	public String getSipIP(){
+		return getVariable(SIP_IP);
+	}
+	public void setSipPort(int port){
+		addVariable(SIP_PORT, Integer.toString(port));
+	}
+	public int getSipPort(){
+		int result = 5060;
+		try
+		{
+			result = Integer.parseInt(getVariable(SIP_PORT));
+		}
+		catch (Exception e){
+			
+		}
+		return result;
 	}
 }
