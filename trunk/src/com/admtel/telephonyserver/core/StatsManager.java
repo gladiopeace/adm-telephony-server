@@ -3,30 +3,31 @@ package com.admtel.telephonyserver.core;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.admtel.telephonyserver.core.Timers.Timer;
 import com.admtel.telephonyserver.events.ChannelEvent;
-
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.interfaces.EventListener;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
 import com.admtel.telephonyserver.utils.LimitedQueue;
+import com.google.common.collect.EvictingQueue;
 
 public class StatsManager implements EventListener, TimerNotifiable {
 
-	private static final long UPDATE_INTERVAL = 60000L; // in ms
-	private static final int MAX_CALLS_FOR_CALCULATOR = 6000;
+	private static final int UPDATE_INTERVAL = 20; // in ms
 	private static final int MAX_CPS_RESULTS = 3;
 
-	LimitedQueue<Date> channelsEventTime = new LimitedQueue<Date>(MAX_CALLS_FOR_CALCULATOR);
-	LimitedQueue<Double> cps = new LimitedQueue<Double>(MAX_CPS_RESULTS);
+	EvictingQueue<Double> cps = EvictingQueue.create(MAX_CPS_RESULTS);
+	long currentCalls = 0;
 
 	Timer cpsCalculatorTimer;
 
 	private StatsManager() {
 		EventsManager.getInstance().addEventListener("STATS_MANAGER", this);
-		cpsCalculatorTimer = Timers.getInstance().startTimer(this, UPDATE_INTERVAL , false, null);
+		cpsCalculatorTimer = Timers.getInstance().startTimer(this, UPDATE_INTERVAL * 1000L , false, null);
 	}
 
 	private static class SingletonHolder {
@@ -37,11 +38,9 @@ public class StatsManager implements EventListener, TimerNotifiable {
 		return SingletonHolder.instance;
 	}
 
-	private void addChannel(Channel channel) {
+	synchronized private void addChannel(Channel channel) {
 		if (channel.getCallOrigin() == CallOrigin.Inbound) {
-			synchronized (channelsEventTime) {
-				this.channelsEventTime.add(new Date());
-			}
+				currentCalls ++;
 		}
 	}
 
@@ -59,61 +58,26 @@ public class StatsManager implements EventListener, TimerNotifiable {
 		return false;
 	}
 
-	private double calculateCPS() {
-		synchronized (channelsEventTime) {
-			BigDecimal result = BigDecimal.ZERO;
-			if (channelsEventTime.size() > 0) {
-				Date firstEvent = this.channelsEventTime.get(0);
-				Date now = new Date();
-				if (firstEvent != null) {
-					long diff = (now.getTime() - firstEvent.getTime()) / 1000;
-
-					if (diff != 0) {
-						result = new BigDecimal(channelsEventTime.size() / (double) diff);
-						result = result.setScale(2, BigDecimal.ROUND_HALF_UP);
-					}
-				}
-			}
-			
-			return result.doubleValue();
-		}
-	}
-
 	@Override
 	public boolean onTimer(Object data) {
 		// Must be the cps calculator timer
 
-		// Remove old calls
-		synchronized (channelsEventTime) {
-			Long now = new Date().getTime();
-			boolean remove = false;
-			do {
-				if (channelsEventTime.size() > 0) {
-					Date d = channelsEventTime.getFirst();
-					remove = (d != null && (now - d.getTime()) > UPDATE_INTERVAL);
-					if (remove) {
-						channelsEventTime.removeFirst();
-					}
-				}
-				else {
-					remove = false;
-				}
-			} while (remove);
-		}
-		
-		double cps = calculateCPS();
+		Double cps = (double)currentCalls / UPDATE_INTERVAL; 
 		this.cps.add(cps);
+		currentCalls = 0;
 		return false;
 	}
 
 	public List<Double> getCPS() {
 		List<Double> result = new ArrayList<Double>();
-		for (int i = MAX_CPS_RESULTS - 1; i >= 0; i--) {
-			if (cps.size() < i + 1) {
-				result.add(0.0);
-			} else {
-				result.add(cps.get(i));
-			}
+		Iterator<Double> it = cps.iterator();
+		int counter = 0;
+		while (it.hasNext()){
+			result.add(it.next());
+			counter++;
+		}
+		for (int i=counter;i<MAX_CPS_RESULTS;i++){
+			result.add(i, 0.0);
 		}
 		return result;
 	}
