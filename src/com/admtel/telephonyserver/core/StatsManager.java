@@ -7,20 +7,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.commons.collections.buffer.CircularFifoBuffer;
+
 import com.admtel.telephonyserver.core.Timers.Timer;
 import com.admtel.telephonyserver.events.ChannelEvent;
 import com.admtel.telephonyserver.events.Event;
 import com.admtel.telephonyserver.interfaces.EventListener;
 import com.admtel.telephonyserver.interfaces.TimerNotifiable;
-import com.admtel.telephonyserver.utils.LimitedQueue;
-import com.google.common.collect.EvictingQueue;
 
 public class StatsManager implements EventListener, TimerNotifiable {
 
 	private static final int UPDATE_INTERVAL = 20; // in ms
 	private static final int MAX_CPS_RESULTS = 3;
 
-	EvictingQueue<Double> cps = EvictingQueue.create(MAX_CPS_RESULTS);
+	//EvictingQueue<Double> cps = EvictingQueue.create(MAX_CPS_RESULTS);
+	CircularFifoBuffer cps = new CircularFifoBuffer(MAX_CPS_RESULTS);  
 	AtomicLong currentCalls = new AtomicLong(0);
 
 	Timer cpsCalculatorTimer;
