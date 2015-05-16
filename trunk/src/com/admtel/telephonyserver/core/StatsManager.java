@@ -21,13 +21,14 @@ public class StatsManager implements EventListener, TimerNotifiable {
 	private static final int MAX_CPS_RESULTS = 3;
 
 	EvictingQueue<Double> cps = EvictingQueue.create(MAX_CPS_RESULTS);
-	long currentCalls = 0;
+	AtomicLong currentCalls = new AtomicLong(0);
 
 	Timer cpsCalculatorTimer;
 
 	private StatsManager() {
 		EventsManager.getInstance().addEventListener("STATS_MANAGER", this);
-		cpsCalculatorTimer = Timers.getInstance().startTimer(this, UPDATE_INTERVAL * 1000L , false, null);
+		cpsCalculatorTimer = Timers.getInstance().startTimer(this,
+				UPDATE_INTERVAL * 1000L, false, null);
 	}
 
 	private static class SingletonHolder {
@@ -38,19 +39,16 @@ public class StatsManager implements EventListener, TimerNotifiable {
 		return SingletonHolder.instance;
 	}
 
-	synchronized private void addChannel(Channel channel) {
-		if (channel.getCallOrigin() == CallOrigin.Inbound) {
-				currentCalls ++;
-		}
-	}
-
 	@Override
 	public boolean onEvent(Event event) {
 		switch (event.getEventType()) {
-		//case Alerting:
+		// case Alerting:
 		case Offered:
 			ChannelEvent ce = (ChannelEvent) event;
-			addChannel(ce.getChannel());
+
+			if (ce.getChannel().getCallOrigin() == CallOrigin.Inbound) {
+				currentCalls.incrementAndGet();
+			}
 
 			break;
 		}
@@ -62,21 +60,26 @@ public class StatsManager implements EventListener, TimerNotifiable {
 	public boolean onTimer(Object data) {
 		// Must be the cps calculator timer
 
-		Double cps = (double)currentCalls / UPDATE_INTERVAL; 
-		this.cps.add(cps);
-		currentCalls = 0;
+		Double cps = (double) currentCalls.get() / UPDATE_INTERVAL;
+		synchronized (cps) {
+			this.cps.add(cps);
+		}
+		currentCalls.set(0);
+		;
 		return false;
 	}
 
 	public List<Double> getCPS() {
 		List<Double> result = new ArrayList<Double>();
-		Iterator<Double> it = cps.iterator();
 		int counter = 0;
-		while (it.hasNext()){
-			result.add(it.next());
-			counter++;
+		synchronized (cps) {
+			Iterator<Double> it = cps.iterator();			
+			while (it.hasNext()) {
+				result.add(it.next());
+				counter++;
+			}
 		}
-		for (int i=counter;i<MAX_CPS_RESULTS;i++){
+		for (int i = counter; i < MAX_CPS_RESULTS; i++) {
 			result.add(i, 0.0);
 		}
 		return result;
